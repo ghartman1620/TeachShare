@@ -9,6 +9,10 @@
   <meta charset="utf-8">
 
   <title>Home</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 
 {% endblock %}
 
@@ -19,6 +23,57 @@
 {% block body %}
 
 <h1>Home</h1>
+
+<!-- Carousel -->
+<div class="container">
+	<section>
+		<div class="carousel slide" id="carousel" data-ride="carousel">
+				<ol class="carousel-indicators">
+					<li data-target="#carousel" data-slide-to="0" class="active"></li>
+					<li data-target="#carousel" data-slide-to="1"></li>
+					<li data-target="#carousel" data-slide-to="2"></li>
+				</ol>
+				
+				<!-- Items -->
+				<div class="carousel-inner">
+
+					<div class="item active">
+						<img src="http://jonvilma.com/images/apple-16.jpg" alt="Stock 1">
+						<div class="container">
+							<div class="carousel-caption">
+								<h1>About Us</h1>
+								<p class="lead">
+									"Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit."
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="item">
+		  				<img src="http://desiredelivered.com/wp-content/uploads/2016/02/green_apple.jpg" alt="Stock 2">
+		  			</div>
+
+		  			<div class="item">
+		  				<img src="http://sites.psu.edu/siowfa15/wp-content/uploads/sites/29639/2015/09/04_Apples.jpg" alt="Stock 3">
+		  			</div>
+
+				</div> <!-- End Carousel inner -->
+			<a href="#carousel" class="left carousel-control" data-slide="prev">
+		  		<span class="glyphicon glyphicon-chevron-left"></span>
+		  	</a>
+		  	<a href="#carousel" class="right carousel-control" data-slide="next">
+		  		<span class="glyphicon glyphicon-chevron-right"></span>
+		  	</a>
+		</div> <!-- End Carousel -->
+
+	</section>
+</div>
+
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
 {% endblock %}
 </body>
+
 </html>
