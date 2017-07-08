@@ -5,11 +5,17 @@
   margin: auto;
 }
 
-#sulogin {  
+#container{
+margin-top: 1px;
+overflow: hidden;
+}
+
+
+#suregister {
    position:relative;
     transition: .5s ease;
-    left: 1100px;
-    right: -420px;
+    margin-right: 20%;
+    float= right
     font-family: "Roboto", sans-serif;
     text-transform: uppercase;
     outline: 0;
@@ -21,8 +27,31 @@
     font-size: 14px;
     -webkit-transition: all 0.3 ease;
     transition: all 0.3 ease;
+    display: inline-block;
     cursor: pointer;
 }
+
+
+#sulogin {  
+   position:relative;
+    transition: .5s ease;
+    margin-left: 49.5%;
+    float= left
+    font-family: "Roboto", sans-serif;
+    text-transform: uppercase;
+    outline: 0;
+    background: #4CAF50;
+    width: 15%;
+    border: 0;
+    padding: 10px;
+    color: #FFFFFF;
+    font-size: 14px;
+    -webkit-transition: all 0.3 ease;
+    transition: all 0.3 ease;
+    display: inline-block;
+    cursor: pointer;
+}
+
 
 
 .form {
