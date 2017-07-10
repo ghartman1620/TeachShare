@@ -19,6 +19,20 @@
     background: #295B2F;
 }
 
+.overlay { 
+  color:#fff;
+  position:absolute;
+  z-index:12;
+  top:50%;
+  left:0;
+  width:100%;
+  text-align:center;
+}
+
+.carousel-inner > .item > img {
+    margin: 0 auto;
+}
+
 body {
   background: #FCF4E3
     ; /* fallback for old browsers */
