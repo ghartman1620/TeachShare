@@ -5,21 +5,22 @@
     letter-spacing: 1px;
     text-transform: uppercase;
 }
- 
+
 .btn:focus, .btn:active:focus, .btn.active:focus {
     outline: 0 none;
 }
- 
+
 .btn-primary {
     background: #41924B;
     color: #ffffff;
 }
- 
+
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
     background: #295B2F;
 }
 
-.overlay { 
+
+.overlay {
   color:#fff;
   position:absolute;
   z-index:12;
@@ -42,5 +43,5 @@ body {
   background: linear-gradient(to left, #76b852, #8DC26F);
   font-family: "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;      
+  -moz-osx-font-smoothing: grayscale;
 }
