@@ -18,8 +18,9 @@ overflow: hidden;
     float= right
     font-family: "Roboto", sans-serif;
     text-transform: uppercase;
+	text-align: center;
     outline: 0;
-    background: #4CAF50;
+    background: #41924B;
     width: 15%;
     border: 0;
     padding: 10px;
@@ -39,8 +40,9 @@ overflow: hidden;
     float= left
     font-family: "Roboto", sans-serif;
     text-transform: uppercase;
+	text-align: center;
     outline: 0;
-    background: #4CAF50;
+    background: #41924B;
     width: 15%;
     border: 0;
     padding: 10px;
@@ -78,11 +80,12 @@ overflow: hidden;
 .form button {
   font-family: "Times", sans-serif;
   text-transform: uppercase;
-  outline: 0;
-  background: #4CAF50;
+  text-align: center;
+  outline: 0 none;
+  background: #41924B;
   width: 100%;
   border: 0;
-  padding: 15px;
+  padding: 14px;
   color: #FFFFFF;
   font-size: 14px;
   -webkit-transition: all 0.3 ease;
