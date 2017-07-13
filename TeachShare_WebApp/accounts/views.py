@@ -26,13 +26,16 @@ def login(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                return HttpResponseRedirect(reverse('account:home'))
+                return HttpResponseRedirect(reverse('account:profile'))
             else:
                 return HttpResponse("Inactive user.")
   
 
-    return render(request, "accounts/home.html", {})
+    return render(request, "accounts/profile.html", {})
 
+def profile(request):
+	args = {'user': request.user}
+	return render(request,'accounts/profile.html',args)
 
 
 
