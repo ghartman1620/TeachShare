@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from django.contrib.auth import authenticate, login
 
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
@@ -13,8 +14,31 @@ def home(request):
 	args = {'myName': name, 'numbers': numbers }
 	return render(request,'accounts/home.html',args)
 	
+#def login(request):
+#	return render(request, 'accounts/login.html',None)
+
 def login(request):
-	return render(request, 'accounts/login.html',None)
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return HttpResponseRedirect(reverse('account:home'))
+            else:
+                return HttpResponse("Inactive user.")
+  
+
+    return render(request, "accounts/home.html", {})
+
+
+
+
+
+
+
 
 def signup(request):
 	return render(request, 'accounts/signup.html',None)
