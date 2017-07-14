@@ -16,6 +16,10 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 <div class="container">
+{% load static %}
+<a href="/account/">
+  <img src="{% static "accounts/tslogo.png" %}" alt="TSLogo"/>
+</a>
 <a href="/account/login" button type="button" class="btn btn-primary btn-lg pull-right" id="right-panel-link" href="#right-panel">Log In</button></a>
 <div class="col-xs-12" style="height:20px;"></div>
 </div>
