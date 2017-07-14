@@ -34,6 +34,13 @@
     margin: 0 auto;
 }
 
+
+.carousel-inner > .item{
+    margin: 0 auto;
+    max-height: 600px;
+}
+
+
 body {
   background: #FCF4E3
     ; /* fallback for old browsers */

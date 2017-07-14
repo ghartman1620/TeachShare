@@ -1,39 +1,50 @@
 <html lang="en">
+
 <head>
 {% load static %}
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-<link rel="stylesheet" href={% static 'accounts/home.css'%} type = "text/css">
-  <meta charset="utf-8">
+<link rel="stylesheet" href={% static 'accounts/home.css'%} type = "text/css"> 
+<meta charset="utf-8">
 
   <title>Home</title>
+
+<style>
+
+	.carousel-caption {
+		top: 50%;
+		text-align: center;
+		transform: translateY(-50%);
+	}
+
+	#logo {
+      	height: 60px;
+	}
+
+</style>
+<!-- Tab icon -->
+<link rel="icon" type="image/png" href="/static/img/icon.png">
 </head>
 
 <body>
 {% block body %}
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
 <div class="container">
-{% load static %}
-<a href="/account/">
-  <img src="{% static "accounts/tslogo.png" %}" alt="TSLogo"/>
-</a>
-<a href="/account/login" button type="button" class="btn btn-primary btn-lg pull-right" id="right-panel-link" href="#right-panel">Log In</button></a>
-<div class="col-xs-12" style="height:20px;"></div>
+	<div class="row">
+		<!-- Logo -->
+		<div class="col-xs-6">
+			<a href="/account/"><img alt="TeachShare Logo" src="/static/img/whitelogo.png" id="logo"></a>
+		</div>
+		<!-- Login Button -->
+		<div class="col-xs-6" style="height:20px;">
+			<a href="/account/login" button type="button" class="btn btn-primary btn-lg pull-right" id="right-panel-link" href="#right-panel">Log In</button></a>
+		</div>
+	</div>
 </div>
 
 
-<!-- Carousel -->
+<!-- Carousel
+===================================================== -->
 <div class="container">
-	<section>
-		<div class="overlay">
-			<h1>ABOUT US</h1>
-			<p class="lead">
-			"We really like apples!"
-			</p>
-		</div>
 		<div class="carousel slide" id="carousel" data-ride="carousel">
 				<ol class="carousel-indicators">
 					<li data-target="#carousel" data-slide-to="0" class="active"></li>
@@ -43,21 +54,37 @@
 
 				<!-- Items -->
 				<div class="carousel-inner">
-
 					<div class="item active">
-						<img src="http://jonvilma.com/images/apple-16.jpg" alt="Stock 1">
+						<img src="/static/img/stock1.jpg" alt="Stock 1">
 						<div class="container">
 							<div class="carousel-caption">
+								<h1>Lesson planning is now easier than ever</h1>
+								<p class="lead">Post your projects and share your ideas with the world.</p>
+								<!--<a class="btn btn-large btn-primary" href="#">Sign up today</a>-->
 							</div>
 						</div>
 					</div>
 
 					<div class="item">
-		  				<img src="http://desiredelivered.com/wp-content/uploads/2016/02/green_apple.jpg" alt="Stock 2">
+		  				<img src="/static/img/stock2.jpg" alt="Stock 2">
+		  				<div class="container">
+				            <div class="carousel-caption">
+				             	<h1>Simple and easy to use</h1>
+				             	<p class="lead">Plan your lessons from anywhere at any time.</p>
+				             	<!--<a class="btn btn-large btn-primary" href="#">Learn more</a>-->
+				            </div>
+				        </div>
 		  			</div>
 
 		  			<div class="item">
-		  				<img src="http://sites.psu.edu/siowfa15/wp-content/uploads/sites/29639/2015/09/04_Apples.jpg" alt="Stock 3">
+		  				<img src="/static/img/stock3.jpg" alt="Stock 3">
+		  				 <div class="container">
+				            <div class="carousel-caption">
+				            	<h1>Let your ideas take shape</h1>
+					             <p class="lead">Collaborate and get inspiration from many other teachers.</p>
+					             <!--<a class="btn btn-large btn-primary" href="#">Browse gallery</a>-->
+				            </div>
+				        </div>
 		  			</div>
 
 				</div> <!-- End Carousel inner -->
@@ -68,8 +95,6 @@
 		  		<span class="glyphicon glyphicon-chevron-right"></span>
 		  	</a>
 		</div> <!-- End Carousel -->
-
-	</section>
 </div>
 
 <div class="col-xs-12" style="height:50px;"></div>
@@ -87,6 +112,9 @@
 </div>
 
 <div class="col-xs-12" style="height:50px;"></div>
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 {% endblock %}
 </body>
 

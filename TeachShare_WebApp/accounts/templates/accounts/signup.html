@@ -6,15 +6,19 @@
         <a href="/account/" <button id="suregister"> Home </button></a>
         <a href="/account/login" <button id="sulogin"> Login </button></a>
 </div>
+<!-- Tab icon -->
+<link rel="icon" type="image/png" href="/static/img/icon.png">
 </head>
-
-<div class="login-page">
-  <div class="form">
-      <input type="text" placeholder="user name"/>
-      <input type="text" placeholder="email address"/>
-      <input type="password" placeholder="password"/>
-      <input type="confirm password" placeholder="confirm password">
-      <button>create</button>
-  </div>
-</div>
+<form action="{% url 'account:register' %}" method="post">
+{% csrf_token %}
+	<div class="login-page">
+		<div class="form">
+			<input type="text" placeholder="user name" name="username"/>
+			<input type="text" placeholder="email address" name="email"/>
+			<input type="password" placeholder="password" name = "pw"/>
+			<input type="password" placeholder="confirm password" name = "pwConfirm"/>
+			<input type="submit" value="Register" />
+		</div>
+	</div>
+</form>
 

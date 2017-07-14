@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pofile</title>
+{% load static %}
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href={% static 'accounts/home.css'%} type = "text/css">
+  <meta charset="utf-8">
+
+<!-- Tab icon -->
+<link rel="icon" type="image/png" href="/static/img/icon.png">
+</head>
+<body>
+<div class="container">
+<a href='/account/' button type="button" class="btn btn-primary btn-lg pull-right" id="right-panel-link" href="#right-panel">Home</button></a>
+<div class="col-xs-12" style="height:20px;"></div>
+</div>
+
+<div class = "container"> 
+<h1> Profile </h1>
+<p>Username:{{user}}</p>
+<p>First name:{{user.first_name}}</p>
+<p>Last name:{{user.last_name}}</p>
+<p>email:{{user.email}}</p>
+</div>
+
+<div class="col-xs-12" style="height:50px;"></div>
+
+<div class="col-lg-12">
+    <div class="row">
+        <div class="col-xs-4">
+        </div>
+        <div class="col-xs-4">
+            <a href='/account/profile/edit'  button type="button" class="btn btn-primary btn-lg btn-block">Edit</button></a>
+        </div>
+        <div class="col-xs-4">
+        </div>
+    </div>
+</div>
+
+<div class="col-xs-12" style="height:50px;"></div>
+
+
+
+
+
+
+
+<div class="col-xs-12" style="height:50px;"></div>
+
+<div class="col-lg-12">
+    <div class="row">
+        <div class="col-xs-4">
+        </div>
+        <div class="col-xs-4">
+            <a href='/account/'  button type="button" class="btn btn-primary btn-lg btn-block">Logout</button></a>
+        </div>
+        <div class="col-xs-4">
+        </div>
+    </div>
+</div>
+
+<div class="col-xs-12" style="height:50px;"></div>
+
+
+
+
+</body>
+</html>
