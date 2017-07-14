@@ -1,4 +1,6 @@
 
+
+
 .login-page {
   width: 360px;
   padding: 8% 0 0;
@@ -10,7 +12,6 @@ margin-top: 1px;
 overflow: hidden;
 }
 
-
 #suregister {
    position:relative;
     transition: .5s ease;
@@ -18,7 +19,7 @@ overflow: hidden;
     float= right
     font-family: "Roboto", sans-serif;
     text-transform: uppercase;
-	text-align: center;
+  text-align: center;
     outline: 0;
     background: #41924B;
     width: 15%;
@@ -40,7 +41,7 @@ overflow: hidden;
     float= left
     font-family: "Roboto", sans-serif;
     text-transform: uppercase;
-	text-align: center;
+  text-align: center;
     outline: 0;
     background: #41924B;
     width: 15%;
