@@ -10,9 +10,12 @@ def home(request):
 	numbers = [1,2,3,4,5,6]
 	args = {'myName': name, 'numbers': numbers }
 	return render(request,'accounts/home.html',args)
-	
+
 def login(request):
 	return render(request, 'accounts/login.html',None)
 
 def signup(request):
 	return render(request, 'accounts/signup.html',None)
+
+def dashboard(request):
+	return render(request, 'accounts/dashboard.html',None)
