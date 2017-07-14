@@ -10,6 +10,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* navbar */
 .navbar {
-  min-height:100px !important
+  min-height:100px !important;
+}
+
+/*buttons on navbar*/
+
+.nav-navitems {
+  text-align: center;
+  padding-top: 30px;
+}
+
+/*search bar on naavbar */
+.nav-searchpad {
+  text-align: center;
+  padding-top: 30px;
 }
