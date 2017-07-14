@@ -2,10 +2,13 @@
 from __future__ import unicode_literals
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import login as auth_login
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect, redirect
 from django.urls import reverse
 from django.template import loader
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserChangeForm 
+from accounts.forms import EditProfileForm
+
 
 # Create your views here.
 def home(request):
@@ -41,11 +44,21 @@ def logout(request):
     return HttpResponseRedirect('account:home')
 
 
-def profile(request):
+def view_profile(request):
 	args = {'user': request.user}
 	return render(request,'accounts/profile.html',args)
 
+def edit_profile(request):
+	if request.method == 'POST':
+	   form = EditProfileForm(request.POST, instance=request.user)
 
+	   if form.is_valid():
+	   	form.save()
+	   	return redirect('/account/profile')
+	else:
+		form = EditProfileForm(instance=request.user)
+		args = {'form': form}
+		return render(request, 'accounts/edit_profile.html',args)
 
 
 
