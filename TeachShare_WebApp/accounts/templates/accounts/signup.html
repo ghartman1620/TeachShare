@@ -6,6 +6,8 @@
         <a href="/account/" <button id="suregister"> Home </button></a>
         <a href="/account/login" <button id="sulogin"> Login </button></a>
 </div>
+<!-- Tab icon -->
+<link rel="icon" type="image/png" href="/static/img/icon.png">
 </head>
 <form action="{% url 'account:register' %}" method="post">
 {% csrf_token %}
