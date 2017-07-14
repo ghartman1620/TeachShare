@@ -17,7 +17,7 @@
 		transform: translateY(-50%);
 	}
 
-	.brand>img {
+	#logo {
       	height: 60px;
 	}
 
@@ -26,25 +26,20 @@
 <link rel="icon" type="image/png" href="/static/img/icon.png">
 </head>
 
-
 <body>
 {% block body %}
 <div class="container">
 	<div class="row">
-	 <div class="col-xs-6"><div class="brand"><img href="/account/" src="/static/img/logo.png"></div></div>
-	<!-- Navbar -->
-	<!--
-	<div class="row">
-			<a href="/account/"><img src="/static/img/logo.png"></a>
-		<div class="col-xs-6" ></div>-->
-	 <!-- ./Navbar -->
-
-	<!-- Login Button -->
-	
+		<!-- Logo -->
+		<div class="col-xs-6">
+			<a href="/account/"><img alt="logo" src="/static/img/logo.png" id="logo"></a>
+		</div>
+		<!-- Login Button -->
 		<div class="col-xs-6" style="height:20px;">
-		<a href="/account/login" button type="button" class="btn btn-primary btn-lg pull-right" id="right-panel-link" href="#right-panel">Log In</button></a></div>
+			<a href="/account/login" button type="button" class="btn btn-primary btn-lg pull-right" id="right-panel-link" href="#right-panel">Log In</button></a>
+		</div>
 	</div>
-</div>	<!-- ./Login Button -->
+</div>
 
 
 <!-- Carousel
