@@ -22,23 +22,23 @@ def home(request):
 
 def login(request):
 
-    next = request.GET.get('next', '/account/profile')
-    if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-        if username is "":
-        	return render(request, 'accounts/loginEmptyFeilds.html',None)
-        if password is "":
-        	return render(request, 'accounts/loginEmptyFeilds.html',None)
-        
-        if user is not None:
-            if user.is_active:
-                auth_login(request, user)
-                return HttpResponseRedirect(next)
-        else:
-            return render(request, 'accounts/loginIncorrect.html',None)
-	return render(request, "accounts/login.html", {'redirect_to': next})
+	next = request.GET.get('next', 'account:view_profile')
+	if request.method == "POST":
+		username = request.POST['username']
+		password = request.POST['password']
+		user = authenticate(username=username, password=password)
+		if username is "":
+			return render(request, 'accounts/loginEmptyFeilds.html',None)
+		if password is "":
+			return render(request, 'accounts/loginEmptyFeilds.html',None)
+		
+		if user is not None:
+			if user.is_active:
+				auth_login(request, user)
+				return HttpResponseRedirect(next)
+		else:
+			return render(request, 'accounts/loginIncorrect.html',None)
+	return render(request, "account:view_profile", None)
 
 
 def logout(request):
