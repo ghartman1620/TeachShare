@@ -62,6 +62,25 @@ def edit_profile(request):
 
 
 
+def password_change(request):
+	try:
+		username = request.POST['username']
+		pwNew = request.POST['pwNew']
+		pwNewC = request.POST['pwNewC']
+	except(KeyError):
+	   return render (request, 'accounts/forgotPasswordEmptyFeilds.html', None)
+	else:
+		try:
+			u = User.objects.get(usernmae= username)
+		except:
+			return render (request, 'accounts/forgotPasswordInValidUser.html', None)
+		if(pwNew != pwNewC):
+			return render (request, 'accounts/forgotPasswordPasswordDoNotMatch.html', None)
+		u.set_password(pwNew)
+		return HttpResponseRedirect(reverse('account:login'))
+
+def password_change_page(request):
+	return render (request, 'accounts/forgotPassword.html', None)
 
 
 def signup(request):
