@@ -15,4 +15,6 @@ urlpatterns = [
 	url(r'^post/$', views.post_list, name='post_list' ),
 	url(r'^dashboard/$', views.dashboard, name='dashboard'),
 	url(r'^detail/(?P<id>\d+)/$', views.post_detail, name='post_detail' ),
+	url(r'^password_change/$', views.password_change, name='password_change'),
+	url(r'^forgotPassword/$', views.password_change_page, name='password_change_page'),
 ]

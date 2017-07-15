@@ -22,21 +22,22 @@ def home(request):
 
 def login(request):
 
-
-	next = request.GET.get('next', '/account/profile')
-	if request.method == "POST":
-		username = request.POST['username']
-		password = request.POST['password']
-		user = authenticate(username=username, password=password)
-
+    next = request.GET.get('next', '/account/profile')
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        if username is "":
+        	return render(request, 'accounts/loginEmptyFeilds.html',None)
+        if password is "":
+        	return render(request, 'accounts/loginEmptyFeilds.html',None)
+        
         if user is not None:
             if user.is_active:
                 auth_login(request, user)
                 return HttpResponseRedirect(next)
         else:
-       		return HttpResponse("You're account is disabled.")
-
-
+            return render(request, 'accounts/loginIncorrect.html',None)
 	return render(request, "accounts/login.html", {'redirect_to': next})
 
 
@@ -61,7 +62,7 @@ def edit_profile(request):
 		args = {'form': form}
 		return render(request, 'accounts/edit_profile.html',args)
 
-def post_list(request):
+#def post_list(request):
 #	if request.user.is_authenticated():
 #		context = {
 	#	'title':"my user list"
@@ -70,13 +71,13 @@ def post_list(request):
 	#	context = {
 	#	'title':"list"
 	#	}
-	queryset = Post.objects.all().order_by("-timestamp")
-	context = {
-		'object_list': queryset,
-		'title': "list"
-		}
+#	queryset = Post.objects.all().order_by("-timestamp")
+#	context = {
+#		'object_list': queryset,
+#		'title': "list"
+#		}
 
-	return render(request,'accounts/post_list.html',context)
+#	return render(request,'accounts/post_list.html',context)
 
 def post_detail(request, id= None):
 	instance = get_object_or_404(Post, id=id)
@@ -85,6 +86,33 @@ def post_detail(request, id= None):
 		"instance": instance,
 	}
 	return render(request,'accounts/post_detail.html',context)
+
+
+def password_change(request):
+	try:
+		username = request.POST['username']
+		pwNew = request.POST['pwNew']
+		pwNewC = request.POST['pwNewC']
+	except(KeyError):
+		return HttpResponse("Something really went wrong. Please contact the admin.")
+	else:
+		if username is "":
+			return render (request, 'accounts/forgotPasswordEmptyFeilds.html', None)
+		if pwNew is "":
+			return render (request, 'accounts/forgotPasswordEmptyFeilds.html', None)
+		if pwNewC is "":
+			return render (request, 'accounts/forgotPasswordEmptyFeilds.html', None)
+		try:
+			u = User.objects.get(usernmae= username)
+		except:
+			return render (request, 'accounts/forgotPasswordInValidUser.html', None)
+		if(pwNew != pwNewC):
+			return render (request, 'accounts/forgotPasswordPasswordDoNotMatch.html', None)
+		u.set_password(pwNew)
+		return HttpResponseRedirect(reverse('account:login'))
+
+def password_change_page(request):
+	return render (request, 'accounts/forgotPassword.html', None)
 
 
 def signup(request):
@@ -98,13 +126,30 @@ def register(request):
 		email = request.POST['email']
 		
 	except(KeyError):
-		return HttpResponse("One or more fields is empty.")
+	   return HttpResponse("Something really went wrong. Please contact the admin.")
 	else:
+		if pw is "":
+			return render (request, 'accounts/signupCPassword.html', None)
+		if pwConfirm is "":
+			return render (request, 'accounts/signupCPassword.html', None)
+		if username is "":
+			return render (request, 'accounts/signupCPassword.html', None)
+		if email is "":
+			return render (request, 'accounts/signupCPassword.html', None)
+			if '@' not in email:
+				return render (request, 'accounts/Email2.html', None)
+			if '.com' not in email:
+				return render (request, 'accounts/Email2.html', None)
+
 		if(pw != pwConfirm):
-			return HttpResponse("Password and confirm password do not match.")
-		user = User.objects.create_user(username, email, pw)
-		return HttpResponseRedirect(reverse('account:home'))
-		
+			return HttpResponse(reverse("accounts/signupPasswordMatch.html"))
+		try:
+			user = User.objects.create_user(username, email, pw)
+		except:
+			return HttpResponse("Something really went wrong. Please contact the admin.")
+		else:
+			return HttpResponseRedirect(reverse('account:home'))
+
 @login_required
 def dashboard(request):
 	return render(request, 'accounts/dashboard.html',{'posts':Post.objects.all()})
