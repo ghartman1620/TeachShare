@@ -38,14 +38,14 @@
   <form>
 
   	<div class="form-group row">
-      <label for="firstname" class="col-sm-2 col-form-label">First name</label>
+      <label for="firstname" class="col-sm-2 col-form-label">First name:</label>
       <div class="col-xs-5">
         <input type="text" class="form-control" placeholder="First name">
       </div>
     </div>
 
     <div class="form-group row">
-      <label for="lastname" class="col-sm-2 col-form-label">Last name</label>
+      <label for="lastname" class="col-sm-2 col-form-label">Last name:</label>
       <div class="col-xs-5">
         <input type="text" class="form-control" placeholder="Last name">
       </div>
@@ -60,13 +60,13 @@
     </div>-->
 
     <div class="form-group row">
-      <label for="inputpassword" class="col-sm-2 col-form-label">Password</label>
+      <label for="inputpassword" class="col-sm-2 col-form-label">Password:</label>
       <div class="col-xs-5">
         <input type="password" class="form-control" placeholder="Password">
       </div>
     </div>
 
-    <!-- Temporary. Need to change to checkbox form for multiple grade levels. -->
+    <!-- Temporary. Need to change to checkbox form for multiple grade levels. 
     <div class="form-group">
       <label for="gradelevel">Grade level currently teaching:</label>
       <select class="form-control" id="sel1">
@@ -85,11 +85,57 @@
         <option>12th Grade</option>
       </select>
     </div>
+    Commented out to test checkbox. -->
+
+    <!-- Grade level(s) form group. -->
+
+    <div class="form-group">
+      <label for="gradelevel">Grade level(s) taught:</label>
+        <div class="checkbox">
+          <label><input type="checkbox" value="">Kindergarten</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="">1st Grade</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="">2nd Grade</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="">3rd Grade</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="">4th Grade</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="">5th Grade</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="">6th Grade</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="">7th Grade</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="">8th Grade</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="">9th Grade</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="">10th Grade</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="">11th Grade</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="">12th Grade</label>
+        </div>
+    </div>
 
     <!-- Ideally should be able to auto-complete based on known school districts. -->
     <!-- Manual input for now. -->
 	<div class="form-group row">
-      <label for="schooldistrict" class="col-sm-2 col-form-label">School district</label>
+      <label for="schooldistrict" class="col-sm-2 col-form-label">School district:</label>
       <div class="col-xs-5">
         <input type="text" class="form-control" placeholder="School district">
       </div>
