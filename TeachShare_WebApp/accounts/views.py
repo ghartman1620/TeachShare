@@ -22,7 +22,6 @@ def home(request):
 
 def login(request):
 
-	next = request.GET.get('next', 'account:view_profile')
 	if request.method == "POST":
 		username = request.POST['username']
 		password = request.POST['password']
@@ -35,10 +34,10 @@ def login(request):
 		if user is not None:
 			if user.is_active:
 				auth_login(request, user)
-				return HttpResponseRedirect(next)
+				return HttpResponseRedirect(reverse('account:view_profile'))
 		else:
 			return render(request, 'accounts/loginIncorrect.html',None)
-	return render(request, "account:view_profile", None)
+	return render(request, "accounts/login.html", None)
 
 
 def logout(request):
