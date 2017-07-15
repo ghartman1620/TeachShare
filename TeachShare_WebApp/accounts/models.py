@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -20,7 +20,7 @@ def create_profile(sender, **kwargs):
 
 
 class Post(models.Model):
-
+	user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
 	title = models.CharField(max_length=100, default='')
 	user = models.CharField(max_length=100, default='')
 	content = models.TextField(default="")

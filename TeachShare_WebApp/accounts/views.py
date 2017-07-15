@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from django.contrib.auth import authenticate, login, logout as auth_logout
 from django.contrib.auth import login as auth_login
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect, redirect
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect, redirect, get_object_or_404
 from django.urls import reverse
 from django.template import loader
 from django.contrib.auth.models import User
@@ -29,12 +29,12 @@ def login(request):
 		password = request.POST['password']
 		user = authenticate(username=username, password=password)
 
-		if user is not None:
-			if user.is_active:
-				auth_login(request, user)
-				return HttpResponseRedirect(next)
-			else:
-				return HttpResponse("You're account is disabled.")
+        if user is not None:
+            if user.is_active:
+                auth_login(request, user)
+                return HttpResponseRedirect(next)
+        else:
+       		return HttpResponse("You're account is disabled.")
 
 
 	return render(request, "accounts/login.html", {'redirect_to': next})
@@ -70,7 +70,7 @@ def post_list(request):
 	#	context = {
 	#	'title':"list"
 	#	}
-	queryset = Post.objects.all()
+	queryset = Post.objects.all().order_by("-timestamp")
 	context = {
 		'object_list': queryset,
 		'title': "list"
@@ -78,6 +78,13 @@ def post_list(request):
 
 	return render(request,'accounts/post_list.html',context)
 
+def post_detail(request, id= None):
+	instance = get_object_or_404(Post, id=id)
+	context = {
+		"title": instance.title,
+		"instance": instance,
+	}
+	return render(request,'accounts/post_detail.html',context)
 
 
 def signup(request):
