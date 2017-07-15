@@ -8,6 +8,7 @@ from django.template import loader
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
 from accounts.forms import EditProfileForm
+from accounts.models import Post
 
 
 # Create your views here.
@@ -60,7 +61,22 @@ def edit_profile(request):
 		args = {'form': form}
 		return render(request, 'accounts/edit_profile.html',args)
 
+def post_list(request):
+#	if request.user.is_authenticated():
+#		context = {
+	#	'title':"my user list"
+	#	}
+	#else:
+	#	context = {
+	#	'title':"list"
+	#	}
+	queryset = Post.objects.all()
+	context = {
+		'object_list': queryset,
+		'title': "list"
+		}
 
+	return render(request,'accounts/post_list.html',context)
 
 
 
