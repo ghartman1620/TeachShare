@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout as auth_logout
 from django.contrib.auth import login as auth_login
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect, redirect
 from django.urls import reverse
 from django.template import loader
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
+from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
+from accounts.models import Post
 
 
 # Create your views here.
@@ -16,32 +18,31 @@ def home(request):
 	numbers = [1,2,3,4,5,6]
 	args = {'myName': name, 'numbers': numbers }
 	return render(request,'accounts/home.html',args)
-	
-#def login(request):
-#	return render(request, 'accounts/login.html',None)
+
+
 def login(request):
 
 
-    next = request.GET.get('next', '/account/profile')
-    if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
+	next = request.GET.get('next', '/account/profile')
+	if request.method == "POST":
+		username = request.POST['username']
+		password = request.POST['password']
+		user = authenticate(username=username, password=password)
 
-        if user is not None:
-            if user.is_active:
-                auth_login(request, user)
-                return HttpResponseRedirect(next)
-            else:
-               return HttpResponse("You're account is disabled.")
+		if user is not None:
+			if user.is_active:
+				auth_login(request, user)
+				return HttpResponseRedirect(next)
+			else:
+				return HttpResponse("You're account is disabled.")
 
 
-    return render(request, "accounts/login.html", {'redirect_to': next})
+	return render(request, "accounts/login.html", {'redirect_to': next})
 
 
 def logout(request):
-    logout(request)
-    return HttpResponseRedirect('account:home')
+	auth_logout(request)
+	return HttpResponseRedirect(reverse('account:home'))
 
 
 def view_profile(request):
@@ -50,17 +51,32 @@ def view_profile(request):
 
 def edit_profile(request):
 	if request.method == 'POST':
-	   form = EditProfileForm(request.POST, instance=request.user)
+		form = EditProfileForm(request.POST, instance=request.user)
 
-	   if form.is_valid():
-	   	form.save()
-	   	return redirect('/account/profile')
+		if form.is_valid():
+			form.save()
+			return redirect('/account/profile')
 	else:
 		form = EditProfileForm(instance=request.user)
 		args = {'form': form}
 		return render(request, 'accounts/edit_profile.html',args)
 
+def post_list(request):
+#	if request.user.is_authenticated():
+#		context = {
+	#	'title':"my user list"
+	#	}
+	#else:
+	#	context = {
+	#	'title':"list"
+	#	}
+	queryset = Post.objects.all()
+	context = {
+		'object_list': queryset,
+		'title': "list"
+		}
 
+	return render(request,'accounts/post_list.html',context)
 
 
 
@@ -75,10 +91,13 @@ def register(request):
 		email = request.POST['email']
 		
 	except(KeyError):
-	   return HttpResponse("One or more fields is empty.")
+		return HttpResponse("One or more fields is empty.")
 	else:
 		if(pw != pwConfirm):
 			return HttpResponse("Password and confirm password do not match.")
 		user = User.objects.create_user(username, email, pw)
 		return HttpResponseRedirect(reverse('account:home'))
 		
+@login_required
+def dashboard(request):
+	return render(request, 'accounts/dashboard.html',{'posts':Post.objects.all()})
