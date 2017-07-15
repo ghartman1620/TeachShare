@@ -24,7 +24,7 @@
 
 
 
-<!-- Django default edit form-->
+<!-- Django default edit form. Should be replaced with Bootstrap forms.-->
 <div class="container"> 
 <form method="post">
 {% csrf_token %}
@@ -131,6 +131,15 @@
           <label><input type="checkbox" value="">12th Grade</label>
         </div>
     </div>
+
+    <!--Subject taught form group. Should have multiple text fields for multiple subjects. Also, should be able to auto-complete. -->
+    <div class="form-group row">
+      <label for="subject" class="col-sm-2 col-form-label">Subject taught:</label>
+      <div class="col-xs-5">
+        <input type="text" class="form-control" placeholder="Subject taught">
+      </div>
+    </div>
+
 
     <!-- Ideally should be able to auto-complete based on known school districts. -->
     <!-- Manual input for now. -->
