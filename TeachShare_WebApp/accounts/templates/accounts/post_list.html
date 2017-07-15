@@ -18,8 +18,9 @@
 </div>
 
 <div class = "container"> 
-<h1> {{ title }} Post </h1>
+<h1> Post </h1>
 {% for obj in object_list %}
+<a href= '/account/detail/{{obj.id}}'>{{obj.title}}</a><br/>
 {{obj.content}}
 {{ obj.updated }}</br>
 {% endfor %}

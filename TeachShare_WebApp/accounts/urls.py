@@ -14,4 +14,5 @@ urlpatterns = [
 	url(r'^profile/edit/$', views.edit_profile, name='edit_profile'),
 	url(r'^post/$', views.post_list, name='post_list' ),
 	url(r'^dashboard/$', views.dashboard, name='dashboard'),
+	url(r'^detail/(?P<id>\d+)/$', views.post_detail, name='post_detail' ),
 ]
