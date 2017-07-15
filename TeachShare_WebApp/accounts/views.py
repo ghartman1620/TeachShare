@@ -20,21 +20,22 @@ def home(request):
 #def login(request):
 #	return render(request, 'accounts/login.html',None)
 def login(request):
-
-
     next = request.GET.get('next', '/account/profile')
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
-
+        if username is "":
+        	return render(request, 'accounts/loginEmptyFeilds.html',None)
+        if password is "":
+        	return render(request, 'accounts/loginEmptyFeilds.html',None)
+        
         if user is not None:
             if user.is_active:
                 auth_login(request, user)
                 return HttpResponseRedirect(next)
-            else:
-               return HttpResponse("You're account is disabled.")
-
+        else:
+            return render(request, 'accounts/loginIncorrect.html',None)
 
     return render(request, "accounts/login.html", {'redirect_to': next})
 
@@ -68,8 +69,14 @@ def password_change(request):
 		pwNew = request.POST['pwNew']
 		pwNewC = request.POST['pwNewC']
 	except(KeyError):
-	   return render (request, 'accounts/forgotPasswordEmptyFeilds.html', None)
+		return HttpResponse("Something really went wrong. Please contact the admin.")
 	else:
+		if username is "":
+			return render (request, 'accounts/forgotPasswordEmptyFeilds.html', None)
+		if pwNew is "":
+			return render (request, 'accounts/forgotPasswordEmptyFeilds.html', None)
+		if pwNewC is "":
+			return render (request, 'accounts/forgotPasswordEmptyFeilds.html', None)
 		try:
 			u = User.objects.get(usernmae= username)
 		except:
@@ -94,10 +101,27 @@ def register(request):
 		email = request.POST['email']
 		
 	except(KeyError):
-	   return HttpResponse("One or more fields is empty.")
+	   return HttpResponse("Something really went wrong. Please contact the admin.")
 	else:
+		if pw is "":
+			return render (request, 'accounts/signupCPassword.html', None)
+		if pwConfirm is "":
+			return render (request, 'accounts/signupCPassword.html', None)
+		if username is "":
+			return render (request, 'accounts/signupCPassword.html', None)
+		if email is "":
+			return render (request, 'accounts/signupCPassword.html', None)
+			if '@' not in email:
+				return render (request, 'accounts/Email2.html', None)
+			if '.com' not in email:
+				return render (request, 'accounts/Email2.html', None)
+
 		if(pw != pwConfirm):
-			return HttpResponse("Password and confirm password do not match.")
-		user = User.objects.create_user(username, email, pw)
-		return HttpResponseRedirect(reverse('account:home'))
+			return HttpResponse(reverse("accounts/signupPasswordMatch.html"))
+		try:
+			user = User.objects.create_user(username, email, pw)
+		except:
+			return HttpResponse("Something really went wrong. Please contact the admin.")
+		else:
+			return HttpResponseRedirect(reverse('account:home'))
 		
