@@ -21,7 +21,8 @@
 <h1> {{ title }} Post </h1>
 {% for obj in object_list %}
 {{obj.content}}
-{{ obj.updated }}</br>
+{{ obj.updated }}
+{{obj.id}}</br>
 {% endfor %}
 </div>
 

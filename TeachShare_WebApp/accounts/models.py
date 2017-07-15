@@ -22,7 +22,8 @@ def create_profile(sender, **kwargs):
 class Post(models.Model):
 
 	title = models.CharField(max_length=100, default='')
-	content = models.TextField()
+	user = models.CharField(max_length=100, default='')
+	content = models.TextField(default="")
 	updated = models.DateTimeField(auto_now=True, auto_now_add=False)
 	timestamp = models.DateTimeField(auto_now=False, auto_now_add= True)
 

@@ -54,5 +54,23 @@
 </nav>
 
 
+{% if posts %}
+	{% for post in posts %}
+		<div class="container">
+			<h2>{{post.title}} <small>{{post.user}}</small></h2>
+			<div class="well">
+				<p>
+					{{post.content}} 
+					<a href="<!--% url 'posts:post' post.id %-->
+								 account/dummyposturl">See more</a>
+				</p>
+			</div>
+			<h4><small>Posted {{post.timestamp}} Updated {{post.updated}}
+			</small></h4>
+		</div> <!-- container -->
+	{% endfor %}
+{% endif %}
+
+
 {% endblock %}
 </body>
