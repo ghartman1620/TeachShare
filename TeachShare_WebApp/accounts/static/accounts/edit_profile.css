@@ -1,3 +1,4 @@
+/* Commented out to make buttons cohesive with Nev's navbar design
 .btn {
     padding: 14px 24px;
     border: 0 none;
@@ -9,7 +10,7 @@
 .btn:focus, .btn:active:focus, .btn.active:focus {
     outline: 0 none;
 }
-
+*/
 .btn-primary {
     background: #41924B;
     color: #ffffff;
@@ -29,4 +30,22 @@ body {
   font-family: "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* navbar */
+.navbar {
+  min-height:100px !important;
+}
+
+/*buttons on navbar*/
+
+.nav-navitems {
+  text-align: center;
+  padding-top: 30px;
+}
+
+/*search bar on naavbar */
+.nav-searchpad {
+  text-align: center;
+  padding-top: 30px;
 }
