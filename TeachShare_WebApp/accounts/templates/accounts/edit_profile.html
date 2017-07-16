@@ -13,6 +13,7 @@
 <title>Profile</title>
 
 {% block body %}
+
 <!-- Navbar -->
 <nav class="navbar navbar-inverse ">
   <div class="container-fluid">
@@ -53,135 +54,161 @@
 </nav>
 
 
-<!-- Django default edit form. Should be replaced with Bootstrap forms.-->
+<!-- TESTING -->
+<!-- Django default edit form. Should be replaced with Bootstrap forms.
 <div class="container"> 
 <form method="post">
 {% csrf_token %}
 {{form.as_p}}
 <button type="submit">Submit</button>
 </div>
-
-<!-- Bootstrap Form (Not functional. Needs to be linked to backend.) -->
+-->
+<!-- Bootstrap Form (Not functional. Needs to be linked to backend.)
 <div class="container">
   <h2>Edit Profile Information</h2>
-  <form>
+  
+-->
+<div class="container">
+<!-- Dynamic Toggleable Form Menu -->
+<ul class="nav nav-tabs">
+  <li class="active"><a data-toggle="tab" href="#home">Edit Profile</a></li>
+  <li><a data-toggle="tab" href="#menu1">Account Settings</a></li>
+  <li><a data-toggle="tab" href="#menu2">Menu 2</a></li>
+</ul>
 
-  	<div class="form-group row">
-      <label for="firstname" class="col-sm-2 col-form-label">First name:</label>
-      <div class="col-xs-5">
-        <input type="text" class="form-control" placeholder="First name">
-      </div>
-    </div>
+<div class="tab-content">
+  <div id="home" class="tab-pane fade in active">
+    <h3>Edit Profile Information</h3>
+    <p><form>
+        <div class="form-group row">
+          <label for="firstname" class="col-sm-2 col-form-label">First name:</label>
+          <div class="col-xs-5">
+            <input type="text" class="form-control" placeholder="First name">
+          </div>
+        </div>
 
-    <div class="form-group row">
-      <label for="lastname" class="col-sm-2 col-form-label">Last name:</label>
-      <div class="col-xs-5">
-        <input type="text" class="form-control" placeholder="Last name">
-      </div>
-    </div>
+        <div class="form-group row">
+          <label for="lastname" class="col-sm-2 col-form-label">Last name:</label>
+          <div class="col-xs-5">
+            <input type="text" class="form-control" placeholder="Last name">
+          </div>
+        </div>
 
-<!--
-    <div class="form-group row">
-      <label for="inputemail" class="col-sm-2 col-form-label">Email address</label>
-      <div class="col-xs-5">
-        <input type="email" class="form-control" placeholder="Email">
-      </div>
-    </div>-->
+        <!-- Temporary. Need to change to checkbox form for multiple grade levels. 
+        <div class="form-group">
+          <label for="gradelevel">Grade level currently teaching:</label>
+          <select class="form-control" id="sel1">
+            <option>Kindergarten</option>
+            <option>1st Grade</option>
+            <option>2nd Grade</option>
+            <option>3rd Grade</option>
+            <option>4th Grade</option>
+            <option>5th Grade</option>
+            <option>6th Grade</option>
+            <option>7th Grade</option>
+            <option>8th Grade</option>
+            <option>9th Grade</option>
+            <option>10th Grade</option>
+            <option>11th Grade</option>
+            <option>12th Grade</option>
+          </select>
+        </div>
+        Commented out to test checkbox. -->
 
-    <div class="form-group row">
-      <label for="inputpassword" class="col-sm-2 col-form-label">Password:</label>
-      <div class="col-xs-5">
-        <input type="password" class="form-control" placeholder="Password">
-      </div>
-    </div>
+        <!-- Grade level(s) form group. -->
 
-    <!-- Temporary. Need to change to checkbox form for multiple grade levels. 
-    <div class="form-group">
-      <label for="gradelevel">Grade level currently teaching:</label>
-      <select class="form-control" id="sel1">
-        <option>Kindergarten</option>
-        <option>1st Grade</option>
-        <option>2nd Grade</option>
-        <option>3rd Grade</option>
-        <option>4th Grade</option>
-        <option>5th Grade</option>
-        <option>6th Grade</option>
-        <option>7th Grade</option>
-        <option>8th Grade</option>
-        <option>9th Grade</option>
-        <option>10th Grade</option>
-        <option>11th Grade</option>
-        <option>12th Grade</option>
-      </select>
-    </div>
-    Commented out to test checkbox. -->
+        <div class="form-group">
+          <label for="gradelevel">Grade level(s) taught:</label>
+            <div class="checkbox">
+              <label><input type="checkbox" value="">Kindergarten</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="">1st Grade</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="">2nd Grade</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="">3rd Grade</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="">4th Grade</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="">5th Grade</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="">6th Grade</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="">7th Grade</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="">8th Grade</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="">9th Grade</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="">10th Grade</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="">11th Grade</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="">12th Grade</label>
+            </div>
+        </div>
 
-    <!-- Grade level(s) form group. -->
+        <!--Subject taught form group. Should have multiple text fields for multiple subjects. Also, should be able to auto-complete. -->
+        <div class="form-group row">
+          <label for="subject" class="col-sm-2 col-form-label">Subject taught:</label>
+          <div class="col-xs-5">
+            <input type="text" class="form-control" placeholder="Subject taught">
+          </div>
+        </div>
 
-    <div class="form-group">
-      <label for="gradelevel">Grade level(s) taught:</label>
-        <div class="checkbox">
-          <label><input type="checkbox" value="">Kindergarten</label>
+        <!-- Ideally should be able to auto-complete based on known school districts. -->
+        <!-- Manual input for now. -->
+      <div class="form-group row">
+          <label for="schooldistrict" class="col-sm-2 col-form-label">School district:</label>
+          <div class="col-xs-5">
+            <input type="text" class="form-control" placeholder="School district">
+          </div>
         </div>
-        <div class="checkbox">
-          <label><input type="checkbox" value="">1st Grade</label>
-        </div>
-        <div class="checkbox">
-          <label><input type="checkbox" value="">2nd Grade</label>
-        </div>
-        <div class="checkbox">
-          <label><input type="checkbox" value="">3rd Grade</label>
-        </div>
-        <div class="checkbox">
-          <label><input type="checkbox" value="">4th Grade</label>
-        </div>
-        <div class="checkbox">
-          <label><input type="checkbox" value="">5th Grade</label>
-        </div>
-        <div class="checkbox">
-          <label><input type="checkbox" value="">6th Grade</label>
-        </div>
-        <div class="checkbox">
-          <label><input type="checkbox" value="">7th Grade</label>
-        </div>
-        <div class="checkbox">
-          <label><input type="checkbox" value="">8th Grade</label>
-        </div>
-        <div class="checkbox">
-          <label><input type="checkbox" value="">9th Grade</label>
-        </div>
-        <div class="checkbox">
-          <label><input type="checkbox" value="">10th Grade</label>
-        </div>
-        <div class="checkbox">
-          <label><input type="checkbox" value="">11th Grade</label>
-        </div>
-        <div class="checkbox">
-          <label><input type="checkbox" value="">12th Grade</label>
-        </div>
-    </div>
 
-    <!--Subject taught form group. Should have multiple text fields for multiple subjects. Also, should be able to auto-complete. -->
-    <div class="form-group row">
-      <label for="subject" class="col-sm-2 col-form-label">Subject taught:</label>
-      <div class="col-xs-5">
-        <input type="text" class="form-control" placeholder="Subject taught">
-      </div>
-    </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
 
+      </form>
+  </p>
+  </div>
+  <div id="menu1" class="tab-pane fade">
+    <h3>Manage Account Settings</h3>
+    <p>
+        <form>
+        <!--
+        <div class="form-group row">
+          <label for="inputemail" class="col-sm-2 col-form-label">Email address</label>
+          <div class="col-xs-5">
+            <input type="email" class="form-control" placeholder="Email">
+          </div>
+        </div>-->
 
-    <!-- Ideally should be able to auto-complete based on known school districts. -->
-    <!-- Manual input for now. -->
-	<div class="form-group row">
-      <label for="schooldistrict" class="col-sm-2 col-form-label">School district:</label>
-      <div class="col-xs-5">
-        <input type="text" class="form-control" placeholder="School district">
-      </div>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Submit</button>
-
-  </form>
-</div><!-- ./End Bootstrap form -->
+        <div class="form-group row">
+          <label for="inputpassword" class="col-sm-2 col-form-label">Password:</label>
+          <div class="col-xs-5">
+            <input type="password" class="form-control" placeholder="Password">
+          </div>
+        </div>
+        </form>
+        </p>
+  </div>
+  <div id="menu2" class="tab-pane fade">
+    <h3>Menu 2</h3>
+    <p>Some content in menu 2.</p>
+  </div>
+</div>
+</div>
+  
 {% endblock %}
 </body>
