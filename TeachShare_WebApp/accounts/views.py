@@ -61,6 +61,18 @@ def edit_profile(request):
 		args = {'form': form}
 		return render(request, 'accounts/edit_profile.html',args)
 
+def post_create(request):
+	if request.method == 'POST':
+		form = EditProfileForm(request.POST, instance=request.user)
+
+		if form.is_valid():
+			form.save()
+			return redirect('/account/profile')
+	else:
+		form = EditProfileForm(instance=request.user)
+		args = {'form': form}
+		return render(request, 'accounts/post_create.html',args)
+
 #def post_list(request):
 #	if request.user.is_authenticated():
 #		context = {
