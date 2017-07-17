@@ -13,6 +13,7 @@ class UserProfile(models.Model):
 	description = models.CharField(max_length=100, default='')
 	phone = models.IntegerField( default=0)
 	city = models.CharField(max_length=100, default='')
+	checkboxStr = models.CharField(max_length=100, default='')
 
 def create_profile(sender, **kwargs):
 	if kwargs['created']:

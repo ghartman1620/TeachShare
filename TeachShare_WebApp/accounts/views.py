@@ -9,8 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
-from accounts.models import Post
-
+from accounts.models import Post, UserProfile
 
 # Create your views here.
 def home(request):
@@ -45,22 +44,41 @@ def logout(request):
 	return HttpResponseRedirect(reverse('account:home'))
 
 
+@login_required(login_url='/account/login')
 def view_profile(request):
 	args = {'user': request.user}
 	return render(request,'accounts/profile.html',args)
 
+@login_required
 def edit_profile(request):
 	if request.method == 'POST':
-		form = EditProfileForm(request.POST, instance=request.user)
+		#Old stuff using django's default form
+		#form = EditProfileForm(request.POST, instance=request.user)
 
-		if form.is_valid():
-			form.save()
-			return redirect('/account/profile')
+		#if form.is_valid():
+		#	form.save()
+		#	return redirect('/account/profile')
+		#new stuff:
+		
+		#this is a method to get the UserProfile object that corresponds to request.user
+		#if there's a better way let me know
+		#searches all UserProfile objects until we find the one with this User
+		#user = request.user
+		#userProfiles = UserProfile.objects.all()
+		
+		#for userProfile in userProfiles:
+		#	if userProfile.user == user:
+		#		thisUserProfile = userProfile
+		#		break
+		#thisUserProfile.checkboxStr = request.POST['K']
+		return HttpResponseRedirect(reverse('account:view_profile'))
 	else:
 		form = EditProfileForm(instance=request.user)
 		args = {'form': form}
 		return render(request, 'accounts/edit_profile.html',args)
 
+		
+@login_required(login_url='/account/login')
 def post_create(request):
 	if request.method == 'POST':
 		form = EditProfileForm(request.POST, instance=request.user)
@@ -73,22 +91,6 @@ def post_create(request):
 		args = {'form': form}
 		return render(request, 'accounts/post_create.html',args)
 
-#def post_list(request):
-#	if request.user.is_authenticated():
-#		context = {
-	#	'title':"my user list"
-	#	}
-	#else:
-	#	context = {
-	#	'title':"list"
-	#	}
-#	queryset = Post.objects.all().order_by("-timestamp")
-#	context = {
-#		'object_list': queryset,
-#		'title': "list"
-#		}
-
-#	return render(request,'accounts/post_list.html',context)
 
 def post_detail(request, id= None):
 	instance = get_object_or_404(Post, id=id)
@@ -153,14 +155,11 @@ def register(request):
 				return render (request, 'accounts/Email2.html', None)
 
 		if(pw != pwConfirm):
-			return HttpResponse(reverse("accounts/signupPasswordMatch.html"))
-		try:
-			user = User.objects.create_user(username, email, pw)
-		except:
-			return HttpResponse("Something really went wrong. Please contact the admin.")
-		else:
-			return HttpResponseRedirect(reverse('account:home'))
+			return render(request, 'accounts/signupPasswordMatch.html', None)
+		user = User.objects.create_user(username, email, pw)
+		userLoggedIn = auth_login(request, authenticate(username=username, password=pw))
+		return HttpResponseRedirect(reverse('account:dashboard'))
 
-@login_required
+@login_required(login_url='/account/login')
 def dashboard(request):
-	return render(request, 'accounts/dashboard.html',{'posts':Post.objects.all()})
+	return render(request, 'accounts/dashboard.html', {'posts' : Post.objects.all()})

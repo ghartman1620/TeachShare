@@ -81,20 +81,22 @@
 
 <div class="tab-content">
   <div id="home" class="tab-pane fade in active">
+	
     <h3>Edit Profile Information</h3>
-    <p><form>
+    <p><form action="{% url 'account:edit_profile' %}" method="post">
+		{% csrf_token %}
         <div class="form-group row">
-          <label for="firstname" class="col-sm-2 col-form-label">First name:</label>
-          <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="First name">
-          </div>
+			<label for="firstname" class="col-sm-2 col-form-label">First name:</label>
+			<div class="col-xs-5">
+				<input type="text" class="form-control" placeholder="First name">
+			</div>
         </div>
 
         <div class="form-group row">
-          <label for="lastname" class="col-sm-2 col-form-label">Last name:</label>
-          <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="Last name">
-          </div>
+			<label for="lastname" class="col-sm-2 col-form-label">Last name:</label>
+			<div class="col-xs-5">
+				<input type="text" class="form-control" placeholder="Last name">
+			</div>
         </div>
 
         <!-- Temporary. Need to change to checkbox form for multiple grade levels. 
@@ -121,45 +123,21 @@
         <!-- Grade level(s) form group. -->
 
         <div class="form-group">
-          <label for="gradelevel">Grade level(s) taught:</label>
+			<label for="gradelevel">Grade level(s) taught:</label>
             <div class="checkbox">
-              <label><input type="checkbox" value="">Kindergarten</label>
-            </div>
-            <div class="checkbox">
-              <label><input type="checkbox" value="">1st Grade</label>
-            </div>
-            <div class="checkbox">
-              <label><input type="checkbox" value="">2nd Grade</label>
-            </div>
-            <div class="checkbox">
-              <label><input type="checkbox" value="">3rd Grade</label>
-            </div>
-            <div class="checkbox">
-              <label><input type="checkbox" value="">4th Grade</label>
-            </div>
-            <div class="checkbox">
-              <label><input type="checkbox" value="">5th Grade</label>
-            </div>
-            <div class="checkbox">
-              <label><input type="checkbox" value="">6th Grade</label>
-            </div>
-            <div class="checkbox">
-              <label><input type="checkbox" value="">7th Grade</label>
-            </div>
-            <div class="checkbox">
-              <label><input type="checkbox" value="">8th Grade</label>
-            </div>
-            <div class="checkbox">
-              <label><input type="checkbox" value="">9th Grade</label>
-            </div>
-            <div class="checkbox">
-              <label><input type="checkbox" value="">10th Grade</label>
-            </div>
-            <div class="checkbox">
-              <label><input type="checkbox" value="">11th Grade</label>
-            </div>
-            <div class="checkbox">
-              <label><input type="checkbox" value="">12th Grade</label>
+				<p><label><input type="checkbox" name="K" value="">Kindergarten</label></p>
+				<p><label><input type="checkbox" name="1" value="">1st Grade</label></p>
+				<p><label><input type="checkbox" name="2"value="">2nd Grade</label></p>
+				<p><label><input type="checkbox" name="3"value="">3rd Grade</label></p>
+				<p><label><input type="checkbox" name="4"value="">4th Grade</label></p>
+				<p><label><input type="checkbox" name="5"value="">5th Grade</label></p>
+				<p><label><input type="checkbox" name="6"value="">6th Grade</label></p>
+				<p><label><input type="checkbox" name="7"value="">7th Grade</label></p>
+				<p><label><input type="checkbox" name="8"value="">8th Grade</label></p>
+				<p><label><input type="checkbox" name="9"value="">9th Grade</label></p>
+				<p><label><input type="checkbox" name="10"value="">10th Grade</label></p>
+				<p><label><input type="checkbox" name="11"value="">11th Grade</label></p>
+				<p><label><input type="checkbox" name="12"value="">12th Grade</label></p>
             </div>
         </div>
 
