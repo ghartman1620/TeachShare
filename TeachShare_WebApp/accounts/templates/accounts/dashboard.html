@@ -63,8 +63,7 @@
 			<div class="well">
 				<p>
 					{{post.content}}
-					<a href="<!--% url 'posts:post' post.id %-->
-								 account/dummyposturl">See more</a>
+					<a href= '/account/detail/{{post.id}}'>See more</a>
 				</p>
 			</div>
 			<h4><small>Posted {{post.timestamp}} Updated {{post.updated}}
