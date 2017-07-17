@@ -116,12 +116,13 @@ def password_change(request):
 		if pwNewC is "":
 			return render (request, 'accounts/forgotPasswordEmptyFeilds.html', None)
 		try:
-			u = User.objects.get(usernmae= username)
+			u = User.objects.get(username= username)
 		except:
 			return render (request, 'accounts/forgotPasswordInValidUser.html', None)
 		if(pwNew != pwNewC):
 			return render (request, 'accounts/forgotPasswordPasswordDoNotMatch.html', None)
 		u.set_password(pwNew)
+		u.save()
 		return HttpResponseRedirect(reverse('account:login'))
 
 def password_change_page(request):
