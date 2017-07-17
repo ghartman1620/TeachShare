@@ -34,7 +34,7 @@ def login(request):
 		if user is not None:
 			if user.is_active:
 				auth_login(request, user)
-				return HttpResponseRedirect(reverse('account:view_profile'))
+				return HttpResponseRedirect(reverse('account:dashboard'))
 		else:
 			return render(request, 'accounts/loginIncorrect.html',None)
 	return render(request, "accounts/login.html", None)

@@ -44,8 +44,8 @@
           <img src="{% static "accounts/applelogo.png" %}" alt="TSLogo"/>
         <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          <li><a href="#">Profile</a></li>
-          <li><a href="#">Settings</a></li>
+          <li><a href="/account/profile/">Profile</a></li>
+          <li><a href="/account/profile/edit/">Settings</a></li>
           <li><a href="/account/">Log Out</a></li>
         </ul>
       </li>
@@ -83,6 +83,18 @@
     </div>
   </div>
 </div>
+
+<!-- Uploading files -->
+  <form class="box" method="post" action="" enctype="multipart/form-data">
+      <div class="box_input">
+        <input class="box_file" type="file" names="files[]" id="file" data-multiple-caption="{count} files selected" multiple/>
+        <label for="file"><strong>Choose a file</strong><span class="box_dragndrop"> or drop it here</span>.</label>
+        <button class="box_button" type="submit">Upload</button>
+      </div>
+      <div class="box_uploading">Uploading&hellip;</div>
+      <div class="box_success">Done!</div>
+      <div class="box_error">Error! <span></span>. </div>
+  </form> <!-- ./End uploading files -->
   
 {% endblock %}
 </body>

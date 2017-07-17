@@ -37,3 +37,10 @@ body {
   text-align: center;
   padding-top: 30px;
 }
+
+.box_dragndrop, 
+.box_uploading,
+.box_success,
+.box_error {
+    display: none;
+}
