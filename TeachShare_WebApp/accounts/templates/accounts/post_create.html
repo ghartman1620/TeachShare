@@ -22,20 +22,14 @@
         <img src="{% static "accounts/tslogo.png" %}" alt="TSLogo"/>
       </a>
     </div>
-  <!-- Search bar -->
-    <form class="navbar-form navbar-left nav-searchpad">
-      <div class="form-group">
-        <input type="text" class="form-control" placeholder="Search">
-      </div>
-      <button type="submit" class="btn btn-default">Submit</button>
-    </form>
-  <!-- Create a Post Button -->
-    <ul class="nav navbar-nav nav-navitems">
-      <li><a href="/account/create/">
-        <p>New Post <span class="glyphicon glyphicon-plus-sign"></span> </p>
-        </a>
-      </li>
-    </ul>
+
+<!-- Create a Post Button -->
+  <ul class="nav navbar-nav nav-navitems">
+    <li><a href="/account/create">
+      <h1>New Post</h1>
+    </a>
+    </li>
+  </ul>
 
   <!-- Dropdown Account Menu -->
     <ul class="nav navbar-nav navbar-right">
@@ -46,7 +40,7 @@
         <ul class="dropdown-menu">
           <li><a href="/account/profile/">Profile</a></li>
           <li><a href="/account/profile/edit/">Settings</a></li>
-          <li><a href="/account/">Log Out</a></li>
+          <li><a href="/account/logout">Log Out</a></li>
         </ul>
       </li>
     </ul>
@@ -78,7 +72,7 @@
   </div>
 
   <div class="form-group">
-    <div class="col-sm-3 pull-right">
+    <div class="col-sm-2 pull-right">
       <input id="submit" name="submit" type="submit" value="Submit" class="btn btn-primary">
     </div>
   </div>
@@ -95,6 +89,6 @@
       <div class="box_success">Done!</div>
       <div class="box_error">Error! <span></span>. </div>
   </form> <!-- ./End uploading files -->
-  
+
 {% endblock %}
 </body>

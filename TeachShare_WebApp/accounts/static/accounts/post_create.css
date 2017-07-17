@@ -2,6 +2,7 @@
 .btn-primary {
     background: #41924B;
     color: #ffffff;
+    border: 0 none;
 }
 
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
@@ -29,7 +30,7 @@ body {
 
 .nav-navitems {
   text-align: center;
-  padding-top: 30px;
+  margin-left: 20%;
 }
 
 /*search bar on naavbar */
@@ -38,7 +39,7 @@ body {
   padding-top: 30px;
 }
 
-.box_dragndrop, 
+.box_dragndrop,
 .box_uploading,
 .box_success,
 .box_error {
