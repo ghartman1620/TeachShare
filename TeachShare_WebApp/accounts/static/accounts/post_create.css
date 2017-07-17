@@ -1,0 +1,39 @@
+
+.btn-primary {
+    background: #41924B;
+    color: #ffffff;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+    background: #295B2F;
+}
+
+body {
+  background: #FCF4E3
+    ; /* fallback for old browsers */
+  background: -webkit-linear-gradient(right, #76b852, #8DC26F);
+  background: -moz-linear-gradient(right, #76b852, #8DC26F);
+  background: -o-linear-gradient(right, #76b852, #8DC26F);
+  background: linear-gradient(to left, #76b852, #8DC26F);
+  font-family: "Roboto", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* navbar */
+.navbar {
+  min-height:100px !important;
+}
+
+/*buttons on navbar*/
+
+.nav-navitems {
+  text-align: center;
+  padding-top: 30px;
+}
+
+/*search bar on naavbar */
+.nav-searchpad {
+  text-align: center;
+  padding-top: 30px;
+}

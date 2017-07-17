@@ -5,11 +5,13 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<link rel="stylesheet" href={% static 'accounts/edit_profile.css'%} type = "text/css">
+<link rel="stylesheet" href={% static 'accounts/post_create.css'%} type = "text/css">
   <meta charset="utf-8">
+<!-- Tab icon -->
+<link rel="icon" type="image/png" href="/static/img/icon.png">
+</head>
 
 <body>
-
 {% block body %}
 
 <!-- Navbar -->
@@ -29,7 +31,7 @@
     </form>
   <!-- Create a Post Button -->
     <ul class="nav navbar-nav nav-navitems">
-      <li><a href="#">
+      <li><a href="/account/create/">
         <p>New Post <span class="glyphicon glyphicon-plus-sign"></span> </p>
         </a>
       </li>
