@@ -49,28 +49,17 @@ def view_profile(request):
 	args = {'user': request.user}
 	return render(request,'accounts/profile.html',args)
 
-@login_required
+@login_required(login_url='/account/login')
 def edit_profile(request):
 	if request.method == 'POST':
-		#Old stuff using django's default form
-		#form = EditProfileForm(request.POST, instance=request.user)
 
-		#if form.is_valid():
-		#	form.save()
-		#	return redirect('/account/profile')
-		#new stuff:
-		
 		#this is a method to get the UserProfile object that corresponds to request.user
 		#if there's a better way let me know
 		#searches all UserProfile objects until we find the one with this User
-		#user = request.user
-		#userProfiles = UserProfile.objects.all()
+		user = request.user
+		userProfile = user.UserProfile
 		
-		#for userProfile in userProfiles:
-		#	if userProfile.user == user:
-		#		thisUserProfile = userProfile
-		#		break
-		#thisUserProfile.checkboxStr = request.POST['K']
+		userProfile.checkboxStr = request.POST['K']
 		return HttpResponseRedirect(reverse('account:view_profile'))
 	else:
 		form = EditProfileForm(instance=request.user)
@@ -156,7 +145,9 @@ def register(request):
 
 		if(pw != pwConfirm):
 			return render(request, 'accounts/signupPasswordMatch.html', None)
-		user = User.objects.create_user(username, email, pw)
+		user_auth = User.objects.create_user(username, email, pw)
+		userProfile = UserProfile(user=user_auth)
+		userProfile.save()
 		userLoggedIn = auth_login(request, authenticate(username=username, password=pw))
 		return HttpResponseRedirect(reverse('account:dashboard'))
 
