@@ -57,9 +57,11 @@ def edit_profile(request):
 		#if there's a better way let me know
 		#searches all UserProfile objects until we find the one with this User
 		user = request.user
-		userProfile = user.UserProfile
+		userProfile = user.userprofile
 		
-		userProfile.checkboxStr = request.POST['K']
+		if 'K' in request.POST:
+			userProfile.checkboxStr = request.POST['K']
+		
 		return HttpResponseRedirect(reverse('account:view_profile'))
 	else:
 		form = EditProfileForm(instance=request.user)
