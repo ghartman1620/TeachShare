@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
-from accounts.models import Post, UserProfile
+from accounts.models import Post, UserProfile, GradeTaught
 
 # Create your views here.
 def home(request):
@@ -46,7 +46,11 @@ def logout(request):
 
 @login_required(login_url='/account/login')
 def view_profile(request):
-	args = {'user': request.user}
+	args = {
+		'user': request.user, 
+		'userProfile': request.user.userprofile,
+		'grades': request.user.userprofile.gradetaught_set.all(),
+	}
 	return render(request,'accounts/profile.html',args)
 
 @login_required(login_url='/account/login')
@@ -59,15 +63,41 @@ def edit_profile(request):
 		user = request.user
 		userProfile = user.userprofile
 		
-		if 'K' in request.POST:
-			userProfile.checkboxStr = request.POST['K']
+		if isValidRequestField(request, 'firstName'):
+			user.first_name = request.POST['firstName']
+		if isValidRequestField(request, 'lastName'):
+			user.last_name = request.POST['lastName']
+		if isValidRequestField(request, 'subject'):
+			userProfile.subjectTaught = request.POST['subject']
+		if isValidRequestField(request, 'district'):
+			userProfile.schoolDistrict = request.POST['district']
+			
 		
+		for grade in userProfile.gradetaught_set.all():
+			grade.delete()
+		
+		for gradeTaught in request.POST:
+			if "grade" in gradeTaught:
+				gradeStr = GradeTaught(grade=request.POST[gradeTaught], userProfile=userProfile)
+				gradeStr.save()
+		
+		
+		user.save()
+		userProfile.save()
 		return HttpResponseRedirect(reverse('account:view_profile'))
 	else:
-		form = EditProfileForm(instance=request.user)
-		args = {'form': form}
+		grades = []
+		for grade in request.user.userprofile.gradetaught_set.all():
+			grades.append(grade.grade)
+		args = {
+			'user': request.user, 
+			'userProfile': request.user.userprofile,
+			'grades': grades,
+		}
 		return render(request, 'accounts/edit_profile.html',args)
 
+def isValidRequestField(request, str):
+	return str in request.POST and request.POST[str] != "";
 		
 @login_required(login_url='/account/login')
 def post_create(request):

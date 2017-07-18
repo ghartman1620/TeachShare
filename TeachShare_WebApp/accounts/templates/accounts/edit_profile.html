@@ -79,6 +79,7 @@
   <li><a data-toggle="tab" href="#menu2">Menu 2</a></li>
 </ul>
 
+
 <div class="tab-content">
   <div id="home" class="tab-pane fade in active">
 	
@@ -86,16 +87,30 @@
     <p><form action="{% url 'account:edit_profile' %}" method="post">
 		{% csrf_token %}
         <div class="form-group row">
-			<label for="firstname" class="col-sm-2 col-form-label">First name:</label>
+			<label for="firstname" 
+				class="col-sm-2 col-form-label">First name:</label>
 			<div class="col-xs-5">
-				<input type="text" class="form-control" placeholder="First name">
+				{% if user.first_name != "" %}
+					<input type="text" class="form-control" 
+							name="firstName" value="{{user.first_name}}">
+				{% else %}
+					<input type="text" class="form-control" 
+							name="firstName" placeholder="First name">
+				{% endif %}
 			</div>
         </div>
 
         <div class="form-group row">
-			<label for="lastname" class="col-sm-2 col-form-label">Last name:</label>
+			<label for="lastname" 
+				class="col-sm-2 col-form-label">Last name:</label>
 			<div class="col-xs-5">
-				<input type="text" class="form-control" placeholder="Last name">
+				{% if user.last_name != "" %}
+				<input type="text" class="form-control" 
+						name="lastName" value="{{user.last_name}}">
+				{% else %}
+				<input type="text" class="form-control" 
+						name="lastName" placeholder="Last name">
+				{% endif %}
 			</div>
         </div>
 
@@ -125,19 +140,136 @@
         <div class="form-group">
 			<label for="gradelevel">Grade level(s) taught:</label>
             <div class="checkbox">
-				<p><label><input type="checkbox" name="K" value="">Kindergarten</label></p>
-				<p><label><input type="checkbox" name="1" value="">1st Grade</label></p>
-				<p><label><input type="checkbox" name="2"value="">2nd Grade</label></p>
-				<p><label><input type="checkbox" name="3"value="">3rd Grade</label></p>
-				<p><label><input type="checkbox" name="4"value="">4th Grade</label></p>
-				<p><label><input type="checkbox" name="5"value="">5th Grade</label></p>
-				<p><label><input type="checkbox" name="6"value="">6th Grade</label></p>
-				<p><label><input type="checkbox" name="7"value="">7th Grade</label></p>
-				<p><label><input type="checkbox" name="8"value="">8th Grade</label></p>
-				<p><label><input type="checkbox" name="9"value="">9th Grade</label></p>
-				<p><label><input type="checkbox" name="10"value="">10th Grade</label></p>
-				<p><label><input type="checkbox" name="11"value="">11th Grade</label></p>
-				<p><label><input type="checkbox" name="12"value="">12th Grade</label></p>
+				{% if "Kindergarten" in grades %}
+				<p><label><input type="checkbox" 
+					name="grade K" value="Kindergarten" 
+					checked>Kindergarten</label></p>
+				{% else %}
+				<p><label><input type="checkbox" 
+					name="grade K" value="Kindergarten" 
+					>Kindergarten</label></p>
+				{% endif %}
+				
+				{% if "1st Grade" in grades %}
+				<p><label><input type="checkbox" 
+					name="grade 1" value="1st Grade" 
+					checked>1st Grade</label></p>
+				{% else %}
+				<p><label><input type="checkbox" 
+					name="grade 1" value="1st Grade" 
+					>1st Grade</label></p>
+				{% endif %}
+				
+				{% if "2nd Grade" in grades %}
+				<p><label><input type="checkbox" 
+					name="grade 2" value="2nd Grade" 
+					checked>2nd Grade</label></p>
+				{% else %}
+				<p><label><input type="checkbox" 
+					name="grade 2" value="2nd Grade" 
+					>2nd Grade</label></p>
+				{% endif %}
+				
+				{% if "3rd Grade" in grades %}
+				<p><label><input type="checkbox" 
+					name="grade 3" value="3rd Grade" 
+					checked>3rd Grade</label></p>
+				{% else %}
+				<p><label><input type="checkbox" 
+					name="grade 3" value="3rd Grade" 
+					>3rd Grade</label></p>
+				{% endif %}
+				
+				{% if "4th Grade" in grades %}
+				<p><label><input type="checkbox" 
+					name="grade 4" value="4th Grade" 
+					checked>4th Grade</label></p>
+				{% else %}
+				<p><label><input type="checkbox" 
+					name="grade 4" value="4th Grade" 
+					>4th Grade</label></p>
+				{% endif %}
+				
+				{% if "5th Grade" in grades %}
+				<p><label><input type="checkbox" 
+					name="grade 5" value="5th Grade" 
+					checked>5th Grade</label></p>
+				{% else %}
+				<p><label><input type="checkbox" 
+					name="grade 5" value="5th Grade" 
+					>5th Grade</label></p>
+				{% endif %}
+				
+				{% if "6th Grade" in grades %}
+				<p><label><input type="checkbox" 
+					name="grade 6" value="6th Grade" 
+					checked>6th Grade</label></p>
+				{% else %}
+				<p><label><input type="checkbox" 
+					name="grade 6" value="6th Grade" 
+					>6th Grade</label></p>
+				{% endif %}
+				
+				{% if "7th Grade" in grades %}
+				<p><label><input type="checkbox" 
+					name="grade 7" value="7th Grade" 
+					checked>7th Grade</label></p>
+				{% else %}
+				<p><label><input type="checkbox" 
+					name="grade 7" value="7th Grade" 
+					>7th Grade</label></p>
+				{% endif %}
+				
+				{% if "8th Grade" in grades %}
+				<p><label><input type="checkbox" 
+					name="grade 8" value="8th Grade" 
+					checked>8th Grade</label></p>
+				{% else %}
+				<p><label><input type="checkbox" 
+					name="grade 8" value="8th Grade" 
+					>8th Grade</label></p>
+				{% endif %}
+				
+				{% if "9th Grade" in grades %}
+				<p><label><input type="checkbox" 
+					name="grade 9" value="9th Grade" 
+					checked>9th Grade</label></p>
+				{% else %}
+				<p><label><input type="checkbox" 
+					name="grade 9" value="9th Grade" 
+					>9th Grade</label></p>
+				{% endif %}
+				
+				{% if "10th Grade" in grades %}
+				<p><label><input type="checkbox" 
+					name="grade 10" value="10th Grade" 
+					checked>10th Grade</label></p>
+				{% else %}
+				<p><label><input type="checkbox" 
+					name="grade 10" value="10th Grade" 
+					>10th Grade</label></p>
+				{% endif %}
+				
+				{% if "11th Grade" in grades %}
+				<p><label><input type="checkbox" 
+					name="grade 11" value="11th Grade" 
+					checked>11th Grade</label></p>
+				{% else %}
+				<p><label><input type="checkbox" 
+					name="grade 11" value="11th Grade" 
+					>11th Grade</label></p>
+				{% endif %}
+				
+				{% if "12th Grade" in grades %}
+				<p><label><input type="checkbox" 
+					name="grade 12" value="12th Grade" 
+					checked>12th Grade</label></p>
+				{% else %}
+				<p><label><input type="checkbox" 
+					name="grade 12" value="12th Grade" 
+					>12th Grade</label></p>
+				{% endif %}
+				
             </div>
         </div>
 
@@ -145,16 +277,31 @@
         <div class="form-group row">
           <label for="subject" class="col-sm-2 col-form-label">Subject taught:</label>
           <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="Subject taught">
+				{% if userProfile.subjectTaught != "" %}
+					<input type="text" class="form-control" 
+							name="subject" 
+							value="{{userProfile.subjectTaught}}">
+				{% else %}
+					<input type="text" class="form-control" 
+							name="subject" placeholder="Subject">
+				{% endif %}
           </div>
         </div>
 
         <!-- Ideally should be able to auto-complete based on known school districts. -->
         <!-- Manual input for now. -->
       <div class="form-group row">
-          <label for="schooldistrict" class="col-sm-2 col-form-label">School district:</label>
+          <label for="schooldistrict" 
+				class="col-sm-2 col-form-label">School district:</label>
           <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="School district">
+			{% if userProfile.schoolDistrict != "" %}
+				<input type="text" class="form-control" 
+						name="district" 
+						value="{{userProfile.schoolDistrict}}">
+			{% else %}
+				<input type="text" class="form-control" 
+						name="district" placeholder="District">
+			{% endif %}
           </div>
         </div>
 
@@ -193,3 +340,4 @@
   
 {% endblock %}
 </body>
+
