@@ -102,15 +102,13 @@ def isValidRequestField(request, str):
 @login_required(login_url='/account/login')
 def post_create(request):
 	if request.method == 'POST':
-		form = EditProfileForm(request.POST, instance=request.user)
-
-		if form.is_valid():
-			form.save()
-			return redirect('/account/profile')
+		post = Post(title=request.POST['title'], content=request.POST['description'],
+						user=request.user.username)
+		post.save()
+		return HttpResponseRedirect(reverse('account:dashboard'))
 	else:
-		form = EditProfileForm(instance=request.user)
-		args = {'form': form}
-		return render(request, 'accounts/post_create.html',args)
+
+		return render(request, 'accounts/post_create.html',None)
 
 
 def post_detail(request, id= None):
