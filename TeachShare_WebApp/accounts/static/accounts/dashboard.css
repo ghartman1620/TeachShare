@@ -19,13 +19,13 @@ body {
 
 .nav-navitems {
   text-align: center;
-  padding-top: 30px;
+  padding-top: 2%;
 }
 
 /*search bar on naavbar */
 .nav-searchpad {
   text-align: center;
-  padding-top: 30px;
+  padding-top: 2%;
 }
 
 .container {
@@ -43,11 +43,11 @@ body {
 	border-top-width: 0px;
 	border-left-width: 0px;
 	border-right-width: 0px;
-	
-	
+
+
 }
 .well {
-  margin-left: 0px; 
+  margin-left: 0px;
 }
 .well>p {
   font-size: 18px;

@@ -30,13 +30,13 @@ body {
 
 .nav-navitems {
   text-align: center;
-  margin-left: 20%;
+  padding-top: 2%;
 }
 
 /*search bar on naavbar */
 .nav-searchpad {
   text-align: center;
-  padding-top: 30px;
+  padding-top: 2%;
 }
 
 .box_dragndrop,

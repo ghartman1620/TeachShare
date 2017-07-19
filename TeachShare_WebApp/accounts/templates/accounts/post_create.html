@@ -22,14 +22,14 @@
         <img src="{% static "accounts/tslogo.png" %}" alt="TSLogo"/>
       </a>
     </div>
+  <!-- Search bar -->
+    <form class="navbar-form navbar-left nav-searchpad">
+      <div class="form-group">
+        <input type="text" class="form-control" placeholder="Search">
+      </div>
+      <button type="submit" class="btn btn-default">Submit</button>
+    </form>
 
-<!-- Create a Post Button -->
-  <ul class="nav navbar-nav nav-navitems">
-    <li><a href="/account/create">
-      <h1>New Post</h1>
-    </a>
-    </li>
-  </ul>
 
   <!-- Dropdown Account Menu -->
     <ul class="nav navbar-nav navbar-right">
@@ -51,7 +51,7 @@
 <div class="container">
   <h3>Create a Post</h3>
 
-  
+
    <form method="post" action= "{% url 'account:post_create' %}">
 	{% csrf_token %}
       <div class="form-group">
@@ -67,12 +67,12 @@
 			<textarea type="text" class="form-control" rows="6" name="description" placeholder="Add a description"></textarea>
          </div>
       </div>
-     
+
       <div class="form-group">
-         <div class="col-sm-3 pull-right">
+         <div class="col-sm-2 pull-right">
          <input id="submit" name="submit" type="submit" value="Submit" class="btn btn-primary">
          </div>
-      </div> 
+      </div>
   </form>
 
   <div class="form-group">
