@@ -5,13 +5,54 @@
 {% load static %}
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-<link rel="stylesheet" href={% static 'accounts/home.css'%} type = "text/css">
+<link rel="stylesheet" href={% static 'accounts/post_detail.css'%} type = "text/css">
   <meta charset="utf-8">
 
 <!-- Tab icon -->
 <link rel="icon" type="image/png" href="/static/img/icon.png">
 </head>
+
 <body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-inverse ">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/account/dashboard">
+        <img src="{% static "accounts/tslogo.png" %}" alt="TSLogo"/>
+      </a>
+    </div>
+  <!-- Search bar -->
+    <form class="navbar-form navbar-left nav-searchpad">
+      <div class="form-group">
+        <input type="text" class="form-control" placeholder="Search">
+      </div>
+      <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+  <!-- Create a Post Button -->
+    <ul class="nav navbar-nav nav-navitems">
+      <li><a href="/account/create/">
+        <p>New Post <span class="glyphicon glyphicon-plus-sign"></span> </p>
+        </a>
+      </li>
+    </ul>
+
+  <!-- Dropdown Account Menu -->
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" >
+          <img src="{% static "accounts/applelogo.png" %}" alt="TSLogo"/>
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="/account/profile/">Profile</a></li>
+          <li><a href="/account/profile/edit/">Settings</a></li>
+          <li><a href="/account/">Log Out</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav> <!-- ./End Navbar -->
+
 <div class="container">
 <a href='/account/' button type="button" class="btn btn-primary btn-lg pull-right" id="right-panel-link" href="#right-panel">Home</button></a>
 <div class="col-xs-12" style="height:20px;"></div>
