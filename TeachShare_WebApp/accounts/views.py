@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
-from accounts.models import Post, UserProfile
+from accounts.models import Post, UserProfile, GradeTaught
 
 # Create your views here.
 def home(request):
@@ -46,50 +46,69 @@ def logout(request):
 
 @login_required(login_url='/account/login')
 def view_profile(request):
-	args = {'user': request.user}
+	args = {
+		'user': request.user, 
+		'userProfile': request.user.userprofile,
+		'grades': request.user.userprofile.gradetaught_set.all(),
+	}
 	return render(request,'accounts/profile.html',args)
 
-@login_required
+@login_required(login_url='/account/login')
 def edit_profile(request):
 	if request.method == 'POST':
-		#Old stuff using django's default form
-		#form = EditProfileForm(request.POST, instance=request.user)
 
-		#if form.is_valid():
-		#	form.save()
-		#	return redirect('/account/profile')
-		#new stuff:
-		
 		#this is a method to get the UserProfile object that corresponds to request.user
 		#if there's a better way let me know
 		#searches all UserProfile objects until we find the one with this User
-		#user = request.user
-		#userProfiles = UserProfile.objects.all()
+		user = request.user
+		userProfile = user.userprofile
 		
-		#for userProfile in userProfiles:
-		#	if userProfile.user == user:
-		#		thisUserProfile = userProfile
-		#		break
-		#thisUserProfile.checkboxStr = request.POST['K']
+		if isValidRequestField(request, 'firstName'):
+			user.first_name = request.POST['firstName']
+		if isValidRequestField(request, 'lastName'):
+			user.last_name = request.POST['lastName']
+		if isValidRequestField(request, 'subject'):
+			userProfile.subjectTaught = request.POST['subject']
+		if isValidRequestField(request, 'district'):
+			userProfile.schoolDistrict = request.POST['district']
+			
+		
+		for grade in userProfile.gradetaught_set.all():
+			grade.delete()
+		
+		for gradeTaught in request.POST:
+			if "grade" in gradeTaught:
+				gradeStr = GradeTaught(grade=request.POST[gradeTaught], userProfile=userProfile)
+				gradeStr.save()
+		
+		
+		user.save()
+		userProfile.save()
 		return HttpResponseRedirect(reverse('account:view_profile'))
 	else:
-		form = EditProfileForm(instance=request.user)
-		args = {'form': form}
+		grades = []
+		for grade in request.user.userprofile.gradetaught_set.all():
+			grades.append(grade.grade)
+		args = {
+			'user': request.user, 
+			'userProfile': request.user.userprofile,
+			'grades': grades,
+		}
 		return render(request, 'accounts/edit_profile.html',args)
 
+def isValidRequestField(request, str):
+	return str in request.POST and request.POST[str] != "";
 		
 @login_required(login_url='/account/login')
 def post_create(request):
 	if request.method == 'POST':
-		form = EditProfileForm(request.POST, instance=request.user)
-
-		if form.is_valid():
-			form.save()
-			return redirect('/account/profile')
+		post = Post(title=request.POST['title'], content=request.POST['description'],
+						user=request.user.username)
+		post.save()
+		return HttpResponseRedirect(reverse('account:dashboard'))
 	else:
-		form = EditProfileForm(instance=request.user)
-		args = {'form': form}
-		return render(request, 'accounts/post_create.html',args)
+
+		return render(request, 'accounts/post_create.html',None)
 
 
 def post_detail(request, id= None):
@@ -157,7 +176,7 @@ def register(request):
 
 		if(pw != pwConfirm):
 			return render(request, 'accounts/signupPasswordMatch.html', None)
-		user = User.objects.create_user(username, email, pw)
+		user_auth = User.objects.create_user(username, email, pw)
 		userLoggedIn = auth_login(request, authenticate(username=username, password=pw))
 		return HttpResponseRedirect(reverse('account:dashboard'))
 

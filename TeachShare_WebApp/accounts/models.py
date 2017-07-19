@@ -9,16 +9,21 @@ from django.db.models.signals import post_save
 
 
 class UserProfile(models.Model):
-	user = models.OneToOneField(User)
-	description = models.CharField(max_length=100, default='')
-	phone = models.IntegerField( default=0)
-	city = models.CharField(max_length=100, default='')
-	checkboxStr = models.CharField(max_length=100, default='')
-
+	user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
+	subjectTaught = models.CharField(max_length=200, default='')
+	schoolDistrict = models.CharField(max_length=500, default='')
+	
+	def __str__(self):
+		return self.user.username
+	
+class GradeTaught(models.Model):
+	grade = models.CharField(max_length=100, default='')
+	userProfile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+	
 def create_profile(sender, **kwargs):
 	if kwargs['created']:
 		user_profile = UserProfile.objects.create(user=kwargs['instance'])
-
+		user_profile.save()
 
 class Post(models.Model):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)

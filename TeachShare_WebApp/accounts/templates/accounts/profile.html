@@ -68,6 +68,15 @@
 <p>First name:{{user.first_name}}</p>
 <p>Last name:{{user.last_name}}</p>
 <p>email:{{user.email}}</p>
+<p>Subject: {{userProfile.subjectTaught}}</p>
+<p>School District: {{userProfile.schoolDistrict}}</p>
+<p> Grades taught:</p>
+{% if grades %}
+	{% for grade in grades %}
+		<p>{{grade.grade}}</p>
+	{% endfor %}
+{% endif %}
+
 </div>
 
 <!--
