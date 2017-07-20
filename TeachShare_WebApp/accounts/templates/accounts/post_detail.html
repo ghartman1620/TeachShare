@@ -67,6 +67,13 @@
 {{instance.title}}</br>
 {{instance.id}}</br>
 <p>Author:{{instance.user}}</p>
+<p>Tags: 
+{% if tags %}
+  {% for tag in tags %}
+      <p>{{tag.tag}}</p>
+  {% endfor %}
+{% endif %}
+</p>
 </div>
 
 

@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
-from accounts.models import Post, UserProfile, GradeTaught
+from accounts.models import Tag, Post, UserProfile, GradeTaught
 
 # Create your views here.
 def home(request):
@@ -105,6 +105,7 @@ def post_create(request):
 		post = Post(title=request.POST['title'], content=request.POST['description'],
 						user=request.user.username)
 		post.save()
+		add_tag(request,post)
 		return HttpResponseRedirect(reverse('account:dashboard'))
 	else:
 
@@ -116,9 +117,18 @@ def post_detail(request, id= None):
 	context = {
 		"title": instance.title,
 		"instance": instance,
+		"tags": instance.tag_set.all()
 	}
 	return render(request,'accounts/post_detail.html',context)
 
+
+def add_tag(request, post):
+	if request.method == 'POST':
+		tagString =request.POST['tag']
+		tagList = tagString.split(',')
+		for s in tagList:
+			tag = Tag(tag=s, post=post)
+			tag.save()
 
 def password_change(request):
 	try:
