@@ -192,4 +192,12 @@ def register(request):
 
 @login_required(login_url='/account/login')
 def dashboard(request):
-	return render(request, 'accounts/dashboard.html', {'posts' : Post.objects.all()})
+	if request.method == 'POST':
+		searchString = request.POST['search']
+		results = []
+		for post in Post.objects.all():
+			if post.title.find(searchString)!= -1:
+				results.append(post)
+		return render(request, 'accounts/dashboard.html', {'posts' : results})
+	else:
+		return render(request, 'accounts/dashboard.html', {'posts' : Post.objects.all()})
