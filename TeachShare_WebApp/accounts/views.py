@@ -198,6 +198,10 @@ def dashboard(request):
 		for post in Post.objects.all():
 			if post.title.find(searchString)!= -1:
 				results.append(post)
+			else: 
+				for tag in post.tag_set.all():
+					if tag.tag.find(searchString)!= -1:
+						results.append(post)
 		return render(request, 'accounts/dashboard.html', {'posts' : results})
 	else:
 		return render(request, 'accounts/dashboard.html', {'posts' : Post.objects.all()})
