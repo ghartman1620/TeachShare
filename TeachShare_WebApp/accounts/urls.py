@@ -17,5 +17,5 @@ urlpatterns = [
 	url(r'^password_change/$', views.password_change, name='password_change'),
 	url(r'^forgotPassword/$', views.password_change_page, name='password_change_page'),
 	url(r'^create/$', views.post_create, name='post_create'),
-	
+	url(r'^like/(?P<id>\d+)/$', views.like, name='like'),
 ]

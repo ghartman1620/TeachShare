@@ -31,6 +31,7 @@ class Post(models.Model):
 	user = models.CharField(max_length=100, default='')
 	content = models.TextField(default="")
 	updated = models.DateTimeField(auto_now=True, auto_now_add=False)
+	likes = models.IntegerField(default=0)
 	timestamp = models.DateTimeField(auto_now=False, auto_now_add= True)
 
 # Creates list of tags for every post

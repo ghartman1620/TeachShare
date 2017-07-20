@@ -122,6 +122,15 @@ def post_detail(request, id= None):
 	return render(request,'accounts/post_detail.html',context)
 
 
+def like(request, id):
+	instance = get_object_or_404(Post, id=id)
+	instance.likes+=1
+	instance.save()
+	print("post liked")
+	
+	return HttpResponse("you liked a post");
+
+
 def add_tag(request, post):
 	if request.method == 'POST':
 		tagString =request.POST['tag']
@@ -192,6 +201,7 @@ def register(request):
 
 @login_required(login_url='/account/login')
 def dashboard(request):
+	print("dashboard viewed")
 	if request.method == 'POST':
 		searchString = request.POST['search']
 		results = []
