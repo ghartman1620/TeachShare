@@ -33,4 +33,9 @@ class Post(models.Model):
 	updated = models.DateTimeField(auto_now=True, auto_now_add=False)
 	timestamp = models.DateTimeField(auto_now=False, auto_now_add= True)
 
+# Creates list of tags for every post
+class Tag(models.Model):
+	tag = models.CharField(max_length=100, default='')
+	post = models.ForeignKey(Post, on_delete=models.CASCADE)
+
 post_save.connect(create_profile, sender=User)
