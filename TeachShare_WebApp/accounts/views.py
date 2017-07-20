@@ -195,7 +195,7 @@ def dashboard(request):
 	if request.method == 'POST':
 		searchString = request.POST['search']
 		results = []
-		for post in Post.objects.all():
+		for post in Post.objects.all().order_by('-timestamp'):
 			if post.title.find(searchString)!= -1:
 				results.append(post)
 			else: 
@@ -204,4 +204,4 @@ def dashboard(request):
 						results.append(post)
 		return render(request, 'accounts/dashboard.html', {'posts' : results})
 	else:
-		return render(request, 'accounts/dashboard.html', {'posts' : Post.objects.all()})
+		return render(request, 'accounts/dashboard.html', {'posts' : Post.objects.all().order_by('-timestamp')})
