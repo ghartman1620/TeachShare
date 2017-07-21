@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+{% load static %}
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href={% static 'accounts/post_create.css'%} type = "text/css">
+  <meta charset="utf-8">
+<!-- Tab icon -->
+<link rel="icon" type="image/png" href="/static/img/icon.png">
+</head>
+
+<body>
+{% block body %}
+
+<!-- Navbar -->
+<nav class="navbar navbar-inverse ">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/account/dashboard">
+        <img src="{% static "accounts/tslogo.png" %}" alt="TSLogo"/>
+      </a>
+    </div>
+  <!-- Search bar -->
+    <form class="navbar-form navbar-left nav-searchpad">
+      <div class="form-group">
+        <input type="text" class="form-control" placeholder="Search">
+      </div>
+      <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+
+
+  <!-- Dropdown Account Menu -->
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" >
+          <img src="{% static "accounts/applelogo.png" %}" alt="TSLogo"/>
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="/account/profile/">Profile</a></li>
+          <li><a href="/account/profile/edit/">Settings</a></li>
+          <li><a href="/account/logout">Log Out</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav> <!-- ./End Navbar -->
+
+
+<div class="container">
+  <h3>Upload Files</h3>
+  <form class="box" method="post" action=" " enctype="multipart/form-data">
+  {% csrf_token %}
+      <div class="box_input">
+        <input class="box_file" type="file" name="myfile" id="file" data-multiple-caption="{count} files selected" multiple/>
+        <label for="file"><strong>Choose a file</strong><span class="box_dragndrop"> or drop it here</span>.</label>
+
+        
+        <button class="btn btn-primary btn-lg btn-block" type="submit">Upload</button>
+      </div>
+  </form> 
+  <!-- ./End uploading files -->
+
+{% endblock %}
+</div>
+</body>
