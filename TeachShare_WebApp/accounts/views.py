@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from django.contrib.auth import authenticate, login, logout as auth_logout
 from django.contrib.auth import login as auth_login
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect, redirect, get_object_or_404
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect, redirect, get_object_or_404, render_to_response
 from django.urls import reverse
 from django.template import loader
 from django.contrib.auth.models import User
@@ -10,6 +10,8 @@ from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
 from accounts.models import Tag, Post, UserProfile, GradeTaught
+
+from .models import Attachment
 
 # Create your views here.
 def home(request):
@@ -205,3 +207,28 @@ def dashboard(request):
 		return render(request, 'accounts/dashboard.html', {'posts' : results})
 	else:
 		return render(request, 'accounts/dashboard.html', {'posts' : Post.objects.all().order_by('-timestamp')})
+
+
+
+
+def add_attachment(request):
+    if request.method == "POST":
+        parent_id = request.POST['parent_id']
+        files = request.FILES.getlist('myfiles')
+        for number, a_file in enumerate(files):
+            instance = Attachment(
+                parent_id=parent_id,
+                file_name=a_file.name,
+                attachment=a_file
+            )
+            instance.save()
+
+        request.session['number_of_files'] = number + 1
+        return redirect("account:add_attachment_done")
+
+    return render(request, "accounts/add_attachment.html")
+
+
+def add_attachment_done(request):
+    return render_to_response('accounts/add_attachment_done.html',
+        context={"num_files": request.session["number_of_files"]})
