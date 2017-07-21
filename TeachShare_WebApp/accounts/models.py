@@ -34,6 +34,7 @@ def create_profile(sender, **kwargs):
 class Post(models.Model):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
 	title = models.CharField(max_length=100, default='')
+	Files = models.FileField(null=True, blank=True)
 	user = models.CharField(max_length=100, default='')
 	content = models.TextField(default="")
 	updated = models.DateTimeField(auto_now=True, auto_now_add=False)

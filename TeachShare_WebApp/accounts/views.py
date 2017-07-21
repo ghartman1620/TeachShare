@@ -105,7 +105,7 @@ def isValidRequestField(request, str):
 def post_create(request):
 	if request.method == 'POST':
 		post = Post(title=request.POST['title'], content=request.POST['description'],
-						user=request.user.username)
+						user=request.user.username, Files=request.FILES['files'])
 		post.save()
 		add_tag(request,post)
 		return HttpResponseRedirect(reverse('account:dashboard'))
