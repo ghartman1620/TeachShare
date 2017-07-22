@@ -50,3 +50,27 @@ body {
   text-align: center;
   padding-top: 30px;
 }
+
+.container {
+  width: 800px;
+  text-align: left;
+  background-color: #ffffff;
+}
+.container>p {
+  font-size: 18px;
+}
+.container>h1 {
+	border-style: solid;
+	border-bottom-width: 1px;
+	border-top-width: 0px;
+	border-left-width: 0px;
+	border-right-width: 0px;
+
+
+}
+.well {
+  margin-left: 0px;
+}
+.well>p {
+  font-size: 18px;
+}
