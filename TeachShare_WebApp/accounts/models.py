@@ -16,6 +16,11 @@ class UserProfile(models.Model):
 	def __str__(self):
 		return self.user.username
 	
+class LikedPost(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	postId = models.IntegerField(default=0)
+	
+	
 class GradeTaught(models.Model):
 	grade = models.CharField(max_length=100, default='')
 	userProfile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)

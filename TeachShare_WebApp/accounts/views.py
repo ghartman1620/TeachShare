@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
-from accounts.models import Tag, Post, UserProfile, GradeTaught
+from accounts.models import Tag, Post, UserProfile, GradeTaught, LikedPost
 
 # Create your views here.
 def home(request):
@@ -121,16 +121,23 @@ def post_detail(request, id= None):
 	}
 	return render(request,'accounts/post_detail.html',context)
 
-
+@login_required(login_url='/account/login')
 def like(request, id):
 	instance = get_object_or_404(Post, id=id)
-	instance.likes+=1
-	instance.save()
-	print("post liked")
+	if not hasLikedPost(request.user, instance):
+		instance.likes+=1
+		instance.save()
+		likedPost = LikedPost(user=request.user, id=instance.id)
+		likedPost.save()
+	return HttpResponse("Error: dashboard like button should " 
+						     +"suppress POST request redirection");
+
+def hasLikedPost(user, instance):
+	for post in user.likedpost_set.all():
+		if(post.id == instance.id):
+			return True;
+	return False;
 	
-	return HttpResponse("you liked a post");
-
-
 def add_tag(request, post):
 	if request.method == 'POST':
 		tagString =request.POST['tag']
@@ -201,7 +208,6 @@ def register(request):
 
 @login_required(login_url='/account/login')
 def dashboard(request):
-	print("dashboard viewed")
 	if request.method == 'POST':
 		searchString = request.POST['search']
 		results = []
