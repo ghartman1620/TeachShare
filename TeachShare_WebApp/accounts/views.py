@@ -104,9 +104,19 @@ def isValidRequestField(request, str):
 @login_required(login_url='/account/login')
 def post_create(request):
 	if request.method == 'POST':
-		post = Post(title=request.POST['title'], content=request.POST['description'],
-						user=request.user.username, Files=request.FILES['files'])
-		post.save()
+		title=request.POST['title'], 
+		content=request.POST['description'],
+		user=request.user.username 
+		Files=request.FILES.getlist('files')
+		post = None
+		
+		for number, a_file in enumerate(Files):
+			post = Post(
+            	title=title,
+            	content=content,
+            	user=user,
+            	Files=a_file)
+			post.save()
 		add_tag(request,post)
 		return HttpResponseRedirect(reverse('account:dashboard'))
 	else:
@@ -211,24 +221,16 @@ def dashboard(request):
 
 
 
-def add_attachment(request):
-    if request.method == "POST":
-        parent_id = request.POST['parent_id']
-        files = request.FILES.getlist('myfiles')
-        for number, a_file in enumerate(files):
-            instance = Attachment(
-                parent_id=parent_id,
-                file_name=a_file.name,
-                attachment=a_file
-            )
-            instance.save()
+# def add_attachment(request):
+#     if request.method == "POST":
+#         parent_id = request.POST['parent_id']
+#         files = request.FILES.getlist('myfiles')
+#         request.session['number_of_files'] = number + 1
+#         return redirect("account:add_attachment_done")
 
-        request.session['number_of_files'] = number + 1
-        return redirect("account:add_attachment_done")
-
-    return render(request, "accounts/add_attachment.html")
+#     return render(request, "accounts/add_attachment.html")
 
 
-def add_attachment_done(request):
-    return render_to_response('accounts/add_attachment_done.html',
-        context={"num_files": request.session["number_of_files"]})
+# def add_attachment_done(request):
+#     return render_to_response('accounts/add_attachment_done.html',
+#         context={"num_files": request.session["number_of_files"]})
