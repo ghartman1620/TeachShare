@@ -112,6 +112,10 @@
 						id="likeForm{{post.id}}">
 					{% csrf_token %}
 					<button type="submit" class="btn btn-default">
+						<!--The text should be "Like" if a user has not yet 
+						liked a post or "Unlike" otherwise. The exact 
+						text is important for the function below
+						called on submitting this form. -->
 						{% if likedPosts %}
 							{% if post.id in likedPosts %}
 								<div id="likeSubmit{{post.id}}">Unlike</div>
