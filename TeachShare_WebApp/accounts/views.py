@@ -121,23 +121,45 @@ def post_detail(request, id= None):
 	}
 	return render(request,'accounts/post_detail.html',context)
 
+	
+'''
+This POST request handles the user clicking the "like" or "dislike"
+button on the dashboard. It does both by checking whether the 
+user has already liked the post - if they have, then decrement
+that posts' likes and remove that post from the user's like post list,
+and do the opposite for a post that the user has not yet liked.
+'''
 @login_required(login_url='/account/login')
 def like(request, id):
 	instance = get_object_or_404(Post, id=id)
+	
+	
 	post = getLikedPost(request.user, instance)
+	#Handle liking
 	if post == None:
 		instance.likes+=1
 		instance.save()
 		likedPost = LikedPost(user=request.user, id=instance.id)
 		likedPost.save()
+	#Handle unliking
 	else:
 		instance.likes-=1
 		instance.save()
 		post.delete()
-		
-	return HttpResponseRedirect(reverse('account:dashboard'))
+	#Based on the redirect suppression in the script in dashboard.html
+	#this POST request should not be allowed to refresh the dashboard.
+	#So this line should not matter, but if it does, dashboard is the most
+	#natural place to redirect to
 	
-
+	#(for example, during debugging when the javascript had a syntax error
+	#the redirect suppression would fail so this return would function). 
+	#So this should probably stay incase of errors.
+	return HttpResponseRedirect(reverse('account:dashboard'))
+'''	
+Returns the LikedPost object corresponding to a user's like
+of a instance post or None if the user has not liked that
+particular post. 
+'''
 def getLikedPost(user, instance):
 	for post in user.likedpost_set.all():
 		if(post.id == instance.id):

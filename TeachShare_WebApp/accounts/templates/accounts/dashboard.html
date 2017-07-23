@@ -133,18 +133,40 @@
 {% endblock %}
 
 <script>
+//This function is called when user clicks a like or unlike post button.
+//It will handle the post request and update the page to correspond to the user's
+//post like without refreshing the page.
 $("form").submit(function(event) {
-	// Stop form from submitting normally
+	//Stop POST request from submitting and redirecting
 	event.preventDefault();
+	/*
+	Send the POST request. This does not redirect.
+	The post request  (see views.py/like()) will decide whether to increase
+	or decrease likes based on whether or not a user has already liked
+	the post. So we have a single request do both liking and disliking
+	This lets this function right here be a single function instead of
+	two, and I know python/django better than javascript so I thought
+	that this would be an easier implementation. 
+	*/
 	var likeReq = $(this);
 	var posting = $.post( likeReq.attr('action'), likeReq.serialize() );
 
+	/*Get the name of the form that was submitted.
+	The part of the from we care about is the ID - the number that follows
+	"likeForm" in the string.*/
 	var formId = $(this).closest("form").attr('id');
 	var id = formId.substr(8);
+	//This is the name of the div tag that contains the text "like" or "unlike"
 	var likeBtnId = "likeSubmit".concat(id);
-	document.getElementById("debugtxt").innerHTML = "139";
+	
+	/*If the text was like, the user must be liking it. So we'll
+	change the text to unlike and increment the number of likes displayed by one.
 	
 	
+	Notice that this incrementation does not change the database. The POST
+	request above did that, so this is merely making the page display
+	what the database knows without refreshing the page and making 
+	another database read.*/
 	if(document.getElementById(likeBtnId).innerHTML.localeCompare("Like")==0){
 		document.getElementById(likeBtnId).innerHTML = "Unlike";
 		
@@ -153,28 +175,16 @@ $("form").submit(function(event) {
 		
 		
 		likes++;
-		document.getElementById("debugtxt").innerHTML = likes;
 		document.getElementById("likes".concat(id)).innerHTML = likes;
 	}
+	//Likewise if the text was unlike, the user is retracting their like
+	//of a post. 
 	else{
 		document.getElementById(likeBtnId).innerHTML = "Like";
 		var likes = parseInt(document.getElementById("likes".concat(id)).innerHTML);
 		likes--;
 		document.getElementById("likes".concat(id)).innerHTML = likes.toString();
 	}
-	// Send the data using post
-
-	//this will change the text on one like button to unlike
-
-	//substring paramter is simply the index 
-	// of the numbers in the string "postLike####" 
-	/*
-	Plan: One form, no ifs for form in here. A single post request "like" will
-	check whtehr a user has liked a post or not and switch that, modifying the post
-	score accordingly. This function will only update the plaintext fields on this
-	page and send the post request. the post request manages like vs. dislike.
-	*/
-
 });
 
 
