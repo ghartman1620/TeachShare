@@ -11,7 +11,8 @@ from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
 from accounts.models import Tag, Post, UserProfile, GradeTaught, LikedPost
 
-# Create your views here.
+
+
 def home(request):
 	name = 'TeachShare'
 	numbers = [1,2,3,4,5,6]
@@ -56,10 +57,6 @@ def view_profile(request):
 @login_required(login_url='/account/login')
 def edit_profile(request):
 	if request.method == 'POST':
-
-		#this is a method to get the UserProfile object that corresponds to request.user
-		#if there's a better way let me know
-		#searches all UserProfile objects until we find the one with this User
 		user = request.user
 		userProfile = user.userprofile
 		
@@ -123,6 +120,19 @@ def post_detail(request, id= None):
 
 	
 '''
+Renders the favorites page. 
+The loop is gathering up the posts that a user has liked based on their post id,
+which is their index in the all posts list.
+'''
+@login_required(login_url='/account/login')	
+def favorites(request):
+	posts = []
+	for likedPost in request.user.likedpost_set.all():
+		posts.append(Post.objects.all()[likedPost.postId])
+	return render(request, 'accounts/favorites.html', {'posts': posts })
+	
+	
+'''
 This POST request handles the user clicking the "like" or "dislike"
 button on the dashboard. It does both by checking whether the 
 user has already liked the post - if they have, then decrement
@@ -137,12 +147,14 @@ def like(request, id):
 	post = getLikedPost(request.user, instance)
 	#Handle liking
 	if post == None:
+		print("liking")
 		instance.likes+=1
 		instance.save()
-		likedPost = LikedPost(user=request.user, id=instance.id)
+		likedPost = LikedPost(user=request.user, postId=instance.id)
 		likedPost.save()
 	#Handle unliking
 	else:
+		print("unliking")
 		instance.likes-=1
 		instance.save()
 		post.delete()
@@ -151,19 +163,19 @@ def like(request, id):
 	#So this line should not matter, but if it does, dashboard is the most
 	#natural place to redirect to
 	
-	#(for example, during debugging when the javascript had a syntax error
-	#the redirect suppression would fail so this return would function). 
-	#So this should probably stay incase of errors.
-	return HttpResponseRedirect(reverse('account:dashboard'))
+	#Returns an error page in development (the debug field in settings is true)
+	#otherwise just redirects to dashboard
+	#but if everything is working as intended neither of these will happen
+	return HttpResponse("redirect suppression failed")
 '''	
 Returns the LikedPost object corresponding to a user's like
 of a instance post or None if the user has not liked that
 particular post. 
 '''
-def getLikedPost(user, instance):
-	for post in user.likedpost_set.all():
-		if(post.id == instance.id):
-			return post;
+def getLikedPost(user, post):
+	for likedPost in user.likedpost_set.all():
+		if(likedPost.postId == post.id):
+			return likedPost;
 	return None;
 	
 def add_tag(request, post):
@@ -238,7 +250,7 @@ def register(request):
 def dashboard(request):
 	likedPosts = []
 	for post in request.user.likedpost_set.all():
-		likedPosts.append(post.id)
+		likedPosts.append(post.postId)
 	if request.method == 'POST':
 		searchString = request.POST['search']
 		results = []

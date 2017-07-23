@@ -59,6 +59,9 @@
   </div>
 </nav> <!-- ./End Navbar -->
 
+<div class="page-header">
+  <h1>Favorites</h1>
+</div>
 
 {% if posts %}
 	{% for post in posts %}
@@ -76,27 +79,19 @@
 						id="likeForm{{post.id}}">
 					{% csrf_token %}
 					<button type="submit" class="btn btn-default">
-						<!--The text should be "Like" if a user has not yet 
-						liked a post or "Unlike" otherwise. The exact 
-						text is important for the function below
-						called on submitting this form. -->
-						{% if likedPosts %}
-							{% if post.id in likedPosts %}
-								<div id="likeSubmit{{post.id}}">Unlike</div>
-							{% else %}
-								<div id="likeSubmit{{post.id}}">Like</div>
-							{% endif %}
-						{% else %}
-							<div id="likeSubmit{{post.id}}">Like</div>
-						{% endif %}
+						<!-- The conditional on this text has been removed
+						from dashboard.html. If a post appears on the favorites page
+						the user has already liked it so the "Unlike" button
+						appears by default. This can still be changed 
+						below as in dashboard.-->
+						<div id="likeSubmit{{post.id}}">Unlike</div>
+
 					</button>
 				</form>
 			<p> Likes: <div id="likes{{post.id}}">{{post.likes}}</div></p>
-			<p> ID: {{post.id}}</p>
 		</div> <!-- container -->
 	{% endfor %}
 {% endif %}
-
 
 {% endblock %}
 
@@ -154,7 +149,6 @@ $("form").submit(function(event) {
 		document.getElementById("likes".concat(id)).innerHTML = likes.toString();
 	}
 });
-
-
 </script>
+
 </body>
