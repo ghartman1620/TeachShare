@@ -80,29 +80,25 @@
          </p>
     </div>
 </div>
-<div class="row">
-    <div class="col-sm-4"></div>
-    <div class="col-sm-4"></div>
-      <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#comment">Comment</button>
-    <div class="col-sm-4"></div>
-</div>
 
+<div class="container">
+    <div class="col-sm-2 pull-right"></div>
+        <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#comment">Comment</button>
+    </div>
   <div id="comment" class="collapae">
     <div class="form-group">
        <label for="message" class="col-sm-12 control-label">Comment</label>
        <div class="col-sm-11">
-    <textarea type="text" class="form-control" rows="4" name="description" placeholder="Add a comment"></textarea>
+          <textarea type="text" class="form-control" rows="4" name="description" placeholder="Add a comment"></textarea>
+       </div>
+    </div>
+    <div class="form-group">
+       <div class="col-sm-2 pull-right">
+         <input id="submit" name="submit" type="submit" value="Submit" class="btn btn-primary">
        </div>
     </div>
   </div>
-
-<script>
-$(document).ready(function(){
-    $(".btn-primary").click(function(){
-        $(".collapse").collapse('comment');
-    });
-});
-</script>
+</div>
 
 
 
