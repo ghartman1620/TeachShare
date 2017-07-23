@@ -71,27 +71,109 @@
 			</div>
 			<h4><small>Posted {{post.timestamp}} Updated {{post.updated}}
 			</small></h4>
-         <form action="{% url 'account:like' id=post.id %}" method="POST"
-                  id="likeForm">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-default">Like</button>
-         </form>
-			<p> Likes: {{post.likes}}</p>
+			
+			<!-- {# This is all to show a "Unlike" button if the user has already liked a post
+			and a "Like" button if a user hasn't like that post. The "Like" form is repeated}
+			twice becuase we must guard against likedPosts being empty. #}
+			{% if likedPosts %}
+				{% if post.id in likedPosts %}
+				<form action="{% url 'account:like' id=post.id %}" method="POST"
+						id="unlikeForm{{post.id}}">
+					{% csrf_token %}
+					<button type="submit" class="btn btn-default">
+						<div id="likeSubmit{{post.id}}">
+							Unlike
+						</div>
+					</button>
+				</form>
+				{% else %}
+				<form action="{% url 'account:like' id=post.id %}" method="POST"
+						id="likeForm{{post.id}}">
+					{% csrf_token %}
+					<button type="submit" class="btn btn-default">
+						<div id="likeSubmit{{post.id}}">
+							Like
+						</div>
+					</button>
+				</form>
+				{% endif %}
+			{% else %}
+			<form action="{% url 'account:like' id=post.id %}" method="POST"
+						id="likeForm{{post.id}}">
+				{% csrf_token %}
+				<button type="submit" class="btn btn-default">
+					<div id="likeSubmit{{post.id}}">
+						Like
+					</div>
+				</button>
+			</form>
+			{% endif %}-->
+			<form action="{% url 'account:like' id=post.id %}" method="POST"
+						id="likeForm{{post.id}}">
+					{% csrf_token %}
+					<button type="submit" class="btn btn-default">
+						{% if likedPosts %}
+							{% if post.id in likedPosts %}
+								<div id="likeSubmit{{post.id}}">Unlike</div>
+							{% else %}
+								<div id="likeSubmit{{post.id}}">Like</div>
+							{% endif %}
+						{% else %}
+							<div id="likeSubmit{{post.id}}">Like</div>
+						{% endif %}
+					</button>
+				</form>
+			<p> Likes: <div id="likes{{post.id}}">{{post.likes}}</div></p>
 		</div> <!-- container -->
 	{% endfor %}
 {% endif %}
 
+<div id="debugtxt"></div>
 
 {% endblock %}
 
 <script>
 $("form").submit(function(event) {
-  // Stop form from submitting normally
-  event.preventDefault();
-  var likeReq = $(this);
-  // Send the data using post
-  var posting = $.post( likeReq.attr('action'), likeReq.serialize() );
-  // if success:  
+	// Stop form from submitting normally
+	event.preventDefault();
+	var likeReq = $(this);
+	var posting = $.post( likeReq.attr('action'), likeReq.serialize() );
+
+	var formId = $(this).closest("form").attr('id');
+	var id = formId.substr(8);
+	var likeBtnId = "likeSubmit".concat(id);
+	document.getElementById("debugtxt").innerHTML = "139";
+	
+	
+	if(document.getElementById(likeBtnId).innerHTML.localeCompare("Like")==0){
+		document.getElementById(likeBtnId).innerHTML = "Unlike";
+		
+		
+		var likes = parseInt(document.getElementById("likes".concat(id)).innerHTML);
+		
+		
+		likes++;
+		document.getElementById("debugtxt").innerHTML = likes;
+		document.getElementById("likes".concat(id)).innerHTML = likes;
+	}
+	else{
+		document.getElementById(likeBtnId).innerHTML = "Like";
+		var likes = parseInt(document.getElementById("likes".concat(id)).innerHTML);
+		likes--;
+		document.getElementById("likes".concat(id)).innerHTML = likes.toString();
+	}
+	// Send the data using post
+
+	//this will change the text on one like button to unlike
+
+	//substring paramter is simply the index 
+	// of the numbers in the string "postLike####" 
+	/*
+	Plan: One form, no ifs for form in here. A single post request "like" will
+	check whtehr a user has liked a post or not and switch that, modifying the post
+	score accordingly. This function will only update the plaintext fields on this
+	page and send the post request. the post request manages like vs. dislike.
+	*/
 
 });
 

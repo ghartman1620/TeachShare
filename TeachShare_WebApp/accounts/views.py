@@ -124,19 +124,25 @@ def post_detail(request, id= None):
 @login_required(login_url='/account/login')
 def like(request, id):
 	instance = get_object_or_404(Post, id=id)
-	if not hasLikedPost(request.user, instance):
+	post = getLikedPost(request.user, instance)
+	if post == None:
 		instance.likes+=1
 		instance.save()
 		likedPost = LikedPost(user=request.user, id=instance.id)
 		likedPost.save()
-	return HttpResponse("Error: dashboard like button should " 
-						     +"suppress POST request redirection");
+	else:
+		instance.likes-=1
+		instance.save()
+		post.delete()
+		
+	return HttpResponseRedirect(reverse('account:dashboard'))
+	
 
-def hasLikedPost(user, instance):
+def getLikedPost(user, instance):
 	for post in user.likedpost_set.all():
 		if(post.id == instance.id):
-			return True;
-	return False;
+			return post;
+	return None;
 	
 def add_tag(request, post):
 	if request.method == 'POST':
@@ -208,6 +214,9 @@ def register(request):
 
 @login_required(login_url='/account/login')
 def dashboard(request):
+	likedPosts = []
+	for post in request.user.likedpost_set.all():
+		likedPosts.append(post.id)
 	if request.method == 'POST':
 		searchString = request.POST['search']
 		results = []
@@ -218,6 +227,11 @@ def dashboard(request):
 				for tag in post.tag_set.all():
 					if tag.tag.find(searchString)!= -1:
 						results.append(post)
-		return render(request, 'accounts/dashboard.html', {'posts' : results})
+		return render(request, 'accounts/dashboard.html',
+					{'posts' : results, 
+					 'likedPosts' : likedPosts})
 	else:
-		return render(request, 'accounts/dashboard.html', {'posts' : Post.objects.all().order_by('-timestamp')})
+		return render(request, 'accounts/dashboard.html',
+						{'posts' : Post.objects.all().order_by('-timestamp'),
+						 'likedPosts' : likedPosts})
+					
