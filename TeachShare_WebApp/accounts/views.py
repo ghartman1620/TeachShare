@@ -9,9 +9,23 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
-from accounts.models import Tag, Post, UserProfile, GradeTaught, LikedPost
+from accounts.models import Tag, Post, UserProfile, GradeTaught
 
-
+'''
+Searches the given posts and returns a subset of these posts.
+Posts are included in the returned set if the search string
+is a substring of the post's title or one of its tags.
+'''
+def search(posts, searchString):
+	results = []
+	for post in posts.order_by('-timestamp'):
+		if post.title.find(searchString)!= -1:
+			results.append(post)
+		else: 
+			for tag in post.tag_set.all():
+				if tag.tag.find(searchString)!= -1:
+					results.append(post)
+	return results
 
 def home(request):
 	name = 'TeachShare'
@@ -126,11 +140,19 @@ which is their index in the all posts list.
 '''
 @login_required(login_url='/account/login')	
 def favorites(request):
-	posts = []
-	for likedPost in request.user.likedpost_set.all():
-		posts.append(Post.objects.all()[likedPost.postId])
-	return render(request, 'accounts/favorites.html', {'posts': posts })
+	if request.method == 'POST':
+		return render(request, 'accounts/favorites.html',
+				{'posts': search(request.user.userprofile.favorites.all(),
+									request.POST['search'])})
+	return render(request, 'accounts/favorites.html', 
+			{'posts': request.user.userprofile.favorites.all()})
 	
+	
+def likesPost(userProfile, post):
+	for fav in userProfile.favorites.all():
+		if(fav == post):
+			return True
+	return False
 	
 '''
 This POST request handles the user clicking the "like" or "dislike"
@@ -144,20 +166,17 @@ def like(request, id):
 	instance = get_object_or_404(Post, id=id)
 	
 	
-	post = getLikedPost(request.user, instance)
 	#Handle liking
-	if post == None:
-		print("liking")
+	if not likesPost(request.user.userprofile, instance):
 		instance.likes+=1
 		instance.save()
-		likedPost = LikedPost(user=request.user, postId=instance.id)
-		likedPost.save()
+
+		request.user.userprofile.favorites.add(instance)
 	#Handle unliking
-	else:
-		print("unliking")
+	else:	
 		instance.likes-=1
 		instance.save()
-		post.delete()
+		request.user.userprofile.favorites.remove(instance)
 	#Based on the redirect suppression in the script in dashboard.html
 	#this POST request should not be allowed to refresh the dashboard.
 	#So this line should not matter, but if it does, dashboard is the most
@@ -167,16 +186,7 @@ def like(request, id):
 	#otherwise just redirects to dashboard
 	#but if everything is working as intended neither of these will happen
 	return HttpResponse("redirect suppression failed")
-'''	
-Returns the LikedPost object corresponding to a user's like
-of a instance post or None if the user has not liked that
-particular post. 
-'''
-def getLikedPost(user, post):
-	for likedPost in user.likedpost_set.all():
-		if(likedPost.postId == post.id):
-			return likedPost;
-	return None;
+
 	
 def add_tag(request, post):
 	if request.method == 'POST':
@@ -249,20 +259,12 @@ def register(request):
 @login_required(login_url='/account/login')
 def dashboard(request):
 	likedPosts = []
-	for post in request.user.likedpost_set.all():
-		likedPosts.append(post.postId)
+	for post in request.user.userprofile.favorites.all():
+		likedPosts.append(post)
 	if request.method == 'POST':
-		searchString = request.POST['search']
-		results = []
-		for post in Post.objects.all().order_by('-timestamp'):
-			if post.title.find(searchString)!= -1:
-				results.append(post)
-			else: 
-				for tag in post.tag_set.all():
-					if tag.tag.find(searchString)!= -1:
-						results.append(post)
+		
 		return render(request, 'accounts/dashboard.html',
-					{'posts' : results, 
+					{'posts' : search(Post.objects.all(), request.POST['search']), 
 					 'likedPosts' : likedPosts})
 	else:
 		return render(request, 'accounts/dashboard.html',
