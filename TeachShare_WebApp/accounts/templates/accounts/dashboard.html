@@ -71,43 +71,6 @@
 			</div>
 			<h4><small>Posted {{post.timestamp}} Updated {{post.updated}}
 			</small></h4>
-			
-			<!-- {# This is all to show a "Unlike" button if the user has already liked a post
-			and a "Like" button if a user hasn't like that post. The "Like" form is repeated}
-			twice becuase we must guard against likedPosts being empty. #}
-			{% if likedPosts %}
-				{% if post.id in likedPosts %}
-				<form action="{% url 'account:like' id=post.id %}" method="POST"
-						id="unlikeForm{{post.id}}">
-					{% csrf_token %}
-					<button type="submit" class="btn btn-default">
-						<div id="likeSubmit{{post.id}}">
-							Unlike
-						</div>
-					</button>
-				</form>
-				{% else %}
-				<form action="{% url 'account:like' id=post.id %}" method="POST"
-						id="likeForm{{post.id}}">
-					{% csrf_token %}
-					<button type="submit" class="btn btn-default">
-						<div id="likeSubmit{{post.id}}">
-							Like
-						</div>
-					</button>
-				</form>
-				{% endif %}
-			{% else %}
-			<form action="{% url 'account:like' id=post.id %}" method="POST"
-						id="likeForm{{post.id}}">
-				{% csrf_token %}
-				<button type="submit" class="btn btn-default">
-					<div id="likeSubmit{{post.id}}">
-						Like
-					</div>
-				</button>
-			</form>
-			{% endif %}-->
 			<form action="{% url 'account:like' id=post.id %}" method="POST"
 						id="likeForm{{post.id}}">
 					{% csrf_token %}
