@@ -11,6 +11,14 @@ from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
 from accounts.models import Tag, Post, UserProfile, GradeTaught
 
+from django.conf import settings 
+
+from django.utils.timezone import now as timezone_now
+
+#import pdb; pdb.set_trace()
+
+import os, sys
+
 from .models import Attachment
 
 # Create your views here.
@@ -100,25 +108,26 @@ def edit_profile(request):
 
 def isValidRequestField(request, str):
 	return str in request.POST and request.POST[str] != "";
+
 		
 @login_required(login_url='/account/login')
 def post_create(request):
 	if request.method == 'POST':
-		title=request.POST['title'], 
-		content=request.POST['description'],
-		user=request.user.username 
-		Files=request.FILES.getlist('files')
-		post = None
-		
-		for number, a_file in enumerate(Files):
-			post = Post(
-            	title=title,
-            	content=content,
-            	user=user,
-            	Files=a_file)
-			post.save()
-		add_tag(request,post)
-		return HttpResponseRedirect(reverse('account:dashboard'))
+		post = Post(title=request.POST['title'], content=request.POST['description'],
+						user=request.user.username)
+		files = request.FILES.getlist('files')
+		for a_file in enumerate(files):
+			instance = Attachment(attachment=a_file)
+			instance.save()
+		post.save()
+		add_tag(request, post)
+		now = timezone_now()
+		dirs =os.listdir(os.path.join(settings.MEDIA_ROOT,'my_uploads/{}'.format(now.strftime("%Y/%m/%d/%Y%m%d%H%M%S/"))))
+		for file in dirs:
+			now = timezone_now()
+			file ='/my_uploads/{}'.format(now.strftime("%Y/%m/%d/%Y%m%d%H%M%S/")) + file
+
+		return render(request, 'accounts/dashboard.html',{"dirs": dirs})
 	else:
 
 		return render(request, 'accounts/post_create.html',None)
@@ -219,18 +228,3 @@ def dashboard(request):
 		return render(request, 'accounts/dashboard.html', {'posts' : Post.objects.all().order_by('-timestamp')})
 
 
-
-
-# def add_attachment(request):
-#     if request.method == "POST":
-#         parent_id = request.POST['parent_id']
-#         files = request.FILES.getlist('myfiles')
-#         request.session['number_of_files'] = number + 1
-#         return redirect("account:add_attachment_done")
-
-#     return render(request, "accounts/add_attachment.html")
-
-
-# def add_attachment_done(request):
-#     return render_to_response('accounts/add_attachment_done.html',
-#         context={"num_files": request.session["number_of_files"]})

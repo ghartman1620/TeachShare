@@ -31,23 +31,6 @@ def create_profile(sender, **kwargs):
 		user_profile = UserProfile.objects.create(user=kwargs['instance'])
 		user_profile.save()
 
-class Post(models.Model):
-	user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
-	title = models.CharField(max_length=100, default='')
-	Files = models.FileField(null=True, blank=True)
-	user = models.CharField(max_length=100, default='')
-	content = models.TextField(default="")
-	updated = models.DateTimeField(auto_now=True, auto_now_add=False)
-	timestamp = models.DateTimeField(auto_now=False, auto_now_add= True)
-
-# Creates list of tags for every post
-class Tag(models.Model):
-	tag = models.CharField(max_length=100, default='')
-	post = models.ForeignKey(Post, on_delete=models.CASCADE)
-
-post_save.connect(create_profile, sender=User)
-
-
 def create_random_string(length=30):
     if length <= 0:
         length = 30
@@ -59,14 +42,27 @@ def create_random_string(length=30):
 def upload_to(instance, filename):
     now = timezone_now()
     filename_base, filename_ext = os.path.splitext(filename)
-    return 'my_uploads/{}_{}{}'.format(
-        now.strftime("%Y/%m/%d/%Y%m%d%H%M%S"),
+    return 'my_uploads/{}{}{}'.format(
+        now.strftime("%Y/%m/%d/%Y%m%d%H%M%S/"),
         create_random_string(),
-        filename_ext.lower()
-    )
-
+        filename_ext.lower())
 
 class Attachment(models.Model):
-    parent_id = models.CharField(max_length=18)
-    file_name = models.CharField(max_length=100)
-    attachment = models.FileField(upload_to=upload_to)
+    attachment = models.FileField(upload_to = 'documents/')
+
+class Post(models.Model):
+	user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
+	title = models.CharField(max_length=100, default='')
+	user = models.CharField(max_length=100, default='')
+	content = models.TextField(default="")
+	fileLocation = models.TextField(default = "")
+	updated = models.DateTimeField(auto_now=True, auto_now_add=False)
+	timestamp = models.DateTimeField(auto_now=False, auto_now_add= True)
+
+
+# Creates list of tags for every post
+class Tag(models.Model):
+	tag = models.CharField(max_length=100, default='')
+	post = models.ForeignKey(Post, on_delete=models.CASCADE)
+
+post_save.connect(create_profile, sender=User)
