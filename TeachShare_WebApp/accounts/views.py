@@ -11,7 +11,9 @@ from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
 from accounts.models import Tag, Post, UserProfile, GradeTaught
 
-from .models import Attachment
+from .forms import CommentForm
+
+from .models import Attachment, Comment
 
 # Create your views here.
 def home(request):
@@ -54,6 +56,18 @@ def view_profile(request):
 		'grades': request.user.userprofile.gradetaught_set.all(),
 	}
 	return render(request,'accounts/profile.html',args)
+
+
+def add_comment_to_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == "POST":
+            comment = Comment(text=request.POST['description'], post=post)
+            comment.save()
+            return redirect('account:post_detail', id=pk)
+    else:
+        form = CommentForm()
+
+
 
 @login_required(login_url='/account/login')
 def edit_profile(request):
@@ -107,6 +121,7 @@ def post_create(request):
 		post = Post(title=request.POST['title'], content=request.POST['description'],
 						user=request.user.username)
 		post.save()
+		add_attachment(request)
 		add_tag(request,post)
 		return HttpResponseRedirect(reverse('account:dashboard'))
 	else:
@@ -211,10 +226,10 @@ def dashboard(request):
 
 
 
+
+
 def add_attachment(request):
     if request.method == "POST":
-        parent_id = request.POST['parent_id']
-        files = request.FILES.getlist('myfiles')
         for number, a_file in enumerate(files):
             instance = Attachment(
                 parent_id=parent_id,
@@ -222,11 +237,6 @@ def add_attachment(request):
                 attachment=a_file
             )
             instance.save()
-
-        request.session['number_of_files'] = number + 1
-        return redirect("account:add_attachment_done")
-
-    return render(request, "accounts/add_attachment.html")
 
 
 def add_attachment_done(request):

@@ -7,6 +7,8 @@ from django.db.models.signals import post_save
 
 from django.utils.timezone import now as timezone_now
 
+
+
 import random
 import string
 import os
@@ -31,6 +33,19 @@ def create_profile(sender, **kwargs):
 		user_profile = UserProfile.objects.create(user=kwargs['instance'])
 		user_profile.save()
 
+def upload_to(instance, filename):
+    now = timezone_now()
+    filename_base, filename_ext = os.path.splitext(filename)
+    return 'my_uploads/{}{}{}'.format(
+        now.strftime("%Y/%m/%d/%Y%m%d%H%M%S/"),
+        filename_ext.lower()
+    )
+
+class Attachment(models.Model):
+    parent_id = models.CharField(max_length=18)
+    file_name = models.CharField(max_length=100)
+    attachment = models.FileField(upload_to=upload_to)
+
 class Post(models.Model):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
 	title = models.CharField(max_length=100, default='')
@@ -47,25 +62,11 @@ class Tag(models.Model):
 post_save.connect(create_profile, sender=User)
 
 
-def create_random_string(length=30):
-    if length <= 0:
-        length = 30
-
-    symbols = string.ascii_lowercase + string.ascii_uppercase + string.digits
-    return ''.join([random.choice(symbols) for x in range(length)])
+class Comment(models.Model):
+    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
+    text = models.TextField()
 
 
-def upload_to(instance, filename):
-    now = timezone_now()
-    filename_base, filename_ext = os.path.splitext(filename)
-    return 'my_uploads/{}_{}{}'.format(
-        now.strftime("%Y/%m/%d/%Y%m%d%H%M%S"),
-        create_random_string(),
-        filename_ext.lower()
-    )
+    def __str__(self):
+        return self.text
 
-
-class Attachment(models.Model):
-    parent_id = models.CharField(max_length=18)
-    file_name = models.CharField(max_length=100)
-    attachment = models.FileField(upload_to=upload_to)

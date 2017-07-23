@@ -81,7 +81,30 @@
     </div>
 </div>
 
-<div class="container">
+
+<hr>
+{% for comment in instance.comments.all %}
+<div class="comment">
+        <p>{{ comment.text|linebreaks }}</p>
+    </div>
+{% empty %}
+    <p>No comments here yet :(</p>
+{% endfor %}
+<!-- <a class="btn btn-default" href="{% url 'account:add_comment_to_post' pk=instance.id %}">Add comment</a>
+<hr>
+{% for comment in post.comments.all %}
+    <div class="comment">
+        <div class="date">{{ comment.created_date }}</div>
+        <strong>{{ comment.author }}</strong>
+        <p>{{ comment.text|linebreaks }}</p>
+    </div>
+{% empty %}
+    <p>No comments here yet :(</p>
+{% endfor %} -->
+
+<form method="post" action= "{% url 'account:add_comment_to_post' pk=instance.pk %}">
+{% csrf_token %}
+ <div class="container">
     <div class="col-sm-2 pull-right"></div>
         <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#comment">Comment</button>
     </div>
