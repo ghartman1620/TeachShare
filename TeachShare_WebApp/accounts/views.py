@@ -9,11 +9,34 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
-from accounts.models import Tag, Post, UserProfile, GradeTaught
+from accounts.models import Tag, Post, UserProfile, GradeTaught, Attachment
+from django.conf import settings 
+from django.utils.timezone import now as timezone_now
 
-from .models import Attachment
+#import pdb; pdb.set_trace()
 
-# Create your views here.
+import os, sys
+
+
+'''
+Searches the given posts and returns a subset of these posts.
+Posts are included in the returned set if the search string
+is a substring of the post's title or one of its tags.
+'''
+def search(posts, searchString):
+	results = []
+	for post in posts.order_by('-timestamp'):
+		if post.title.find(searchString)!= -1:
+			results.append(post)
+		else: 
+			for tag in post.tag_set.all():
+				if tag.tag.find(searchString)!= -1:
+					results.append(post)
+	return results
+from .forms import CommentForm
+
+from .models import Attachment, Comment
+
 def home(request):
 	name = 'TeachShare'
 	numbers = [1,2,3,4,5,6]
@@ -55,13 +78,21 @@ def view_profile(request):
 	}
 	return render(request,'accounts/profile.html',args)
 
+
+def add_comment_to_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == "POST":
+            comment = Comment(text=request.POST['description'], post=post)
+            comment.save()
+            return redirect('account:post_detail', id=pk)
+    else:
+        form = CommentForm()
+
+
+
 @login_required(login_url='/account/login')
 def edit_profile(request):
 	if request.method == 'POST':
-
-		#this is a method to get the UserProfile object that corresponds to request.user
-		#if there's a better way let me know
-		#searches all UserProfile objects until we find the one with this User
 		user = request.user
 		userProfile = user.userprofile
 		
@@ -100,30 +131,111 @@ def edit_profile(request):
 
 def isValidRequestField(request, str):
 	return str in request.POST and request.POST[str] != "";
+
 		
 @login_required(login_url='/account/login')
 def post_create(request):
 	if request.method == 'POST':
 		post = Post(title=request.POST['title'], content=request.POST['description'],
 						user=request.user.username)
+		files =request.FILES.getlist('files')
 		post.save()
+		#Handle multi-file upload
+		for a_file in files:
+		
+			instance = Attachment(
+				file=a_file, post=post)
+			
+			instance.save()
+
 		add_tag(request,post)
+
 		return HttpResponseRedirect(reverse('account:dashboard'))
 	else:
 
 		return render(request, 'accounts/post_create.html',None)
 
 
+imgFormats = ["jpg", "jpeg", "gif", "png", "apng", "svg", "bmp", "ico"]
 def post_detail(request, id= None):
 	instance = get_object_or_404(Post, id=id)
+	files = []
+	images = []
+	for attachment in instance.attachment_set.all():
+		file = attachment.file.path
+		name = file[file.rfind("\\")+1:]
+		print(name)
+		file = file[file.find("\media\\"):]
+		if file[-3:] in imgFormats:
+			images.append((file, name))
+		else:
+			files.append((file, name))
+	
 	context = {
 		"title": instance.title,
 		"instance": instance,
-		"tags": instance.tag_set.all()
+		"tags": instance.tag_set.all(),
+		"files": files,
+		"images": images,
 	}
 	return render(request,'accounts/post_detail.html',context)
 
+	
+'''
+Renders the favorites page. 
+The loop is gathering up the posts that a user has liked based on their post id,
+which is their index in the all posts list.
+'''
+@login_required(login_url='/account/login')	
+def favorites(request):
+	if request.method == 'POST':
+		return render(request, 'accounts/favorites.html',
+				{'posts': search(request.user.userprofile.favorites.all(),
+									request.POST['search'])})
+	return render(request, 'accounts/favorites.html', 
+			{'posts': request.user.userprofile.favorites.all()})
+	
+	
+def likesPost(userProfile, post):
+	for fav in userProfile.favorites.all():
+		if(fav == post):
+			return True
+	return False
+	
+'''
+This POST request handles the user clicking the "like" or "dislike"
+button on the dashboard. It does both by checking whether the 
+user has already liked the post - if they have, then decrement
+that posts' likes and remove that post from the user's like post list,
+and do the opposite for a post that the user has not yet liked.
+'''
+@login_required(login_url='/account/login')
+def like(request, id):
+	instance = get_object_or_404(Post, id=id)
+	
+	
+	#Handle liking
+	if not likesPost(request.user.userprofile, instance):
+		instance.likes+=1
+		instance.save()
 
+		request.user.userprofile.favorites.add(instance)
+	#Handle unliking
+	else:	
+		instance.likes-=1
+		instance.save()
+		request.user.userprofile.favorites.remove(instance)
+	#Based on the redirect suppression in the script in dashboard.html
+	#this POST request should not be allowed to refresh the dashboard.
+	#So this line should not matter, but if it does, dashboard is the most
+	#natural place to redirect to
+	
+	#Returns an error page in development (the debug field in settings is true)
+	#otherwise just redirects to dashboard
+	#but if everything is working as intended neither of these will happen
+	return HttpResponse("redirect suppression failed")
+
+	
 def add_tag(request, post):
 	if request.method == 'POST':
 		tagString =request.POST['tag']
@@ -194,38 +306,17 @@ def register(request):
 
 @login_required(login_url='/account/login')
 def dashboard(request):
+	likedPosts = []
+	for post in request.user.userprofile.favorites.all():
+		likedPosts.append(post)
 	if request.method == 'POST':
-		searchString = request.POST['search']
-		results = []
-		for post in Post.objects.all().order_by('-timestamp'):
-			if post.title.find(searchString)!= -1:
-				results.append(post)
-			else: 
-				for tag in post.tag_set.all():
-					if tag.tag.find(searchString)!= -1:
-						results.append(post)
-		return render(request, 'accounts/dashboard.html', {'posts' : results})
+		
+		return render(request, 'accounts/dashboard.html',
+					{'posts' : search(Post.objects.all(), request.POST['search']), 
+					 'likedPosts' : likedPosts})
 	else:
 		return render(request, 'accounts/dashboard.html', {'posts' : Post.objects.all().order_by('-timestamp')})
 
-def add_attachment(request):
-    if request.method == "POST":
-        parent_id = request.POST['parent_id']
-        files = request.FILES.getlist('myfiles')
-        for number, a_file in enumerate(files):
-            instance = Attachment(
-                parent_id=parent_id,
-                file_name=a_file.name,
-                attachment=a_file
-            )
-            instance.save()
-
-        request.session['number_of_files'] = number + 1
-        return redirect("account:add_attachment_done")
-
-    return render(request, "accounts/add_attachment.html")
 
 
-def add_attachment_done(request):
-    return render_to_response('accounts/add_attachment_done.html',
-        context={"num_files": request.session["number_of_files"]})
+

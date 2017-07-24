@@ -5,7 +5,12 @@
 {% load static %}
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<<<<<<< HEAD
 
+=======
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+>>>>>>> 7c9b97628db482324d767cc008c2a6a21230a295
 <link rel="stylesheet" href={% static 'accounts/post_detail.css'%} type = "text/css">
   <meta charset="utf-8">
 
@@ -60,6 +65,7 @@
 <div class="col-xs-12" style="height:20px;"></div>
 </div>-->
 
+<<<<<<< HEAD
 <div class = "container"> 
   <h1>{{title}}</h1>
   <p>Created: {{instance.timestamp}}</br>
@@ -85,10 +91,90 @@
 
 
 </div>
+=======
+<!-- Post Description and Content Box -->
+<div class="container">
+    <h1> {{title}} </h1>
+    <h2><small>Created by: {{instance.user}}</small></h2>
+    <h4><small>Posted {{instance.timestamp}} Updated {{instance.updated}}
+    </small></h4>
+    <!-- Well -->
+    <div class="well">
+            <p>
+                {{instance.content}}</br>
+                <!--{{instance.id}}</br>-->
+            </p>
+            <!-- Files -->
+            <p>Attachments:
+              {% if files %}
+                {% for file in files %}
+                  <p><a href="{{file.0}}" download>{{file.1}}</a></p>
+                {% endfor %}
+              {% endif %}
+            </p>
+            <p>
+              {% if images %}
+                {% for image in images %}
+                  <p><img src='{{image.0}}'></p>
+                  <p><a href="{{image.0}}" download>{{image.1}}</a></p>
+                {% endfor %}
+              {% endif %}
+            </p><!-- ./End Files -->
+    </div> <!-- ./End Well -->
+    <!-- Tags -->
+    <p>Tags: </br>
+      {% if tags %}
+        {% for tag in tags %}
+          <a href="">#{{tag.tag}}</a>
+        {% endfor %}
+      {% endif %}
+    </p> <!-- ./End Tags -->
+
+</div> <!-- ./End Post Box -->
+>>>>>>> 7c9b97628db482324d767cc008c2a6a21230a295
 
 
 
-<div class="col-xs-12" style="height:50px;"></div>
+<hr>
+{% for comment in instance.comments.all %}
+<div class="comment">
+        <p>{{ comment.text|linebreaks }}</p>
+    </div>
+{% empty %}
+    <p>No comments here yet :(</p>
+{% endfor %}
+<!-- <a class="btn btn-default" href="{% url 'account:add_comment_to_post' pk=instance.id %}">Add comment</a>
+<hr>
+{% for comment in post.comments.all %}
+    <div class="comment">
+        <div class="date">{{ comment.created_date }}</div>
+        <strong>{{ comment.author }}</strong>
+        <p>{{ comment.text|linebreaks }}</p>
+    </div>
+{% empty %}
+    <p>No comments here yet :(</p>
+{% endfor %} -->
+
+<form method="post" action= "{% url 'account:add_comment_to_post' pk=instance.pk %}">
+{% csrf_token %}
+ <div class="container">
+    <div class="col-sm-2 pull-right"></div>
+        <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#comment">Comment</button>
+    </div>
+  <div id="comment" class="collapae">
+    <div class="form-group">
+       <label for="message" class="col-sm-12 control-label">Comment</label>
+       <div class="col-sm-11">
+          <textarea type="text" class="form-control" rows="4" name="description" placeholder="Add a comment"></textarea>
+       </div>
+    </div>
+    <div class="form-group">
+       <div class="col-sm-2 pull-right">
+         <input id="submit" name="submit" type="submit" value="Submit" class="btn btn-primary">
+       </div>
+    </div>
+  </div>
+</div>
 
 
 

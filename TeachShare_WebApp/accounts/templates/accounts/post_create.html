@@ -52,57 +52,40 @@
   <h3>Create a Post</h3>
 
 
-   <form method="post" action= "{% url 'account:post_create' %}">
+   <form method="post" action= "{% url 'account:post_create' %}" enctype="multipart/form-data">
 	{% csrf_token %}
       <div class="form-group">
          <label for="title" class="col-sm-12 control-label">Title</label>
          <div class="col-sm-11">
          <input type="text" class="form-control" id="title" name="title" placeholder="Add a title" value="">
          </div>
-      </div>
-
-      <div class="form-group">
+    
          <label for="message" class="col-sm-12 control-label">Description</label>
          <div class="col-sm-11">
 			<textarea type="text" class="form-control" rows="6" name="description" placeholder="Add a description"></textarea>
          </div>
-      </div>
-
-      <div class="form-group">
+     
          <label for="tag" class="col-sm-12 control-label">Tags</label>
          <div class="col-sm-11">
          <input type="text" class="form-control" id="tag" name="tag" placeholder="Add tag(s)" value="">
          <label for="prompt" class="col-sm-12 control-label">List tags as comma-separated list.</label>
          </div>
-      </div>
+     
+     
+  
+ <input class="box_file" type="file" name="files" id="file" data-multiple-caption="{count} files selected" multiple/>
+        <label for="file"><strong>Choose a file</strong><span class="box_dragndrop"> or drop it here</span>.</label>
 
-      <div class="form-group">
-         <div class="col-sm-2 pull-right">
+  <div class="form-group">
+             <div class="col-sm-2 pull-right">
          <input id="submit" name="submit" type="submit" value="Submit" class="btn btn-primary">
          </div>
       </div>
-  </form>
 
-  <div class="form-group">
-         <div class="col-sm-3 pull-left">
-         <input id="save" name="save" type="submit" value="Save" class="btn btn-primary">
-         </div>
-      </div>
-
-
+</form>
 </div>
 
-<!-- Uploading files -->
-  <form class="box" method="post" action="" enctype="multipart/form-data">
-      <div class="box_input">
-        <input class="box_file" type="file" names="files[]" id="file" data-multiple-caption="{count} files selected" multiple/>
-        <label for="file"><strong>Choose a file</strong><span class="box_dragndrop"> or drop it here</span>.</label>
-        <button class="box_button" type="submit">Upload</button>
-      </div>
-      <div class="box_uploading">Uploading&hellip;</div>
-      <div class="box_success">Done!</div>
-      <div class="box_error">Error! <span></span>. </div>
-  </form> <!-- ./End uploading files -->
+
 
 {% endblock %}
 </body>

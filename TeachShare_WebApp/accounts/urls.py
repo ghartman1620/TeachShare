@@ -1,12 +1,9 @@
 from django.conf.urls import url
 from . import views
-from django.contrib.auth.views import login
-
-from .views import add_attachment, add_attachment_done
+from django.contrib.auth.views import login, password_reset, password_reset_done
 
 app_name = 'account'
 urlpatterns = [
-	
 	url(r'^$',views.home, name='home'),
 	url(r'^login/$', views.login, name='login' ),
 	url(r'^signup/$', views.signup, name='signup'),
@@ -19,7 +16,7 @@ urlpatterns = [
 	url(r'^password_change/$', views.password_change, name='password_change'),
 	url(r'^forgotPassword/$', views.password_change_page, name='password_change_page'),
 	url(r'^create/$', views.post_create, name='post_create'),
-	url(r'^add_attachment/$', add_attachment, name="add_attachment"),
-    url(r'^add_attachment_done/$', add_attachment_done, name="add_attachment_done"),
-	
+	url(r'^like/(?P<id>\d+)/$', views.like, name='like'),
+	url(r'^favorites/$', views.favorites, name='favorites'),
+	url(r'^post/(?P<pk>\d+)/comment/$', views.add_comment_to_post, name='add_comment_to_post'),
 ]

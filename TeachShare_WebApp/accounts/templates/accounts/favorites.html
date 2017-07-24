@@ -1,0 +1,157 @@
+<html lang="en">
+<head>
+{% load static %}
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" href={% static 'accounts/dashboard.css'%} type = "text/css">
+<meta charset="utf-8">
+
+  <title>Dashboard</title>
+<!-- Tab icon -->
+<link rel="icon" type="image/png" href="/static/img/icon.png">
+</head>
+
+
+<body>
+{% block body %}
+
+<!-- Navbar -->
+<nav class="navbar navbar-inverse ">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/account/dashboard">
+        <img src="{% static "accounts/tslogo.png" %}" alt="TSLogo"/>
+      </a>
+    </div>
+  <!-- Search bar -->
+    <form class="navbar-form navbar-left nav-searchpad" 
+		method="post" id="search" action="{% url 'account:favorites' %}">
+    {% csrf_token %}
+      <div class="form-group">
+        <input type="text" name="search" class="form-control" placeholder="Search">
+      </div>
+      <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+  <!-- Create a Post Button -->
+    <ul class="nav navbar-nav nav-navitems">
+      <li><a href="/account/create/">
+        <p>New Post <span class="glyphicon glyphicon-plus-sign"></span> </p>
+        </a>
+      </li>
+    </ul>
+  <!-- Dropdown Account Menu -->
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" >
+          <img src="{% static "accounts/applelogo.png" %}" alt="TSLogo"/>
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+		    <li><a href="/account/favorites">Favorites</a></li>
+          <li><a href="/account/profile/">Profile</a></li>
+          <li><a href="/account/profile/edit/">Settings</a></li>
+          <li><a href="/account/logout">Log Out</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav> <!-- ./End Navbar -->
+
+<div class="page-header">
+  <h1>Favorites</h1>
+</div>
+
+{% if posts %}
+	{% for post in posts %}
+		<div class="container">
+			<h2>{{post.title}} <small>{{post.user}}</small></h2>
+			<div class="well">
+				<p>
+					{{post.content}}
+					<a href= '/account/detail/{{post.id}}'>See more</a>
+				</p>
+			</div>
+			<h4><small>Posted {{post.timestamp}} Updated {{post.updated}}
+			</small></h4>
+			<form action="{% url 'account:like' id=post.id %}" method="POST"
+					id="likeForm{{post.id}}">
+				{% csrf_token %}
+				<button type="submit" class="btn btn-default">
+					<!-- The conditional on this text has been removed
+					from dashboard.html. If a post appears on the favorites page
+					the user has already liked it so the "Unlike" button
+					appears by default. This can still be changed 
+					below as in dashboard.-->
+					<div id="likeSubmit{{post.id}}">Unlike</div>
+
+				</button>
+			</form>
+			<p> Likes: <div id="likes{{post.id}}">{{post.likes}}</div></p>
+		</div> <!-- container -->
+	{% endfor %}
+{% endif %}
+
+{% endblock %}
+
+<script>
+//This function is called when user clicks a like or unlike post button.
+//It will handle the post request and update the page to correspond to the user's
+//post like without refreshing the page.
+$("form").submit(function(event) {
+	if($(this).closest("form").attr('id').localeCompare("search")!=0){
+		
+		//Stop POST request from submitting and redirecting
+		event.preventDefault();
+		/*
+		Send the POST request. This does not redirect.
+		The post request  (see views.py/like()) will decide whether to increase
+		or decrease likes based on whether or not a user has already liked
+		the post. So we have a single request do both liking and disliking
+		This lets this function right here be a single function instead of
+		two, and I know python/django better than javascript so I thought
+		that this would be an easier implementation. 
+		*/
+		var likeReq = $(this);
+		var posting = $.post( likeReq.attr('action'), likeReq.serialize() );
+
+		/*Get the name of the form that was submitted.
+		The part of the from we care about is the ID - the number that follows
+		"likeForm" in the string.*/
+		var formId = $(this).closest("form").attr('id');
+		var id = formId.substr(8);
+		//This is the name of the div tag that contains the text "like" or "unlike"
+		var likeBtnId = "likeSubmit".concat(id);
+		
+		/*If the text was like, the user must be liking it. So we'll
+		change the text to unlike and increment the number of likes displayed by one.
+		
+		
+		Notice that this incrementation does not change the database. The POST
+		request above did that, so this is merely making the page display
+		what the database knows without refreshing the page and making 
+		another database read.*/
+		if(document.getElementById(likeBtnId).innerHTML.localeCompare("Like")==0){
+			document.getElementById(likeBtnId).innerHTML = "Unlike";
+			
+			
+			var likes = parseInt(document.getElementById("likes".concat(id)).innerHTML);
+			
+			
+			likes++;
+			document.getElementById("likes".concat(id)).innerHTML = likes;
+		}
+		//Likewise if the text was unlike, the user is retracting their like
+		//of a post. 
+		else{
+			document.getElementById(likeBtnId).innerHTML = "Like";
+			var likes = parseInt(document.getElementById("likes".concat(id)).innerHTML);
+			likes--;
+			document.getElementById("likes".concat(id)).innerHTML = likes.toString();
+		}
+	}
+});
+</script>
+
+</body>
