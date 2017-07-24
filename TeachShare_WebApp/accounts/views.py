@@ -82,7 +82,7 @@ def view_profile(request):
 def add_comment_to_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if request.method == "POST":
-            comment = Comment(text=request.POST['description'], post=post)
+            comment = Comment(text=request.POST['description'], post=post, user=request.user.username)
             comment.save()
             return redirect('account:post_detail', id=pk)
     else:
