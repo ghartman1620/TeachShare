@@ -138,11 +138,13 @@ def post_detail(request, id= None):
 	images = []
 	for attachment in instance.attachment_set.all():
 		file = attachment.file.path
+		name = file[file.rfind("\\")+1:]
+		print(name)
 		file = file[file.find("\media\\"):]
 		if file[-3:] in imgFormats:
-			images.append(file)
+			images.append((file, name))
 		else:
-			files.append(file)
+			files.append((file, name))
 	
 	context = {
 		"title": instance.title,

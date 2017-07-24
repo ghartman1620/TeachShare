@@ -79,15 +79,15 @@
 <p>Attachments:
 {% if files %}
 	{% for file in files %}
-		<a href="{{file}}" download>{{file}}</a>
+		<p><a href="{{file.0}}" download>{{file.1}}</a></p>
 	{% endfor %}
 {% endif %}
 </p>
 
 {% if images %}
 	{% for image in images %}
-		<img src='{{image}}'>
-		<a href="{{image}}" download>{{image}}</a>
+		<p><img src='{{image.0}}'></p>
+		<p><a href="{{image.0}}" download>{{image.1}}</a></p>
 	{% endfor %}
 {% endif %}
 </div>
