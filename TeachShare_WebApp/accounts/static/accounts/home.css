@@ -41,6 +41,11 @@
 }
 
 
+.darktxt{
+	color:#000;
+}
+
+
 body {
   background: #FCF4E3
     ; /* fallback for old browsers */

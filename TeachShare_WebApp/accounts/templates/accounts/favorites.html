@@ -31,7 +31,11 @@
 		method="post" id="search" action="{% url 'account:favorites' %}">
     {% csrf_token %}
       <div class="form-group">
-        <input type="text" name="search" class="form-control" placeholder="Search">
+        {% if searchstring %}
+        <input type="text" name="search" value={{searchstring}} class="form-control">
+		{% else %}
+		<input type="text" name="search" class="form-control" placeholder="Search">
+		{% endif %}
       </div>
       <button type="submit" class="btn btn-default">Submit</button>
     </form>
@@ -89,6 +93,23 @@
 				</button>
 			</form>
 			<p> Likes: <div id="likes{{post.id}}">{{post.likes}}</div></p>
+			
+			{% if post.tags.all %}
+			
+			<div class = "btn-toolbar"  role="group">
+				<div class="tag-container">
+				{% for tag in post.tags.all %}
+					<form method="post" id="search" action="{% url 'account:favorites' %}">
+					{% csrf_token %}
+					<input type="hidden" name="search" value="{{tag.tag}}">
+					<button type="submit" class="btn btn-default">#{{tag.tag}}</button>
+					</form>
+				{% endfor %}
+				</div>
+			</div>
+			<h4><small> Click a tag to search for all posts with that tag!</small></h4>
+			{% endif %}
+			
 		</div> <!-- container -->
 	{% endfor %}
 {% endif %}

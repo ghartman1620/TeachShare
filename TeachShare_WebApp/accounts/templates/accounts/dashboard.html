@@ -31,8 +31,12 @@
 		method="post" id="search" action="{% url 'account:dashboard' %}">
     {% csrf_token %}
       <div class="form-group">
-        <input type="text" name="search" class="form-control" placeholder="Search">
-      </div>
+		{% if searchstring %}
+        <input type="text" name="search" value={{searchstring}} class="form-control">
+		{% else %}
+		<input type="text" name="search" class="form-control" placeholder="Search">
+		{% endif %}
+	 </div>
       <button type="submit" class="btn btn-default">Submit</button>
     </form>
   <!-- Create a Post Button -->
@@ -67,15 +71,14 @@
 			<div class="well">
 				<p>
 					{{post.content}}
-          {% for item in dirs %}
-            <img src='/media/'+{{item}} class='img-responsive'>
-          {% endfor %}
+
                   <a href= '/account/detail/{{post.id}}'>See more</a>
 
 				</p>
 			</div>
 			<h4><small>Posted {{post.timestamp}} Updated {{post.updated}}
 			</small></h4>
+			{{post.id}}
 			<form action="{% url 'account:like' id=post.id %}" method="POST"
 					id="likeForm{{post.id}}">
 				{% csrf_token %}
@@ -85,7 +88,7 @@
 					text is important for the function below
 					called on submitting this form. -->
 					{% if likedPosts %}
-						{% if post in likedPosts %}
+						{% if post.0 in likedPosts %}
 							<div id="likeSubmit{{post.id}}">Unlike</div>
 						{% else %}
 							<div id="likeSubmit{{post.id}}">Like</div>
@@ -94,8 +97,27 @@
 						<div id="likeSubmit{{post.id}}">Like</div>
 					{% endif %}
 				</button>
+				<br>
+				
 			</form>
 			<p> Likes: <div id="likes{{post.id}}">{{post.likes}}</div></p>
+			
+			{% if post.tags.all %}
+			
+			<div class = "btn-toolbar"  role="group">
+				<div class="tag-container">
+				{% for tag in post.tags.all %}
+					<form method="post" id="search" action="{% url 'account:dashboard' %}">
+					{% csrf_token %}
+					<input type="hidden" name="search" value="{{tag.tag}}">
+					<button type="submit" class="btn btn-default">#{{tag.tag}}</button>
+					</form>
+				{% endfor %}
+				</div>
+			</div>
+			<h4><small> Click a tag to search for all posts with that tag!</small></h4>
+			{% endif %}
+
 		</div> <!-- container -->
 	{% endfor %}
 {% endif %}
