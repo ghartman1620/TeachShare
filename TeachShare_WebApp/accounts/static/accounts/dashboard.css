@@ -52,3 +52,8 @@ body {
 .well>p {
   font-size: 18px;
 }
+
+.tag-container {
+	width: 800px;
+	height: 0px;
+}

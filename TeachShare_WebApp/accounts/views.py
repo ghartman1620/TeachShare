@@ -244,8 +244,9 @@ def add_tag(request, post):
 		tagString =request.POST['tag']
 		tagList = tagString.split(',')
 		for s in tagList:
-			tag = Tag(tag=s, post=post)
-			tag.save()
+			if(s != ""):
+				tag = Tag(tag=s, post=post)
+				tag.save()
 
 def password_change(request):
 	try:
