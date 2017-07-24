@@ -55,8 +55,10 @@ class Post(models.Model):
 	content = models.TextField(default="")
 	updated = models.DateTimeField(auto_now=True, auto_now_add=False)
 	timestamp = models.DateTimeField(auto_now=False, auto_now_add= True)
-	attachment = models.FileField(null=True, blank=True, upload_to = upload_to)
-
+	
+class Attachment(models.Model):
+	post = models.ForeignKey(Post, on_delete=models.CASCADE)
+	file = models.FileField(null=True, blank=True, upload_to = upload_to)
 
 # Creates list of tags for every post
 class Tag(models.Model):

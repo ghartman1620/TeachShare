@@ -76,6 +76,19 @@
   {% endfor %}
 {% endif %}
 </p>
+<p>Attachments:
+{% if files %}
+	{% for file in files %}
+		<p>{{file}}</p>
+	{% endfor %}
+{% endif %}
+</p>
+
+{% if images %}
+	{% for image in images %}
+		<img src='{{image}}' class='img-responsive'>
+	{% endfor %}
+{% endif %}
 </div>
 
 

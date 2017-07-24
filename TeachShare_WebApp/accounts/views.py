@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
-from accounts.models import Tag, Post, UserProfile, GradeTaught
+from accounts.models import Tag, Post, UserProfile, GradeTaught, Attachment
 
 from django.conf import settings 
 
@@ -115,15 +115,19 @@ def post_create(request):
 		post = Post(title=request.POST['title'], content=request.POST['description'],
 						user=request.user.username)
 		files =request.FILES.getlist('files')
-		for a_file in files:
-			instance = Post(
-				attachment=a_file
-			)
-			instance.save()
 		post.save()
+		
+		for a_file in files:
+		
+			instance = Attachment(
+				file=a_file, post=post)
+			
+			instance.save()
 		add_tag(request,post)
+		
 		now = timezone_now()
 		dirs =os.listdir(os.path.join(settings.MEDIA_ROOT,'my_uploads/{}'.format(now.strftime("%Y/%m/%d/%Y%m%d%H%M%S/"))))
+		
 		for file in dirs:
 			now = timezone_now()
 			file ='/my_uploads/{}'.format(now.strftime("%Y/%m/%d/%Y%m%d%H%M%S/")) + file
@@ -136,10 +140,21 @@ def post_create(request):
 
 def post_detail(request, id= None):
 	instance = get_object_or_404(Post, id=id)
+	files = []
+	images = []
+	for attachment in instance.attachment_set.all():
+		file = attachment.file.path
+		if file.substring(len(file)-4) == ".jpg":
+			images.append(file)
+		else:
+			files.append(file)
+	
 	context = {
 		"title": instance.title,
 		"instance": instance,
-		"tags": instance.tag_set.all()
+		"tags": instance.tag_set.all(),
+		"files": files,
+		"images": images,
 	}
 	return render(request,'accounts/post_detail.html',context)
 
