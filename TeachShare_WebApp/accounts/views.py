@@ -19,7 +19,6 @@ from django.utils.timezone import now as timezone_now
 
 import os, sys
 
-from .models import Attachment
 
 # Create your views here.
 def home(request):
@@ -115,12 +114,14 @@ def post_create(request):
 	if request.method == 'POST':
 		post = Post(title=request.POST['title'], content=request.POST['description'],
 						user=request.user.username)
-		files = request.FILES.getlist('files')
-		for a_file in enumerate(files):
-			instance = Attachment(attachment=a_file)
+		files =request.FILES.getlist('files')
+		for a_file in files:
+			instance = Post(
+				attachment=a_file
+			)
 			instance.save()
 		post.save()
-		add_tag(request, post)
+		add_tag(request,post)
 		now = timezone_now()
 		dirs =os.listdir(os.path.join(settings.MEDIA_ROOT,'my_uploads/{}'.format(now.strftime("%Y/%m/%d/%Y%m%d%H%M%S/"))))
 		for file in dirs:

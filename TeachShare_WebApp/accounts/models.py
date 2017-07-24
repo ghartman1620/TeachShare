@@ -47,17 +47,15 @@ def upload_to(instance, filename):
         create_random_string(),
         filename_ext.lower())
 
-class Attachment(models.Model):
-    attachment = models.FileField(upload_to = 'documents/')
-
+    
 class Post(models.Model):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
 	title = models.CharField(max_length=100, default='')
 	user = models.CharField(max_length=100, default='')
 	content = models.TextField(default="")
-	fileLocation = models.TextField(default = "")
 	updated = models.DateTimeField(auto_now=True, auto_now_add=False)
 	timestamp = models.DateTimeField(auto_now=False, auto_now_add= True)
+	attachment = models.FileField(null=True, blank=True, upload_to = upload_to)
 
 
 # Creates list of tags for every post
