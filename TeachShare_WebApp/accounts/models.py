@@ -42,9 +42,10 @@ def create_random_string(length=30):
 def upload_to(instance, filename):
     now = timezone_now()
     filename_base, filename_ext = os.path.splitext(filename)
-    return 'my_uploads/{}{}{}'.format(
+    return 'my_uploads/{}{}/{}{}'.format(
         now.strftime("%Y/%m/%d/%Y%m%d%H%M%S/"),
         create_random_string(),
+		  filename_base,
         filename_ext.lower())
 
     

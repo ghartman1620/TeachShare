@@ -124,27 +124,22 @@ def post_create(request):
 			
 			instance.save()
 		add_tag(request,post)
-		
-		now = timezone_now()
-		dirs =os.listdir(os.path.join(settings.MEDIA_ROOT,'my_uploads/{}'.format(now.strftime("%Y/%m/%d/%Y%m%d%H%M%S/"))))
-		
-		for file in dirs:
-			now = timezone_now()
-			file ='/my_uploads/{}'.format(now.strftime("%Y/%m/%d/%Y%m%d%H%M%S/")) + file
 
-		return render(request, 'accounts/dashboard.html',{"dirs": dirs})
+		return HttpResponseRedirect(reverse('account:dashboard'))
 	else:
 
 		return render(request, 'accounts/post_create.html',None)
 
 
+imgFormats = ["jpg", "jpeg", "gif", "png", "apng", "svg", "bmp", "ico"]
 def post_detail(request, id= None):
 	instance = get_object_or_404(Post, id=id)
 	files = []
 	images = []
 	for attachment in instance.attachment_set.all():
 		file = attachment.file.path
-		if file.substring(len(file)-4) == ".jpg":
+		file = file[file.find("\media\\"):]
+		if file[-3:] in imgFormats:
 			images.append(file)
 		else:
 			files.append(file)
