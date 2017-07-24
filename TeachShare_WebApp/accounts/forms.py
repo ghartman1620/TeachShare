@@ -44,24 +44,3 @@ class accountSettingsPassword(forms.Form):
         return self.cleaned_data
 
     
-
-
-# class accountSettingsEmail(forms.Form):
-# 	oldEmail = forms.CharField(widget=forms.PasswordInput, required=True)
-#     newEmail = forms.CharField(widget=forms.PasswordInput, required=True)
-#     confirmEmail = forms.CharField(widget=forms.PasswordInput, required=True)
-
-#     def __init__(self, *args, **kwargs):
-#          self.email = kwargs.pop('email',None)
-#          super(MyForm, self).__init__(*args, **kwargs)
-
-#     def clean(self):
-#     	oldEmail = self.cleaned_data.get('oldEmail')
-#     	newEmail = self.cleaned_data.get('newEmail')
-#     	confirmEmail = self.cleaned_data.get('confirmEmail')
-
-#     	if oldEmail != email:
-#     		raise forms.ValidationError("Sorry, your Old Email is invalid. Please try again.")
-#     	if newEmail != confirmEmail:
-#     		raise forms.ValidationError("Sorry, your new emails does not match. Please try again.")
-#     	return self.cleaned_data	

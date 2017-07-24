@@ -102,6 +102,7 @@ def account_settings(request):
 			return render(request, 'accounts/edit_profile.html')
 	if request.POST and form.is_valid():
 		u.set_password(newPassword)
+		u.save()
 		return HttpResponseRedirect(reverse("account:dashboard"))
 	return render(request, 'accounts/edit_profile.html')
 
@@ -324,12 +325,10 @@ def dashboard(request):
 	for post in request.user.userprofile.favorites.all():
 		likedPosts.append(post)
 	if request.method == 'POST':
-		
 		return render(request, 'accounts/dashboard.html',
 					{'posts' : search(Post.objects.all(), request.POST['search']), 
 					 'likedPosts' : likedPosts})
 	else:
-
 		return render(request, 'accounts/dashboard.html',
 						{'posts' : Post.objects.all().order_by('-timestamp'),
 						 'likedPosts' : likedPosts})
