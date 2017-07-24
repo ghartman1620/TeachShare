@@ -19,4 +19,6 @@ urlpatterns = [
 	url(r'^create/$', views.post_create, name='post_create'),
 	url(r'^like/(?P<id>\d+)/$', views.like, name='like'),
 	url(r'^favorites/$', views.favorites, name='favorites'),
+	url(r'^post/(?P<pk>\d+)/comment/$', views.add_comment_to_post, name='add_comment_to_post'),
+	
 ]

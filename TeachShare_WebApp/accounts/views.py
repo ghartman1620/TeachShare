@@ -10,9 +10,7 @@ from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
 from accounts.models import Tag, Post, UserProfile, GradeTaught, Attachment
-
 from django.conf import settings 
-
 from django.utils.timezone import now as timezone_now
 
 #import pdb; pdb.set_trace()
@@ -35,6 +33,9 @@ def search(posts, searchString):
 				if tag.tag.find(searchString)!= -1:
 					results.append(post)
 	return results
+from .forms import CommentForm
+
+from .models import Attachment, Comment
 
 def home(request):
 	name = 'TeachShare'
@@ -76,6 +77,18 @@ def view_profile(request):
 		'grades': request.user.userprofile.gradetaught_set.all(),
 	}
 	return render(request,'accounts/profile.html',args)
+
+
+def add_comment_to_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == "POST":
+            comment = Comment(text=request.POST['description'], post=post)
+            comment.save()
+            return redirect('account:post_detail', id=pk)
+    else:
+        form = CommentForm()
+
+
 
 @login_required(login_url='/account/login')
 def edit_profile(request):
@@ -134,6 +147,7 @@ def post_create(request):
 				file=a_file, post=post)
 			
 			instance.save()
+
 		add_tag(request,post)
 
 		return HttpResponseRedirect(reverse('account:dashboard'))
@@ -305,5 +319,6 @@ def dashboard(request):
 		return render(request, 'accounts/dashboard.html',
 						{'posts' : Post.objects.all().order_by('-timestamp'),
 						 'likedPosts' : likedPosts})
-					
+
+
 

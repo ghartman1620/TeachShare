@@ -2,8 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm
 
-
-
+from .models import Comment
 
 
 class EditProfileForm(UserChangeForm):
@@ -13,3 +12,10 @@ class EditProfileForm(UserChangeForm):
      		'first_name',
      		'last_name',
      		'password')
+
+
+class CommentForm(forms.ModelForm):
+
+    class Meta:
+        model = Comment
+        fields = ('text',)

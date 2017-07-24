@@ -27,8 +27,13 @@
       </a>
     </div>
   <!-- Search bar -->
+<<<<<<< HEAD
     <form class="navbar-form navbar-left nav-searchpad" 
 		method="post" id="search" action="{% url 'account:dashboard' %}">
+=======
+    <form class="navbar-form navbar-left nav-searchpad"
+    method="post" action="{% url 'account:dashboard' %}">
+>>>>>>> origin/comments
     {% csrf_token %}
       <div class="form-group">
         <input type="text" name="search" class="form-control" placeholder="Search">
@@ -96,7 +101,6 @@
 				</button>
 			</form>
 			<p> Likes: <div id="likes{{post.id}}">{{post.likes}}</div></p>
-			<p> ID: {{post.id}}</p>
 		</div> <!-- container -->
 	{% endfor %}
 {% endif %}

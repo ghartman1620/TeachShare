@@ -7,6 +7,8 @@ from django.db.models.signals import post_save
 
 from django.utils.timezone import now as timezone_now
 
+
+
 import random
 import string
 import os
@@ -44,14 +46,27 @@ def create_profile(sender, **kwargs):
 		user_profile = UserProfile.objects.create(user=kwargs['instance'])
 		user_profile.save()
 
+
+ 
+# Creates list of tags for every post
+class Tag(models.Model):
+	tag = models.CharField(max_length=100, default='')
+	post = models.ForeignKey(Post, on_delete=models.CASCADE)
+
+post_save.connect(create_profile, sender=User)
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
+    text = models.TextField()
+
+    def __str__(self):
+        return self.text
+
 def create_random_string(length=30):
     if length <= 0:
         length = 30
-
-    symbols = string.ascii_lowercase + string.ascii_uppercase + string.digits
-    return ''.join([random.choice(symbols) for x in range(length)])
-
-
+		  
 def upload_to(instance, filename):
     now = timezone_now()
     filename_base, filename_ext = os.path.splitext(filename)
@@ -74,10 +89,5 @@ class Post(models.Model):
 class Attachment(models.Model):
 	post = models.ForeignKey(Post, on_delete=models.CASCADE)
 	file = models.FileField(null=True, blank=True, upload_to = upload_to)
-
-# Creates list of tags for every post
-class Tag(models.Model):
-	tag = models.CharField(max_length=100, default='')
-	post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
 post_save.connect(create_profile, sender=User)
