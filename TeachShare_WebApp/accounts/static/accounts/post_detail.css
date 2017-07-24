@@ -17,7 +17,7 @@
     border: 0 none;
 }
 
-.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+.btn-primary:hover, .btn-primary:focus{
     background: #295B2F;
 }
 
