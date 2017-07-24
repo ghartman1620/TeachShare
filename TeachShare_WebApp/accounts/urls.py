@@ -1,10 +1,9 @@
 from django.conf.urls import url
 from . import views
-from django.contrib.auth.views import login
+from django.contrib.auth.views import login, password_reset, password_reset_done
 
 app_name = 'account'
 urlpatterns = [
-	
 	url(r'^$',views.home, name='home'),
 	url(r'^login/$', views.login, name='login' ),
 	url(r'^signup/$', views.signup, name='signup'),
@@ -20,5 +19,4 @@ urlpatterns = [
 	url(r'^like/(?P<id>\d+)/$', views.like, name='like'),
 	url(r'^favorites/$', views.favorites, name='favorites'),
 	url(r'^post/(?P<pk>\d+)/comment/$', views.add_comment_to_post, name='add_comment_to_post'),
-	
 ]
