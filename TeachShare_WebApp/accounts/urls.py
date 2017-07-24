@@ -1,12 +1,11 @@
 from django.conf.urls import url
 from . import views
-from django.contrib.auth.views import login
+from django.contrib.auth.views import login, password_reset, password_reset_done
 
 from .views import add_attachment, add_attachment_done
 
 app_name = 'account'
 urlpatterns = [
-	
 	url(r'^$',views.home, name='home'),
 	url(r'^login/$', views.login, name='login' ),
 	url(r'^signup/$', views.signup, name='signup'),
@@ -21,5 +20,4 @@ urlpatterns = [
 	url(r'^create/$', views.post_create, name='post_create'),
 	url(r'^add_attachment/$', add_attachment, name="add_attachment"),
     url(r'^add_attachment_done/$', add_attachment_done, name="add_attachment_done"),
-	
 ]
