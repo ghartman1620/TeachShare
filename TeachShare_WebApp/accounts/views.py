@@ -208,9 +208,6 @@ def dashboard(request):
 	else:
 		return render(request, 'accounts/dashboard.html', {'posts' : Post.objects.all().order_by('-timestamp')})
 
-
-
-
 def add_attachment(request):
     if request.method == "POST":
         parent_id = request.POST['parent_id']

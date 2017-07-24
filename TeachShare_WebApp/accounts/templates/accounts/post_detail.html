@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Pofile</title>
+<title>Profile</title>
 {% load static %}
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
 <link rel="stylesheet" href={% static 'accounts/post_detail.css'%} type = "text/css">
   <meta charset="utf-8">
 
@@ -60,20 +61,29 @@
 </div>-->
 
 <div class = "container"> 
-<h1> {{ title }} Working </h1>
-{{instance.timestamp}}</br>
-{{ instance.updated }}</br>
-{{instance.content}}</br>
-{{instance.title}}</br>
-{{instance.id}}</br>
-<p>Author:{{instance.user}}</p>
-<p>Tags: 
-{% if tags %}
-  {% for tag in tags %}
-      <p>{{tag.tag}}</p>
-  {% endfor %}
-{% endif %}
-</p>
+  <h1>{{title}}</h1>
+  <p>Created: {{instance.timestamp}}</br>
+  Updated: {{instance.updated}}</br></p>
+
+  <!-- Post Description and Content -->
+  <div class="panel panel-default">
+    <div class="panel-heading">Created by: {{instance.user}}</div>
+    <div class="panel-body">{{instance.content}}</div>
+  </div>
+
+  <!--{{instance.title}}</br>
+  {{instance.id}}</br>-->
+
+
+  <p>Tags: </br>
+    {% if tags %}
+      {% for tag in tags %}
+        <a href="">#{{tag.tag}}</a>
+      {% endfor %}
+    {% endif %}
+  </p>
+
+
 </div>
 
 
