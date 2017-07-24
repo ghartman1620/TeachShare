@@ -57,7 +57,7 @@ body {
 }
 /*general white centered container*/
 .container {
-  width: 800px;
+  width: 45%;
   text-align: left;
   background-color: #ffffff;
   padding-bottom: 50px;
@@ -71,8 +71,12 @@ body {
 	border-top-width: 0px;
 	border-left-width: 0px;
 	border-right-width: 0px;
+}
 
-
+/*container for images*/
+.container-img{
+  width: 30%;
+  height: auto;
 }
 
 /*small well modifications*/
@@ -85,7 +89,7 @@ body {
 
 /*specialized container for comments*/
 .container-comments {
-  width: 800px;
+  width: 45%;
   text-align: left;
   font-size: 16px;
   padding-top: 10px;
@@ -104,6 +108,6 @@ body {
     padding-left: 15px;
     margin-right: auto;
     margin-left: auto;
-    width: 800px;
+    width: 45%;
     background color: #FCF4E3;
 }

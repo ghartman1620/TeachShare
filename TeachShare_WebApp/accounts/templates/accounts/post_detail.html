@@ -92,7 +92,11 @@
 	<p>
 		{% if images %}
 			{% for image in images %}
-				<p><img src='{{image.0}}'></p>
+				<div class="container-img">
+					<a href="{{image.0}}" download>
+						<p><img src='{{image.0}}' class="img-responsive img-thumbnail"></p>
+					</a>
+				</div>
 				<p><a href="{{image.0}}" download>{{image.1}}</a></p>
 			{% endfor %}
 		{% endif %}
@@ -104,6 +108,7 @@
 	<hr>
 	{% for comment in instance.comments.all %}
 		<div class="comment">
+			<h4><small>Author: {{comment.user}} Time Posted: {{comment.timestamp}}</small></h4>
 			<div class="well well-comments">
 				<p>{{ comment.text|linebreaks }}</p>
 			</div> <!-- end well -->
