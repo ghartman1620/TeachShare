@@ -31,7 +31,11 @@
 		method="post" id="search" action="{% url 'account:favorites' %}">
     {% csrf_token %}
       <div class="form-group">
-        <input type="text" name="search" class="form-control" placeholder="Search">
+        {% if searchstring %}
+        <input type="text" name="search" value={{searchstring}} class="form-control">
+		{% else %}
+		<input type="text" name="search" class="form-control" placeholder="Search">
+		{% endif %}
       </div>
       <button type="submit" class="btn btn-default">Submit</button>
     </form>

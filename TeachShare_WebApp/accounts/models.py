@@ -50,8 +50,9 @@ def create_profile(sender, **kwargs):
  
 # Creates list of tags for every post
 class Tag(models.Model):
-	tag = models.CharField(max_length=100, default='')
-	post = models.ForeignKey(Post, on_delete=models.CASCADE)
+	tag = models.CharField(max_length=100,default='')
+	post = models.ForeignKey(Post, related_name='tags', on_delete=models.CASCADE)
+
 
 post_save.connect(create_profile, sender=User)
 
