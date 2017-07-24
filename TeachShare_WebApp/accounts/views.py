@@ -8,7 +8,7 @@ from django.template import loader
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
 from django.contrib.auth.decorators import login_required
-from accounts.forms import EditProfileForm
+from accounts.forms import EditProfileForm, accountSettingsPassword
 from accounts.models import Tag, Post, UserProfile, GradeTaught, Attachment
 from django.conf import settings 
 from django.utils.timezone import now as timezone_now
@@ -89,13 +89,27 @@ def add_comment_to_post(request, pk):
         form = CommentForm()
 
 
+@login_required(login_url='/account/login')
+def account_settings(request):
+	if request.method == 'POST':
+		u = User.objects.get(username= request.user.username)
+		oldPassword = grade=request.POST['oldPassword']
+		newPassword = grade=request.POST['newPassword']
+		confirmPassword = grade=request.POST['confirmPassword']
+		if oldPassword!= '' and newPassword != '' and confirmPassword != '':
+			form = accountSettingsPassword(request.POST, user=request.user.username)
+		else:
+			return render(request, 'accounts/edit_profile.html')
+	if request.POST and form.is_valid():
+		u.set_password(newPassword)
+		return HttpResponseRedirect(reverse("account:dashboard"))
+	return render(request, 'accounts/edit_profile.html')
 
 @login_required(login_url='/account/login')
 def edit_profile(request):
 	if request.method == 'POST':
 		user = request.user
 		userProfile = user.userprofile
-		
 		if isValidRequestField(request, 'firstName'):
 			user.first_name = request.POST['firstName']
 		if isValidRequestField(request, 'lastName'):
