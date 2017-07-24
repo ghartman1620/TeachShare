@@ -2,14 +2,23 @@
 from __future__ import unicode_literals
 from django.contrib.auth import authenticate, login, logout as auth_logout
 from django.contrib.auth import login as auth_login
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect, redirect, get_object_or_404
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect, redirect, get_object_or_404, render_to_response
 from django.urls import reverse
 from django.template import loader
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
-from accounts.models import Tag, Post, UserProfile, GradeTaught
+from accounts.models import Tag, Post, UserProfile, GradeTaught, Attachment
+
+from django.conf import settings 
+
+from django.utils.timezone import now as timezone_now
+
+#import pdb; pdb.set_trace()
+
+import os, sys
+
 
 '''
 Searches the given posts and returns a subset of these posts.
@@ -109,26 +118,51 @@ def edit_profile(request):
 
 def isValidRequestField(request, str):
 	return str in request.POST and request.POST[str] != "";
+
 		
 @login_required(login_url='/account/login')
 def post_create(request):
 	if request.method == 'POST':
 		post = Post(title=request.POST['title'], content=request.POST['description'],
 						user=request.user.username)
+		files =request.FILES.getlist('files')
 		post.save()
+		
+		for a_file in files:
+		
+			instance = Attachment(
+				file=a_file, post=post)
+			
+			instance.save()
 		add_tag(request,post)
+
 		return HttpResponseRedirect(reverse('account:dashboard'))
 	else:
 
 		return render(request, 'accounts/post_create.html',None)
 
 
+imgFormats = ["jpg", "jpeg", "gif", "png", "apng", "svg", "bmp", "ico"]
 def post_detail(request, id= None):
 	instance = get_object_or_404(Post, id=id)
+	files = []
+	images = []
+	for attachment in instance.attachment_set.all():
+		file = attachment.file.path
+		name = file[file.rfind("\\")+1:]
+		print(name)
+		file = file[file.find("\media\\"):]
+		if file[-3:] in imgFormats:
+			images.append((file, name))
+		else:
+			files.append((file, name))
+	
 	context = {
 		"title": instance.title,
 		"instance": instance,
-		"tags": instance.tag_set.all()
+		"tags": instance.tag_set.all(),
+		"files": files,
+		"images": images,
 	}
 	return render(request,'accounts/post_detail.html',context)
 
@@ -267,7 +301,9 @@ def dashboard(request):
 					{'posts' : search(Post.objects.all(), request.POST['search']), 
 					 'likedPosts' : likedPosts})
 	else:
+
 		return render(request, 'accounts/dashboard.html',
 						{'posts' : Post.objects.all().order_by('-timestamp'),
 						 'likedPosts' : likedPosts})
 					
+

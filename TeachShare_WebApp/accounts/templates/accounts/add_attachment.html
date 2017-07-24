@@ -1,0 +1,17 @@
+{% extends 'accounts/base.html' %}
+
+{% load i18n staticfiles %}
+
+{% block title %}Adding Multiple Files{% endblock %}
+
+{% block content %}
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>
+            <label for="id_parent_id">Parent ID:</label>
+            <input id="id_parent_id" type="text" maxlength="18" name="parent_id">
+        </p>
+        <input type="file" name="myfiles" multiple>
+        <button type="submit">{% trans "Save" %}</button>
+    </form>
+{% endblock %}

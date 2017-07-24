@@ -67,7 +67,11 @@
 			<div class="well">
 				<p>
 					{{post.content}}
-					<a href= '/account/detail/{{post.id}}'>See more</a>
+          {% for item in dirs %}
+            <img src='/media/'+{{item}} class='img-responsive'>
+          {% endfor %}
+                  <a href= '/account/detail/{{post.id}}'>See more</a>
+
 				</p>
 			</div>
 			<h4><small>Posted {{post.timestamp}} Updated {{post.updated}}

@@ -66,6 +66,7 @@
 {{instance.content}}</br>
 {{instance.title}}</br>
 {{instance.id}}</br>
+
 <p>Author:{{instance.user}}</p>
 <p>Tags: 
 {% if tags %}
@@ -74,6 +75,20 @@
   {% endfor %}
 {% endif %}
 </p>
+<p>Attachments:
+{% if files %}
+	{% for file in files %}
+		<p><a href="{{file.0}}" download>{{file.1}}</a></p>
+	{% endfor %}
+{% endif %}
+</p>
+
+{% if images %}
+	{% for image in images %}
+		<p><img src='{{image.0}}'></p>
+		<p><a href="{{image.0}}" download>{{image.1}}</a></p>
+	{% endfor %}
+{% endif %}
 </div>
 
 
