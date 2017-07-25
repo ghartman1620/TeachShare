@@ -1,4 +1,11 @@
 {% extends "accounts/login.html" %}
 {% block content %}
-	<p><font align='center' color="red" size= "3">our Username or Password is incorrect!</font></p>
+	
+{% if typeErr == 1 %}
+	<p><font align='center' color="red" size= "3">Your Username or Password is incorrect!</font></p>
+{% elif typeErr == 2 %}
+	<p><font align='center' color="red" size= "3">One or More Fields Are Not Filled In</font></p>
+{%endif%}
+
+	
 {% endblock %}
