@@ -25,7 +25,7 @@ is a substring of the post's title or one of its tags.
 '''
 def search(posts, searchString):
 	results = []
-	for post in posts.order_by('-likes'):
+	for post in posts.order_by('-timestamp'):
 		if post.title.find(searchString)!= -1:
 			results.append(post)
 		else: 
@@ -50,14 +50,14 @@ def login(request):
 		password = request.POST['password']
 		user = authenticate(username=username, password=password)
 		if username is "" or  password is "":
-			typeErr= 1
+			typeErr= 2
 			return render(request, 'accounts/loginIncorrect.html', {'typeErr': typeErr})
 		if user is not None:
 			if user.is_active:
 				auth_login(request, user)
 				return HttpResponseRedirect(reverse('account:dashboard'))
 		else:
-			typeErr= 2
+			typeErr= 1
 			return render(request, 'accounts/loginIncorrect.html', {'typeErr': typeErr})
 	return render(request, "accounts/login.html", None)
 
@@ -227,7 +227,6 @@ def post_detail(request, id= None):
 			name = file[file.rfind("\\")+1:]
 			file = file[file.find("\media\\"):]
 
-		file = file[file.find("\media\\"):]
 		if file[-3:] in imgFormats or file[-4:] in imgFormats:
 			images.append((file, name))
 		else:
@@ -334,7 +333,7 @@ def dashboard(request):
 					 'searchstring' : request.POST['search']})
 	else:
 		return render(request, 'accounts/dashboard.html',
-						{'posts' : Post.objects.order_by("-likes"),
+						{'posts' : Post.objects.order_by("-timestamp"),
 						 'likedPosts' : request.user.userprofile.favorites.all()})
 
 
