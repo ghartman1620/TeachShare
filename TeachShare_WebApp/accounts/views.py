@@ -77,6 +77,12 @@ def view_profile(request):
 	return render(request,'accounts/profile.html',args)
 
 
+'''
+asks user for comment in textfeild. The input is taken in post detail,
+passed through this view, to be saved to the Comments model and rendered
+on the post detail page
+'''
+
 def add_comment_to_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if request.method == "POST":
@@ -86,7 +92,13 @@ def add_comment_to_post(request, pk):
     else:
         form = CommentForm()
 
-
+'''
+Takes in three inputs from the Edit_profile page. One of the in puts is the old
+password which it  verfies here is true. If not an error will pop up. The other two 
+text boxes deal with setting a new password and confirming it. If they are not the same
+error will pop up. However if old password is true and the new passwords match then 
+this view sets the accounts password to the new password
+'''
 @login_required(login_url='/account/login')
 def account_settings(request):
 	if request.method == 'POST':
@@ -284,35 +296,6 @@ def like(request, id):
 	
 	return HttpResponseRedirect(reverse('account:dashboard'))
 	
-
-
-def password_change(request):
-	try:
-		username = request.POST['username']
-		pwNew = request.POST['pwNew']
-		pwNewC = request.POST['pwNewC']
-	except(KeyError):
-		return HttpResponse("Something really went wrong. Please contact the admin.")
-	else:
-		if username is "":
-			return render (request, 'accounts/forgotPasswordEmptyFeilds.html', None)
-		if pwNew is "":
-			return render (request, 'accounts/forgotPasswordEmptyFeilds.html', None)
-		if pwNewC is "":
-			return render (request, 'accounts/forgotPasswordEmptyFeilds.html', None)
-		try:
-			u = User.objects.get(username= username)
-		except:
-			return render (request, 'accounts/forgotPasswordInValidUser.html', None)
-		if(pwNew != pwNewC):
-			return render (request, 'accounts/forgotPasswordPasswordDoNotMatch.html', None)
-		u.set_password(pwNew)
-		u.save()
-		return HttpResponseRedirect(reverse('account:login'))
-
-def password_change_page(request):
-	return render (request, 'accounts/forgotPassword.html', None)
-
 
 def signup(request):
 	if request.user.is_authenticated():
