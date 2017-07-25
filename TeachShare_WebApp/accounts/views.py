@@ -334,10 +334,7 @@ def register(request):
 			return render (request, 'accounts/signupCPassword.html', None)
 		if email is "":
 			return render (request, 'accounts/signupCPassword.html', None)
-		if '@' not in email:
-			return render (request, 'accounts/Email2.html', None)
-		if '.com' not in email:
-			return render (request, 'accounts/Email2.html', None)
+
 
 		if(pw != pwConfirm):
 			return render(request, 'accounts/signupPasswordMatch.html', None)
