@@ -88,13 +88,33 @@ def add_comment_to_post(request, pk):
         form = CommentForm()
 
 
+@login_required(login_url='/account/login')
+def account_settings(request):
+	if request.method == 'POST':
+		u = User.objects.get(username= request.user.username)
+		oldPassword = grade=request.POST['oldPassword']
+		newPassword = grade=request.POST['newPassword']
+		confirmPassword = grade=request.POST['confirmPassword']
+		if oldPassword== '' and newPassword == '' and confirmPassword == '':
+			typeErr=1
+			return render(request, 'accounts/edit_profile_error.html', {'typeErr': typeErr})
+		elif (authenticate(username=request.user.username, password=oldPassword)==None):
+			typeErr=2
+			return render(request, 'accounts/edit_profile_error.html', {'typeErr': typeErr})
+		elif (newPassword!=confirmPassword):
+			typeErr=3
+			return render(request, 'accounts/edit_profile_error.html', {'typeErr': typeErr})
+		else:
+			u.set_password(newPassword)
+			u.save()
+			return HttpResponseRedirect(reverse("account:dashboard"))
+	return render(request, 'accounts/edit_profile.html')
 
 @login_required(login_url='/account/login')
 def edit_profile(request):
 	if request.method == 'POST':
 		user = request.user
 		userProfile = user.userprofile
-		
 		if isValidRequestField(request, 'firstName'):
 			user.first_name = request.POST['firstName']
 		if isValidRequestField(request, 'lastName'):
@@ -327,21 +347,16 @@ def register(request):
 
 @login_required(login_url='/account/login')
 def dashboard(request):
-	likedPosts = []
-	for post in request.user.userprofile.favorites.all():
-		likedPosts.append(post)
-	
 	if request.method == 'POST':
-		print(request.POST['search'])
-		print("foo")
+
 		return render(request, 'accounts/dashboard.html',
 					{'posts' : search(Post.objects.all(), request.POST['search']), 
-					 'likedPosts' : likedPosts,
+					 'likedPosts' : request.user.userprofile.favorites.all(),
 					 'searchstring' : request.POST['search']})
 	else:
 		return render(request, 'accounts/dashboard.html',
 						{'posts' : Post.objects.order_by("-likes"),
-						 'likedPosts' : likedPosts})
+						 'likedPosts' : request.user.userprofile.favorites.all()})
 
 
 

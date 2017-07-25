@@ -78,7 +78,6 @@
 			</div>
 			<h4><small>Posted {{post.timestamp}} Updated {{post.updated}}
 			</small></h4>
-			{{post.id}}
 			<form action="{% url 'account:like' id=post.id %}" method="POST"
 					id="likeForm{{post.id}}">
 				{% csrf_token %}
@@ -88,7 +87,7 @@
 					text is important for the function below
 					called on submitting this form. -->
 					{% if likedPosts %}
-						{% if post.0 in likedPosts %}
+						{% if post in likedPosts %}
 							<div id="likeSubmit{{post.id}}">Unlike</div>
 						{% else %}
 							<div id="likeSubmit{{post.id}}">Like</div>

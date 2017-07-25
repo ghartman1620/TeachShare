@@ -19,4 +19,5 @@ urlpatterns = [
 	url(r'^like/(?P<id>\d+)/$', views.like, name='like'),
 	url(r'^favorites/$', views.favorites, name='favorites'),
 	url(r'^post/(?P<pk>\d+)/comment/$', views.add_comment_to_post, name='add_comment_to_post'),
+	url(r'^profile/accountSettings/$', views.account_settings, name='account_settings'),
 ]

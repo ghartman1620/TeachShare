@@ -76,7 +76,6 @@
 <ul class="nav nav-tabs">
   <li class="active"><a data-toggle="tab" href="#home">Edit Profile</a></li>
   <li><a data-toggle="tab" href="#menu1">Account Settings</a></li>
-  <li><a data-toggle="tab" href="#menu2">Menu 2</a></li>
 </ul>
 
 
@@ -293,7 +292,8 @@
 
 
     <h3>Manage Account Settings</h3>
-    <p><form action="{% url 'account:account_settings' %}" method="post"> {% csrf_token %}
+    <p><form action="{% url 'account:account_settings' %}" method="post">
+    {% csrf_token %}
         <h3>Change Password</h3>
         <div class="form-group row">
           <label for="inputoldpassword" class="col-sm-2 col-form-label">Old Password:</label>
@@ -313,15 +313,11 @@
             <input type="password" class="form-control" placeholder="New Password" name = 'confirmPassword'>
           </div>
         </div>
-        {% if form.non_field_errors %}
-    	<ul class='form-errors'>
-        {% for error in form.non_field_errors %}
-            <li>{{ error }}</li>
-        {% endfor %}
-    		</ul>
-		{% endif %}
+
+        {% block content %}{% endblock %}
 
         <button type="submit" class="btn btn-primary">Submit</button>
+
         </p>
         
   </div>
