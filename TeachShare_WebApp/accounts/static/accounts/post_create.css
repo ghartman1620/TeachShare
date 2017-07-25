@@ -1,4 +1,4 @@
-
+/*button style*/
 .btn-primary {
     background: #41924B;
     color: #ffffff;
@@ -30,13 +30,13 @@ body {
 
 .nav-navitems {
   text-align: center;
-  padding-top: 2%;
+  padding-top: 30px;
 }
 
 /*search bar on naavbar */
 .nav-searchpad {
   text-align: center;
-  padding-top: 2%;
+  padding-top: 30px;
 }
 
 .box_dragndrop,

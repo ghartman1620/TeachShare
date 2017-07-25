@@ -1,3 +1,4 @@
+/*button style*/
 .btn {
     padding: 14px 24px;
     border: 0 none;
@@ -19,7 +20,7 @@
     background: #295B2F;
 }
 
-
+/*test overlay */
 .overlay {
   color:#fff;
   position:absolute;
@@ -30,6 +31,7 @@
   text-align:center;
 }
 
+/*carousel style*/
 .carousel-inner > .item > img {
     margin: 0 auto;
 }

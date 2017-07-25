@@ -1,16 +1,4 @@
-/* Commented out to make buttons cohesive with Nev's navbar design
-.btn {
-    padding: 14px 24px;
-    border: 0 none;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.btn:focus, .btn:active:focus, .btn.active:focus {
-    outline: 0 none;
-}
-*/
+/* button style*/
 .btn-primary {
     background: #41924B;
     color: #ffffff;
