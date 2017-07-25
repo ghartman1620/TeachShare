@@ -49,17 +49,16 @@ def login(request):
 		username = request.POST['username']
 		password = request.POST['password']
 		user = authenticate(username=username, password=password)
-		if username is "":
-			return render(request, 'accounts/loginEmptyFeilds.html',None)
-		if password is "":
-			return render(request, 'accounts/loginEmptyFeilds.html',None)
-		
+		if username is "" or  password is "":
+			typeErr= 1
+			return render(request, 'accounts/loginIncorrect.html', {'typeErr': typeErr})
 		if user is not None:
 			if user.is_active:
 				auth_login(request, user)
 				return HttpResponseRedirect(reverse('account:dashboard'))
 		else:
-			return render(request, 'accounts/loginIncorrect.html',None)
+			typeErr= 2
+			return render(request, 'accounts/loginIncorrect.html', {'typeErr': typeErr})
 	return render(request, "accounts/login.html", None)
 
 
@@ -341,18 +340,14 @@ def register(request):
 	except(KeyError):
 	   return HttpResponse("Something really went wrong. Please contact the admin.")
 	else:
-		if pw is "":
-			return render (request, 'accounts/signupCPassword.html', None)
-		if pwConfirm is "":
-			return render (request, 'accounts/signupCPassword.html', None)
-		if username is "":
-			return render (request, 'accounts/signupCPassword.html', None)
-		if email is "":
-			return render (request, 'accounts/signupCPassword.html', None)
+		if pw is "" or pwConfirm is "" or username is "" or email is "":
+			typeErr= 1
+			return render(request, 'accounts/signupCPassword.html', {'typeErr': typeErr})
 
 
 		if(pw != pwConfirm):
-			return render(request, 'accounts/signupPasswordMatch.html', None)
+			typeErr= 2
+			return render(request, 'accounts/edit_profile_error.html', {'typeErr': typeErr})
 		user_auth = User.objects.create_user(username, email, pw)
 		userLoggedIn = auth_login(request, authenticate(username=username, password=pw))
 		return HttpResponseRedirect(reverse('account:dashboard'))
