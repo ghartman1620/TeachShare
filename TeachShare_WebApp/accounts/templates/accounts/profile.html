@@ -26,10 +26,16 @@
       </a>
     </div>
   <!-- Search bar -->
-    <form class="navbar-form navbar-left nav-searchpad">
+    <form class="navbar-form navbar-left nav-searchpad" 
+		method="post" id="search" action="{% url 'account:dashboard' %}">
+    {% csrf_token %}
       <div class="form-group">
-        <input type="text" class="form-control" placeholder="Search">
-      </div>
+		{% if searchstring %}
+        <input type="text" name="search" value={{searchstring}} class="form-control">
+		{% else %}
+		<input type="text" name="search" class="form-control" placeholder="Search">
+		{% endif %}
+	 </div>
       <button type="submit" class="btn btn-default">Submit</button>
     </form>
   <!-- Create a Post Button -->
@@ -39,7 +45,6 @@
         </a>
       </li>
     </ul>
-
   <!-- Dropdown Account Menu -->
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
@@ -47,9 +52,10 @@
           <img src="{% static "accounts/applelogo.png" %}" alt="TSLogo"/>
         <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          <li><a href="/account/profile/">Profile</a></li>
-          <li><a href="/account/profile/edit/">Settings</a></li>
-          <li><a href="/account/">Log Out</a></li>
+		  <li><a href="/account/profile/">Profile</a></li>
+          <li><a href="/account/favorites">Favorites</a></li>
+		  <li><a href="/account/profile/edit/">Settings</a></li>
+          <li><a href="/account/logout">Log Out</a></li>
         </ul>
       </li>
     </ul>
