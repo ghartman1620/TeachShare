@@ -249,6 +249,7 @@ def like(request, id):
 	return HttpResponseRedirect(reverse('accounts:dashboard'))
 	
 
+
 def password_change(request):
 	try:
 		username = request.POST['username']
