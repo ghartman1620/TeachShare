@@ -1,0 +1,13 @@
+{%extends "accounts/edit_profile.html" %}
+
+{% block content %}
+
+{% if typeErr == 1 %}
+	<p><font color="red" size= "3"> One or More Fields are not Filled In</font></p>
+{% elif typeErr == 2 %}
+	<p><font color="red" size= "3">Your Old Password is Incorrect</font></p>
+{% elif typeErr == 3 %}
+	<p><font color="red" size= "3"> New Password and Confirm Password Do Not Match</font></p>
+{%endif%}
+
+{% endblock %}

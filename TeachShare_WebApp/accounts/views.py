@@ -8,7 +8,7 @@ from django.template import loader
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
 from django.contrib.auth.decorators import login_required
-from accounts.forms import EditProfileForm, accountSettingsPassword
+from accounts.forms import EditProfileForm
 from accounts.models import Tag, Post, UserProfile, GradeTaught, Attachment
 from django.conf import settings 
 from django.utils.timezone import now as timezone_now
@@ -96,14 +96,19 @@ def account_settings(request):
 		oldPassword = grade=request.POST['oldPassword']
 		newPassword = grade=request.POST['newPassword']
 		confirmPassword = grade=request.POST['confirmPassword']
-		if oldPassword!= '' and newPassword != '' and confirmPassword != '':
-			form = accountSettingsPassword(request.POST, user=request.user.username)
+		if oldPassword== '' and newPassword == '' and confirmPassword == '':
+			typeErr=1
+			return render(request, 'accounts/edit_profile_error.html', {'typeErr': typeErr})
+		elif (authenticate(username=request.user.username, password=oldPassword)==None):
+			typeErr=2
+			return render(request, 'accounts/edit_profile_error.html', {'typeErr': typeErr})
+		elif (newPassword!=confirmPassword):
+			typeErr=3
+			return render(request, 'accounts/edit_profile_error.html', {'typeErr': typeErr})
 		else:
-			return render(request, 'accounts/edit_profile.html')
-	if request.POST and form.is_valid():
-		u.set_password(newPassword)
-		u.save()
-		return HttpResponseRedirect(reverse("account:dashboard"))
+			u.set_password(newPassword)
+			u.save()
+			return HttpResponseRedirect(reverse("account:dashboard"))
 	return render(request, 'accounts/edit_profile.html')
 
 @login_required(login_url='/account/login')

@@ -333,13 +333,7 @@
             <input type="password" class="form-control" placeholder="New Password" name = 'confirmPassword'>
           </div>
         </div>
-        {% if form.non_field_errors %}
-    	<ul class='form-errors'>
-        {% for error in form.non_field_errors %}
-            <li>{{ error }}</li>
-        {% endfor %}
-    		</ul>
-		{% endif %}
+        {% block content %}{% endblock %}
 
         <button type="submit" class="btn btn-primary">Submit</button>
 
