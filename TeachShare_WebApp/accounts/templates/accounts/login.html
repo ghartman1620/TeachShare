@@ -2,31 +2,33 @@
 <head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <link rel="stylesheet" href={% static 'accounts/login.css'%} type = "text/css">
-
-<div id= "container">
-	 <a href="/account/" <button id="suregister"> Home </button></a>
-	 <a href="/account/signup"<button id="sulogin"> Sign Up </button></a>
-</div>
-
-<div id="OverviewText4">
-	<img style="position:absolute; top:35px; left:37.5%; width:300px; height:100px" src="/static/img/whitelogo.png">
-
-</div>
-
 <!-- Tab icon -->
 <link rel="icon" type="image/png" href="/static/img/icon.png">
+
+<!-- login and sign up buttons -->
+<div id= "container">
+	<div class="col-sm-12">
+	 <a href="/account/" <button type="button" class="btn btn-primary btn-lg pull-right" >Home </button></a>
+	 <a href="/account/signup" <button type="button" class="btn btn-primary btn-lg pull-left"> Sign Up </button></a>
+ </div> <!-- end col -->
+</div> <!-- end container -->
+
 </head>
 
-<div class="login-page">
-  <div class="form">
-    
-	<form action="{%url 'account:login'%}" method="post">
-	{% csrf_token %}
-		<input type="text" placeholder="user name" name="username"/>
-		<input type="password" placeholder="password" name = "password"/>
-		<input type="submit" value="Login" />
-		<a href="/reset-password/">Forgot Password</a>
-		{% block content %}{% endblock %}
-    </form>
-  </div>
-</div>
+<body>
+<!-- login text area -->
+	<div class="login-page">
+		<!-- logo -->
+		<img class="img-responsive" src="/static/img/whitelogo.png">
+	  <div class="form">
+			<form action="{%url 'account:login'%}" method="post">
+				{% csrf_token %}
+				<input type="text" placeholder="user name" name="username"/>
+				<input type="password" placeholder="password" name = "password"/>
+				<input type="submit" value="Login" />
+				<a href="/reset-password/">Forgot Password</a>
+				{% block content %}{% endblock %}
+	    </form>
+	  </div>
+	</div>
+</body>

@@ -1,13 +1,34 @@
 
 .login-page {
   width: 360px;
-  padding: 8% 0 0;
+  padding: 4% 0 0;
   margin: auto;
 }
 
 #container{
 margin-top: 1px;
 overflow: hidden;
+}
+
+.btn {
+    padding: 14px 24px;
+    border: 0 none;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.btn:focus, .btn:active:focus, .btn.active:focus {
+    outline: 0 none;
+}
+
+.btn-primary {
+    background: #41924B;
+    color: #ffffff;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+    background: #295B2F;
 }
 
 
@@ -33,7 +54,7 @@ overflow: hidden;
 }
 
 
-#sulogin {  
+#sulogin {
    position:relative;
     transition: .5s ease;
     margin-left: 49.5%;
@@ -149,5 +170,5 @@ body {
   background: linear-gradient(to left, #76b852, #8DC26F);
   font-family: "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;      
+  -moz-osx-font-smoothing: grayscale;
 }

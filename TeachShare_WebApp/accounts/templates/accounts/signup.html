@@ -2,19 +2,24 @@
 <head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <link rel="stylesheet" href={% static 'accounts/signup.css'%} type = "text/css">
-<div id= "container">
-        <a href="/account/" <button id="suregister"> Home </button></a>
-        <a href="/account/login" <button id="sulogin"> Login </button></a>
-</div>
-<div id="OverviewText4">
-	<img style="position:absolute; top:35px; left:37.5%; width:300px; height:100px" src="/static/img/whitelogo.png">
-</div>
 <!-- Tab icon -->
 <link rel="icon" type="image/png" href="/static/img/icon.png">
+
+<div id= "container">
+	<div class="col-sm-12">
+	 <a href="/account/" <button type="button" class="btn btn-primary btn-lg pull-right" >Home </button></a>
+	 <a href="/account/login" <button type="button" class="btn btn-primary btn-lg pull-left">Log In </button></a>
+ </div> <!-- end col -->
+</div> <!-- end container -->
 </head>
+
+<body>
+<!--sign up text areas-->
 <form action="{% url 'account:register' %}" method="post">
 {% csrf_token %}
 	<div class="login-page">
+    <!-- logo -->
+    <img class="img-responsive" src="/static/img/whitelogo.png">
 		<div class="form">
 			<input type="text" placeholder="user name" name="username"/>
 			<input type="email" placeholder="email address" name="email"/>
@@ -26,3 +31,4 @@
 	</div>
 </form>
 
+</body>
