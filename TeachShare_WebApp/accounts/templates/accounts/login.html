@@ -10,6 +10,7 @@
 
 <div id="OverviewText4">
 	<img style="position:absolute; top:35px; left:37.5%; width:300px; height:100px" src="/static/img/whitelogo.png">
+
 </div>
 
 <!-- Tab icon -->
@@ -25,6 +26,7 @@
 		<input type="password" placeholder="password" name = "password"/>
 		<input type="submit" value="Login" />
 		<a href="/reset-password/">Forgot Password</a>
+		{% block content %}{% endblock %}
     </form>
   </div>
 </div>
