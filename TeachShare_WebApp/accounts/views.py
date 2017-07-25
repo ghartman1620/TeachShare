@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
-from accounts.models import Tag, Post, UserProfile, GradeTaught, Attachment
+from accounts.models import Tag, Post, UserProfile, GradeTaught, Attachment, SubjectTaught
 from django.conf import settings 
 from django.utils.timezone import now as timezone_now
 
@@ -100,8 +100,16 @@ def edit_profile(request):
 			user.first_name = request.POST['firstName']
 		if isValidRequestField(request, 'lastName'):
 			user.last_name = request.POST['lastName']
+		for subject in request.user.userprofile.subjects.all():
+			subject.delete()	
 		if isValidRequestField(request, 'subject'):
-			userProfile.subjectTaught = request.POST['subject']
+
+
+			subjectlist = request.POST['subject'].split(",")
+			for s in subjectlist:
+				subject = SubjectTaught(subject=s, userProfile=userProfile)
+				print(s)
+				subject.save()	
 		if isValidRequestField(request, 'district'):
 			userProfile.schoolDistrict = request.POST['district']
 			
@@ -122,10 +130,17 @@ def edit_profile(request):
 		grades = []
 		for grade in request.user.userprofile.gradetaught_set.all():
 			grades.append(grade.grade)
+		subjects = ""
+		for subject in request.user.userprofile.subjects.all():
+			subjects += subject.subject
+			subjects += ","
+		if subjects[-1:] == ",":
+			subjects = subjects[:-1]
 		args = {
 			'user': request.user, 
 			'userProfile': request.user.userprofile,
 			'grades': grades,
+			'subjectsTaught' :subjects
 		}
 		return render(request, 'accounts/edit_profile.html',args)
 
