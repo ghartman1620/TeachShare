@@ -178,6 +178,10 @@ def add_tag(request, post):
 @login_required(login_url='/account/login')
 def post_create(request):
 	if request.method == 'POST':
+		title=request.POST['title']
+		content=request.POST['description']
+		if title == '' or content == '':
+			return render(request, 'accounts/emptyPost.html',None)
 		post = Post(title=request.POST['title'], content=request.POST['description'],
 						user=request.user.username)
 		files =request.FILES.getlist('files')
