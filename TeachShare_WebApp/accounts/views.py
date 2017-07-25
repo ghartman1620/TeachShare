@@ -25,11 +25,11 @@ is a substring of the post's title or one of its tags.
 '''
 def search(posts, searchString):
 	results = []
-	for post in posts.order_by('-timestamp'):
+	for post in posts.order_by('-likes'):
 		if post.title.find(searchString)!= -1:
 			results.append(post)
 		else: 
-			for tag in post.tag_set.all():
+			for tag in post.tags.all():
 				if tag.tag.find(searchString)!= -1:
 					results.append(post)
 	return results
@@ -38,14 +38,13 @@ from .forms import CommentForm
 from .models import Attachment, Comment
 
 def home(request):
-	name = 'TeachShare'
-	numbers = [1,2,3,4,5,6]
-	args = {'myName': name, 'numbers': numbers }
-	return render(request,'accounts/home.html',args)
+
+	return render(request,'accounts/home.html',None)
 
 
 def login(request):
-
+	if request.user.is_authenticated():
+		return HttpResponseRedirect(reverse('account:dashboard'))
 	if request.method == "POST":
 		username = request.POST['username']
 		password = request.POST['password']
@@ -132,7 +131,16 @@ def edit_profile(request):
 def isValidRequestField(request, str):
 	return str in request.POST and request.POST[str] != "";
 
+def add_tag(request, post):
+	if request.method == 'POST':
+		tagString =request.POST['tag']
+		tagList = tagString.split(',')
+		for s in tagList:
+			if s != "":
+				tag = Tag(tag=s, post=post)
+				tag.save()
 		
+
 @login_required(login_url='/account/login')
 def post_create(request):
 	if request.method == 'POST':
@@ -163,10 +171,16 @@ def post_detail(request, id= None):
 	images = []
 	for attachment in instance.attachment_set.all():
 		file = attachment.file.path
-		name = file[file.rfind("\\")+1:]
+		if file.find("/") != -1:
+			name = file[file.rfind("/")+1:]
+			file = file[file.find("/media/"):]
+		else:
+			name = file[file.rfind("\\")+1:]
+			file = file[file.find("\media\\"):]
+
 		print(name)
 		file = file[file.find("\media\\"):]
-		if file[-3:] in imgFormats:
+		if file[-3:] in imgFormats or file[-4:] in imgFormats:
 			images.append((file, name))
 		else:
 			files.append((file, name))
@@ -174,7 +188,7 @@ def post_detail(request, id= None):
 	context = {
 		"title": instance.title,
 		"instance": instance,
-		"tags": instance.tag_set.all(),
+		"tags": instance.tags.all(),
 		"files": files,
 		"images": images,
 	}
@@ -190,11 +204,13 @@ which is their index in the all posts list.
 def favorites(request):
 	if request.method == 'POST':
 		return render(request, 'accounts/favorites.html',
-				{'posts': search(request.user.userprofile.favorites.all(),
-									request.POST['search'])})
+				{'posts': search(request.user.userprofile.favorites,
+									request.POST['search']),
+				 'searchstring' : request.POST['search']})
 	return render(request, 'accounts/favorites.html', 
-			{'posts': request.user.userprofile.favorites.all()})
+			{'posts': request.user.userprofile.favorites.order_by('-likes')})
 	
+
 	
 def likesPost(userProfile, post):
 	for fav in userProfile.favorites.all():
@@ -230,19 +246,9 @@ def like(request, id):
 	#So this line should not matter, but if it does, dashboard is the most
 	#natural place to redirect to
 	
-	#Returns an error page in development (the debug field in settings is true)
-	#otherwise just redirects to dashboard
-	#but if everything is working as intended neither of these will happen
-	return HttpResponse("redirect suppression failed")
-
+	return HttpResponseRedirect(reverse('accounts:dashboard'))
 	
-def add_tag(request, post):
-	if request.method == 'POST':
-		tagString =request.POST['tag']
-		tagList = tagString.split(',')
-		for s in tagList:
-			tag = Tag(tag=s, post=post)
-			tag.save()
+
 
 def password_change(request):
 	try:
@@ -273,6 +279,8 @@ def password_change_page(request):
 
 
 def signup(request):
+	if request.user.is_authenticated():
+		return HttpResponseRedirect(reverse('account:dashboard'))
 	return render(request, 'accounts/signup.html',None)
 
 def register(request):
@@ -293,10 +301,10 @@ def register(request):
 			return render (request, 'accounts/signupCPassword.html', None)
 		if email is "":
 			return render (request, 'accounts/signupCPassword.html', None)
-			if '@' not in email:
-				return render (request, 'accounts/Email2.html', None)
-			if '.com' not in email:
-				return render (request, 'accounts/Email2.html', None)
+		if '@' not in email:
+			return render (request, 'accounts/Email2.html', None)
+		if '.com' not in email:
+			return render (request, 'accounts/Email2.html', None)
 
 		if(pw != pwConfirm):
 			return render(request, 'accounts/signupPasswordMatch.html', None)
@@ -309,15 +317,18 @@ def dashboard(request):
 	likedPosts = []
 	for post in request.user.userprofile.favorites.all():
 		likedPosts.append(post)
+	
 	if request.method == 'POST':
-		
+		print(request.POST['search'])
+		print("foo")
 		return render(request, 'accounts/dashboard.html',
 					{'posts' : search(Post.objects.all(), request.POST['search']), 
-					 'likedPosts' : likedPosts})
+					 'likedPosts' : likedPosts,
+					 'searchstring' : request.POST['search']})
 	else:
 
 		return render(request, 'accounts/dashboard.html',
-						{'posts' : Post.objects.all().order_by('-timestamp'),
+						{'posts' : Post.objects.order_by("-likes"),
 						 'likedPosts' : likedPosts})
 
 
