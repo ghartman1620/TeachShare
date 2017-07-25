@@ -88,16 +88,16 @@
 					called on submitting this form. -->
 					{% if likedPosts %}
 						{% if post in likedPosts %}
-							<div id="likeSubmit{{post.id}}">Unlike</div>
+							<div id="likeSubmit{{post.id}}"><img src="/static/img/appleLike.png"></div>
 						{% else %}
-							<div id="likeSubmit{{post.id}}">Like</div>
+							<div id="likeSubmit{{post.id}}"><img src="/static/img/appleUnlike.png"></div>
 						{% endif %}
 					{% else %}
-						<div id="likeSubmit{{post.id}}">Like</div>
+						<div id="likeSubmit{{post.id}}"><img src="/static/img/appleUnlike.png"></div>
 					{% endif %}
 				</button>
 				<br>
-				
+			<div id="debugtxt"></div> <!-- remove me-->
 			</form>
 			<p> Likes: <div id="likes{{post.id}}">{{post.likes}}</div></p>
 			
@@ -134,6 +134,9 @@ $("form").submit(function(event) {
 	if($(this).closest("form").attr('id').localeCompare("search")!=0){
 		//Stop POST request from submitting and redirecting
 		event.preventDefault();
+		//the values in the button for when a post is liked and disliked
+		var like = "<img src=\"/static/img/appleLike.png\">";
+		var unlike = "<img src=\"/static/img/appleUnlike.png\">";
 		/*
 		Send the POST request. This does not redirect.
 		The post request  (see views.py/like()) will decide whether to increase
@@ -145,7 +148,6 @@ $("form").submit(function(event) {
 		*/
 		var likeReq = $(this);
 		var posting = $.post( likeReq.attr('action'), likeReq.serialize() );
-
 		/*Get the name of the form that was submitted.
 		The part of the from we care about is the ID - the number that follows
 		"likeForm" in the string.*/
@@ -153,7 +155,6 @@ $("form").submit(function(event) {
 		var id = formId.substr(8);
 		//This is the name of the div tag that contains the text "like" or "unlike"
 		var likeBtnId = "likeSubmit".concat(id);
-		
 		/*If the text was like, the user must be liking it. So we'll
 		change the text to unlike and increment the number of likes displayed by one.
 		
@@ -162,24 +163,31 @@ $("form").submit(function(event) {
 		request above did that, so this is merely making the page display
 		what the database knows without refreshing the page and making 
 		another database read.*/
-		if(document.getElementById(likeBtnId).innerHTML.localeCompare("Like")==0){
-			document.getElementById(likeBtnId).innerHTML = "Unlike";
+		if(document.getElementById(likeBtnId).
+					innerHTML.localeCompare(like)==0){
 			
 			
-			var likes = parseInt(document.getElementById("likes".concat(id)).innerHTML);
+			document.getElementById(likeBtnId).innerHTML = unlike;
+
+			
+			var likesCount = 
+				parseInt(document.getElementById("likes".concat(id)).innerHTML);
 			
 			
-			likes++;
-			document.getElementById("likes".concat(id)).innerHTML = likes;
+			likesCount--;
+			document.getElementById("likes".concat(id))
+						.innerHTML = likesCount.toString();
 		}
 		//Likewise if the text was unlike, the user is retracting their like
 		//of a post. 
 		else{
-			document.getElementById(likeBtnId).innerHTML = "Like";
-			var likes = parseInt(document.getElementById("likes".concat(id)).innerHTML);
-			likes--;
-			document.getElementById("likes".concat(id)).innerHTML = likes.toString();
+			document.getElementById(likeBtnId).innerHTML = like;
+			var likesCount = parseInt(document.getElementById("likes".concat(id)).innerHTML);
+			likesCount++;
+			document.getElementById("likes".concat(id))
+						.innerHTML = likesCount.toString();
 		}
+
 	}
 });
 

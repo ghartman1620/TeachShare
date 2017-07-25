@@ -110,6 +110,12 @@ def account_settings(request):
 			return HttpResponseRedirect(reverse("account:dashboard"))
 	return render(request, 'accounts/edit_profile.html')
 
+'''
+POST request for edit profile writing and
+renders the profile page when its loaded.
+Creates many GradeTaught and SubjectTaught objects
+and assigns other fields in UserProfile.
+'''
 @login_required(login_url='/account/login')
 def edit_profile(request):
 	if request.method == 'POST':
@@ -119,6 +125,8 @@ def edit_profile(request):
 			user.first_name = request.POST['firstName']
 		if isValidRequestField(request, 'lastName'):
 			user.last_name = request.POST['lastName']
+		#So that if a user clears subjects from the text thhey will
+		#no longer be saved to their profile.
 		for subject in request.user.userprofile.subjects.all():
 			subject.delete()	
 		if isValidRequestField(request, 'subject'):
@@ -131,10 +139,12 @@ def edit_profile(request):
 		if isValidRequestField(request, 'district'):
 			userProfile.schoolDistrict = request.POST['district']
 			
-		
+		#as with subjects taught
 		for grade in userProfile.gradetaught_set.all():
 			grade.delete()
 		
+		#Get every POST request that has "grade" as part of its ID
+		#Since the 13 grade checkboxes require separate IDs
 		for gradeTaught in request.POST:
 			if "grade" in gradeTaught:
 				gradeStr = GradeTaught(grade=request.POST[gradeTaught], userProfile=userProfile)
@@ -145,6 +155,8 @@ def edit_profile(request):
 		userProfile.save()
 		return HttpResponseRedirect(reverse('account:view_profile'))
 	else:
+		#This stuff passes strings related to the user's profile
+		#To autopopulate the fields on edit profile.
 		grades = []
 		for grade in request.user.userprofile.gradetaught_set.all():
 			grades.append(grade.grade)
@@ -282,7 +294,6 @@ def like(request, id):
 	#this POST request should not be allowed to refresh the dashboard.
 	#So this line should not matter, but if it does, dashboard is the most
 	#natural place to redirect to
-	
 	return HttpResponseRedirect(reverse('account:dashboard'))
 	
 
@@ -348,6 +359,8 @@ def register(request):
 
 @login_required(login_url='/account/login')
 def dashboard(request):
+	#Dashboard POST requests are a search. Searching done in the search function
+	
 	if request.method == 'POST':
 
 		return render(request, 'accounts/dashboard.html',
