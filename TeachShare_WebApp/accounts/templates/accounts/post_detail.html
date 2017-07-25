@@ -68,36 +68,36 @@
 	<h4><small>Posted {{instance.timestamp}} Updated {{instance.updated}}
 	</small></h4>
 	<div class="well">
+	<!-- file attachment -->
 		<p>
 			{{instance.content}}</br>
 			{{instance.id}}</br>
 		</p>
-		<p>Tags:
-			{% if tags %}
-				{% for tag in tags %}
-					<p>{{tag.tag}}</p>
+		<p>Attachments:
+			{% if files %}
+				{% for file in files %}
+					<p><a href="{{file.0}}" download>{{file.1}}</a></p>
+				{% endfor %}
+			{% endif %}
+		</p>
+		<p>
+			{% if images %}
+				{% for image in images %}
+					<div class="container-img">
+						<a href="{{image.0}}" download>
+							<p><img src='{{image.0}}' class="img-responsive img-thumbnail"></p>
+						</a>
+					</div>
+					<p><a href="{{image.0}}" download>{{image.1}}</a></p>
 				{% endfor %}
 			{% endif %}
 		</p>
 	</div> <!-- end well-->
-
-	<!-- file attachments -->
-	<p>Attachments:
-		{% if files %}
-			{% for file in files %}
-				<p><a href="{{file.0}}" download>{{file.1}}</a></p>
-			{% endfor %}
-		{% endif %}
-	</p>
-	<p>
-		{% if images %}
-			{% for image in images %}
-				<div class="container-img">
-					<a href="{{image.0}}" download>
-						<p><img src='{{image.0}}' class="img-responsive img-thumbnail"></p>
-					</a>
-				</div>
-				<p><a href="{{image.0}}" download>{{image.1}}</a></p>
+	<!-- tags section -->
+	<p>Tags:
+		{% if tags %}
+			{% for tag in tags %}
+				<p>{{tag.tag}}</p>
 			{% endfor %}
 		{% endif %}
 	</p>
@@ -117,20 +117,11 @@
 		<p>No comments here yet :(</p>
 	{% endfor %}
 </div> <!-- end container-->
-<!-- <a class="btn btn-default" href="{% url 'account:add_comment_to_post' pk=instance.id %}">Add comment</a>
-<hr>
-{% for comment in post.comments.all %}
-		<div class="comment">
-				<div class="date">{{ comment.created_date }}</div>
-				<strong>{{ comment.author }}</strong>
-				<p>{{ comment.text|linebreaks }}</p>
-		</div>
-{% empty %}
-		<p>No comments here yet :(</p>
-{% endfor %} -->
-<div class="container container-comments">
-	<button type="button" class="btn btn-primary btn-block" data-toggle="collapse" data-target="#comment">Click Here to Comment</button>
-</div>
+
+<!--commenting button a text area-->
+	<div class="container-commenting">
+		<button type="button" class="btn btn-primary btn-block" data-toggle="collapse" data-target="#comment">Click Here to Comment</button>
+  </div>
 	<form method="post" action= "{% url 'account:add_comment_to_post' pk=instance.pk %}">
 	{% csrf_token %}
 		<div class="collapse" id="comment">
@@ -140,14 +131,14 @@
 				 	<div class="col-sm-11">
 						<textarea type="text" class="form-control" rows="4" name="description" placeholder="Add a comment"></textarea>
 				 </div>
-				</div>
+			  </div> <!--end form-group-->
 				<div class="form-group">
 				 	<div class="col-sm-6 pull-left">
 					 	<input id="submit" name="submit" type="submit" value="Submit" class="btn btn-primary">
 				 	</div>
-				</div>
-			</div>
-		</div>
+				</div> <!--end form-group-->
+			</div> <!-- end container -->
+		</div> <!-- end collapse -->
 
 
 
