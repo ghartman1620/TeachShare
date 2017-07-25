@@ -8,7 +8,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <link rel="stylesheet" href={% static 'accounts/post_detail.css'%} type = "text/css">
-  <meta charset="utf-8">
+	<meta charset="utf-8">
 
 <!-- Tab icon -->
 <link rel="icon" type="image/png" href="/static/img/icon.png">
@@ -18,41 +18,41 @@
 
 <!-- Navbar -->
 <nav class="navbar navbar-inverse ">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="/account/dashboard">
-        <img src="{% static "accounts/tslogo.png" %}" alt="TSLogo"/>
-      </a>
-    </div>
-  <!-- Search bar -->
-    <form class="navbar-form navbar-left nav-searchpad">
-      <div class="form-group">
-        <input type="text" class="form-control" placeholder="Search">
-      </div>
-      <button type="submit" class="btn btn-default">Submit</button>
-    </form>
-  <!-- Create a Post Button -->
-    <ul class="nav navbar-nav nav-navitems">
-      <li><a href="/account/create/">
-        <p>New Post <span class="glyphicon glyphicon-plus-sign"></span> </p>
-        </a>
-      </li>
-    </ul>
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="/account/dashboard">
+				<img src="{% static "accounts/tslogo.png" %}" alt="TSLogo"/>
+			</a>
+		</div>
+	<!-- Search bar -->
+		<form class="navbar-form navbar-left nav-searchpad">
+			<div class="form-group">
+				<input type="text" class="form-control" placeholder="Search">
+			</div>
+			<button type="submit" class="btn btn-default">Submit</button>
+		</form>
+	<!-- Create a Post Button -->
+		<ul class="nav navbar-nav nav-navitems">
+			<li><a href="/account/create/">
+				<p>New Post <span class="glyphicon glyphicon-plus-sign"></span> </p>
+				</a>
+			</li>
+		</ul>
 
-  <!-- Dropdown Account Menu -->
-    <ul class="nav navbar-nav navbar-right">
-      <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" >
-          <img src="{% static "accounts/applelogo.png" %}" alt="TSLogo"/>
-        <span class="caret"></span></a>
-        <ul class="dropdown-menu">
-          <li><a href="/account/profile/">Profile</a></li>
-          <li><a href="/account/profile/edit/">Settings</a></li>
-          <li><a href="/account/">Log Out</a></li>
-        </ul>
-      </li>
-    </ul>
-  </div>
+	<!-- Dropdown Account Menu -->
+		<ul class="nav navbar-nav navbar-right">
+			<li class="dropdown">
+				<a class="dropdown-toggle" data-toggle="dropdown" >
+					<img src="{% static "accounts/applelogo.png" %}" alt="TSLogo"/>
+				<span class="caret"></span></a>
+				<ul class="dropdown-menu">
+					<li><a href="/account/profile/">Profile</a></li>
+					<li><a href="/account/profile/edit/">Settings</a></li>
+					<li><a href="/account/">Log Out</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
 </nav> <!-- ./End Navbar -->
 
 <!--
@@ -62,89 +62,84 @@
 </div>-->
 
 
-<!-- Post Description and Content Box -->
 <div class="container">
-    <h1> {{title}} </h1>
-    <h2><small>Created by: {{instance.user}}</small></h2>
-    <h4><small>Posted {{instance.timestamp}} Updated {{instance.updated}}
-    </small></h4>
-    <!-- Well -->
-    <div class="well">
-            <p>
-                {{instance.content}}</br>
-                <!--{{instance.id}}</br>-->
-            </p>
-            <!-- Files -->
-            <p>Attachments:
-              {% if files %}
-                {% for file in files %}
-                  <p><a href="{{file.0}}" download>{{file.1}}</a></p>
-                {% endfor %}
-              {% endif %}
-            </p>
-            <p>
-              {% if images %}
-                {% for image in images %}
-                  <p><img src='{{image.0}}'></p>
-                  <p><a href="{{image.0}}" download>{{image.1}}</a></p>
-                {% endfor %}
-              {% endif %}
-            </p><!-- ./End Files -->
-    </div> <!-- ./End Well -->
-    <!-- Tags -->
-    <p>Tags: </br>
-      {% if tags %}
-        {% for tag in tags %}
-          <a href="">#{{tag.tag}}</a>
-        {% endfor %}
-      {% endif %}
-    </p> <!-- ./End Tags -->
+	<!-- post basic info -->
+	<h1> {{ title }} </h1>
+	<h2><small>{{instance.user}}</small></h2>
+	<h4><small>Posted {{instance.timestamp}} Updated {{instance.updated}}
+	</small></h4>
+	<div class="well">
+	<!-- file attachment -->
+		<p>
+			{{instance.content}}</br>
+			{{instance.id}}</br>
+		</p>
+		<p>Attachments:
+			{% if files %}
+				{% for file in files %}
+					<p><a href="{{file.0}}" download>{{file.1}}</a></p>
+				{% endfor %}
+			{% endif %}
+		</p>
+		<p>
+			{% if images %}
+				{% for image in images %}
+					<div class="container-img">
+						<a href="{{image.0}}" download>
+							<p><img src='{{image.0}}' class="img-responsive img-thumbnail"></p>
+						</a>
+					</div>
+					<p><a href="{{image.0}}" download>{{image.1}}</a></p>
+				{% endfor %}
+			{% endif %}
+		</p>
+	</div> <!-- end well-->
+	<!-- tags section -->
+	<p>Tags:
+		{% if tags %}
+			{% for tag in tags %}
+				<p>{{tag.tag}}</p>
+			{% endfor %}
+		{% endif %}
+	</p>
+</div> <!-- end container -->
 
-</div> <!-- ./End Post Box -->
+<div class="container container-comments">
+	<h2>Comments</h2>
+	<hr>
+	{% for comment in instance.comments.all %}
+		<div class="comment">
+			<h4><small>Author: {{comment.user}} Time Posted: {{comment.timestamp}}</small></h4>
+			<div class="well well-comments">
+				<p>{{ comment.text|linebreaks }}</p>
+			</div> <!-- end well -->
+		</div>
+		{% empty %}
+		<p>No comments here yet :(</p>
+	{% endfor %}
+</div> <!-- end container-->
 
-
-
-<hr>
-{% for comment in instance.comments.all %}
-<div class="comment">
-        <p>{{ comment.text|linebreaks }}</p>
-    </div>
-{% empty %}
-    <p>No comments here yet :(</p>
-{% endfor %}
-<!-- <a class="btn btn-default" href="{% url 'account:add_comment_to_post' pk=instance.id %}">Add comment</a>
-<hr>
-{% for comment in post.comments.all %}
-    <div class="comment">
-        <div class="date">{{ comment.created_date }}</div>
-        <strong>{{ comment.author }}</strong>
-        <p>{{ comment.text|linebreaks }}</p>
-    </div>
-{% empty %}
-    <p>No comments here yet :(</p>
-{% endfor %} -->
-
-<form method="post" action= "{% url 'account:add_comment_to_post' pk=instance.pk %}">
-{% csrf_token %}
- <div class="container">
-    <div class="col-sm-2 pull-right"></div>
-        <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#comment">Comment</button>
-    </div>
-  <div id="comment" class="collapae">
-    <div class="form-group">
-       <label for="message" class="col-sm-12 control-label">Comment</label>
-       <div class="col-sm-11">
-          <textarea type="text" class="form-control" rows="4" name="description" placeholder="Add a comment"></textarea>
-       </div>
-    </div>
-    <div class="form-group">
-       <div class="col-sm-2 pull-right">
-         <input id="submit" name="submit" type="submit" value="Submit" class="btn btn-primary">
-       </div>
-    </div>
+<!--commenting button a text area-->
+	<div class="container-commenting">
+		<button type="button" class="btn btn-primary btn-block" data-toggle="collapse" data-target="#comment">Click Here to Comment</button>
   </div>
-</div>
-
+	<form method="post" action= "{% url 'account:add_comment_to_post' pk=instance.pk %}">
+	{% csrf_token %}
+		<div class="collapse" id="comment">
+			<div class = "container">
+				<div class="form-group">
+				 	<label for="message" class="col-md-12 control-label"><h2>Comment</h2></label>
+				 	<div class="col-sm-11">
+						<textarea type="text" class="form-control" rows="4" name="description" placeholder="Add a comment"></textarea>
+				 </div>
+			  </div> <!--end form-group-->
+				<div class="form-group">
+				 	<div class="col-sm-6 pull-left">
+					 	<input id="submit" name="submit" type="submit" value="Submit" class="btn btn-primary">
+				 	</div>
+				</div> <!--end form-group-->
+			</div> <!-- end container -->
+		</div> <!-- end collapse -->
 
 
 

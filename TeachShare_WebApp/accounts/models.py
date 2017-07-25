@@ -66,6 +66,8 @@ post_save.connect(create_profile, sender=User)
 class Comment(models.Model):
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
     text = models.TextField()
+    user = models.CharField(max_length=100, default='')
+    timestamp = models.DateTimeField(auto_now=False, auto_now_add= True)
 
     def __str__(self):
         return self.text

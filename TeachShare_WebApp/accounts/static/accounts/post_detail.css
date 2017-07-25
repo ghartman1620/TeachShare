@@ -17,8 +17,13 @@
     border: 0 none;
 }
 
-.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+.btn-primary:hover, .btn-primary:focus{
     background: #295B2F;
+}
+
+.btn-comment {
+  padding-top: 10px;
+  padding-bottom: 20px;
 }
 
 body {
@@ -50,11 +55,12 @@ body {
   text-align: center;
   padding-top: 30px;
 }
-
+/*general white centered container*/
 .container {
-  width: 800px;
+  width: 45%;
   text-align: left;
   background-color: #ffffff;
+  padding-bottom: 50px;
 }
 .container>p {
   font-size: 18px;
@@ -65,12 +71,43 @@ body {
 	border-top-width: 0px;
 	border-left-width: 0px;
 	border-right-width: 0px;
-
-
 }
+
+/*container for images*/
+.container-img{
+  width: 30%;
+  height: auto;
+}
+
+/*small well modifications*/
 .well {
   margin-left: 0px;
 }
 .well>p {
   font-size: 18px;
+}
+
+/*specialized container for comments*/
+.container-comments {
+  width: 45%;
+  text-align: left;
+  font-size: 16px;
+  margin-top: 20px;
+  background-color: #f5f5f5;
+}
+
+/*well style for individual comments*/
+.well-comments {
+  background-color: #ffffff;
+  border: 1px solid #e3e3e3;
+}
+
+/*specialized container for commenting area*/
+.container-commenting {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    width: 45%;
+    background color: #FCF4E3;
 }
