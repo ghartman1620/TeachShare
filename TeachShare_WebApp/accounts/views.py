@@ -283,7 +283,7 @@ def like(request, id):
 	#So this line should not matter, but if it does, dashboard is the most
 	#natural place to redirect to
 	
-	return HttpResponseRedirect(reverse('accounts:dashboard'))
+	return HttpResponseRedirect(reverse('account:dashboard'))
 	
 
 
