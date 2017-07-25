@@ -100,7 +100,13 @@
               <td>{{user.email}}</td>
             </tr>
               <td>Subjects taught: </td>
-              <td>{{userProfile.subjectTaught}}</td>
+               <td>
+                {% if userProfile.subjects.all %}
+                  {% for subject in userProfile.subjects.all %}
+                    <p>{{subject.subject}}</p>
+                  {% endfor %}
+                {% endif %}
+                </td>
             </tr>
               <tr>
               <td>School district:</td>

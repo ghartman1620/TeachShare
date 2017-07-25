@@ -27,7 +27,6 @@ class Post(models.Model):
 
 class UserProfile(models.Model):
 	user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
-	subjectTaught = models.CharField(max_length=200, default='')
 	schoolDistrict = models.CharField(max_length=500, default='')
 	favorites = models.ManyToManyField(Post)
 	
@@ -40,6 +39,13 @@ class UserProfile(models.Model):
 class GradeTaught(models.Model):
 	grade = models.CharField(max_length=100, default='')
 	userProfile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+
+
+class SubjectTaught(models.Model):
+	subject = models.CharField(max_length=100, default='')
+	userProfile = models.ForeignKey(UserProfile, on_delete=models.CASCADE,
+		related_name='subjects')
+
 	
 def create_profile(sender, **kwargs):
 	if kwargs['created']:

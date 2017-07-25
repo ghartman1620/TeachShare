@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm 
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
-from accounts.models import Tag, Post, UserProfile, GradeTaught, Attachment
+from accounts.models import Tag, Post, UserProfile, GradeTaught, Attachment, SubjectTaught
 from django.conf import settings 
 from django.utils.timezone import now as timezone_now
 
@@ -99,8 +99,15 @@ def edit_profile(request):
 			user.first_name = request.POST['firstName']
 		if isValidRequestField(request, 'lastName'):
 			user.last_name = request.POST['lastName']
+		for subject in request.user.userprofile.subjects.all():
+			subject.delete()	
 		if isValidRequestField(request, 'subject'):
-			userProfile.subjectTaught = request.POST['subject']
+
+
+			subjectlist = request.POST['subject'].split(",")
+			for s in subjectlist:
+				subject = SubjectTaught(subject=s, userProfile=userProfile)
+				subject.save()	
 		if isValidRequestField(request, 'district'):
 			userProfile.schoolDistrict = request.POST['district']
 			
@@ -121,10 +128,17 @@ def edit_profile(request):
 		grades = []
 		for grade in request.user.userprofile.gradetaught_set.all():
 			grades.append(grade.grade)
+		subjects = ""
+		for subject in request.user.userprofile.subjects.all():
+			subjects += subject.subject
+			subjects += ","
+		if subjects[-1:] == ",":
+			subjects = subjects[:-1]
 		args = {
 			'user': request.user, 
 			'userProfile': request.user.userprofile,
 			'grades': grades,
+			'subjectsTaught' :subjects
 		}
 		return render(request, 'accounts/edit_profile.html',args)
 
@@ -148,7 +162,7 @@ def post_create(request):
 						user=request.user.username)
 		files =request.FILES.getlist('files')
 		post.save()
-		
+		#Handle multi-file upload
 		for a_file in files:
 		
 			instance = Attachment(
@@ -178,7 +192,6 @@ def post_detail(request, id= None):
 			name = file[file.rfind("\\")+1:]
 			file = file[file.find("\media\\"):]
 
-		print(name)
 		file = file[file.find("\media\\"):]
 		if file[-3:] in imgFormats or file[-4:] in imgFormats:
 			images.append((file, name))
@@ -326,7 +339,6 @@ def dashboard(request):
 					 'likedPosts' : likedPosts,
 					 'searchstring' : request.POST['search']})
 	else:
-
 		return render(request, 'accounts/dashboard.html',
 						{'posts' : Post.objects.order_by("-likes"),
 						 'likedPosts' : likedPosts})
