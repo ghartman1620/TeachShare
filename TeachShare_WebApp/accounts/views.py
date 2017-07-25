@@ -131,7 +131,16 @@ def edit_profile(request):
 def isValidRequestField(request, str):
 	return str in request.POST and request.POST[str] != "";
 
+def add_tag(request, post):
+	if request.method == 'POST':
+		tagString =request.POST['tag']
+		tagList = tagString.split(',')
+		for s in tagList:
+			if s != "":
+				tag = Tag(tag=s, post=post)
+				tag.save()
 		
+
 @login_required(login_url='/account/login')
 def post_create(request):
 	if request.method == 'POST':
@@ -239,14 +248,6 @@ def like(request, id):
 	
 	return HttpResponseRedirect(reverse('accounts:dashboard'))
 	
-def add_tag(request, post):
-	if request.method == 'POST':
-		tagString =request.POST['tag']
-		tagList = tagString.split(',')
-		for s in tagList:
-			if s != "":
-				tag = Tag(tag=s, post=post)
-				tag.save()
 
 def password_change(request):
 	try:
