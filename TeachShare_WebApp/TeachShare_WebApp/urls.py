@@ -19,6 +19,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import password_reset, password_reset_done, password_reset_confirm, password_reset_complete
 
+from rest_framework import routers
+from accounts.views import UserProfileViewset, UserViewset, GroupViewset
+
+router = routers.DefaultRouter()
+router.register(r'userprofiles', UserProfileViewset)
+router.register(r'users', UserViewset)
+router.register(r'groups', GroupViewset)
+
 urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls')),
     url(r'^admin/', admin.site.urls),
@@ -29,8 +37,9 @@ urlpatterns = [
     url(r'^reset-password/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
         password_reset_confirm, name='password_reset_confirm'),
     url(r'^reset-password/complete/$', password_reset_complete,
-        name='password_reset_complete')
+        name='password_reset_complete'),
 
+    url(r'^api/', include(router.urls)),
 ]
 
 if settings.DEBUG:
