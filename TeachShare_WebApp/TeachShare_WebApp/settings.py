@@ -42,6 +42,7 @@ DEFAULT_FROM_EMAIL = 'teamteachbears@gmail.com'
 
 INSTALLED_APPS = [
     'accounts',
+    'posts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
