@@ -15,8 +15,7 @@ import os
 # Create your models here.
 
 
-
-#Post & related fields
+# Post & related fields
 
 class Post(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -26,6 +25,7 @@ class Post(models.Model):
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
     likes = models.IntegerField(default=0)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
+
 
 class Comment(models.Model):
     post = models.ForeignKey(
@@ -51,15 +51,17 @@ def upload_to(instance, filename):
 class Attachment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     file = models.FileField(null=True, blank=True, upload_to=upload_to)
-    
+
 # Creates list of tags for every post
+
+
 class Tag(models.Model):
     tag = models.CharField(max_length=100, default='')
     post = models.ForeignKey(Post, related_name='tags',
                              on_delete=models.CASCADE)
 
 
-#userprofile & related models
+# userprofile & related models
 
 class UserProfile(models.Model):
     user = models.OneToOneField(
@@ -88,32 +90,12 @@ def create_profile(sender, **kwargs):
         user_profile.save()
 
 
-
-
-
 post_save.connect(create_profile, sender=User)
-
-
 
 
 def create_random_string(length=30):
     if length <= 0:
         length = 30
-
-
-
-'''    
-class Post(models.Model):
-	user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
-	title = models.CharField(max_length=100, default='')
-	user = models.CharField(max_length=100, default='')
-	content = models.TextField(default="")
-	updated = models.DateTimeField(auto_now=True, auto_now_add=False)
-	timestamp = models.DateTimeField(auto_now=False, auto_now_add= True)
-'''
-
-
-
 
 
 post_save.connect(create_profile, sender=User)

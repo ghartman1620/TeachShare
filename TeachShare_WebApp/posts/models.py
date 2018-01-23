@@ -16,6 +16,7 @@ class Post(models.Model):
     likes = models.IntegerField(default=0)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
 
+
 class Comment(models.Model):
     post = models.ForeignKey(
         Post, related_name='comments', on_delete=models.CASCADE)
@@ -35,18 +36,21 @@ def upload_to(instance, filename):
         create_random_string(),
         filename_base,
         filename_ext.lower())
+
+
 def create_random_string(length=30):
     if length <= 0:
         length = 30
 
 
-
-
 class Attachment(models.Model):
-    post = models.ForeignKey(Post, related_name='attachments', on_delete=models.CASCADE)
+    post = models.ForeignKey(
+        Post, related_name='attachments', on_delete=models.CASCADE)
     file = models.FileField(null=True, blank=True, upload_to=upload_to)
-    
+
 # Creates list of tags for every post
+
+
 class Tag(models.Model):
     tag = models.CharField(max_length=100, default='')
     post = models.ForeignKey(Post, related_name='tags',
