@@ -25,7 +25,7 @@ from .models import UserProfile
 from django.contrib.auth.models import User, Group
 
 
-class UserProfileViewset(viewsets.ModelViewSet):
+class UserProfileViewSet(viewsets.ModelViewSet):
     """
     API endpoint for UserProfile model
     """
@@ -33,15 +33,15 @@ class UserProfileViewset(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
 
 
-class UserViewset(viewsets.ModelViewSet):
+class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint for UserProfile model
     """
-    queryset = User.objects.all().order_by('-date_joined')
+    queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
-class GroupViewset(viewsets.ModelViewSet):
+class GroupViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
