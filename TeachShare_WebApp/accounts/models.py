@@ -66,7 +66,6 @@ class UserProfile(models.Model):
         User, primary_key=True, on_delete=models.CASCADE)
     schoolDistrict = models.CharField(max_length=500, default='')
     favorites = models.ManyToManyField(Post)
-
     def __str__(self):
         return self.user.username
 

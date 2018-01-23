@@ -20,13 +20,13 @@ from django.conf.urls.static import static
 from django.contrib.auth.views import password_reset, password_reset_done, password_reset_confirm, password_reset_complete
 
 from rest_framework import routers
-from accounts.views import UserProfileViewset, UserViewset, GroupViewset
+from accounts.views import UserProfileViewSet, UserViewSet, GroupViewSet
 from posts.views import PostViewSet, CommentViewSet, AttachmentViewSet
 
 router = routers.DefaultRouter()
-router.register(r'userprofiles', UserProfileViewset)
-router.register(r'users', UserViewset)
-router.register(r'groups', GroupViewset)
+router.register(r'userprofiles', UserProfileViewSet)
+router.register(r'users', UserViewSet)
+router.register(r'groups', GroupViewSet)
 router.register(r'posts', PostViewSet)
 router.register(r'comments', CommentViewSet)
 router.register(r'attachments', AttachmentViewSet)
