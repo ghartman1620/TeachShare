@@ -21,11 +21,15 @@ from django.contrib.auth.views import password_reset, password_reset_done, passw
 
 from rest_framework import routers
 from accounts.views import UserProfileViewset, UserViewset, GroupViewset
+from posts.views import PostViewSet, CommentViewSet, AttachmentViewSet
 
 router = routers.DefaultRouter()
 router.register(r'userprofiles', UserProfileViewset)
 router.register(r'users', UserViewset)
 router.register(r'groups', GroupViewset)
+router.register(r'posts', PostViewSet)
+router.register(r'comments', CommentViewSet)
+router.register(r'attachments',AttachmentViewSet)
 
 urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls')),
