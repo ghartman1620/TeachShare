@@ -35,8 +35,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'teamteachbears@gmail.com'
 EMAIL_HOST_PASSWORD = 'teachbears_cmps115'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-DEFAULT_FROM_EMAIL = 'teamteachbears@gmail.com'  
-
+DEFAULT_FROM_EMAIL = 'teamteachbears@gmail.com'
 
 
 # Application definition
@@ -49,7 +48,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # additional apps:
+    'rest_framework',
 ]
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -124,8 +134,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-
 
 
 # Static files (CSS, JavaScript, Images)
