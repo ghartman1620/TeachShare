@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import JSONField
 from django.conf import settings
 from django.utils.timezone import now as timezone_now
 import random
@@ -11,7 +12,7 @@ class Post(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='posts',
                              default=1, on_delete=models.CASCADE)
     title = models.CharField(max_length=100, default='')
-    content = models.TextField(default="")
+    content = JSONField()
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
     likes = models.IntegerField(default=0)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
