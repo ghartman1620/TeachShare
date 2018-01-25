@@ -42,6 +42,7 @@ DEFAULT_FROM_EMAIL = 'teamteachbears@gmail.com'
 
 INSTALLED_APPS = [
     'accounts',
+    'posts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -97,8 +98,12 @@ WSGI_APPLICATION = 'TeachShare_WebApp.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'teachshare',
+        'USER': 'postgres',
+        'PASSWORD': 'password123',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 

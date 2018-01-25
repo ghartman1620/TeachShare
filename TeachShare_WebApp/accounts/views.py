@@ -18,6 +18,36 @@ from django.utils.timezone import now as timezone_now
 import os
 import sys
 
+from .serializers import UserProfileSerializer, UserSerializer, GroupSerializer
+from rest_framework import viewsets
+from .models import UserProfile
+
+from django.contrib.auth.models import User, Group
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for UserProfile model
+    """
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for UserProfile model
+    """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class GroupViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+
 
 '''
 Searches the given posts and returns a subset of these posts.
