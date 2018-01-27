@@ -8,6 +8,7 @@ export default new Vuex.Store({
     state: {
         post: null,
         user: null,
+        comment: null,
         posts: []
     },
     mutations: {
@@ -19,6 +20,9 @@ export default new Vuex.Store({
         },
         LOAD_USER: (state, data) => {
             state.user = Object.assign({}, data);
+        },
+        LOAD_COMMENT: (state, data) => {
+            state.comment = Object.assign({}, data);
         }
     },
     actions: {
@@ -38,6 +42,12 @@ export default new Vuex.Store({
             console.log('FETCH_USER');
             api.get(`users/${userID}/`)
                 .then(response => state.commit('LOAD_USER', response.data))
+                .catch(err => console.log(err));
+        },
+        fetchComment: (state, commentID) => {
+            console.log('FETCH_COMMENT');
+            api.get(`comments/${commentID}/`)
+                .then(response => state.commit('LOAD_COMMENT', response.data))
                 .catch(err => console.log(err));
         }
     }

@@ -14,6 +14,11 @@
       {{post.pk}}.) <strong>Title: {{ post.title }}</strong> ==> Content: {{ post.content }}
       </li>
     </ul>
+    <form v-on:submit.prevent="getComment">
+      <input type="number" id="name" v-model="commentid">
+      <input type="submit" value="Submit">
+    </form>
+    <h3 v-if="comment">{{comment.text}}</h3>
   </div>
   </div>
 </template>
@@ -22,23 +27,34 @@
 export default {
   name: 'Test',
   data: function() {
-    return {userid: ''}
+    return {
+      userid: '',
+      commentid: '',
+    }
   },
   computed: {
     posts: {
       get: function(){
         return this.$store.state.posts;
       },
-      set: function(newValue){  // placeholder, does not work
-        newValue = this.$store.state.posts;
+      set: function(newValue){
+        // placeholder, does not work
       }
     },
     user: {
       get: function(){
         return this.$store.state.user;
       },
-      set: function(newUser){ // placeholder, does not work
-        newUser = this.$store.state.user;
+      set: function(newUser){
+        // placeholder, does not work
+      }
+    },
+    comment: {
+      get: function(){
+        return this.$store.state.comment;
+      },
+      set: function(newUser){
+        // placeholder, does not work
       }
     }
   },
@@ -53,9 +69,11 @@ export default {
     getUser(){
       this.$store.dispatch('fetchUser', this.userid);
     },
+    getComment(){
+      this.$store.dispatch('fetchComment', this.commentid);
+    },
     testStore(){
       this.$store.dispatch('fetchAllPosts');
-      this.message = this.$store.state.post;
     }
   }
 }

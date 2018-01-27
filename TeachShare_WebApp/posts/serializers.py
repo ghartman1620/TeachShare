@@ -17,7 +17,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Comment
-        fields=('post', 'text', 'user','timestamp')
+        fields=('pk', 'post', 'text', 'user','timestamp')
 class AttachmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model=Attachment
