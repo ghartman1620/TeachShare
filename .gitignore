@@ -2,3 +2,7 @@
 env/
 __pycache__/
 .idea/
+.vscode/
+*.jshintrc
+*.project
+*.pydevproject
