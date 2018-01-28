@@ -3,10 +3,7 @@ from .models import UserProfile
 from django.contrib.auth.models import User, Group
 
 
-class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
-    user = serializers.HyperlinkedRelatedField(many=False, read_only=True,
-                                               view_name='user-detail')
-
+class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ('user', 'url', 'schoolDistrict')

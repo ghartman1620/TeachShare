@@ -21,8 +21,9 @@ import sys
 from .serializers import UserProfileSerializer, UserSerializer, GroupSerializer
 from rest_framework import viewsets
 from .models import UserProfile
-
+from rest_framework import permissions
 from django.contrib.auth.models import User, Group
+from django_filters import rest_framework as filters
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -31,15 +32,18 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     """
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
-
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('user',)
 
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint for UserProfile model
     """
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('username', 'email')
 
 class GroupViewSet(viewsets.ModelViewSet):
     """
