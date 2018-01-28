@@ -5,7 +5,7 @@ import HelloWorld from '@/components/HelloWorld';
 import Test from '@/components/Test';
 
 Vue.use(Router);
-Vue.use(Vuex);
+
 
 export default new Router({
     routes: [{

@@ -15,7 +15,11 @@
     <h2>Posts:</h2>
     <button v-on:click="getPostsByMyUser">Get Posts By User Selected</button>
     <button v-on:click="testStore">Get Posts</button>
+
+    <!-- This is how you use components, you can just put them in the markup -->
     <list-component :items='posts'></list-component>
+    <!--  -->
+
     <br><br>
 
     <!-- Getting comments by primary key (pk) -->
@@ -34,6 +38,14 @@
       <input type="submit" value="Submit">
     </form>
     <h3 v-if="post">{{post}}</h3>
+
+    <!-- Getting comments for a particular post by it's primary key (pk) -->
+    <h2>Comments for post:</h2>
+    <form v-on:submit.prevent="getCommentsForPost">
+      <input type="number" id="name" v-model="postid">
+      <input type="submit" value="Submit">
+    </form>
+    <h3 v-if="comments.length">{{comments}}</h3>
   </div>
   </div>
 </template>
@@ -56,7 +68,8 @@ export default {
     post: state => state.post,
     posts: state => state.posts,
     user: state => state.user,
-    comment: state => state.comment
+    comment: state => state.comment,
+    comments: state => state.comments
   }),
   methods: {
     loadPost(){
@@ -81,6 +94,9 @@ export default {
     getPostsByMyUser(){
       console.log(this.userid);
       this.$store.dispatch('fetchFilteredPosts', this.userid);
+    },
+    getCommentsForPost(){
+      this.$store.dispatch('fetchCommentsForPost', this.postid)
     }
   }
 }

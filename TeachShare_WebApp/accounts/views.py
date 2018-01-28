@@ -39,7 +39,6 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint for UserProfile model
     """
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = (filters.DjangoFilterBackend,)
@@ -51,6 +50,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     """
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    
 
 
 '''

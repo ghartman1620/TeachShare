@@ -8,12 +8,12 @@ from rest_framework import serializers
 from posts.models import Post, Comment, Attachment, Tag
 from accounts.serializers import UserSerializer
 
-
 class CommentSerializer(serializers.ModelSerializer):
     user = UserSerializer(required=True)
     class Meta:
         model = Comment
         fields=('pk', 'post', 'text', 'user','timestamp')
+
 
 class AttachmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,6 +28,4 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('pk','user','title', 'content', 'updated', 'likes', 'timestamp', 'comments', 'attachments')
-        # view_name='track-detail'
-
 

@@ -9,6 +9,7 @@ export default new Vuex.Store({
         post: null,
         user: null,
         comment: null,
+        comments: [],
         posts: []
     },
     mutations: {
@@ -23,6 +24,9 @@ export default new Vuex.Store({
         },
         LOAD_COMMENT: (state, data) => {
             state.comment = Object.assign({}, data);
+        },
+        LOAD_COMMENTS_FOR_POST: (state, data) => {
+            state.comments = Object.assign([], data);
         },
         LOAD_FILTERED_POSTS: (state, data) => {
             state.posts = Object.assign([], data);
@@ -61,13 +65,13 @@ export default new Vuex.Store({
         },
         fetchCommentsForPost: (state, postID) => {
             console.log('FETCH_COMMENT');
-            api.get(`comments/${commentID}/`)
-                .then(response => state.commit('LOAD_COMMENT', response.data))
+            api.get(`comments/?post=${postID}`)
+                .then(response => state.commit('LOAD_COMMENTS_FOR_POST', response.data))
                 .catch(err => console.log(err));
         },
         fetchFilteredPosts: (state, filterParams) => {
             console.log('FETCH_FILTERED_POSTS', filterParams);
-            api.get('posts/')
+            api.get(`posts/?user=${filterParams}`)
                 .then(response => state.commit('LOAD_FILTERED_POSTS', response.data))
                 .catch(err => console.log(err));
         }

@@ -9,13 +9,12 @@ class PostViewSet(viewsets.ModelViewSet):
     """
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('user', 'title', 'updated', 'likes', 'timestamp')
     
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    
+    filter_fields = ('post', 'text', 'user', 'timestamp')
 
 class AttachmentViewSet(viewsets.ModelViewSet):
     """
@@ -23,3 +22,4 @@ class AttachmentViewSet(viewsets.ModelViewSet):
     """
     queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer
+    filter_fields = ('post', 'file')
