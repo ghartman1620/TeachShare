@@ -12,7 +12,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
     #user = serializers.HyperlinkedRelatedField(many=False, read_only=True, view_name='users')
     class Meta:
         model = Post
-        fields = ('pk','user','title', 'content', 'updated', 'likes', 'timestamp','attachments')
+        fields = ('pk','user','title', 'content', 'updated', 'likes', 'comments', 'timestamp','attachments')
         # view_name='track-detail'
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

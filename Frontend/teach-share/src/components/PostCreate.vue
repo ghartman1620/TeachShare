@@ -3,7 +3,6 @@ Questions for today:
 logging in with vue?
 importing from cdns in vue?
 programming error when comments are included in the post serializer
-package.json error when trying to npm run dev from teachshare repo
 difference between commit and dispatch
 # in url?
 -->
@@ -117,6 +116,7 @@ export default {
         "title" : this.title, 
         "content" : "{plaintext:" + this.contents + "}",
         "likes" : 0,
+        "comments" : [],
         "attachments" : [],
       }
       console.log(obj)
