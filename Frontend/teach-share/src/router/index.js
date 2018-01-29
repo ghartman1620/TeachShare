@@ -6,7 +6,7 @@ import Test from '@/components/Test';
 import PostCreate from '@/components/PostCreate';
 
 Vue.use(Router);
-Vue.use(Vuex);
+
 
 export default new Router({
     routes: [{

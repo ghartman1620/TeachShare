@@ -6,42 +6,71 @@
       <input type="number" id="name" v-model="userid">
       <input type="submit" value="Submit">
     </form>
-      <button v-on:click="testStore">Get Posts</button>
+
   </div>
   <div>
-    <ul>
-      <li v-for="post in posts" :key="post.pk">
-      {{post.pk}}.) <strong>Title: {{ post.title }}</strong> ==> Content: {{ post.content }}
-      </li>
-    </ul>
+    <br><br>
+
+    <!-- Getting all the json for all the posts, using a demo component -->
+    <h2>Posts:</h2>
+    <button v-on:click="getPostsByMyUser">Get Posts By User Selected</button>
+    <button v-on:click="testStore">Get Posts</button>
+
+    <!-- This is how you use components, you can just put them in the markup -->
+    <list-component :items='posts'></list-component>
+    <!--  -->
+
+    <br><br>
+
+    <!-- Getting comments by primary key (pk) -->
+    <h2>Comments:</h2>
+    <form v-on:submit.prevent="getComment">
+      <input type="number" id="name" v-model="commentid">
+      <input type="submit" value="Submit">
+    </form>
+    <h3 v-if="comment">{{comment.text}}</h3>
+    <br><br>
+
+    <!-- Getting a post by it's primary key (pk) -->
+    <h2>Post:</h2>
+    <form v-on:submit.prevent="getPost">
+      <input type="number" id="name" v-model="postid">
+      <input type="submit" value="Submit">
+    </form>
+    <h3 v-if="post">{{post}}</h3>
+
+    <!-- Getting comments for a particular post by it's primary key (pk) -->
+    <h2>Comments for post:</h2>
+    <form v-on:submit.prevent="getCommentsForPost">
+      <input type="number" id="name" v-model="postid">
+      <input type="submit" value="Submit">
+    </form>
+    <h3 v-if="comments.length">{{comments}}</h3>
   </div>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import { ListComponent } from './ListComponent';
+
 export default {
+  components: ListComponent,
   name: 'Test',
   data: function() {
-    return {userid: ''}
-  },
-  computed: {
-    posts: {
-      get: function(){
-        return this.$store.state.posts;
-      },
-      set: function(newValue){  // placeholder, does not work
-        newValue = this.$store.state.posts;
-      }
-    },
-    user: {
-      get: function(){
-        return this.$store.state.user;
-      },
-      set: function(newUser){ // placeholder, does not work
-        newUser = this.$store.state.user;
-      }
+    return {
+      userid: '',
+      commentid: '',
+      postid: ''
     }
   },
+  computed: mapState({
+    post: state => state.post,
+    posts: state => state.posts,
+    user: state => state.user,
+    comment: state => state.comment,
+    comments: state => state.comments
+  }),
   methods: {
     loadPost(){
       console.log('beginning fetch');
@@ -53,9 +82,21 @@ export default {
     getUser(){
       this.$store.dispatch('fetchUser', this.userid);
     },
+    getComment(){
+      this.$store.dispatch('fetchComment', this.commentid);
+    },
+    getPost(){
+      this.$store.dispatch('fetchPost', this.postid);
+    },
     testStore(){
       this.$store.dispatch('fetchAllPosts');
-      this.message = this.$store.state.post;
+    },
+    getPostsByMyUser(){
+      console.log(this.userid);
+      this.$store.dispatch('fetchFilteredPosts', this.userid);
+    },
+    getCommentsForPost(){
+      this.$store.dispatch('fetchCommentsForPost', this.postid)
     }
   }
 }
