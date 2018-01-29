@@ -51,13 +51,11 @@ export default new Vuex.Store({
                 .then(response => state.commit('LOAD_USER', response.data))
                 .catch(err => console.log(err));
         },
-<<<<<<< HEAD
         createPost: (state, postObj) => {
             api.post('posts/', postObj)
-              .then(response => console.log('post post success'))
-              .catch(err => console.log(err))
+                .then(response => console.log('post post success'))
+                .catch(err => console.log(err))
         },
-=======
         fetchComment: (state, commentID) => {
             console.log('FETCH_COMMENT');
             api.get(`comments/${commentID}/`)
@@ -82,6 +80,5 @@ export default new Vuex.Store({
                 .then(response => state.commit('LOAD_FILTERED_POSTS', response.data))
                 .catch(err => console.log(err));
         }
->>>>>>> vuex_api-integration
     }
 })

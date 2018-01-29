@@ -16,6 +16,7 @@
     <button v-on:click="getPostsByMyUser">Get Posts By User Selected</button>
     <button v-on:click="testStore">Get Posts</button>
 
+    <h1>HEY</h1>
     <!-- This is how you use components, you can just put them in the markup -->
     <list-component :items='posts'></list-component>
     <!--  -->

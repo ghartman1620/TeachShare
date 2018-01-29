@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    ports: 
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_DB: teachshare
+      POSTGRES_PASSWORD: password123
+      POSTGRES_USER: postgres
