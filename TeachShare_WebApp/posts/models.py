@@ -21,7 +21,7 @@ class Post(models.Model):
 class Comment(models.Model):
     post = models.ForeignKey( 
         Post, related_name='comments', 
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE) 
     text = models.TextField()
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='comments',
                              default=1, on_delete=models.CASCADE)

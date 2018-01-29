@@ -1,8 +1,6 @@
 <!--
 Questions for today:
-logging in with vue?
-importing from cdns in vue?
-programming error when comments are included in the post serializer
+logging in with vue? - TODO
 difference between commit and dispatch
 # in url?
 -->
@@ -12,12 +10,11 @@ difference between commit and dispatch
 
 <body>
 
-<button class="btn"> foobar</button>
 <nav class="navbar navbar-inverse ">
   <div class="container-fluid">
     <div class="navbar-header">
       <a class="navbar-brand" href="/account/dashboard">
-        <img src="<!--the apple logo -->" alt="TSLogo"/>
+        <img src="http://127.0.0.1:8000/static/img/tslogo.png" alt="TSLogo"/>
       </a>
     </div>
   <!-- Search bar -->
@@ -39,7 +36,7 @@ difference between commit and dispatch
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" >
-          <img src="<!-- the small apple logo for dropdown -->" alt="TSLogo"/>
+          <img src="http://127.0.0.1:8000/static/img/applelogo.png" alt="TSLogo"/>
         <span class="caret"></span></a>
         <ul class="dropdown-menu">
 		  <li><a href="/account/profile/">Profile</a></li>
@@ -103,8 +100,8 @@ export default {
       contents: 'Give your post a description',
       tags: 'give your post some tags!',
       user: null
+      
     }
-    
   },
   methods: {
     getUser: function(){
