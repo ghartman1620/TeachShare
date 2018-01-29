@@ -39,6 +39,11 @@ export default new Vuex.Store({
             api.get(`users/${userID}/`)
                 .then(response => state.commit('LOAD_USER', response.data))
                 .catch(err => console.log(err));
-        }
+        },
+        createPost: (state, postObj) => {
+            api.post('posts/', postObj)
+              .then(response => console.log('post post success'))
+              .catch(err => console.log(err))
+        },
     }
 })
