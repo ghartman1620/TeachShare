@@ -10,7 +10,8 @@ export default new Vuex.Store({
         user: null,
         comment: null,
         comments: [],
-        posts: []
+        posts: [],
+        token: null,
     },
     mutations: {
         LOAD_POSTS: (state, data) => {
@@ -30,6 +31,12 @@ export default new Vuex.Store({
         },
         LOAD_FILTERED_POSTS: (state, data) => {
             state.posts = Object.assign([], data);
+        },
+        SET_TOKEN: (state, tok) => {
+            state.token = tok;
+            console.log(state.token);
+            api.defaults.headers.Authorization = "Token " + state.token;
+            console.log(api.defaults.headers.Authorization)
         }
     },
     actions: {
@@ -41,6 +48,7 @@ export default new Vuex.Store({
         },
         fetchPost: (state, postID) => {
             console.log('FETCH_POST');
+            console.log(api.defaults.headers.Authorization);
             api.get(`posts/${postID}/`)
                 .then(response => state.commit('LOAD_POST', response.data))
                 .catch(err => console.log(err));
@@ -50,11 +58,6 @@ export default new Vuex.Store({
             api.get(`users/${userID}/`)
                 .then(response => state.commit('LOAD_USER', response.data))
                 .catch(err => console.log(err));
-        },
-        createPost: (state, postObj) => {
-            api.post('posts/', postObj)
-                .then(response => console.log('post post success'))
-                .catch(err => console.log(err))
         },
         fetchComment: (state, commentID) => {
             console.log('FETCH_COMMENT');
@@ -79,6 +82,19 @@ export default new Vuex.Store({
             api.get(`posts/?user=${filterParams}`)
                 .then(response => state.commit('LOAD_FILTERED_POSTS', response.data))
                 .catch(err => console.log(err));
-        }
+        },
+        createPost: (state, postObj) => {
+            api.post('posts/', postObj)
+                .then(response => console.log('post post success'))
+                .catch(err => console.log(err))
+        },
+        login: (state, credentials) => {
+            var body = '{\"username\" : \"' + credentials.username + '\",' +
+                       '\"password\" : \"' + credentials.pw + '\"}';
+            var head = {headers: {"content-type": "application/json"}};
+            api.post('get_token/', body, head)
+            .then(response => state.commit('SET_TOKEN', response.data.token))
+            .catch(err => console.log(err));
+        },
     }
 })

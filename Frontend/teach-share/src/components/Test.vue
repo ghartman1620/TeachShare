@@ -53,7 +53,9 @@
 
 <script>
 import { mapState } from 'vuex';
-import { ListComponent } from './ListComponent';
+//removed { } from ListComponent because it generated a warning
+//possibly because ListComponent exports something? 
+import  ListComponent  from './ListComponent';
 
 export default {
   components: ListComponent,

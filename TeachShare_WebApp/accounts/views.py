@@ -19,11 +19,12 @@ import os
 import sys
 
 from .serializers import UserProfileSerializer, UserSerializer, GroupSerializer
-from rest_framework import viewsets
+from rest_framework import viewsets,permissions, routers, serializers, authentication
 from .models import UserProfile
-from rest_framework import permissions
+from rest_framework.response import Response
 from django.contrib.auth.models import User, Group
 from django_filters import rest_framework as filters
+from rest_framework.decorators import api_view
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -49,8 +50,8 @@ class GroupViewSet(viewsets.ModelViewSet):
     API endpoint that allows groups to be viewed or edited.
     """
     queryset = Group.objects.all()
+    required_scopes = ['groups']
     serializer_class = GroupSerializer
-    
 
 
 '''

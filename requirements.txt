@@ -5,3 +5,4 @@ django-cors-headers==2.1.0
 Markdown==2.6.11
 psycopg2==2.7.3.2
 pytz==2017.3
+oauthlib==2.0.6
