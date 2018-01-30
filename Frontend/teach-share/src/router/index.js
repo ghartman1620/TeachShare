@@ -4,6 +4,7 @@ import Router from 'vue-router';
 import HelloWorld from '@/components/HelloWorld';
 import Test from '@/components/Test';
 import PostCreate from '@/components/PostCreate';
+import Base from '@/components/Base';
 
 Vue.use(Router);
 
@@ -20,9 +21,14 @@ export default new Router({
             component: Test
         },
         {
-          path: '/create',
-          name: 'PostCreate',
-          component: PostCreate
+            path: '/create',
+            name: 'PostCreate',
+            component: PostCreate
+        },
+        {
+            path: '/base',
+            name: 'Base',
+            component: Base
         }
     ]
 })
