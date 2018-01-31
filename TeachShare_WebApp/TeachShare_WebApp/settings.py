@@ -53,7 +53,9 @@ INSTALLED_APPS = [
     # additional apps:
     'corsheaders',
     'rest_framework',
-    'rest_framework.authtoken',
+    'oauth2_provider',
+    'social_django',
+    'rest_framework_social_oauth2',
     'django_filters',
 ]
 
@@ -65,10 +67,19 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-    ),    
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'rest_framework_social_oauth2.authentication.SocialAuthentication',
+    ),
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }
+
+AUTHENTICATION_BACKENDS = (
+    # Facebook OAuth2
+    'social_core.backends.google.GoogleOAuth2',
+
+    'rest_framework_social_oauth2.backends.DjangoOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -95,6 +106,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -136,6 +149,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '232250430081-c7aicgo6hrj04074sdhruurc8dm9un2b.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'UcvpIOjRuIOJ_6NT9CYUHraA'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/

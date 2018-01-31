@@ -69,6 +69,7 @@ class UserProfile(models.Model):
         User, primary_key=True, on_delete=models.CASCADE)
     schoolDistrict = models.CharField(max_length=500, default='')
     favorites = models.ManyToManyField(Post)
+
     def __str__(self):
         return self.user.username
 
@@ -97,9 +98,10 @@ def create_random_string(length=30):
     if length <= 0:
         length = 30
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_auth_token(sender, instance=None, created=False, **kwargs):
-    if created:
-        Token.objects.create(user=instance)
+# @receiver(post_save, sender=settings.AUTH_USER_MODEL)
+# def create_auth_token(sender, instance=None, created=False, **kwargs):
+#     if created:
+#         Token.objects.create(user=instance)
+
 
 post_save.connect(create_profile, sender=User)
