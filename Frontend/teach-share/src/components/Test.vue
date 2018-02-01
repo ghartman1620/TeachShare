@@ -18,7 +18,7 @@
 
     <h1>HEY</h1>
     <!-- This is how you use components, you can just put them in the markup -->
-    <list-component :items='posts'></list-component>
+    <list-component :items="posts"></list-component>
     <!--  -->
 
     <br><br>

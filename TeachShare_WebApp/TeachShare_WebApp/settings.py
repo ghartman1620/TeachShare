@@ -74,12 +74,19 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = (
-    # Facebook OAuth2
+    'social_core.backends.open_id.OpenIdAuth',
+    'social_core.backends.google.GoogleOpenId',
     'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.google.GoogleOAuth',
+    'social_core.backends.twitter.TwitterOAuth',
+    'social_core.backends.yahoo.YahooOpenId',
 
     'rest_framework_social_oauth2.backends.DjangoOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '232250430081-c7aicgo6hrj04074sdhruurc8dm9un2b.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'UcvpIOjRuIOJ_6NT9CYUHraA'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -149,9 +156,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '232250430081-c7aicgo6hrj04074sdhruurc8dm9un2b.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'UcvpIOjRuIOJ_6NT9CYUHraA'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
