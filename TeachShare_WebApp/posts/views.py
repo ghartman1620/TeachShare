@@ -1,5 +1,5 @@
-from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer
-from .models import Post, Comment, Attachment
+from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer, TagSerializer
+from .models import Post, Comment, Attachment, Tag
 from rest_framework import viewsets
 from django_filters import rest_framework as filters
 
@@ -7,7 +7,7 @@ from django_filters import rest_framework as filters
 # test
 from django.http import HttpResponse
 from django.shortcuts import render
-
+ 
 
 class PostViewSet(viewsets.ModelViewSet):
     """
@@ -30,8 +30,16 @@ class AttachmentViewSet(viewsets.ModelViewSet):
     """
     queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer
-    filter_fields = ('post', 'file')
+    filter_fields = ('post',)
 
 
 def SimpleMethod(request):
     return render(request, 'test.html')
+
+class TagViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for Attachment model
+    """
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    filter_fields = ('tag', 'post')

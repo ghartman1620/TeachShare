@@ -58,7 +58,7 @@ class Attachment(models.Model):
 
 class Tag(models.Model):
     tag = models.CharField(max_length=100, default='')
-    post = models.ForeignKey(Post, related_name='tags',
+    post = models.ForeignKey(Post, related_name='tags', 
                              on_delete=models.CASCADE)
 
 

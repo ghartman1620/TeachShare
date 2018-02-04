@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import Router from 'vue-router';
 import HelloWorld from '@/components/HelloWorld';
-import Test from '@/components/Test';
+import Base from '@/components/Base';
 import PostCreate from '@/components/PostCreate';
 import Login from '@/components/Login';
 
@@ -16,19 +16,19 @@ export default new Router({
             component: HelloWorld
         },
         {
-            path: '/test',
-            name: 'Test',
-            component: Test
+            path: '/base',
+            name: 'base',
+            component: Base
         },
         {
-          path: '/create',
-          name: 'PostCreate',
-          component: PostCreate
+            path: '/create',
+            name: 'PostCreate',
+            component: PostCreate
         },
         {
-          path: '/login',
-          name: 'Login',
-          component: Login
+            path: '/login',
+            name: 'Login',
+            component: Login
         },
     ]
 })

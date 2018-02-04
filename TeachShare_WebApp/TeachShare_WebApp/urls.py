@@ -21,7 +21,7 @@ from django.contrib.auth.views import password_reset, password_reset_done, passw
 
 from rest_framework import routers
 from accounts.views import UserProfileViewSet, UserViewSet, GroupViewSet
-from posts.views import PostViewSet, CommentViewSet, AttachmentViewSet
+from posts.views import PostViewSet, CommentViewSet, AttachmentViewSet, TagViewSet
 from rest_framework.authtoken import views as rest_framework_views
 from posts.views import *
 
@@ -32,6 +32,7 @@ router.register(r'groups', GroupViewSet)
 router.register(r'posts', PostViewSet)
 router.register(r'comments', CommentViewSet)
 router.register(r'attachments', AttachmentViewSet)
+router.register(r'tags', TagViewSet)
 
 urlpatterns = [
     url(r'^test/', SimpleMethod),
