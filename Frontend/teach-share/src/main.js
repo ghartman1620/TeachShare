@@ -12,7 +12,6 @@ require('bootstrap');
 
 Vue.config.productionTip = false;
 Vue.use(Vuex);
-Vue.use(ElementUI);
 
 // This would declare Element button as a component,
 // but I couldn't get Element UI stuff to work. -JL

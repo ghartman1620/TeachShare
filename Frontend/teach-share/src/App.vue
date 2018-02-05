@@ -3,9 +3,8 @@
 <template>
 <body>
   <div id="app">
-    <router-view/>
     <h1></h1>
-    <div class="navbar">
+    <!--<div class="navbar">
       <form>
         <div class="searchbar">
           <input type="search" id="mySearch" name="q"
@@ -13,8 +12,9 @@
         </div>
       </form>
 
-    </div>
-
+    </div>-->
+    <router-view/>
+    
   </div>
 </body>
 </template>

@@ -12,6 +12,8 @@ export default new Vuex.Store({
         comments: [],
         posts: [],
         token: null,
+        inProgressPostComponents: [],
+        inProgressPostEditedComponentType: "",
     },
     mutations: {
         LOAD_POSTS: (state, data) => {
@@ -37,6 +39,14 @@ export default new Vuex.Store({
             console.log(state.token);
             api.defaults.headers.Authorization = "Token " + state.token;
             console.log(api.defaults.headers.Authorization)
+        },
+        ADD_COMPONENT: (state, component) => {
+            state.inProgressPostComponents.push(component);
+            console.log('add component mutation');
+        },
+        CHANGE_EDITED_COMPONENT: (state, type) => {
+            state.inProgressPostEditedComponentType = type;
+            console.log('edited component mutation');
         }
     },
     actions: {
@@ -84,6 +94,7 @@ export default new Vuex.Store({
                 .catch(err => console.log(err));
         },
         createPost: (state, postObj) => {
+            alert(JSON.stringify(postObj));
             api.post('posts/', postObj)
                 .then(response => console.log('post post success'))
                 .catch(err => console.log(err))
@@ -98,5 +109,13 @@ export default new Vuex.Store({
                 .then(response => state.commit('SET_TOKEN', response.data.token))
                 .catch(err => console.log(err));
         },
+        addComponent: (state, component) => {
+            state.commit('ADD_COMPONENT', component);
+            console.log('add_component action');
+        },
+        changeEditedComponent: (state, type) => {
+            state.commit('CHANGE_EDITED_COMPONENT', type);
+            console.log('change edited component action');
+        }
     }
 })
