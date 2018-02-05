@@ -11,6 +11,7 @@ require('bootstrap');
 Vue.config.productionTip = false;
 Vue.use(Vuex);
 
+
 /* eslint-disable no-new */
 new Vue({
     el: '#app',
