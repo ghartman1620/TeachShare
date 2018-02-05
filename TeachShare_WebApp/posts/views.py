@@ -1,7 +1,10 @@
 from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer, TagSerializer
 from .models import Post, Comment, Attachment, Tag
-from rest_framework import viewsets
+from rest_framework import viewsets, views
+from rest_framework.parsers import FileUploadParser
 from django_filters import rest_framework as filters
+from rest_framework.response import Response
+from uuid import uuid4
 
 
 # test
@@ -43,3 +46,14 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     filter_fields = ('tag', 'post')
+ 
+
+class FileUploadView(views.APIView):
+    parser_classes = (FileUploadParser,)
+
+    def put(self, request, filename, format=None):
+        file_obj = request.data['file']
+        p = Post.objects.first()
+        a = Attachment.objects.create(post=p, file=file_obj)
+        file_obj.close()
+        return Response(data={'status': 'OK', 'id': a.pk, 'filename': a.file.name}, status=201)

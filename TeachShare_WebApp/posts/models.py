@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils.timezone import now as timezone_now
 import random
 import string
+from uuid import uuid4
 import os
 # Create your models here.
 
@@ -34,17 +35,11 @@ class Comment(models.Model):
 
 def upload_to(instance, filename):
     now = timezone_now()
-    filename_base, filename_ext = os.path.splitext(filename)
-    return 'my_uploads/{}{}/{}{}'.format(
+    # filename_base, filename_ext = os.path.splitext(filename)
+    return 'my_uploads/{}{}/{}'.format(
         now.strftime("%Y/%m/%d/%Y%m%d%H%M%S/"),
-        create_random_string(),
-        filename_base,
-        filename_ext.lower())
-
-
-def create_random_string(length=30):
-    if length <= 0:
-        length = 30
+        str(uuid4()),
+        filename)
 
 
 class Attachment(models.Model):

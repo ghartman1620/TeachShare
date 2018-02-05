@@ -24,6 +24,7 @@ from accounts.views import UserProfileViewSet, UserViewSet, GroupViewSet
 from posts.views import PostViewSet, CommentViewSet, AttachmentViewSet, TagViewSet
 from rest_framework.authtoken import views as rest_framework_views
 from posts.views import *
+from posts.views import FileUploadView
 
 router = routers.DefaultRouter()
 router.register(r'userprofiles', UserProfileViewSet)
@@ -37,6 +38,9 @@ router.register(r'tags', TagViewSet)
 urlpatterns = [
     url(r'^test/', SimpleMethod),
     url(r'^auth/', include('rest_framework_social_oauth2.urls')),
+
+    url(r'^api/upload/(?P<filename>[^/]+)$', FileUploadView.as_view()),
+
 
     # url(r'get_token/$', rest_framework_views.obtain_auth_token, name='get_auth_token'),
     # url(r'^api-auth/', include('rest_framework.urls')),

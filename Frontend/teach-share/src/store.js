@@ -12,6 +12,7 @@ export default new Vuex.Store({
         comments: [],
         posts: [],
         token: null,
+        files: []
     },
     mutations: {
         LOAD_POSTS: (state, data) => {
@@ -37,6 +38,10 @@ export default new Vuex.Store({
             console.log(state.token);
             api.defaults.headers.Authorization = "Token " + state.token;
             console.log(api.defaults.headers.Authorization)
+        },
+        SET_FILES: (state, data) => {
+            console.log(state, data);
+            state.files = Object.assign({}, data);
         }
     },
     actions: {
@@ -93,10 +98,28 @@ export default new Vuex.Store({
                 'username': credentials.username,
                 'password': credentials.pw
             };
-            var head = { headers: { "content-type": "application/json" } };
+            var head = { headers: { 'content-type': 'application/json' } };
             api.post('get_token/', body, head)
                 .then(response => state.commit('SET_TOKEN', response.data.token))
                 .catch(err => console.log(err));
         },
+        fileUpload: (state, { self, formData }) => {
+            var files = formData.getAll('files')
+            state.commit('SET_FILES', files);
+            for (var file of files.entries()) {
+
+                let config = {
+                    onUploadProgress: progressEvent => {
+                        let percentCompleted = Math.floor((progressEvent.loaded * 100) / progressEvent.total);
+                        // @TODO: setup an action to update a progressbar
+                        self.updatePercent(percentCompleted, file);
+                    }
+                }
+                console.log(file)
+                api.put(`upload/${file[1].name}`, file[1], config)
+                    // .then(response => state.commit('SET_FILES', response.data))
+                    .catch(err => console.log(err));
+            }
+        }
     }
 })

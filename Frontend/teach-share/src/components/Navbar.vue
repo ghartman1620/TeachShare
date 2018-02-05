@@ -56,7 +56,7 @@ export default Vue.component('nav-bar', {
 </script>
 
 
-<style lang="scss">
+<style lang="scss" scoped>
 
 // this is an example, not an end result
 .router-link-exact-active {
@@ -64,6 +64,8 @@ export default Vue.component('nav-bar', {
   text-decoration-style: solid;
   text-decoration-color: #46E;
 }
-
+.nav {
+  height: 100px;
+}
 
 </style>

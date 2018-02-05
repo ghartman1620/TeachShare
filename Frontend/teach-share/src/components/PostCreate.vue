@@ -18,7 +18,7 @@ difference between commit and dispatch
       </a>
     </div>
   <!-- Search bar -->
-    <form class="navbar-form navbar-left nav-searchpad" 
+    <form class="navbar-form navbar-left nav-searchpad"
 		method="post" id="search" action="<!-- search the dashboard -->">
       <div class="form-group">
 		<input type="text" name="search" class="form-control" placeholder="Search">
@@ -60,21 +60,21 @@ difference between commit and dispatch
       <div class="col-sm-11">
         <input type="text" class="form-control" v-model="title" name="title" placeholder="Add a title" value="">
       </div>
-    
+
       <label for="message" class="col-sm-12 control-label">Description</label>
       <div class="col-sm-11">
-	    <textarea type="text" class="form-control" rows="6" 
+	    <textarea type="text" class="form-control" rows="6"
             v-model="contents" placeholder="Add a description"></textarea>
       </div>
-     
+
       <label for="tag" class="col-sm-12 control-label">Tags</label>
       <div class="col-sm-11">
         <input type="text" class="form-control" v-model="tags" name="tag" placeholder="Add tag(s)" value="">
         <label for="prompt" class="col-sm-12 control-label">List tags as comma-separated list.</label>
       </div>
- 
-     
-  
+
+
+
       <input class="box_file" type="file" name="files" id="file" data-multiple-caption="{count} files selected" multiple/>
       <label for="file"><strong>Choose a file</strong><span class="box_dragndrop"> or drop it here</span>.</label>
     </div>
@@ -100,7 +100,7 @@ export default {
       contents: 'Give your post a description',
       tags: 'give your post some tags!',
       user: null
-      
+
     }
   },
   methods: {
@@ -109,8 +109,8 @@ export default {
     },
     submitPost: function(event){
       var obj = {
-        "user" : this.$store.state.user.url, 
-        "title" : this.title, 
+        "user" : this.$store.state.user.url,
+        "title" : this.title,
         "content" : "{plaintext:" + this.contents + "}",
         "likes" : 0,
         "comments" : [],
@@ -128,7 +128,7 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
 .btn-primary {
     background: #41924B;
     color: #ffffff;
