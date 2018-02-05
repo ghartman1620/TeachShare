@@ -8,14 +8,7 @@ import store from './store';
 
 require('bootstrap');
 
-Vue.config.productionTip = false;
 Vue.use(Vuex);
-Vue.use(ElementUI);
-
-// This would declare Element button as a component,
-// but I couldn't get Element UI stuff to work. -JL
-// Vue.component(Button.name, Button);
-
 
 /* eslint-disable no-new */
 new Vue({
@@ -24,4 +17,8 @@ new Vue({
     store,
     components: { App },
     template: '<App/>'
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 5b26237ecab93a4922e65e771bb410b77c368367
