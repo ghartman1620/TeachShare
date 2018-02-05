@@ -17,8 +17,4 @@ new Vue({
     store,
     components: { App },
     template: '<App/>'
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> 5b26237ecab93a4922e65e771bb410b77c368367

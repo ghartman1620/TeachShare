@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar fixed-top navbar-inverse navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar fixed-top navbar-inverse navbar-expand-lg navbar-dark bg-custom-colors">
 
     <!-- brand section -->
     <router-link class="navbar-brand" to="/">TeachShare</router-link>
@@ -57,6 +57,9 @@ export default Vue.component('nav-bar', {
 
 
 <style lang="scss">
+.bg-custom-colors {
+  background-color: #65A98F;
+}
 
 // this is an example, not an end result
 .router-link-exact-active {

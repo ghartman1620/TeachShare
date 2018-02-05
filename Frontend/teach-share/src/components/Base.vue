@@ -10,7 +10,7 @@
 
 <script>
 import Vue from 'vue';
-import Navbar from './Navbar'
+import Navbar from '@/components/Navbar'
 
 export default Vue.component('base-page', {
     components: Navbar,
