@@ -6,8 +6,11 @@ import App from './App';
 import router from './router';
 import store from './store';
 
+require('bootstrap');
+
 Vue.config.productionTip = false;
 Vue.use(Vuex);
+
 
 /* eslint-disable no-new */
 new Vue({

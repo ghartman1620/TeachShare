@@ -10,7 +10,7 @@ from accounts.serializers import UserSerializer
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = UserSerializer(required=True)
+    # user = UserSerializer(required=True)
 
     class Meta:
         model = Comment
@@ -23,14 +23,20 @@ class AttachmentSerializer(serializers.ModelSerializer):
         fields = ('pk', 'post', 'file')
 
 
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ('pk', 'tag', 'post')
+
+
 class PostSerializer(serializers.ModelSerializer):
     #user = serializers.HyperlinkedRelatedField(many=False, read_only=True, view_name='users')
-    comments = CommentSerializer(many=True)
-    user = UserSerializer(required=True)
-    attachments = AttachmentSerializer(many=True)
+    # comments = CommentSerializer(many=True)
+    # user = UserSerializer(required=True, read_only=True)
+    # attachments = AttachmentSerializer(many=True)
     pk = serializers.ReadOnlyField()
 
     class Meta:
         model = Post
-        fields = ('pk', 'user', 'title', 'content', 'updated',
-                  'likes', 'timestamp', 'comments', 'attachments')
+        fields = ('pk', 'title', 'content', 'updated',
+                  'likes', 'timestamp', 'user', 'comments', 'attachments', 'tags')

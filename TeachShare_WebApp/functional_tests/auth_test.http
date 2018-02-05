@@ -1,0 +1,14 @@
+GET http://localhost:8000/api/users/ HTTP/1.1
+Content-Type: application/json
+Authorization: bearer google-oauth2 ya29.GlxXBacOaYVDEtGVF95tkLaa6H6xbHlDejckzgjkAtJmBXKh4jWSg7oYIo1vwOFOk8jpMt4X2I9wVaalDwM4I-4-xDvFVUGvVfrN_ur6c1oyfNvMBojqUHg0zf6zsA
+
+
+# This is the base url
+https://accounts.google.com/signin/oauth?
+
+# These are the query parameters -- 
+client_id=232250430081-c7aicgo6hrj04074sdhruurc8dm9un2b.apps.googleusercontent.com
+as=A1NtG-zy-Q3TLW6YOtYkFbH375hhjDU3SBx24WSzBrbwUPplAHCOjYzcZI7q19t-4KSMXZ0m2oOD9P3wrDT9a-JE2Z3qvBN26wkURPdfhSxaGV3a5l0RfMDdj4Yad1Uit6UODZOg1EPiGWFPOQWOw6_IqjnrfKVk9NT70GADryk
+destination=http://127.0.0.1:8000
+approval_state=!ChQyT2xvUWlEQjhiQXlDRnNuckpYRxIfODRyZm9KbWYzdVVVZ0dULWVTYTM3MXc1Ml9NdkZoWQ%E2%88%99ACThZt4AAAAAWnjentALMyp904pkXcQKRZzF9aJ6uQ23
+xsrfsig=AHgIfE9uYe1NSProHsICCLSNRXNLQa28ZA

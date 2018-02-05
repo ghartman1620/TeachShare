@@ -89,12 +89,14 @@ export default new Vuex.Store({
                 .catch(err => console.log(err))
         },
         login: (state, credentials) => {
-            var body = '{\"username\" : \"' + credentials.username + '\",' +
-                       '\"password\" : \"' + credentials.pw + '\"}';
-            var head = {headers: {"content-type": "application/json"}};
+            var body = {
+                'username': credentials.username,
+                'password': credentials.pw
+            };
+            var head = { headers: { "content-type": "application/json" } };
             api.post('get_token/', body, head)
-            .then(response => state.commit('SET_TOKEN', response.data.token))
-            .catch(err => console.log(err));
+                .then(response => state.commit('SET_TOKEN', response.data.token))
+                .catch(err => console.log(err));
         },
     }
 })
