@@ -28,6 +28,7 @@ class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True)
     user = UserSerializer(required=True)
     attachments = AttachmentSerializer(many=True)
+    pk = serializers.ReadOnlyField()
 
     class Meta:
         model = Post
