@@ -13,7 +13,7 @@ import Vue from 'vue';
 import Navbar from './Navbar'
 
 export default Vue.component('base-page', {
-    components: Navbar,
+    components:{ Navbar },
     props: ['items'],
     data() {
       return {

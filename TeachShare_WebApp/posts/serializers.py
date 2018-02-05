@@ -34,7 +34,8 @@ class PostSerializer(serializers.ModelSerializer):
     # comments = CommentSerializer(many=True)
     # user = UserSerializer(required=True, read_only=True)
     # attachments = AttachmentSerializer(many=True)
-    pk = serializers.ReadOnlyField()
+    tags = TagSerializer(many=True, required=False)
+    # pk = serializers.ReadOnlyField()
 
     class Meta:
         model = Post

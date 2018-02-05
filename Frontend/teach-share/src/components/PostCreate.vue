@@ -111,12 +111,12 @@ export default {
     submitPost: function(event){
       console.log(this.$store.state.inProgressPostComponents);
       var obj = {
-        "pk": 3,
-        "user" : 3, 
+        "user" : 1, 
         "title" : this.title, 
         "content" : JSON.stringify(this.$store.state.inProgressPostComponents),
         "likes" : 0,
         "comments" : [],
+        "tags": [],
         "attachments" : [],
       }
       console.log(obj)
