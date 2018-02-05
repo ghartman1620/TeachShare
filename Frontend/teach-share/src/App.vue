@@ -25,6 +25,10 @@ export default {
 }
 </script>
 
+<style lang="scss">
+@import '../node_modules/bootstrap/scss/bootstrap.scss';
+</style>
+
 <style>
   .navbar {
     width: 100%;
@@ -37,11 +41,6 @@ export default {
 
 
 body{
-  background: #e5ffee;
-  /*background: -webkit-linear-gradient(right, #e5ffee, #e5ffee); Might be cool to use later, or for other components? - JL
-  background: -moz-linear-gradient(right, #e5ffee, #e5ffee);
-  background: -o-linear-gradient(right, #e5ffee, #e5ffee);
-  background: linear-gradient(to left, #e5ffee, #e5ffee);*/
   font-family: "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

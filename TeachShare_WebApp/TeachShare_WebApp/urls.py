@@ -21,7 +21,9 @@ from django.contrib.auth.views import password_reset, password_reset_done, passw
 
 from rest_framework import routers
 from accounts.views import UserProfileViewSet, UserViewSet, GroupViewSet
-from posts.views import PostViewSet, CommentViewSet, AttachmentViewSet
+from posts.views import PostViewSet, CommentViewSet, AttachmentViewSet, TagViewSet
+from rest_framework.authtoken import views as rest_framework_views
+from posts.views import *
 
 router = routers.DefaultRouter()
 router.register(r'userprofiles', UserProfileViewSet)
@@ -30,9 +32,15 @@ router.register(r'groups', GroupViewSet)
 router.register(r'posts', PostViewSet)
 router.register(r'comments', CommentViewSet)
 router.register(r'attachments', AttachmentViewSet)
+router.register(r'tags', TagViewSet)
 
 urlpatterns = [
-    url(r'^api-auth/', include('rest_framework.urls')),
+    url(r'^test/', SimpleMethod),
+    url(r'^auth/', include('rest_framework_social_oauth2.urls')),
+
+    # url(r'get_token/$', rest_framework_views.obtain_auth_token, name='get_auth_token'),
+    # url(r'^api-auth/', include('rest_framework.urls')),
+
     url(r'^admin/', admin.site.urls),
     url(r'^account/', include('accounts.urls')),
     # this and urls down are concerned with reseting pssword
@@ -44,6 +52,7 @@ urlpatterns = [
         name='password_reset_complete'),
 
     url(r'^api/', include(router.urls)),
+
 ]
 
 if settings.DEBUG:

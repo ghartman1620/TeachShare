@@ -18,7 +18,7 @@
 
     <h1>HEY</h1>
     <!-- This is how you use components, you can just put them in the markup -->
-    <list-component :items='posts'></list-component>
+    <list-component :items="posts"></list-component>
     <!--  -->
 
     <br><br>
@@ -53,7 +53,9 @@
 
 <script>
 import { mapState } from 'vuex';
-import { ListComponent } from './ListComponent';
+//removed { } from ListComponent because it generated a warning
+//possibly because ListComponent exports something? 
+import  ListComponent  from './ListComponent';
 
 export default {
   components: ListComponent,

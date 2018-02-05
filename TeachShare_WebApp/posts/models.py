@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
+from django.contrib.auth.models import User
 from django.conf import settings
 from django.utils.timezone import now as timezone_now
 import random
@@ -9,8 +10,8 @@ import os
 
 
 class Post(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='posts',
-                             default=1, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        User, primary_key=True, on_delete=models.CASCADE, related_name="postuser")
     title = models.CharField(max_length=100, default='')
     content = JSONField()
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
@@ -48,7 +49,7 @@ def create_random_string(length=30):
 
 class Attachment(models.Model):
     post = models.ForeignKey(
-        Post, related_name='attachments', on_delete=models.CASCADE)
+        Post, related_name='attachments', on_delete=models.SET_NULL, null=True)
     file = models.FileField(null=True, blank=True, upload_to=upload_to)
 
 # Creates list of tags for every post

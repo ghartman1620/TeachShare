@@ -4,7 +4,8 @@ from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
-
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
 from django.utils.timezone import now as timezone_now
 
 
@@ -57,7 +58,7 @@ class Attachment(models.Model):
 
 class Tag(models.Model):
     tag = models.CharField(max_length=100, default='')
-    post = models.ForeignKey(Post, related_name='tags',
+    post = models.ForeignKey(Post, related_name='tags', 
                              on_delete=models.CASCADE)
 
 
@@ -68,6 +69,7 @@ class UserProfile(models.Model):
         User, primary_key=True, on_delete=models.CASCADE)
     schoolDistrict = models.CharField(max_length=500, default='')
     favorites = models.ManyToManyField(Post)
+
     def __str__(self):
         return self.user.username
 
@@ -95,6 +97,11 @@ post_save.connect(create_profile, sender=User)
 def create_random_string(length=30):
     if length <= 0:
         length = 30
+
+# @receiver(post_save, sender=settings.AUTH_USER_MODEL)
+# def create_auth_token(sender, instance=None, created=False, **kwargs):
+#     if created:
+#         Token.objects.create(user=instance)
 
 
 post_save.connect(create_profile, sender=User)
