@@ -19,8 +19,9 @@ import os
 # Post & related fields
 
 class Post(models.Model):
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             default=1, on_delete=models.CASCADE)
+                             on_delete=models.CASCADE)
     title = models.CharField(max_length=100, default='')
     content = models.TextField(default="")
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
@@ -58,7 +59,7 @@ class Attachment(models.Model):
 
 class Tag(models.Model):
     tag = models.CharField(max_length=100, default='')
-    post = models.ForeignKey(Post, related_name='tags', 
+    post = models.ForeignKey(Post, related_name='tags',
                              on_delete=models.CASCADE)
 
 

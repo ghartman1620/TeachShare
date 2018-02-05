@@ -9,13 +9,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ('user', 'url', 'schoolDistrict')
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('url', 'username', 'email')
 
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ('url', 'name')
