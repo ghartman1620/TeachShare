@@ -40,6 +40,9 @@ export default new Vuex.Store({
             api.defaults.headers.Authorization = "Token " + state.token;
             console.log(api.defaults.headers.Authorization)
         },
+        
+        
+        //Mutations for the currently edited post data: inProgressEditedComponentType and inProgressPostComponents
         ADD_COMPONENT: (state, component) => {
             console.log(state.inProgressPostComponents);
             state.inProgressPostComponents.push(component);
@@ -61,6 +64,9 @@ export default new Vuex.Store({
             Vue.set(state.inProgressPostComponents, 
                 j, tmp);
             console.log(state.inProgressPostComponents);
+        },
+        REMOVE_COMPONENT: (state, index) => {
+            state.inProgressPostComponents.splice(index, 1);
         }
         
     },
@@ -124,6 +130,8 @@ export default new Vuex.Store({
                 .then(response => state.commit('SET_TOKEN', response.data.token))
                 .catch(err => console.log(err));
         },
+        
+        //Actions for in progress posts
         addComponent: (state, component) => {
           
             console.log('add_component action');
@@ -140,6 +148,9 @@ export default new Vuex.Store({
         swapComponents: (state, iAndJ) => {
             console.log(iAndJ[0] + ' ' + iAndJ[1]);
             state.commit('SWAP_COMPONENTS', iAndJ);
+        },
+        removeComponent: (state, index) => {
+            state.commit('REMOVE_COMPONENT', index);
         }
     }
 })

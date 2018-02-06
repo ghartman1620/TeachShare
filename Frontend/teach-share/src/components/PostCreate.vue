@@ -41,10 +41,10 @@
     </ul>
   </div>
 </nav> <!-- ./End Navbar -->
-
+<div class="container">
 <input class="postheader" type="text" v-model="title" placeholder="title"></input><br>
 <input class="postheader" type="text" placeholder="tags"></input>
-
+</div>
 <div id="buttonbar">
 <!-- Text button -->
 
@@ -81,6 +81,9 @@
   <div class="post-component card" v-else>
     <p>A file component!</p>  
   </div>
+  </div>
+  <div class="col 11">
+    <button @click="removeComponent(index)"><font face="courier">x</font></button>
   </div>
   </div>
 </div>
@@ -159,6 +162,9 @@ export default {
         //dispatch only allows one argument so we'll pass them as an array        
       }
     },
+    removeComponent: function(index){
+      this.$store.dispatch("removeComponent", index);
+    }
   },
   beforeMount(){
     this.getUser()
@@ -170,10 +176,8 @@ export default {
 
 <style scoped>
 .postheader {
-  width: 40%;
-  margin: auto;
   height: 30px;
-  
+  width:100%;
 }
 
 
