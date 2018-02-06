@@ -3,34 +3,37 @@ from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
 from posts.models import Post
 from accounts.models import User
+from posts.serializers import PostSerializer
 
 
 class PostCreateTestCase(TestCase):
     def setUp(self):
         print("PostCreate [setUp]")
+        User.objects.create_user('bryan', 'bmccoid@ucsc.edu')
+        self.u = User.objects.first()
+        self.client = APIClient()
         # nothing yet
 
+    def test_can_lookup(self):
+        # create a post to lookup
+        Post.objects.create(title='test post', content={},
+                            likes=0, user=self.u)
+        p = Post.objects.first()
+
+        # test get request
+        resp = self.client.get('/api/posts/{}/'.format(p.pk))
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, PostSerializer(p).data)
+
     def test_can_create(self):
-        # factory = APIRequestFactory()
-        # request = factory.get('/posts/1/')
-        # print(request)
-
-        User.objects.create_user('bryan', 'bmccoid@ucsc.edu')
-        u = User.objects.first()
-        # Post.objects.create(title='test post', content={}, likes=0, user=u)
-        # p = Post.objects.first()
-        # print(Post.objects.all())
-
-        client = APIClient()
-        resp = client.post('/api/posts/', {
+        resp = self.client.post('/api/posts/', {
             'title': 'test post',
             'content': {},
             'likes': 0,
-            'user': u.pk,
+            'user': self.u.pk,
+            'comments': [],
+            'attachments': [],
+            'tags': [],
         }, format='json')
-        # resp = client.get('/api/posts/1/')
-        print(dir(resp))
-        print(resp.content)
-        print(resp.data)
-        print(resp.items)
         self.assertEqual(resp.status_code, 201)

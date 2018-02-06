@@ -28,16 +28,16 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('pk', 'tag', 'post')
 
+
 class PostSerializer(serializers.ModelSerializer):
-    #user = serializers.HyperlinkedRelatedField(many=False, read_only=True, view_name='users')
-    comments = CommentSerializer(many=True, read_only=True)
-    # user = UserSerializer(read_only=False)
-    attachments = AttachmentSerializer(many=True, read_only=True)
-    tags = TagSerializer(many=True, read_only=True)
+    # user = serializers.HyperlinkedRelatedField(many=False, read_only=True, view_name='users')
+    # comments = CommentSerializer(many=True)
+    # user = UserSerializer(required=True, read_only=True)
+    # attachments = AttachmentSerializer(many=True)
+    # tags = TagSerializer(many=True, required=False, read_only=True)
+    # pk = serializers.ReadOnlyField()
 
     class Meta:
         model = Post
         fields = ('pk', 'title', 'content', 'updated',
-                  'likes', 'timestamp', 'user', 'comments', 'attachments', 'tags') 
- 
-
+                  'likes', 'timestamp', 'user', 'comments', 'attachments', 'tags')

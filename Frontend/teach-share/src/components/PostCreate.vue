@@ -49,118 +49,152 @@ difference between commit and dispatch
   </div>
 </nav> <!-- ./End Navbar -->
 
+<input class="postheader" type="text" v-model="title" placeholder="title"></input><br>
+<input class="postheader" type="text" placeholder="tags"></input>
 
-<div class="container">
-  <h3>Create a Post</h3>
+<div id="buttonbar">
+<!-- Text button -->
 
-
-  <!--<form method="post" action= "" enctype="multipart/form-data">-->
-    <div class="form-group">
-      <label for="title" class="col-sm-12 control-label">Title</label>
-      <div class="col-sm-11">
-        <input type="text" class="form-control" v-model="title" name="title" placeholder="Add a title" value="">
-      </div>
-
-      <label for="message" class="col-sm-12 control-label">Description</label>
-      <div class="col-sm-11">
-	    <textarea type="text" class="form-control" rows="6"
-            v-model="contents" placeholder="Add a description"></textarea>
-      </div>
-
-      <label for="tag" class="col-sm-12 control-label">Tags</label>
-      <div class="col-sm-11">
-        <input type="text" class="form-control" v-model="tags" name="tag" placeholder="Add tag(s)" value="">
-        <label for="prompt" class="col-sm-12 control-label">List tags as comma-separated list.</label>
-      </div>
-
-
-
-      <input class="box_file" type="file" name="files" id="file" data-multiple-caption="{count} files selected" multiple/>
-      <label for="file"><strong>Choose a file</strong><span class="box_dragndrop"> or drop it here</span>.</label>
-    </div>
-    <div class="form-group">
-      <div class="col-sm-2 pull-right">
-        <input v-on:click="submitPost" class="btn btn-primary">
-      </div>
-    </div>
-  <!--</form>-->
+<button type="button" v-on:click="createTextComponent"  class="btn btn-default btn-circle btn-xl" id="text-button"><span class="glyphicon glyphicon-asterisk"></span></button>
+<button type="button" v-on:click="createImageComponent" class="btn btn-default btn-circle btn-xl" id="image-button"><i class="glyphicon glyphicon-picture"></i></button>
+<button type="button" v-on:click="createAudioComponent" class="btn btn-default btn-circle btn-xl" id="audio-button"><i class="glyphicon glyphicons-music"></i></button>
+<button type="button" v-on:click="createVideoComponent" class="btn btn-default btn-circle btn-xl" id="video-button"><i class="glyphicons glyphicons-film"></i></button>
+<button type="button" v-on:click="createFileComponent" class="btn btn-default btn-circle btn-xl" id="file-button"><i class="glyphicons glyphicons-folder-open"></i></button>
 </div>
+<component v-bind:is="editedComponent"></component>
 
-
+<li v-for="component in storeComponents">
+  <div v-if="component.type === 'text'">
+    <view-text :component="component"></view-text>
+  </div>
+  <div v-else-if="component.type === 'image'">
+    <p>An image component!</p>  
+  </div>
+  <div v-else-if="component.type === 'audio'">
+    <p>An audio component!</p>  
+  </div>
+  <div v-else-if="component.type === 'video'">
+    <p>A video component!</p>  
+  </div>
+  <div v-else>
+    <p>A file component!</p>  
+  </div>
+</li>
+<button v-on:click="submitPost">Submit</button>
 </body>
 </template>
 
 
 <script>
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import EditText from './EditText';
+import EditImage from './EditImage';
+import ViewText from './ViewText';
+
 export default {
+
   name: 'PostCreate',
   data: function() {
     return {
-      title: 'Title your post',
-      contents: 'Give your post a description',
-      tags: 'give your post some tags!',
-      user: null
-
+      title: "",
     }
   },
+  computed: mapState({
+    editedComponent: state => state.inProgressPostEditedComponentType,
+    storeComponents: state => state.inProgressPostComponents,
+  }),
   methods: {
     getUser: function(){
       this.$store.dispatch('fetchUser', 1)
     },
     submitPost: function(event){
+      console.log(this.$store.state.inProgressPostComponents);
       var obj = {
-        "user" : this.$store.state.user.url,
-        "title" : this.title,
-        "content" : "{plaintext:" + this.contents + "}",
+        "user" : 1, 
+        "title" : this.title, 
+        "content" : JSON.stringify(this.$store.state.inProgressPostComponents),
         "likes" : 0,
         "comments" : [],
+        "tags": [],
         "attachments" : [],
       }
       console.log(obj)
       this.$store.dispatch('createPost', obj)
     },
+    createTextComponent: function(event){
+      console.log("begin create text component");
+      this.$store.dispatch("changeEditedComponent", "edit-text");
+      console.log("create text component");
+    },
+    createImageComponent: function(event){
+      this.$store.dispatch("changeEditedComponent", "edit-image");
+      console.log("create image component");
+    },
+    createAudioComponent: function(event){
+
+      console.log("hi world");
+    },
+    createVideoComponent: function(event){
+
+      console.log("hi world");
+    },
+    createFileComponent: function(event){
+
+      console.log("hi world");
+    },
+    
   },
   beforeMount(){
     this.getUser()
-  }
+  },
 }
 
 </script>
 
 
-<style scoped>
-.btn-primary {
-    background: #41924B;
-    color: #ffffff;
-    border: 0 none;
+<style>
+.postheader {
+  width: 40%;
+  margin: auto;
+  height: 30px;
+  
 }
-
-.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
-    background: #295B2F;
-}
-/* navbar */
-.navbar {
-  min-height:100px !important;
-}
-
-/*buttons on navbar*/
-
-.nav-navitems {
+.btn-circle {
+  width: 30px;
+  height: 30px;
   text-align: center;
-  padding-top: 30px;
+  padding: 6px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+}
+.btn-circle.btn-xl {
+  width: 70px;
+  height: 70px;
+  padding: 10px 16px;
+  vertical-align: middle;
+  font-size: 24px;
+  line-height: 1.33;
+  border-radius: 35px;
+}
+.btn-ciricle.btn-xl:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
 
-/*search bar on naavbar */
-.nav-searchpad {
-  text-align: center;
-  padding-top: 30px;
-}
 
-.box_dragndrop,
-.box_uploading,
-.box_success,
-.box_error {
-    display: none;
+#text-button { background: #FFAE03; }
+#image-button { background: #1D3461; }
+#audio-button { background: #42AA8B; }
+#video-button { background: #E07700; }
+#file-button { background: #23528E; }
+
+#buttonbar {
+  margin: auto;
+  width: 380px;
+  height: 100px;
+  background-color: #99B5AA;
+  border-radius: 15px;
 }
 
 </style>
