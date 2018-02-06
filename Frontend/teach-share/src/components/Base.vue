@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container light-aqua" >
     <nav-bar :query="queryParam"></nav-bar>
     <!-- This can be used as a template -->
     <!-- insert content here for pages,
@@ -7,6 +7,14 @@
 
   </div>
 </template>
+
+<style lang="css">
+
+  .light-aqua:{
+    background-color: E5FFEE;
+  }
+
+</style>
 
 <script>
 import Vue from 'vue';
