@@ -1,6 +1,6 @@
 <template>
 <body>
-<input v-model="text">
+<input v-model="component.contents">
 <button v-on:click="submit">Submit.</button>
 <button v-on:click="close">X</button>
 
@@ -10,6 +10,7 @@
 <script>
 import Vue from "vue";
 export default Vue.component("edit-text", {
+    props: ['component', 'index'],
     data() {
       return {
         text: "",
@@ -17,10 +18,12 @@ export default Vue.component("edit-text", {
     },
     methods: {
       submit: function(event){
-        this.$store.dispatch("addComponent", {
-          "type": "text",
-          "contents": this.text,
-        });
+        this.$store.dispatch("editComponent", {
+          "index": this.index,
+          "component" : {
+            "type": "text",
+            "contents": this.component.contents,
+          }});
         this.$store.dispatch("changeEditedComponent", "");
       },
       close: function(event){

@@ -60,14 +60,15 @@
 <div class="container" v-for="(component,index) in storeComponents">
   <div class="row">
   <div class="col-1"><!-- col-xs-auto -->
-  <div id="arrange-btn-group" class="btn-group-vertical">
+  <div class="btn-group-vertical">
     <button @click="moveComponentUp(index)" class="up-down-button"><font face="courier">^</font></button>
     <button @click="moveComponentDown(index)" class="up-down-button"><font face="courier">v</font></button>
   </div>
   </div>
   <div class="col-10"> <!-- col-11 -->
   <div class="post-component card" v-if="component.type === 'text'">
-    <view-text :component="component"></view-text>
+    <edit-text v-if="component.inProgress" :component="component" :index="index"></edit-text>
+    <view-text v-else :component="component"></view-text>
   </div>
   <div class="post-component card" v-else-if="component.type === 'image'">
     <p>An image component!</p>  
@@ -83,7 +84,10 @@
   </div>
   </div>
   <div class="col 11">
+  <div class="btn-group-vertical">
     <button @click="removeComponent(index)"><font face="courier">x</font></button>
+    <button @click="editComponent(index)"><font face="courier">E</font></button>
+  </div>
   </div>
   </div>
 </div>
@@ -130,8 +134,14 @@ export default {
       this.$store.dispatch('createPost', obj)
     },
     createTextComponent: function(event){
-      this.$store.dispatch("changeEditedComponent", "edit-text");
+      /**this.$store.dispatch("changeEditedComponent", "edit-text");
       console.log("create text component");
+      */
+      this.$store.dispatch("addComponent", {
+          "type" : "text",
+          "contents" : "",
+          "inProgress" : true,
+      });
     },
     createImageComponent: function(event){
       this.$store.dispatch("changeEditedComponent", "edit-image");
@@ -164,6 +174,16 @@ export default {
     },
     removeComponent: function(index){
       this.$store.dispatch("removeComponent", index);
+    },
+    editComponent: function(index){
+      console.log("in edit component " + index);
+      var obj = this.$store.state.inProgressPostComponents[index];
+      obj.inProgress = true;
+      console.log(obj);
+      this.$store.dispatch("editComponent", {
+        "index": index,
+        "component": obj
+      });
     }
   },
   beforeMount(){
@@ -186,11 +206,7 @@ export default {
   width:60%;  
   height: 300px;
 }
-#arrange-btn-group {
-  /*position: absolute;
-  left: 23%;
-  width: 2%; */ 
-}
+
 .up-down-button {
 
 }

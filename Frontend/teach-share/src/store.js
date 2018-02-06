@@ -67,6 +67,9 @@ export default new Vuex.Store({
         },
         REMOVE_COMPONENT: (state, index) => {
             state.inProgressPostComponents.splice(index, 1);
+        },
+        EDIT_COMPONENT: (state, editComponent) => {
+            Vue.set(state.inProgressPostComponents, editComponent.index, editComponent.component); 
         }
         
     },
@@ -151,6 +154,12 @@ export default new Vuex.Store({
         },
         removeComponent: (state, index) => {
             state.commit('REMOVE_COMPONENT', index);
+        },
+        //the editedComponent parameter is an object with index - the index of the 
+        //component to be edited - and component - the object to set it to.
+        editComponent: (state, editedComponent) => {
+            console.log(editedComponent);
+            state.commit('EDIT_COMPONENT', editedComponent); 
         }
     }
 })
