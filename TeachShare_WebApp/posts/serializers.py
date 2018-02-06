@@ -30,11 +30,11 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-    #user = serializers.HyperlinkedRelatedField(many=False, read_only=True, view_name='users')
+    # user = serializers.HyperlinkedRelatedField(many=False, read_only=True, view_name='users')
     # comments = CommentSerializer(many=True)
     # user = UserSerializer(required=True, read_only=True)
     # attachments = AttachmentSerializer(many=True)
-    tags = TagSerializer(many=True, required=False)
+    # tags = TagSerializer(many=True, required=False, read_only=True)
     # pk = serializers.ReadOnlyField()
 
     class Meta:

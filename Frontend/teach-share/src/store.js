@@ -94,7 +94,7 @@ export default new Vuex.Store({
                 .catch(err => console.log(err));
         },
         createPost: (state, postObj) => {
-            alert(JSON.stringify(postObj));
+            console.log(JSON.stringify(postObj));
             api.post('posts/', postObj)
                 .then(response => console.log('post post success'))
                 .catch(err => console.log(err))
