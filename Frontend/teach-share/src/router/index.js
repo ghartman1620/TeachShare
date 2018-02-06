@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import Router from 'vue-router';
 import HelloWorld from '@/components/HelloWorld';
+import RichTextEditor from '@/components/RichTextEditor';
 import Base from '@/components/Base';
 import PostCreate from '@/components/PostCreate';
 import Login from '@/components/Login';
@@ -24,6 +25,11 @@ export default new Router({
             path: '/create',
             name: 'PostCreate',
             component: PostCreate
+        },
+        {
+            path: '/create/text',
+            name: 'RichText',
+            component: RichTextEditor
         },
         {
             path: '/login',

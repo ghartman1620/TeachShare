@@ -1,7 +1,6 @@
 
-<!-- This is just the editor component, to get source dependencies just run npm install -->
+<!--  See Quill docs or vue-quill-editor's github for more ways to customize and mess with this -->
 
-< link href="https://cdn.quilljs.com/1.3.5/quill.snow.css" rel="stylesheet">
 
 <head>
   <title>Bootstrap Example</title>
@@ -41,11 +40,11 @@
     data() {
       return {
         content: '<p>example content</p>',
-        editorOption: {}
+        editorOption: {} //sooooooooo many options to pass for customizing the editor.
       }
     },
     mounted() {
-      console.log('this is current quill instance object', this.myQuillEditor)
+      console.log('this is a current quill instance object', this.myQuillEditor)
     },
     methods: {
       onEditorBlur(editor) {

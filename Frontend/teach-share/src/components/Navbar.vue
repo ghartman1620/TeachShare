@@ -8,7 +8,6 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <img src="../assets/logo-red-and-white.png" class="img-responsive pull-right" >
       <ul class="navbar-nav mr-auto">
 
         <!-- home link -->

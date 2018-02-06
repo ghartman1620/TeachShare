@@ -1,5 +1,8 @@
 # TeachShare
 
+The rich text editor is setup in this branch, under its own new component. To check it out,
+go ahead and npm install, then go over to /create/text.
+
 ## To set up a new development environment:
 
 ### Backend -
