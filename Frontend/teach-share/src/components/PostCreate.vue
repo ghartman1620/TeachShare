@@ -1,10 +1,3 @@
-<!--
-Questions for today:
-logging in with vue? - TODO
-difference between commit and dispatch
-# in url?
--->
-
 
 <template>
 
@@ -63,23 +56,34 @@ difference between commit and dispatch
 </div>
 <component v-bind:is="editedComponent"></component>
 
-<li v-for="component in storeComponents">
-  <div v-if="component.type === 'text'">
+
+<div class="container" v-for="(component,index) in storeComponents">
+  <div class="row">
+  <div class="col-1"><!-- col-xs-auto -->
+  <div id="arrange-btn-group" class="btn-group-vertical">
+    <button @click="moveComponentUp(index)" class="up-down-button"><font face="courier">^</font></button>
+    <button @click="moveComponentDown(index)" class="up-down-button"><font face="courier">v</font></button>
+  </div>
+  </div>
+  <div class="col-10"> <!-- col-11 -->
+  <div class="post-component card" v-if="component.type === 'text'">
     <view-text :component="component"></view-text>
   </div>
-  <div v-else-if="component.type === 'image'">
+  <div class="post-component card" v-else-if="component.type === 'image'">
     <p>An image component!</p>  
   </div>
-  <div v-else-if="component.type === 'audio'">
+  <div class="post-component card" v-else-if="component.type === 'audio'">
     <p>An audio component!</p>  
   </div>
-  <div v-else-if="component.type === 'video'">
+  <div class="post-component card" v-else-if="component.type === 'video'">
     <p>A video component!</p>  
   </div>
-  <div v-else>
+  <div class="post-component card" v-else>
     <p>A file component!</p>  
   </div>
-</li>
+  </div>
+  </div>
+</div>
 <button v-on:click="submitPost">Submit</button>
 </body>
 </template>
@@ -123,7 +127,6 @@ export default {
       this.$store.dispatch('createPost', obj)
     },
     createTextComponent: function(event){
-      console.log("begin create text component");
       this.$store.dispatch("changeEditedComponent", "edit-text");
       console.log("create text component");
     },
@@ -143,7 +146,19 @@ export default {
 
       console.log("hi world");
     },
-    
+    moveComponentUp: function(index){
+      console.log("moveComponentUp:"  + index);
+      if(index != 0){
+        this.$store.dispatch("swapComponents", [index,index-1]);   
+        //dispatch only allows one argument so we'll pass them as an array        
+      }
+    },
+    moveComponentDown: function(index){
+      if(index != this.$store.state.inProgressPostComponents.length-1){
+        this.$store.dispatch("swapComponents", [index,index+1]);   
+        //dispatch only allows one argument so we'll pass them as an array        
+      }
+    },
   },
   beforeMount(){
     this.getUser()
@@ -153,12 +168,48 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
 .postheader {
   width: 40%;
   margin: auto;
   height: 30px;
   
+}
+
+
+//Submitted components now being viewed
+.container-component {
+  width:60%;  
+  height: 300px;
+}
+#arrange-btn-group {
+  /*position: absolute;
+  left: 23%;
+  width: 2%; */ 
+}
+.up-down-button {
+
+}
+.post-component {
+  /*position: absolute;
+  left: 25%;  
+  width: 50%;*/
+}
+
+
+
+//The five buttons on the button bar
+#text-button { background: #FFAE03; }
+#image-button { background: #1D3461; }
+#audio-button { background: #42AA8B; }
+#video-button { background: #E07700; }
+#file-button { background: #23528E; }
+#buttonbar {
+  margin: auto;
+  width:368px;
+  height: 70px;
+  background-color: #99B5AA;
+  border-radius: 15px;
 }
 .btn-circle {
   width: 30px;
@@ -172,8 +223,7 @@ export default {
 .btn-circle.btn-xl {
   width: 70px;
   height: 70px;
-  padding: 10px 16px;
-  vertical-align: middle;
+  margin: 0px;
   font-size: 24px;
   line-height: 1.33;
   border-radius: 35px;
@@ -183,18 +233,5 @@ export default {
 }
 
 
-#text-button { background: #FFAE03; }
-#image-button { background: #1D3461; }
-#audio-button { background: #42AA8B; }
-#video-button { background: #E07700; }
-#file-button { background: #23528E; }
-
-#buttonbar {
-  margin: auto;
-  width: 380px;
-  height: 100px;
-  background-color: #99B5AA;
-  border-radius: 15px;
-}
 
 </style>

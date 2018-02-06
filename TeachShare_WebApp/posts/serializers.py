@@ -36,7 +36,7 @@ class PostSerializer(serializers.ModelSerializer):
     # attachments = AttachmentSerializer(many=True)
     # tags = TagSerializer(many=True, required=False, read_only=True)
     # pk = serializers.ReadOnlyField()
-
+        
     class Meta:
         model = Post
         fields = ('pk', 'title', 'content', 'updated',
