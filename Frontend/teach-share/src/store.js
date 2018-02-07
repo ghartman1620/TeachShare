@@ -14,6 +14,7 @@ export default new Vuex.Store({
         token: null,
         inProgressPostComponents: [],
         inProgressPostEditedComponentType: "",
+        postOpacity: {opacity: 1}
     },
     mutations: {
         LOAD_POSTS: (state, data) => {
@@ -52,6 +53,12 @@ export default new Vuex.Store({
         CHANGE_EDITED_COMPONENT: (state, type) => {
             state.inProgressPostEditedComponentType = type;
             console.log('edited component mutation');
+            if(state.postOpacity.opacity == 1){
+              state.postOpacity.opacity = .3;
+            }
+            else{
+              state.postOpacity.opacity = 1;
+            }
         },
         SWAP_COMPONENTS: (state, iAndJ) => {
             //I wrote this code because i'm triggered by being limited
@@ -138,7 +145,7 @@ export default new Vuex.Store({
             state.commit('ADD_COMPONENT', component);
         },
         changeEditedComponent: (state, type) => {
-          
+            
             console.log('change edited component action');
             state.commit('CHANGE_EDITED_COMPONENT', type);
         },

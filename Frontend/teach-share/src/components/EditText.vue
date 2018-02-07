@@ -22,6 +22,7 @@ export default Vue.component("edit-text", {
           "contents": this.text,
         });
         this.$store.dispatch("changeEditedComponent", "");
+        
       },
       close: function(event){
       

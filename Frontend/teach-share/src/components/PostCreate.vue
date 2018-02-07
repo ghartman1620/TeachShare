@@ -2,7 +2,8 @@
 <template>
 
 <body>
-
+<component class="card container foreground" v-bind:is="editedComponent"></component>
+<div :style=opacity>
 <nav class="navbar navbar-inverse ">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -54,8 +55,6 @@
 <button type="button" v-on:click="createVideoComponent" class="btn btn-default btn-circle btn-xl" id="video-button"><i class="glyphicons glyphicons-film"></i></button>
 <button type="button" v-on:click="createFileComponent" class="btn btn-default btn-circle btn-xl" id="file-button"><i class="glyphicons glyphicons-folder-open"></i></button>
 </div>
-<component v-bind:is="editedComponent"></component>
-
 
 <div class="container" v-for="(component,index) in storeComponents">
   <div class="row">
@@ -88,6 +87,7 @@
   </div>
 </div>
 <button v-on:click="submitPost">Submit</button>
+</div>
 </body>
 </template>
 
@@ -110,6 +110,7 @@ export default {
   computed: mapState({
     editedComponent: state => state.inProgressPostEditedComponentType,
     storeComponents: state => state.inProgressPostComponents,
+    opacity: state => state.postOpacity
   }),
   methods: {
     getUser: function(){
@@ -132,22 +133,31 @@ export default {
     createTextComponent: function(event){
       this.$store.dispatch("changeEditedComponent", "edit-text");
       console.log("create text component");
+      this.opacity.opacity = .3;
+      
     },
     createImageComponent: function(event){
       this.$store.dispatch("changeEditedComponent", "edit-image");
       console.log("create image component");
+      
     },
     createAudioComponent: function(event){
 
       console.log("hi world");
+      this.opacity.opacity = .3;
+      
     },
     createVideoComponent: function(event){
 
       console.log("hi world");
+      this.opacity.opacity = .3;
+      
     },
     createFileComponent: function(event){
 
       console.log("hi world");
+      this.opacity.opacity = .3;
+      
     },
     moveComponentUp: function(index){
       console.log("moveComponentUp:"  + index);
@@ -175,6 +185,19 @@ export default {
 
 
 <style scoped>
+
+
+.foreground {
+  position: fixed;
+  left: 20%;
+  top: 20%;
+  width: 80%;
+  margin: auto;
+  z-index: 2;  
+  opacity: 1;
+}
+
+
 .postheader {
   height: 30px;
   width:100%;
