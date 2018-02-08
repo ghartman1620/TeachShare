@@ -1,6 +1,6 @@
 <template>
 <body>
-<input v-model="text">
+<input v-model="component.contents">
 <button v-on:click="submit">Submit.</button>
 <button v-on:click="close">X</button>
 
@@ -10,9 +10,9 @@
 <script>
 import Vue from "vue";
 export default Vue.component("edit-text", {
+    props: ['component'],
     data() {
       return {
-        text: "",
       }
     },
     methods: {
