@@ -16,51 +16,7 @@ import os
 # Create your models here.
 
 
-# Post & related fields
 
-class Post(models.Model):
-
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
-    title = models.CharField(max_length=100, default='')
-    content = models.TextField(default="")
-    updated = models.DateTimeField(auto_now=True, auto_now_add=False)
-    likes = models.IntegerField(default=0)
-    timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
-
-
-class Comment(models.Model):
-    post = models.ForeignKey(
-        Post, related_name='comments', on_delete=models.CASCADE)
-    text = models.TextField()
-    user = models.CharField(max_length=100, default='')
-    timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
-
-    def __str__(self):
-        return self.text
-
-
-def upload_to(instance, filename):
-    now = timezone_now()
-    filename_base, filename_ext = os.path.splitext(filename)
-    return 'my_uploads/{}{}/{}{}'.format(
-        now.strftime("%Y/%m/%d/%Y%m%d%H%M%S/"),
-        create_random_string(),
-        filename_base,
-        filename_ext.lower())
-
-
-class Attachment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    file = models.FileField(null=True, blank=True, upload_to=upload_to)
-
-# Creates list of tags for every post
-
-
-class Tag(models.Model):
-    tag = models.CharField(max_length=100, default='')
-    post = models.ForeignKey(Post, related_name='tags',
-                             on_delete=models.CASCADE)
 
 
 # userprofile & related models
@@ -69,7 +25,6 @@ class UserProfile(models.Model):
     user = models.OneToOneField(
         User, primary_key=True, on_delete=models.CASCADE)
     schoolDistrict = models.CharField(max_length=500, default='')
-    favorites = models.ManyToManyField(Post)
 
     def __str__(self):
         return self.user.username

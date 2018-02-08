@@ -17,7 +17,13 @@
 </div>
 <div class="container">
 <input class="postheader" type="text" v-model="title" placeholder="title"></input><br>
-<input class="postheader" type="text" placeholder="tags"></input>
+<div class="card">
+<div v-for="(tag,index) in tags"> <button @click="removeTag(index)">{{tag}}</button></div>
+<form v-on:submit.prevent="nop">
+<input class="postheader" v-model="inProgressTag" v-on:keyup="createTag" placeholder="tags"></input>
+</form>
+
+</div>
 </div>
 
 <div class="container" v-for="(component,index) in storeComponents">
@@ -80,6 +86,8 @@ export default {
       title: "",
       editedComponent: {},
       editedComponentIndex: -1,
+      inProgressTag: "",
+      tags: [],
     }
   },
   computed: mapState({
@@ -88,6 +96,18 @@ export default {
     opacity: state => state.postOpacity
   }),
   methods: {
+    nop: function(){},
+    removeTag: function(index) {
+      console.log("remove tag" + index);
+      this.tags.splice(index, 1);
+    },
+    createTag: function(e) {
+      if (e.keyCode === 13 && this.inProgressTag !== "") {
+        console.log("enter pressed");
+        this.tags.push(this.inProgressTag);
+        this.inProgressTag = "";
+      }
+    },
     getUser: function(){
       this.$store.dispatch('fetchUser', 1)
     },
@@ -99,7 +119,7 @@ export default {
         "content" : JSON.stringify(this.$store.state.inProgressPostComponents),
         "likes" : 0,
         "comments" : [],
-        "tags": [],
+        "tags": JSON.stringify(this.tags),
         "attachments" : [],
       }
       console.log(obj)
@@ -113,7 +133,7 @@ export default {
     createTextComponent: function(event){
       this.editedComponent = {
         "type": "text",
-        "contents" : "",
+        "contents" : "<p></p>",
       }
       this.editedComponentIndex = this.$store.state.inProgressPostComponents.length;
       
@@ -125,7 +145,6 @@ export default {
     createImageComponent: function(event){
       this.$store.dispatch("changeEditedComponent", "edit-image");
       console.log("create image component");
-      
     },
     createAudioComponent: function(event){
 

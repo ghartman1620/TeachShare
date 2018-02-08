@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
-from accounts.models import Tag, Post, UserProfile, GradeTaught, Attachment, SubjectTaught
+from accounts.models import UserProfile, GradeTaught, SubjectTaught
 from django.conf import settings
 from django.utils.timezone import now as timezone_now
 

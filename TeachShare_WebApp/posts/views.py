@@ -1,7 +1,8 @@
-from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer, TagSerializer
-from .models import Post, Comment, Attachment, Tag
+from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer
+from .models import Post, Comment, Attachment
 from rest_framework import viewsets, views
 from rest_framework.parsers import FileUploadParser
+
 from django_filters import rest_framework as filters
 from rest_framework.response import Response
 from uuid import uuid4
@@ -39,15 +40,6 @@ class AttachmentViewSet(viewsets.ModelViewSet):
 def SimpleMethod(request):
     return render(request, 'test.html')
 
-class TagViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for Attachment model
-    """
-    queryset = Tag.objects.all()
-    serializer_class = TagSerializer
-    filter_fields = ('tag', 'post')
- 
-
 class FileUploadView(views.APIView):
     parser_classes = (FileUploadParser,)
 
@@ -57,3 +49,4 @@ class FileUploadView(views.APIView):
         a = Attachment.objects.create(post=p, file=file_obj)
         file_obj.close()
         return Response(data={'status': 'OK', 'id': a.pk, 'filename': a.file.name}, status=201)
+

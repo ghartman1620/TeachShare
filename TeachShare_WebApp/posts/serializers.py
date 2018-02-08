@@ -5,7 +5,7 @@ Created on Jan 23, 2018
 '''
 
 from rest_framework import serializers
-from posts.models import Post, Comment, Attachment, Tag
+from posts.models import Post, Comment, Attachment
 from accounts.serializers import UserSerializer
 
 
@@ -22,11 +22,6 @@ class AttachmentSerializer(serializers.ModelSerializer):
         model = Attachment
         fields = ('pk', 'post', 'file')
 
-
-class TagSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tag
-        fields = ('pk', 'tag', 'post')
 
 
 class PostSerializer(serializers.ModelSerializer):

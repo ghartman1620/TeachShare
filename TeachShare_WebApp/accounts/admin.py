@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+'''from __future__ import unicode_literals
 
 from django.contrib import admin
 
@@ -20,3 +20,5 @@ class PostModelAdmin(admin.ModelAdmin):
 admin.site.register(UserProfile)
 
 admin.site.register(Post, PostModelAdmin)
+
+'''
