@@ -2,47 +2,10 @@
 <template>
 
 <body>
+<base-page>
+<span slot="body">
 <component class="card container foreground" v-bind:component="editedComponent" :index="editedComponentIndex"v-bind:is="editedComponentType"></component>
 <div :style=opacity>
-<nav class="navbar navbar-inverse ">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="/account/dashboard">
-        <img src="http://127.0.0.1:8000/static/img/tslogo.png" alt="TSLogo"/>
-      </a>
-    </div>
-  <!-- Search bar -->
-    <form class="navbar-form navbar-left nav-searchpad"
-		method="post" id="search" action="<!-- search the dashboard -->">
-      <div class="form-group">
-		<input type="text" name="search" class="form-control" placeholder="Search">
-	 </div>
-      <button type="submit" class="btn btn-default">Submit</button>
-    </form>
-  <!-- Create a Post Button -->
-    <ul class="nav navbar-nav nav-navitems">
-      <li><a href="/account/create/">
-        <p>New Post <span class="glyphicon glyphicon-plus-sign"></span> </p>
-        </a>
-      </li>
-    </ul>
-  <!-- Dropdown Account Menu -->
-    <ul class="nav navbar-nav navbar-right">
-      <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" >
-          <img src="http://127.0.0.1:8000/static/img/applelogo.png" alt="TSLogo"/>
-        <span class="caret"></span></a>
-        <ul class="dropdown-menu">
-		  <li><a href="/account/profile/">Profile</a></li>
-          <li><a href="/account/favorites">Favorites</a></li>
-		  <li><a href="/account/profile/edit/">Settings</a></li>
-          <li><a href="/account/logout">Log Out</a></li>
-        </ul>
-      </li>
-    </ul>
-  </div>
-</nav> <!-- ./End Navbar -->
-
 <div id="buttonbar">
 <!-- Text button -->
 
@@ -94,7 +57,11 @@
 </div>
 <button v-on:click="submitPost">Publish</button>
 </div>
+</span>
+</base-page>
+
 </body>
+
 </template>
 
 
