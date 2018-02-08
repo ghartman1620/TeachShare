@@ -60,15 +60,10 @@ const UPLOAD_INITIAL = 0, UPLOAD_SAVING = 1, UPLOAD_SUCCESS = 2, UPLOAD_ERROR = 
 
 export default Vue.component('file-upload', {
     components: {},
-    props: ['uploadFieldName'],
+    props: ['uploadFieldName', 'acceptedFileTypes'],
     data() {
       return {
-        currentFileList: [],
-        uploadedFiles: [],
-        uploadedError: null,
         currentStatus: null,
-        fileKeys: {},
-        progress: 0,
       }
     },
     computed: {
@@ -87,11 +82,9 @@ export default Vue.component('file-upload', {
       currentFiles() {
         return this.$store.state.files;
       },
-      // fileUploadProgress() {
-      //   return this.$store.getters.filesUploadStatus;
-      // },
       ...mapGetters([
-        'filesUploadStatus'
+        'filesUploadStatus',
+        'allFilesUploadComplete'
       ]),
     },
     methods: {

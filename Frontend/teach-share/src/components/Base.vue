@@ -9,24 +9,28 @@
     <div class="row">
       <file-upload uploadFieldName="files"></file-upload>
     </div>
-    <!-- <div class="row">
+    <div class="row">
       <video-component :isFile="true"></video-component>
-    </div> -->
+    </div>
+    <div class="row">
+      <file-component></file-component>
+    </div>
   </div>
 </template>
 
 <script>
 import Vue from 'vue';
-import Navbar from './Navbar'
+import Navbar from './Navbar';
 import VideoComponent from './video/VideoComponent.vue';
 import FileUpload from './FileUpload.vue';
+import FileComponent from './FileComponent.vue';
 
 export default Vue.component('base-page', {
-    components: { Navbar, VideoComponent, FileUpload },
+    components: { Navbar, VideoComponent, FileUpload, FileComponent },
     props: ['items'],
     data() {
       return {
-        queryParam: ""
+        queryParam: "",
       }
     }
   })
