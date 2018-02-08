@@ -4,8 +4,9 @@
     <!-- This can be used as a template -->
     <!-- insert content here for pages,
     components will have to be separate of course -->
-    <!-- <video-component :isFile="true"></video-component>
     <slot name="body"></slot>
+    
+    <!-- <video-component :isFile="true"></video-component>
     <div class="row">
       <file-upload uploadFieldName="files"></file-upload>
     </div>
