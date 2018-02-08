@@ -15,8 +15,8 @@ export default new Vuex.Store({
         files: [],
         filesPercents: {},
         inProgressPostComponents: [],
-        inProgressPostEditedComponentType: ''
-            // post_create
+        inProgressPostEditedComponentType: '',
+        postOpacity: { opacity: 1 }
     },
     mutations: {
         LOAD_POSTS: (state, data) => {
@@ -48,13 +48,23 @@ export default new Vuex.Store({
             state.files = Object.assign({}, data);
         },
 
+
+
+        //Mutations for the currently edited post data: inProgressEditedComponentType and inProgressPostComponents
         ADD_COMPONENT: (state, component) => {
+            console.log(state.inProgressPostComponents);
             state.inProgressPostComponents.push(component);
+            console.log(state.inProgressPostComponents);
             console.log('add component mutation');
         },
         CHANGE_EDITED_COMPONENT: (state, type) => {
             state.inProgressPostEditedComponentType = type;
             console.log('edited component mutation');
+            if (state.postOpacity.opacity == 1) {
+                state.postOpacity.opacity = .3;
+            } else {
+                state.postOpacity.opacity = 1;
+            }
         },
         CHANGE_UPLOADED_FILES: (state, data) => {
             console.log(data);
@@ -63,7 +73,26 @@ export default new Vuex.Store({
             var testObj = Object.assign(state.filesPercents, newObj);
             state.filesPercents = Object.assign({}, testObj);
             console.log(state.filesPercents)
+        },
+        SWAP_COMPONENTS: (state, iAndJ) => {
+            //I wrote this code because i'm triggered by being limited
+            //to one function argument so I'm going to pretend I can pass two.
+            var i = iAndJ[0];
+            var j = iAndJ[1];
+            var tmp = state.inProgressPostComponents[i];
+            Vue.set(state.inProgressPostComponents,
+                i, state.inProgressPostComponents[j]);
+            Vue.set(state.inProgressPostComponents,
+                j, tmp);
+            console.log(state.inProgressPostComponents);
+        },
+        REMOVE_COMPONENT: (state, index) => {
+            state.inProgressPostComponents.splice(index, 1);
+        },
+        EDIT_COMPONENT: (state, editedComponent) => {
+            state.inProgressPostComponents.splice(editedComponent.index, 1, editedComponent.component);
         }
+
     },
     actions: {
         fetchAllPosts: (state) => {
@@ -145,22 +174,40 @@ export default new Vuex.Store({
                     .catch(err => console.log(err));
             });
         },
+
+        //Actions for in progress posts
         addComponent: (state, component) => {
-            state.commit('ADD_COMPONENT', component);
+
             console.log('add_component action');
+            state.commit('ADD_COMPONENT', component);
         },
         changeEditedComponent: (state, type) => {
-            state.commit('CHANGE_EDITED_COMPONENT', type);
+
             console.log('change edited component action');
+            state.commit('CHANGE_EDITED_COMPONENT', type);
+        },
+        //Actions are only allowed to have one argument so iAndJ is
+        //a list with index 0 as the first index to be swapped
+        //and index 1 the second
+        swapComponents: (state, iAndJ) => {
+            console.log(iAndJ[0] + ' ' + iAndJ[1]);
+            state.commit('SWAP_COMPONENTS', iAndJ);
+        },
+        removeComponent: (state, index) => {
+            state.commit('REMOVE_COMPONENT', index);
+        },
+        editComponent: (state, editedComponent) => {
+            state.commit('EDIT_COMPONENT', editedComponent);
         }
     },
     getters: {
         filesUploadStatus: state => state.filesPercents,
-        allFilesUploadComplete: state => {
-            console.log('allUploadFinished');
-            for (var obj in state.filesPercents.keys()) {
-                console.log('OBJECT: ', key, obj);
-            }
-        }
+        // allFilesUploadComplete: state => {
+        //     console.log('allUploadFinished');
+        //     for (var obj in state.filesPercents.keys()) {
+        //         console.log('OBJECT: ', key, obj);
+        //     }
+        // }
+
     }
 })

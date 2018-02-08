@@ -64,6 +64,7 @@ export default Vue.component('file-upload', {
     data() {
       return {
         currentStatus: null,
+        currentFileList: [],
       }
     },
     computed: {

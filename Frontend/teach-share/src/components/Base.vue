@@ -6,7 +6,7 @@
     components will have to be separate of course -->
     <!-- <video-component :isFile="true"></video-component> -->
     <slot name="body"></slot>
-    <div class="row">
+    <!-- <div class="row">
       <file-upload uploadFieldName="files"></file-upload>
     </div>
     <div class="row">
@@ -14,7 +14,7 @@
     </div>
     <div class="row">
       <file-component></file-component>
-    </div>
+    </div> -->
   </div>
 </template>
 

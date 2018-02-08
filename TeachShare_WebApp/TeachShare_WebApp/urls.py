@@ -22,7 +22,6 @@ from django.contrib.auth.views import password_reset, password_reset_done, passw
 from rest_framework import routers
 from accounts.views import UserProfileViewSet, UserViewSet, GroupViewSet
 from posts.views import PostViewSet, CommentViewSet, AttachmentViewSet, TagViewSet
-from rest_framework.authtoken import views as rest_framework_views
 from posts.views import *
 from posts.views import FileUploadView
 
@@ -38,25 +37,18 @@ router.register(r'tags', TagViewSet)
 urlpatterns = [
     url(r'^test/', SimpleMethod),
     url(r'^auth/', include('rest_framework_social_oauth2.urls')),
-
     url(r'^api/upload/(?P<filename>[^/]+)$', FileUploadView.as_view()),
 
-
-    # url(r'get_token/$', rest_framework_views.obtain_auth_token, name='get_auth_token'),
-    # url(r'^api-auth/', include('rest_framework.urls')),
-
     url(r'^admin/', admin.site.urls),
-    url(r'^account/', include('accounts.urls')),
     # this and urls down are concerned with reseting pssword
-    url(r'^reset-password/$', password_reset, name="reset_password"),
-    url(r'^reset-password/done/$', password_reset_done, name="password_reset_done"),
-    url(r'^reset-password/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        password_reset_confirm, name='password_reset_confirm'),
-    url(r'^reset-password/complete/$', password_reset_complete,
-        name='password_reset_complete'),
+    # url(r'^reset-password/$', password_reset, name="reset_password"),
+    # url(r'^reset-password/done/$', password_reset_done, name="password_reset_done"),
+    # url(r'^reset-password/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
+    #     password_reset_confirm, name='password_reset_confirm'),
+    # url(r'^reset-password/complete/$', password_reset_complete,
+    #     name='password_reset_complete'),
 
     url(r'^api/', include(router.urls)),
-
 ]
 
 if settings.DEBUG:
