@@ -26,15 +26,22 @@
         <div class="col">
         <h4>Uploaded files: </h4>
         <ul class="list-group">
-          <li v-bind:key="file.name" v-for="file in currentFiles"
+          <li v-bind:key="key" v-for="(value, file) in filesUploadStatus"
             class="list-group-item d-flex justify-content-between align-items-center">
-              {{ file.name }}
-              <div class="col">
+              {{ file }}
+              <div v-on: class="col">
               <div class="progress">
-                  <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" :style="{width: percentage + '%'}" :aria-valuenow="percentage" aria-valuemin="0" aria-valuemax="100">{{ percentage }}%</div>
+                  <div class="progress-bar progress-bar-striped progress-bar-animated"
+                    role="progressbar"
+                    :style="{width: value + '%'}"
+                    :aria-valuenow="value"
+                    aria-valuemin="0"
+                    aria-valuemax="100">
+                      {{ value }}%
+                    </div>
                 </div>
               </div>
-              <div class="col-1" v-if="percentage=100">
+              <div class="col-1" v-if="value=100">
                 Done.
               </div>
           </li>
@@ -47,7 +54,7 @@
 <!-- Javascript -->
 <script>
 import Vue from 'vue';
-import { mapState } from 'vuex';
+import { mapGetters } from 'vuex';
 
 const UPLOAD_INITIAL = 0, UPLOAD_SAVING = 1, UPLOAD_SUCCESS = 2, UPLOAD_ERROR = 3;
 
@@ -60,8 +67,8 @@ export default Vue.component('file-upload', {
         uploadedFiles: [],
         uploadedError: null,
         currentStatus: null,
-        percentage: 0,
-        fileKeys: null,
+        fileKeys: {},
+        progress: 0,
       }
     },
     computed: {
@@ -80,17 +87,18 @@ export default Vue.component('file-upload', {
       currentFiles() {
         return this.$store.state.files;
       },
-      FileUploadProgress: function() {
-        this.$on('FileUploadProgress', function(progress){
-          console.log("PROGRESS", progress)
-          return progress;
-        });
-      }
+      // fileUploadProgress() {
+      //   return this.$store.getters.filesUploadStatus;
+      // },
+      ...mapGetters([
+        'filesUploadStatus'
+      ]),
     },
     methods: {
       updatePercent(percent, file) {
         console.log("UpdatePercent: ", percent, file)
-        this.percentage = percent;
+        console.log(this.fileKeys);
+        this.files = this.$set(this.fileKeys, String(file.name), percent);
       },
       save(formData) {
         var self = this

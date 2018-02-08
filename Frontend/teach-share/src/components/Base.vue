@@ -9,9 +9,9 @@
     <div class="row">
       <file-upload uploadFieldName="files"></file-upload>
     </div>
-    <div class="row">
+    <!-- <div class="row">
       <video-component :isFile="true"></video-component>
-    </div>
+    </div> -->
   </div>
 </template>
 

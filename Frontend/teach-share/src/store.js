@@ -13,9 +13,10 @@ export default new Vuex.Store({
         posts: [],
         token: null,
         files: [],
+        filesPercents: {},
         inProgressPostComponents: [],
-        inProgressPostEditedComponentType: "",
-        post_create
+        inProgressPostEditedComponentType: ''
+            // post_create
     },
     mutations: {
         LOAD_POSTS: (state, data) => {
@@ -54,6 +55,14 @@ export default new Vuex.Store({
         CHANGE_EDITED_COMPONENT: (state, type) => {
             state.inProgressPostEditedComponentType = type;
             console.log('edited component mutation');
+        },
+        CHANGE_UPLOADED_FILES: (state, data) => {
+            console.log(data);
+            var newObj = Object.assign({});
+            newObj[data.file] = data.percent;
+            var testObj = Object.assign(state.filesPercents, newObj);
+            state.filesPercents = Object.assign({}, testObj);
+            console.log(state.filesPercents)
         }
     },
     actions: {
@@ -118,21 +127,23 @@ export default new Vuex.Store({
         },
         fileUpload: (state, { self, formData }) => {
             var files = formData.getAll('files')
-            state.commit('SET_FILES', files);
-            for (var file of files.entries()) {
-
+            files.forEach(function(file) {
+                console.log('Files: ', file);
                 let config = {
                     onUploadProgress: progressEvent => {
+                        console.log("CURRENT FILE BEING UPLAODED: ", file);
                         let percentCompleted = Math.floor((progressEvent.loaded * 100) / progressEvent.total);
-                        // @TODO: setup an action to update a progressbar
-                        self.updatePercent(percentCompleted, file);
+                        state.commit({
+                            type: 'CHANGE_UPLOADED_FILES',
+                            percent: percentCompleted,
+                            file: file.name
+                        });
                     }
                 }
-                console.log(file)
-                api.put(`upload/${file[1].name}`, file[1], config)
+                api.put(`upload/${file.name}`, file, config)
                     // .then(response => state.commit('SET_FILES', response.data))
                     .catch(err => console.log(err));
-            }
+            });
         },
         addComponent: (state, component) => {
             state.commit('ADD_COMPONENT', component);
@@ -142,5 +153,8 @@ export default new Vuex.Store({
             state.commit('CHANGE_EDITED_COMPONENT', type);
             console.log('change edited component action');
         }
+    },
+    getters: {
+        filesUploadStatus: state => state.filesPercents
     }
 })

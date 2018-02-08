@@ -17,7 +17,7 @@
 
         <!-- create a post link -->
         <li class="nav-item">
-          <router-link class="nav-link" to="/create">Create Post</router-link>
+          <router-link class="nav-link" to="/">Create Post</router-link>
         </li>
 
         <!-- just an example dropdown -->
