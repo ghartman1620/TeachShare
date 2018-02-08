@@ -74,6 +74,9 @@ export default new Vuex.Store({
         },
         REMOVE_COMPONENT: (state, index) => {
             state.inProgressPostComponents.splice(index, 1);
+        },
+        EDIT_COMPONENT: (state, editedComponent) => {
+            state.inProgressPostComponents.splice(editedComponent.index, 1, editedComponent.component);
         }
         
     },
@@ -158,6 +161,10 @@ export default new Vuex.Store({
         },
         removeComponent: (state, index) => {
             state.commit('REMOVE_COMPONENT', index);
+        },
+        editComponent: (state, editedComponent) => {
+            state.commit('EDIT_COMPONENT', editedComponent);
         }
+        
     }
 })

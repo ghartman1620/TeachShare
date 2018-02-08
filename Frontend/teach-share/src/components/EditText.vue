@@ -10,17 +10,26 @@
 <script>
 import Vue from "vue";
 export default Vue.component("edit-text", {
-    props: ['component'],
+    props: ['component', 'index'],
     data() {
       return {
+        text: "",
       }
     },
     methods: {
       submit: function(event){
-        this.$store.dispatch("addComponent", {
-          "type": "text",
-          "contents": this.text,
-        });
+        if(this.index == this.$store.state.inProgressPostComponents.length){
+          this.$store.dispatch("addComponent", {
+            "type": "text",
+            "contents": this.component.contents,
+          });
+        }
+        else{
+          this.$store.dispatch("editComponent", {
+            "index" : this.index,
+            "component": this.component
+          });
+        }
         this.$store.dispatch("changeEditedComponent", "");
         
       },

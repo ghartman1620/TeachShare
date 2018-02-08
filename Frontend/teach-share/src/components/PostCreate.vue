@@ -2,7 +2,7 @@
 <template>
 
 <body>
-<component class="card container foreground" v-bind:is="editedComponent"></component>
+<component class="card container foreground" v-bind:component="editedComponent" :index="editedComponentIndex"v-bind:is="editedComponentType"></component>
 <div :style=opacity>
 <nav class="navbar navbar-inverse ">
   <div class="container-fluid">
@@ -42,10 +42,7 @@
     </ul>
   </div>
 </nav> <!-- ./End Navbar -->
-<div class="container">
-<input class="postheader" type="text" v-model="title" placeholder="title"></input><br>
-<input class="postheader" type="text" placeholder="tags"></input>
-</div>
+
 <div id="buttonbar">
 <!-- Text button -->
 
@@ -55,14 +52,18 @@
 <button type="button" v-on:click="createVideoComponent" class="btn btn-default btn-circle btn-xl" id="video-button"><i class="glyphicons glyphicons-film"></i></button>
 <button type="button" v-on:click="createFileComponent" class="btn btn-default btn-circle btn-xl" id="file-button"><i class="glyphicons glyphicons-folder-open"></i></button>
 </div>
+<div class="container">
+<input class="postheader" type="text" v-model="title" placeholder="title"></input><br>
+<input class="postheader" type="text" placeholder="tags"></input>
+</div>
 
 <div class="container" v-for="(component,index) in storeComponents">
   <div class="row">
   <div class="col-1"><!-- col-xs-auto -->
-  <div id="arrange-btn-group" class="btn-group-vertical">
-    <button @click="moveComponentUp(index)" class="up-down-button"><font face="courier">^</font></button>
-    <button @click="moveComponentDown(index)" class="up-down-button"><font face="courier">v</font></button>
-  </div>
+    <div id="arrange-btn-group" class="btn-group-vertical">
+      <button @click="moveComponentUp(index)" class="up-down-button"><font face="courier">^</font></button>
+      <button @click="moveComponentDown(index)" class="up-down-button"><font face="courier">v</font></button>
+    </div>
   </div>
   <div class="col-10"> <!-- col-11 -->
   <div class="post-component card" v-if="component.type === 'text'">
@@ -82,11 +83,16 @@
   </div>
   </div>
   <div class="col 11">
-    <button @click="removeComponent(index)"><font face="courier">x</font></button>
+    <div id="arrange-btn-group" class="btn-group-vertical">
+      <button @click="removeComponent(index)"><font face="courier">x</font></button>
+      <button @click="editComponent(index)"><font face="courier">E</font></button>
+    
+    </div>
   </div>
+  
   </div>
 </div>
-<button v-on:click="submitPost">Submit</button>
+<button v-on:click="submitPost">Publish</button>
 </div>
 </body>
 </template>
@@ -105,10 +111,12 @@ export default {
   data: function() {
     return {
       title: "",
+      editedComponent: {},
+      editedComponentIndex: -1,
     }
   },
   computed: mapState({
-    editedComponent: state => state.inProgressPostEditedComponentType,
+    editedComponentType: state => state.inProgressPostEditedComponentType,
     storeComponents: state => state.inProgressPostComponents,
     opacity: state => state.postOpacity
   }),
@@ -130,7 +138,18 @@ export default {
       console.log(obj)
       this.$store.dispatch('createPost', obj)
     },
+    editComponent: function(index) {
+      this.editedComponent = this.$store.state.inProgressPostComponents[index];
+      this.editedComponentIndex = index;
+      this.$store.dispatch("changeEditedComponent", "edit-" + this.editedComponent.type);
+    },
     createTextComponent: function(event){
+      this.editedComponent = {
+        "type": "text",
+        "contents" : "",
+      }
+      this.editedComponentIndex = this.$store.state.inProgressPostComponents.length;
+      
       this.$store.dispatch("changeEditedComponent", "edit-text");
       console.log("create text component");
       this.opacity.opacity = .3;
