@@ -2,7 +2,7 @@
 <body>
 <p> I'm a text view component! </p>
 {{component}}
-
+<p v-html="component.contents"></p>
 </body>
 
 </template>
