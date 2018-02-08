@@ -26,12 +26,12 @@
         <div class="col">
         <h4>Uploaded files: </h4>
         <ul class="list-group">
-          <li v-bind:key="key" v-for="(value, file) in filesUploadStatus"
+          <li v-bind:key="file" v-for="(value, file) in filesUploadStatus"
             class="list-group-item d-flex justify-content-between align-items-center">
               {{ file }}
               <div v-on: class="col">
               <div class="progress">
-                  <div class="progress-bar progress-bar-striped progress-bar-animated"
+                  <div class="progress-bar bg-success"
                     role="progressbar"
                     :style="{width: value + '%'}"
                     :aria-valuenow="value"
@@ -41,7 +41,7 @@
                     </div>
                 </div>
               </div>
-              <div class="col-1" v-if="value=100">
+              <div class="col-1" v-if="value===100">
                 Done.
               </div>
           </li>
