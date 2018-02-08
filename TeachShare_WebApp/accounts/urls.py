@@ -5,7 +5,7 @@ from django.contrib.auth.views import login, password_reset, password_reset_done
 
 app_name = 'account'
 urlpatterns = [
-    url(r'^$', views.home, name='home'),
+    '''url(r'^$', views.home, name='home'),
     url(r'^login/$', views.login, name='login'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^logout/$', views.logout, name='logout'),
@@ -21,4 +21,5 @@ urlpatterns = [
         views.add_comment_to_post, name='add_comment_to_post'),
     url(r'^profile/accountSettings/$',
         views.account_settings, name='account_settings'),
+    '''
 ]

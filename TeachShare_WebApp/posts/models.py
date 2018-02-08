@@ -17,7 +17,7 @@ class Post(models.Model):
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
     likes = models.IntegerField(default=0)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
-
+    tags = JSONField()
 
 class Comment(models.Model):
     post = models.ForeignKey(
@@ -55,7 +55,3 @@ class Attachment(models.Model):
 # Creates list of tags for every post
 
 
-class Tag(models.Model):
-    tag = models.CharField(max_length=100, default='')
-    post = models.ForeignKey(Post, related_name='tags',
-                             on_delete=models.CASCADE)

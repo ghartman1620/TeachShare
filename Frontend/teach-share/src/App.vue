@@ -1,6 +1,7 @@
 <!--Very very barebones. This will be improved shortly! -JL -->
 
 <template>
+
 <body>
   <div id="app">
     <h1></h1>

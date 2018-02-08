@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.decorators import login_required
 from accounts.forms import EditProfileForm
-from accounts.models import Tag, Post, UserProfile, GradeTaught, Attachment, SubjectTaught
+from accounts.models import UserProfile, GradeTaught, SubjectTaught
 from django.conf import settings
 from django.utils.timezone import now as timezone_now
 
@@ -60,7 +60,7 @@ Posts are included in the returned set if the search string
 is a substring of the post's title or one of its tags.
 '''
 
-
+'''
 def search(posts, searchString):
     results = []
     for post in posts.order_by('-timestamp'):
@@ -118,11 +118,9 @@ def view_profile(request):
     return render(request, 'accounts/profile.html', args)
 
 
-'''
 asks user for comment in textfeild. The input is taken in post detail,
 passed through this view, to be saved to the Comments model and rendered
 on the post detail page
-'''
 
 
 def add_comment_to_post(request, pk):
@@ -136,13 +134,11 @@ def add_comment_to_post(request, pk):
         form = CommentForm()
 
 
-'''
 Takes in three inputs from the Edit_profile page. One of the in puts is the old
 password which it  verfies here is true. If not an error will pop up. The other two 
 text boxes deal with setting a new password and confirming it. If they are not the same
 error will pop up. However if old password is true and the new passwords match then 
 this view sets the accounts password to the new password
-'''
 
 
 @login_required(login_url='/account/login')
@@ -168,13 +164,10 @@ def account_settings(request):
     return render(request, 'accounts/edit_profile.html')
 
 
-'''
 POST request for edit profile writing and
 renders the profile page when its loaded.
 Creates many GradeTaught and SubjectTaught objects
 and assigns other fields in UserProfile.
-'''
-
 
 @login_required(login_url='/account/login')
 def edit_profile(request):
@@ -306,11 +299,9 @@ def post_detail(request, id=None):
     return render(request, 'accounts/post_detail.html', context)
 
 
-'''
 Renders the favorites page. 
 The loop is gathering up the posts that a user has liked based on their post id,
 which is their index in the all posts list.
-'''
 
 
 @login_required(login_url='/account/login')
@@ -331,13 +322,12 @@ def likesPost(userProfile, post):
     return False
 
 
-'''
+
 This POST request handles the user clicking the "like" or "dislike"
 button on the dashboard. It does both by checking whether the 
 user has already liked the post - if they have, then decrement
 that posts' likes and remove that post from the user's like post list,
 and do the opposite for a post that the user has not yet liked.
-'''
 
 
 @login_required(login_url='/account/login')
@@ -405,3 +395,4 @@ def dashboard(request):
         return render(request, 'accounts/dashboard.html',
                       {'posts': Post.objects.order_by("-timestamp"),
                        'likedPosts': request.user.userprofile.favorites.all()})
+'''
