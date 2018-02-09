@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 services:
   db:
@@ -10,3 +10,24 @@ services:
       POSTGRES_DB: teachshare
       POSTGRES_PASSWORD: password123
       POSTGRES_USER: postgres
+    
+  web:
+    build: ./TeachShare_WebApp/.
+    command: python3 TeachShare_WebApp/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+  vue:
+    build: ./Frontend/.
+    command: npm run dev 
+    volumes:
+      - ./Frontend/.:/code
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - web
+    

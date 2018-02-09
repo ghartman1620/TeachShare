@@ -208,6 +208,5 @@ export default new Vuex.Store({
         //         console.log('OBJECT: ', key, obj);
         //     }
         // }
-
     }
 })
