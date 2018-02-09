@@ -12,7 +12,7 @@
               :name="uploadFieldName"
               :disabled="isSaving"
               @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
-              accept="file/*"
+              accept="acceptedFileTypes"
               class="input-file">
               <p v-if="isInitial">
                 Drag your file(s) here to begin<br> or click to browse
@@ -26,22 +26,22 @@
         <div class="col">
         <h4>Uploaded files: </h4>
         <ul class="list-group">
-          <li v-bind:key="file" v-for="(value, file) in filesUploadStatus"
+          <li v-bind:key="obj.file.name" v-for="obj in filesUploadStatus"
             class="list-group-item d-flex justify-content-between align-items-center">
-              {{ file }}
+              {{ obj.file.name }}
               <div v-on: class="col">
               <div class="progress">
                   <div class="progress-bar bg-success"
                     role="progressbar"
-                    :style="{width: value + '%'}"
-                    :aria-valuenow="value"
+                    :style="{width: obj.percent + '%'}"
+                    :aria-valuenow="obj.percent"
                     aria-valuemin="0"
                     aria-valuemax="100">
-                      {{ value }}%
+                      {{ obj.percent }}%
                     </div>
                 </div>
               </div>
-              <div class="col-1" v-if="value===100">
+              <div class="col-1" v-if="obj.percent===100">
                 Done.
               </div>
           </li>
@@ -56,10 +56,18 @@
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
+var fileTypes = Object.freeze({
+  'FILE': 'file/*',
+  'IMG': 'image/*',
+  'VID': 'video/*', // don't know if this is correct
+  'AUD': 'audio/*'
+})
+
 const UPLOAD_INITIAL = 0, UPLOAD_SAVING = 1, UPLOAD_SUCCESS = 2, UPLOAD_ERROR = 3;
 
 export default Vue.component('file-upload', {
     components: {},
+    //file/*
     props: ['uploadFieldName', 'acceptedFileTypes'],
     data() {
       return {

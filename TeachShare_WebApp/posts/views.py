@@ -37,9 +37,11 @@ class AttachmentViewSet(viewsets.ModelViewSet):
     filter_fields = ('post',)
 
 
-def SimpleMethod(request):
+def SimpleMethod(request): 
     return render(request, 'test.html')
 
+
+# @TODO: figure out how to deal with bad url characters
 class FileUploadView(views.APIView):
     parser_classes = (FileUploadParser,)
 
@@ -48,5 +50,12 @@ class FileUploadView(views.APIView):
         p = Post.objects.first()
         a = Attachment.objects.create(post=p, file=file_obj)
         file_obj.close()
-        return Response(data={'status': 'OK', 'id': a.pk, 'filename': a.file.name}, status=201)
+        
+        return Response(data={
+                'status': 'OK', 
+                'id': a.pk,
+                'url': a.file.url,
+                'filename': a.file.name
+            }, 
+            status=201)
 

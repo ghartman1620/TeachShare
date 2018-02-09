@@ -1,4 +1,4 @@
-version: '3'
+version: '2'
 
 services:
   db:
@@ -13,7 +13,7 @@ services:
     
   web:
     build: ./TeachShare_WebApp/.
-    command: python3 TeachShare_WebApp/manage.py runserver 0.0.0.0:8000
+    command: bash -c "./TeachShare_WebApp/wait-for-it.sh -h db -p 5432 -- python3 TeachShare_WebApp/manage.py migrate && python3 TeachShare_WebApp/manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
     ports:
@@ -21,10 +21,10 @@ services:
     depends_on:
       - db
   vue:
-    build: ./Frontend/.
+    build: Frontend/.
     command: npm run dev 
     volumes:
-      - ./Frontend/.:/code
+      - ./Frontend/teach-share/.:/code/.
     ports:
       - "8080:8080"
     depends_on:

@@ -36,8 +36,8 @@ class Comment(models.Model):
 def upload_to(instance, filename):
     now = timezone_now()
     # filename_base, filename_ext = os.path.splitext(filename)
-    return 'my_uploads/{}{}/{}'.format(
-        now.strftime("%Y/%m/%d/%Y%m%d%H%M%S/"),
+    return '../media/uploads/{}{}/{}'.format(
+        now.strftime("%Y/%m/%d/"),
         str(uuid4()),
         filename)
 

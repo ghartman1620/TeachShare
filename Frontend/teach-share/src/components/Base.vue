@@ -5,11 +5,14 @@
     <!-- insert content here for pages,
     components will have to be separate of course -->
     <slot name="body"></slot>
-    
-    <!-- <video-component :isFile="true"></video-component>
     <div class="row">
-      <file-upload uploadFieldName="files"></file-upload>
+      <file-upload
+        uploadFieldName="files"
+        acceptedFileTypes="file/*"
+      />
     </div>
+    <!-- <video-component :isFile="true"></video-component>
+
     <div class="row">
       <video-component :isFile="true"></video-component>
     </div>

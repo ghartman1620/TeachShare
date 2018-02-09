@@ -1,14 +1,13 @@
-FROM node:0.12.7
-RUN mkdir /code
+FROM node:carbon
 
-# change working directory
-WORKDIR /code/teach-share/
+WORKDIR /code/
 
-# copy this all to container
-ADD . /code/
+COPY teach-share/package*.json ./
 
-# get dependencies...
 RUN npm install
 
-# expose the correct port
+COPY teach-share/. .
+
 EXPOSE 8080
+
+CMD [ "npm", "run", "dev" ]
