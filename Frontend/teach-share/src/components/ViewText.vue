@@ -1,8 +1,10 @@
 <template>
 <body>
+<div class="container">
 <p> I'm a text view component! </p>
 {{component}}
 <p v-html="component.contents"></p>
+</div>
 </body>
 
 </template>
@@ -15,7 +17,7 @@ import VueQuillEditor from 'vue-quill-editor'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
-Vue.use(VueQuillEditor, );
+Vue.use(VueQuillEditor);
 export default Vue.component("view-text", {
   props: ['component'],
   })
