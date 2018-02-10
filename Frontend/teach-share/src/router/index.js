@@ -5,7 +5,7 @@ import HelloWorld from '@/components/HelloWorld';
 import Base from '@/components/Base';
 import PostCreate from '@/components/PostCreate';
 import Login from '@/components/Login';
-
+import PostFeed from '@/components/PostFeed';
 Vue.use(Router);
 
 
@@ -30,5 +30,12 @@ export default new Router({
             name: 'Login',
             component: Login
         },
+        {
+            path: '/dashboard',
+            name: 'PostFeed',
+            component: PostFeed
+        },
+        
+
     ]
 })

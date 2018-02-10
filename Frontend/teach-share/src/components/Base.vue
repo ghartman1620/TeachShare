@@ -5,12 +5,12 @@
     <!-- insert content here for pages,
     components will have to be separate of course -->
     <slot name="body"></slot>
-    <div class="row">
+    <!--<div class="row">
       <file-upload
         uploadFieldName="files"
         acceptedFileTypes="file/*"
       />
-    </div>
+    </div>-->
     <!-- <video-component :isFile="true"></video-component>
 
     <div class="row">

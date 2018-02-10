@@ -35,21 +35,8 @@
     </div>
   </div>
   <div class="col-10"> <!-- col-11 -->
-  <div class="post-component card" v-if="component.type === 'text'">
-    <view-text :component="component"></view-text>
-  </div>
-  <div class="post-component card" v-else-if="component.type === 'image'">
-    <p>An image component!</p>  
-  </div>
-  <div class="post-component card" v-else-if="component.type === 'audio'">
-    <p>An audio component!</p>  
-  </div>
-  <div class="post-component card" v-else-if="component.type === 'video'">
-    <p>A video component!</p>  
-  </div>
-  <div class="post-component card" v-else>
-    <p>A file component!</p>  
-  </div>
+
+  <post-component class="card" :component="component"></post-component>
   </div>
   <div class="col 11">
     <div id="arrange-btn-group" class="btn-group-vertical">
@@ -71,11 +58,13 @@
 
 
 <script>
-import Vue from 'vue';
-import { mapState } from 'vuex';
-import EditText from './EditText';
-import EditImage from './EditImage';
-import ViewText from './ViewText';
+import Vue from "vue";
+import { mapState } from "vuex";
+import EditText from "./EditText";
+import EditImage from "./EditImage";
+
+
+import PostComponentView from "./PostComponentView";
 
 export default {
 
@@ -113,13 +102,13 @@ export default {
     submitPost: function(event){
       console.log(this.$store.state.inProgressPostComponents);
       var obj = {
-        "user" : 1, 
-        "title" : this.title, 
-        "content" : JSON.stringify(this.$store.state.inProgressPostComponents),
-        "likes" : 0,
-        "comments" : [],
-        "tags": JSON.stringify(this.tags),
-        "attachments" : [],
+        user : 1, 
+        title : this.title, 
+        content : this.$store.state.inProgressPostComponents,
+        likes : 0,
+        comments : [],
+        tags: this.tags,
+        attachments : [],
       }
       console.log(obj)
       this.$store.dispatch('createPost', obj)
@@ -214,17 +203,10 @@ export default {
   height: 300px;
 }
 #arrange-btn-group {
-  /*position: absolute;
-  left: 23%;
-  width: 2%; */ 
+
 }
 .up-down-button {
 
-}
-.post-component {
-  /*position: absolute;
-  left: 25%;  
-  width: 50%;*/
 }
 
 
