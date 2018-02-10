@@ -1,9 +1,11 @@
 <template>
 <base-page>
 <span slot="body">
+    <br>
+
 
 <div v-for="(post,index) in posts">
-    <div :style="getPostContainerStyle(index)" class="container card">
+    <div :id="index" :style="getPostContainerStyle(index)" class="container card">
         <h3>{{post.title}}</h3>
         <div class="truncatedPostComponent">
         <div v-for="component in post.content">
@@ -12,9 +14,12 @@
         </div>
         </div>
         <div :style="getGradientStyle(index)"></div>
+     
         <p id="seeMore" @click="expandPost(index)" v-html="seeMoreString(index)"></p>
     </div>
+       
 </div>
+<button @click="getPosts">See More Posts</button>
 </span>
 </base-page>
 </template>
@@ -32,12 +37,13 @@ const postContainerExpanded = {
 };
 const gradientDefault = {
     position:"absolute",
+    overflow: "hidden",
     zIndex:"2",
     right:"0", 
     bottom:"0", 
     left:"0",
     height:"200px",
-    background: "linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 99%)"
+    background: "linear-gradient(to bottom,  rgba(255,255,255,0) 70%,rgba(50,50,50, .9) 95%)"
 };
 const gradientExpanded = {
 
@@ -55,6 +61,7 @@ export default{
         
     }),
     methods: {
+
         getPostContainerStyle(index){     
             if(this.expandedPosts.includes(index)){
                 return postContainerExpanded
@@ -71,8 +78,12 @@ export default{
                 return gradientDefault;
             }
         },
+        /*isTruncated(index){
+            console.log("istruncated" + index);
+            return document.getElementById(index).offsetHeight >= 400;
+        },*/
         getPosts: function() {
-            this.$store.dispatch("fetchAllPosts");
+            this.$store.dispatch("addMorePosts");
         },
 
         expandPost(index){
@@ -98,6 +109,12 @@ export default{
         this.getPosts();
 
     },
+    created () { // would work in 'ready', 'attached', etc.
+        window.addEventListener('load', () => {
+
+        })
+    }   
+
 }
 
 </script>
@@ -107,22 +124,15 @@ export default{
 .truncatedPostComponent {
     overflow: hidden;
 }
-.gradient {
-    position:absolute;
-    z-index:2;
-    right:0; bottom:0; left:0;
-    height:200px;
-    background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 99%);
-}
+
 #seeMore {
     z-index: 3;
     width: 100%;
     text-align: center;
+    visibility: visible;
 }
 #seeMore:hover {
     background-color: gray;
 }
-#truncatedPostContainer1{
-    background-color: red;
-}
+
 </style>

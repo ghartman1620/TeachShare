@@ -4,14 +4,25 @@ from rest_framework import viewsets, views
 from rest_framework.parsers import FileUploadParser
 
 from django_filters import rest_framework as filters
+import django_filters
 from rest_framework.response import Response
 from uuid import uuid4
 
+from pprint import pprint
 
 # test
 from django.http import HttpResponse
 from django.shortcuts import render
  
+class PostFilter(filters.FilterSet):
+    beginIndex = django_filters.NumberFilter(name='beginIndex', label="beginIndex", method='filterNumberPosts')
+    class Meta:
+        model = Post
+        fields = ('user', 'title', 'updated', 'likes', 'timestamp')
+    def filterNumberPosts(self, queryset, name, value):
+
+        
+        return queryset[value:value+10]
 
 class PostViewSet(viewsets.ModelViewSet):
     """
@@ -19,8 +30,9 @@ class PostViewSet(viewsets.ModelViewSet):
     """
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    filter_fields = ('user', 'title', 'updated', 'likes', 'timestamp')
-
+    filter_class = PostFilter
+    def get_queryset(self):
+        return self.queryset
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()

@@ -10,17 +10,28 @@ export default new Vuex.Store({
         user: null,
         comment: null,
         comments: [],
-        posts: [],
+        
         token: null,
+        //file upload
         files: [],
         filesPercents: [],
+        //post create
         inProgressPostComponents: [],
         inProgressPostEditedComponentType: '',
-        postOpacity: { opacity: 1 }
+        postOpacity: { opacity: 1 },
+        //Post feed
+        posts: [],
+        maximumPostIndex: 0,
     },
     mutations: {
-        LOAD_POSTS: (state, data) => {
-            state.posts = Object.assign([], data);
+        ADD_POSTS: (state) => {
+            api.get("posts/?beginIndex="+ state.maximumPostIndex)
+                .then(response => response.data.forEach(function(post){
+                    state.posts.push(post); state.maximumPostIndex++;
+                }))
+
+                .catch(err => console.log(err));
+            console.log(state.posts)
         },
         LOAD_POST: (state, data) => {
             state.post = Object.assign({}, data);
@@ -114,11 +125,9 @@ export default new Vuex.Store({
 
     },
     actions: {
-        fetchAllPosts: (state) => {
-            console.log('FETCH_POSTS');
-            api.get('posts/')
-                .then(response => state.commit('LOAD_POSTS', response.data))
-                .catch(err => console.log(err));
+        addMorePosts: (state) => {
+            state.commit("ADD_POSTS");
+
         },
         fetchPost: (state, postID) => {
             console.log('FETCH_POST');
