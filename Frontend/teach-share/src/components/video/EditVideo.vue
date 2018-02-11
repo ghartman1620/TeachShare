@@ -6,24 +6,26 @@
 
     <nav>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-      <a class="nav-item nav-link active"
+      <router-link class="nav-item nav-link active"
         id="nav-home-tab"
         data-toggle="tab"
         href="#nav-home"
+        to=""
         role="tab"
         aria-controls="nav-home"
         aria-selected="true">
           Video Link (YouTube, Vimeo, etc...)
-      </a>
-      <a class="nav-item nav-link"
+      </router-link>
+      <router-link class="nav-item nav-link"
         id="nav-profile-tab"
         data-toggle="tab"
         href="#nav-profile"
+        to=""
         role="tab"
         aria-controls="nav-profile"
         aria-selected="false">
           Video File
-      </a>
+      </router-link>
     </div>
   </nav>
   <div class="card-body">
@@ -49,7 +51,7 @@
         <br>
         <div class="row">
           <div class="offset-4 col-4">
-            <button type="button" class="btn btn-primary btn-block">Submit</button>
+            <button type="button" disabled class="btn btn-primary btn-block">Submit</button>
           </div>
         </div>
       </form>
@@ -58,7 +60,12 @@
       id="nav-profile"
       role="tabpanel"
       aria-labelledby="nav-profile-tab">
-      <file-upload title="Upload Video Files"></file-upload>
+      <file-upload title="Upload Video Files" fileAcceptType="VID"></file-upload>
+       <div class="row">
+          <div class="offset-4 col-4">
+            <button type="button" disabled class="btn btn-primary btn-block">Submit</button>
+          </div>
+        </div>
     </div>
     </div>
     </div>

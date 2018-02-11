@@ -99,7 +99,7 @@ export default new Router({
                     }
                 },
                 {
-                    name: 'video',
+                    name: 'video-edit',
                     path: 'edit',
                     component: EditVideo,
                     props: {}

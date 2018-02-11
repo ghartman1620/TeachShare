@@ -70,7 +70,7 @@ const UPLOAD_INITIAL = 0, UPLOAD_SAVING = 1, UPLOAD_SUCCESS = 2, UPLOAD_ERROR = 
 export default Vue.component('file-upload', {
     components: {},
     //file/*
-    props: ['title'],
+    props: ['title', 'fileAcceptType'],
     data() {
       return {
         currentStatus: null,
@@ -79,7 +79,13 @@ export default Vue.component('file-upload', {
     },
     computed: {
       accept() {
-        return fileTypes[this.$route.query.type];
+        if (this.$route.query.type) {
+          return fileTypes[this.$route.query.type];
+        } else if (this.fileAcceptType) {
+          return fileTypes[this.fileAcceptType];
+        } else {
+          return fileTypes['FILE'];
+        }
       },
       isInitial() {
         return this.currentStatus === UPLOAD_INITIAL;
