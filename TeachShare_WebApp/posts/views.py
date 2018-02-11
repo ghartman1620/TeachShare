@@ -9,7 +9,6 @@ from rest_framework.response import Response
 from uuid import uuid4
 
 from pprint import pprint
-
 # test
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -20,7 +19,6 @@ class PostFilter(filters.FilterSet):
         model = Post
         fields = ('user', 'title', 'updated', 'likes', 'timestamp')
     def filterNumberPosts(self, queryset, name, value):
-
         
         return queryset[value:value+10]
 

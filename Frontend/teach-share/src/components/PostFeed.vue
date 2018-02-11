@@ -14,12 +14,11 @@
         </div>
         </div>
         <div :style="getGradientStyle(index)"></div>
-     
-        <p id="seeMore" @click="expandPost(index)" v-html="seeMoreString(index)"></p>
+        <p v-if="!isSmall(index)" id="seeMore" @click="expandPost(index)" v-html="seeMoreString(index)"></p>
     </div>
        
 </div>
-<button @click="getPosts">See More Posts</button>
+<br><!-- this br is required so scroll() can function properly-->
 </span>
 </base-page>
 </template>
@@ -53,35 +52,36 @@ export default{
     name: "PostFeed",
     data: function() {
         return {
-            expandedPosts: []
+            posts: [],
+            expandedPosts: [],
+            smallPosts: [],
         }
     },
-    computed: mapState({
-        posts: state => state.posts,
-        
-    }),
-    methods: {
+    computed: { 
 
+    },
+    methods: {
+        isSmall(index){
+
+            return this.smallPosts.includes(index);
+        },
         getPostContainerStyle(index){     
-            if(this.expandedPosts.includes(index)){
-                return postContainerExpanded
+            if(this.expandedPosts.includes(index) || this.smallPosts.includes(index)){
+                return postContainerExpanded;
             }
             else{
-                return postContainerDefault
+                return postContainerDefault;
             }
         },
         getGradientStyle(index) {
-            if(this.expandedPosts.includes(index)){
+            if(this.expandedPosts.includes(index) || this.smallPosts.includes(index)){
                 return gradientExpanded;
             }
             else{
                 return gradientDefault;
             }
         },
-        /*isTruncated(index){
-            console.log("istruncated" + index);
-            return document.getElementById(index).offsetHeight >= 400;
-        },*/
+
         getPosts: function() {
             this.$store.dispatch("addMorePosts");
         },
@@ -103,17 +103,56 @@ export default{
             else{
                 return "See More";
             }
+        },
+        scroll(){
+            var offset = document.documentElement.scrollTop + window.innerHeight;
+            var height = document.documentElement.offsetHeight;
+
+            if (offset >= height) {
+                this.getPosts();
+            }        
+        },
+        checkHeights(){
+            
+            for(var i = 0; i < this.posts.length; i++){
+                var ele = document.getElementById(i.toString());
+                if(ele.offsetHeight <= 390){
+                    this.smallPosts.push(i);
+                }
+            }
+
         }
     },
     beforeMount(){
         this.getPosts();
-
+        //this isn't accessible in an anonymous function,
+        //so we'll make it a variable so we can call scroll() 
+        var t = this;
+        window.addEventListener('scroll', function() {t.scroll()}, false);
     },
-    created () { // would work in 'ready', 'attached', etc.
-        window.addEventListener('load', () => {
+    mounted() {
+        this.$store.watch(this.$store.getters.getPosts, posts => {
+            console.log("posts changed");
+            this.posts = posts;
+           
 
-        })
-    }   
+
+            //So with this watch function waiting until posts is updated,
+            //you'd think that it could also render the page so that we can
+            //determine the height of all of the post containers and 
+            //remove the gradient appropriately.
+
+            //You'd THINK that.
+
+            //But you'd think wrong. So I had to write this nonsense.
+            var t = this;
+            //this.checkHeights();
+            setTimeout(function(){t.checkHeights()}, 0);
+        });
+    },
+    destroyed() {
+        window.removeEventListener('scroll', function() {t.scroll()}, false);
+    }
 
 }
 

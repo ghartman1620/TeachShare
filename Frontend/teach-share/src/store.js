@@ -28,10 +28,10 @@ export default new Vuex.Store({
             api.get("posts/?beginIndex="+ state.maximumPostIndex)
                 .then(response => response.data.forEach(function(post){
                     state.posts.push(post); state.maximumPostIndex++;
-                }))
-
+                    
+                })
+                )
                 .catch(err => console.log(err));
-            console.log(state.posts)
         },
         LOAD_POST: (state, data) => {
             state.post = Object.assign({}, data);
@@ -235,5 +235,6 @@ export default new Vuex.Store({
         //         console.log('OBJECT: ', key, obj);
         //     }
         // }
+        getPosts: state => () => state.posts,
     }
 })
