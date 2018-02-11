@@ -4,15 +4,15 @@
       <div class="row">
         <div class="col-12">
         <form enctype="multipart/form-data" novalidate multiple v-if="isInitial || isSaving">
-          <h1>Upload images</h1>
+          <h1>{{title}}</h1>
           <div class="dropbox">
             <input
               type="file"
               multiple
-              :name="uploadFieldName"
+              name="files"
               :disabled="isSaving"
               @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
-              accept="acceptedFileTypes"
+              :accept="accept"
               class="input-file">
               <p v-if="isInitial">
                 Drag your file(s) here to begin<br> or click to browse
@@ -28,7 +28,9 @@
         <ul class="list-group">
           <li v-bind:key="obj.file.name" v-for="obj in filesUploadStatus"
             class="list-group-item d-flex justify-content-between align-items-center">
-              {{ obj.file.name }}
+              <span v-if="obj.url">
+                <a v-bind:href="'http://127.0.0.1:8000' + obj.url">{{ obj.file.name }}</a></span>
+              <span v-else>{{ obj.file.name }}</span>
               <div v-on: class="col">
               <div class="progress">
                   <div class="progress-bar bg-success"
@@ -41,9 +43,9 @@
                     </div>
                 </div>
               </div>
-              <div class="col-1" v-if="obj.percent===100">
+              <!-- <div class="col-2" v-if="obj.percent===100">
                 Done.
-              </div>
+              </div> -->
           </li>
         </ul>
         </div>
@@ -59,7 +61,7 @@ import { mapGetters } from 'vuex';
 var fileTypes = Object.freeze({
   'FILE': 'file/*',
   'IMG': 'image/*',
-  'VID': 'video/*', // don't know if this is correct
+  'VID': 'video/*',
   'AUD': 'audio/*'
 })
 
@@ -68,14 +70,17 @@ const UPLOAD_INITIAL = 0, UPLOAD_SAVING = 1, UPLOAD_SUCCESS = 2, UPLOAD_ERROR = 
 export default Vue.component('file-upload', {
     components: {},
     //file/*
-    props: ['uploadFieldName', 'acceptedFileTypes'],
+    props: ['title'],
     data() {
       return {
         currentStatus: null,
-        currentFileList: [],
+        currentFileList: []
       }
     },
     computed: {
+      accept() {
+        return fileTypes[this.$route.query.type];
+      },
       isInitial() {
         return this.currentStatus === UPLOAD_INITIAL;
       },
@@ -89,7 +94,7 @@ export default Vue.component('file-upload', {
         return this.currentStatus === UPLOAD_ERROR;
       },
       currentFiles() {
-        return this.$store.state.files;
+        return this.$store.state.fs.files;
       },
       ...mapGetters([
         'filesUploadStatus',
@@ -97,32 +102,28 @@ export default Vue.component('file-upload', {
       ]),
     },
     methods: {
-      updatePercent(percent, file) {
-        console.log("UpdatePercent: ", percent, file)
-        console.log(this.fileKeys);
-        this.files = this.$set(this.fileKeys, String(file.name), percent);
-      },
       save(formData) {
-        var self = this
-        this.$store.dispatch('fileUpload', {self, formData})
+        this.$store.dispatch('fileUpload', formData)
 
       },
       resetState() {
         this.currentStatus = UPLOAD_INITIAL;
-        this.uploadedFiles = [];
         this.uploadError = null;
       },
       filesChange(fieldName, fileList) {
-        console.log(fieldName, fileList);
-        console.log(fileList[0].type)
+        console.log(fieldName, fileList)
         this.currentFileList.push(fileList)
-
         const formData = new FormData();
+        if (!fileList.length) {
+          console.log('fileList is empty');
+          return;
 
-        if (!fileList.length) { return; }
+        }
 
         Array.from(Array(fileList.length).keys())
           .map(x => {
+            console.log(x);
+            console.log(fieldName, fileList[x], fileList[x].name)
             formData.append(fieldName, fileList[x], fileList[x].name);
           });
         this.save(formData);

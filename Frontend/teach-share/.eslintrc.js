@@ -21,8 +21,11 @@ module.exports = {
     ],
     // add your custom rules here
     rules: {
+        "semi": 0,
+        "indent": 0,
+        "eol-last": 0,
         // allow async-await
-        "indent": [2, 4],
+        // "indent": [2, 4],
         'generator-star-spacing': 'off',
         // allow debugger during development
         'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'

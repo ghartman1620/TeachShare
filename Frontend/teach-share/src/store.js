@@ -1,10 +1,14 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import api from '../src/api';
+import FileService from './store_modules/FileService';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
+    modules: {
+        fs: FileService
+    },
     state: {
         post: null,
         user: null,
@@ -12,8 +16,6 @@ export default new Vuex.Store({
         comments: [],
         posts: [],
         token: null,
-        files: [],
-        filesPercents: [],
         inProgressPostComponents: [],
         inProgressPostEditedComponentType: '',
         postOpacity: { opacity: 1 }
@@ -43,21 +45,6 @@ export default new Vuex.Store({
             api.defaults.headers.Authorization = "Token " + state.token;
             console.log(api.defaults.headers.Authorization)
         },
-        UPDATE_UPLOAD_FILES: (state, data) => {
-            console.log(state, data);
-            state.files.map((val, index, arr) => {
-                var filename = data.data.filename.substring(data.data.filename.lastIndexOf('/') + 1, data.data.filename.length);
-                console.log('filename from server: ', filename);
-                console.log('file we have (url encoded): ', encodeURI(val.file.name));
-                if (filename === encodeURI(val.file.name)) {
-                    val = Object.assign(val, {
-                        id: data.data.id,
-                        url: data.data.url,
-                        filename: filename
-                    })
-                }
-            })
-        },
 
         // Mutations for the currently edited post data: inProgressEditedComponentType and inProgressPostComponents
         ADD_COMPONENT: (state, component) => {
@@ -74,24 +61,6 @@ export default new Vuex.Store({
             } else {
                 state.postOpacity.opacity = 1;
             }
-        },
-        CHANGE_UPLOADED_FILES: (state, data) => {
-            var exists = false;
-            state.files.map(function(val, ind) {
-                console.log('VAL/IND: ', val, ind);
-                if (val.file.name === data.file.name) {
-                    console.log('data.file.name===', data);
-                    state.files.splice(ind, 1, data);
-                    exists = true;
-                }
-            })
-            if (!exists) {
-                state.files.push(data);
-                return
-            }
-            console.log('EXISTS: ', exists);
-
-            // state.filesPercents
         },
         SWAP_COMPONENTS: (state, iAndJ) => {
             // I wrote this code because i'm triggered by being limited
@@ -173,34 +142,13 @@ export default new Vuex.Store({
                 .then(response => state.commit('SET_TOKEN', response.data.token))
                 .catch(err => console.log(err));
         },
-        fileUpload: (state, { self, formData }) => {
-            var files = formData.getAll('files')
-            files.forEach(function(file) {
-                console.log('Files: ', file);
-                let config = {
-                    onUploadProgress: progressEvent => {
-                        let percentCompleted = Math.floor((progressEvent.loaded * 100) / progressEvent.total);
-                        state.commit('CHANGE_UPLOADED_FILES', {
-                            percent: percentCompleted,
-                            file: file
-                        });
-                    }
-                }
-                api.put(`upload/${file.name}`, file, config)
-                    .then(response => state.commit('UPDATE_UPLOAD_FILES', response))
-                    // .then(response => state.commit('SET_FILES', response.data))
-                    .catch(err => console.log(err));
-            });
-        },
 
         // Actions for in progress posts
         addComponent: (state, component) => {
-
             console.log('add_component action');
             state.commit('ADD_COMPONENT', component);
         },
         changeEditedComponent: (state, type) => {
-
             console.log('change edited component action');
             state.commit('CHANGE_EDITED_COMPONENT', type);
         },
@@ -218,13 +166,5 @@ export default new Vuex.Store({
             state.commit('EDIT_COMPONENT', editedComponent);
         }
     },
-    getters: {
-        filesUploadStatus: state => state.files,
-        // allFilesUploadComplete: state => {
-        //     console.log('allUploadFinished');
-        //     for (var obj in state.filesPercents.keys()) {
-        //         console.log('OBJECT: ', key, obj);
-        //     }
-        // }
-    }
+    getters: {}
 })

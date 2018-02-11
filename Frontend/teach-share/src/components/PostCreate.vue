@@ -3,7 +3,7 @@
 
 <body>
 <base-page>
-<span slot="body">
+<!-- <span slot="body"> -->
 <component class="card container foreground" v-bind:component="editedComponent" :index="editedComponentIndex"v-bind:is="editedComponentType"></component>
 <div :style=opacity>
 <div id="buttonbar">
@@ -39,32 +39,33 @@
     <view-text :component="component"></view-text>
   </div>
   <div class="post-component card" v-else-if="component.type === 'image'">
-    <p>An image component!</p>  
+    <p>An image component!</p>
   </div>
   <div class="post-component card" v-else-if="component.type === 'audio'">
-    <p>An audio component!</p>  
+    <p>An audio component!</p>
   </div>
   <div class="post-component card" v-else-if="component.type === 'video'">
-    <p>A video component!</p>  
+    <p>A video component!</p>
   </div>
   <div class="post-component card" v-else>
-    <p>A file component!</p>  
+    <p>A file component!</p>
   </div>
   </div>
   <div class="col 11">
     <div id="arrange-btn-group" class="btn-group-vertical">
       <button @click="removeComponent(index)"><font face="courier">x</font></button>
       <button @click="editComponent(index)"><font face="courier">E</font></button>
-    
+
     </div>
   </div>
-  
+
   </div>
 </div>
 <button v-on:click="submitPost">Publish</button>
 </div>
-</span>
+<!-- </span> -->
 </base-page>
+<router-view/>
 </body>
 
 </template>
@@ -113,8 +114,8 @@ export default {
     submitPost: function(event){
       console.log(this.$store.state.inProgressPostComponents);
       var obj = {
-        "user" : 1, 
-        "title" : this.title, 
+        "user" : 1,
+        "title" : this.title,
         "content" : JSON.stringify(this.$store.state.inProgressPostComponents),
         "likes" : 0,
         "comments" : [],
@@ -135,11 +136,11 @@ export default {
         "contents" : "<p></p>",
       }
       this.editedComponentIndex = this.$store.state.inProgressPostComponents.length;
-      
+
       this.$store.dispatch("changeEditedComponent", "edit-text");
       console.log("create text component");
       this.opacity.opacity = .3;
-      
+
     },
     createImageComponent: function(event){
       this.$store.dispatch("changeEditedComponent", "edit-image");
@@ -149,31 +150,31 @@ export default {
 
       console.log("hi world");
       this.opacity.opacity = .3;
-      
+
     },
     createVideoComponent: function(event){
 
       console.log("hi world");
       this.opacity.opacity = .3;
-      
+
     },
     createFileComponent: function(event){
 
       console.log("hi world");
       this.opacity.opacity = .3;
-      
+
     },
     moveComponentUp: function(index){
       console.log("moveComponentUp:"  + index);
       if(index != 0){
-        this.$store.dispatch("swapComponents", [index,index-1]);   
-        //dispatch only allows one argument so we'll pass them as an array        
+        this.$store.dispatch("swapComponents", [index,index-1]);
+        //dispatch only allows one argument so we'll pass them as an array
       }
     },
     moveComponentDown: function(index){
       if(index != this.$store.state.inProgressPostComponents.length-1){
-        this.$store.dispatch("swapComponents", [index,index+1]);   
-        //dispatch only allows one argument so we'll pass them as an array        
+        this.$store.dispatch("swapComponents", [index,index+1]);
+        //dispatch only allows one argument so we'll pass them as an array
       }
     },
     removeComponent: function(index){
@@ -197,7 +198,7 @@ export default {
   top: 20%;
   width: 80%;
   margin: auto;
-  z-index: 2;  
+  z-index: 2;
   opacity: 1;
 }
 
@@ -210,20 +211,20 @@ export default {
 
 //Submitted components now being viewed
 .container-component {
-  width:60%;  
+  width:60%;
   height: 300px;
 }
 #arrange-btn-group {
   /*position: absolute;
   left: 23%;
-  width: 2%; */ 
+  width: 2%; */
 }
 .up-down-button {
 
 }
 .post-component {
   /*position: absolute;
-  left: 25%;  
+  left: 25%;
   width: 50%;*/
 }
 

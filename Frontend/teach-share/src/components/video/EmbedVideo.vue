@@ -1,19 +1,87 @@
 <template>
-<div>
-  <iframe></iframe>
-</div>
-
+  <div class="container row">
+  <div class="card" :style="{width: cardWidth + 'px', padding: '10px'}">
+    <div :class="aspectRatioClass">
+      <iframe
+        class="embed-responsive-item"
+        :id="id"
+        :width="width"
+        :height="height"
+        :src="actualSource">
+      </iframe>
+    </div>
+  <div class="card-body">
+      <h5 class="card-title">{{ title }}</h5>
+      <p class="card-text">
+        <slot>
+          There was no content provided.
+        </slot>
+      </p>
+    </div>
+  </div>
+  </div>
 </template>
 
 <script>
 import Vue from 'vue';
 
 export default Vue.component('embed-video', {
-    props: ['url'],
+    props: [
+      'id',
+      'autoplay',
+      'width',
+      'height',
+      'controls',
+      'title',
+      'source',
+      'playlist',
+      'loop'
+    ],
     data() {
       return {
 
       }
+    },
+    computed: {
+      cardWidth: function() { return parseInt(this.width) + 20 },
+      aspectRatioClass: function() {
+        var ratio = this.width / this.height
+        console.log(ratio)
+        // all the ratios are fudged down slightly to make the ratios match up more closely to
+        // values that are 'in-between'.
+        if (ratio >= (19/9)) { return 'embed-responsive embed-responsive-21by9'; }
+        else if ( ratio >= (14/9)) { return 'embed-responsive embed-responsive-16by9'; }
+        else if ( ratio >= (7/6)) { return 'embed-responsive embed-responsive-4by3'; }
+        else { return 'embed-responsive embed-responsive-1by1'; }
+      },
+      actualSource() {
+        var temp = this.source;
+        var url = new URL(this.source);
+        console.log(url)
+        var params = url.searchParams;
+
+        console.log(url.toString());
+
+        if (this.playlist) {
+          params.append('playlist', this.playlist);
+        }
+        if (this.autoplay) {
+          params.append('autoplay', '1');
+        }
+        if (this.loop) {
+          params.append('loop', '1');
+        }
+        if (this.controls) {
+          if (this.controls===true) { params.append('controls', '1'); }
+          else { params.append('controls', '0'); }
+        }
+        return url.toString()
+      }
     }
   })
 </script>
+
+<style lang="scss" scoped>
+
+</style>
+
