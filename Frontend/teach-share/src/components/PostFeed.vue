@@ -90,6 +90,9 @@ export default{
             for(var i = 0; i < this.expandedPosts.length; i++){
                 if(this.expandedPosts[i] == index){
                     this.expandedPosts.splice(i, 1);
+                    console.log(document.getElementById(index));
+                    console.log(document.getElementById(index).offsetTop)
+                    window.scrollTo(0, document.getElementById(index).offsetTop-55);
                     return;
                 }
             }
