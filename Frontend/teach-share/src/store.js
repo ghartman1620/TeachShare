@@ -2,12 +2,14 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import api from '../src/api';
 import FileService from './store_modules/FileService';
+import YouTubeService from './store_modules/YouTubeService';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     modules: {
-        fs: FileService
+        fs: FileService,
+        yts: YouTubeService
     },
     state: {
         post: null,

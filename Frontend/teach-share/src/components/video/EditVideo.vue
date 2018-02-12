@@ -35,23 +35,34 @@
       <p>
         Enter the embed url here
       </p>
-      <form action="">
+      <form v-on:submit.prevent="TestYoutube">
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon3">Embed URL</span>
           </div>
-          <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3">
+          <input
+            v-validate="'required|url|YoutubeEmbedURL'"
+            :class="{'input': true, 'outline-danger': errors.has('embedurl') }"
+            v-model="EmbedURL"
+            type="text"
+            class="form-control"
+            name="embedurl"
+            aria-describedby="basic-addon3">
         </div>
-
+         <span v-show="errors.has('embedurl')" class="help text-danger">{{ errors.first('embedurl') }}</span>
         <br>
-        <p>
+        <br>
+        <h4>
           Video Description (optional) :
-        </p>
+        </h4>
         <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
         <br>
         <div class="row">
-          <div class="offset-4 col-4">
-            <button type="button" disabled class="btn btn-primary btn-block">Submit</button>
+          <div class="offset-3 col-6">
+            <button type="submit" :disabled="EmbedURL.length <= 0" class="btn btn-primary btn-block">
+              <span v-if="EmbedURL.length">Submit Video Link</span>
+              <span v-else>Please enter a valid link</span>
+            </button>
           </div>
         </div>
       </form>
@@ -61,9 +72,13 @@
       role="tabpanel"
       aria-labelledby="nav-profile-tab">
       <file-upload title="Upload Video Files" fileAcceptType="VID"></file-upload>
+       <br>
        <div class="row">
-          <div class="offset-4 col-4">
-            <button type="button" disabled class="btn btn-primary btn-block">Submit</button>
+          <div class="offset-3 col-6">
+            <button type="button" :disabled="hasFiles" class="btn btn-primary btn-block">
+              <span v-if="hasFiles">Please Select File(s) to upload</span>
+              <span v-else>Submit Video(s)</span>
+            </button>
           </div>
         </div>
     </div>
@@ -71,13 +86,28 @@
     </div>
     </div>
   </div>
-  <div class="col-1"></div>
+  <!-- <div class="col-1"></div> -->
+  <div class="container">
+    <br>
+    {{errors}}
+    <br><br>
+    <div class="row">
+      <div class="media">
+        <img class="mr-3" :src="videoThumbnail.url" alt="Generic placeholder image">
+        <div class="media-body">
+          <h5 class="mt-0">media title</h5>
+            {{videoDescription}}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 </template>
 
 <script>
 import Vue from 'vue';
 import FileUpload from '../FileUpload';
+import { mapGetters } from 'vuex';
 
 export default Vue.component('edit-video', {
     components: { FileUpload },
@@ -95,17 +125,33 @@ export default Vue.component('edit-video', {
         'source': '',
         'link': '',
         'playlist': '',
-        'loop': false
+        'loop': false,
+        'EmbedURL': ''
       }
     },
     computed: {
-
+      ...mapGetters([
+        'hasFiles',
+        'videoDescription',
+        'videoThumbnail'
+      ])
+    },
+    methods: {
+      TestYoutube(){
+        this.$store.dispatch('getYoutubeVideoInfo', this.EmbedURL)
+      }
     }
   })
 </script>
 
 
+
 <style lang="scss" scoped>
+.outline-danger {
+  border-color: red;
+  border-width: 0.1em;
+}
+
 
 </style>
 

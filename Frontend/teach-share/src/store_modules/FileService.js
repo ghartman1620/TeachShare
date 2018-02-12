@@ -63,7 +63,8 @@ const FileService = {
                 return val.percent === 100;
             })
             return res.length === state.files.length;
-        }
+        },
+        hasFiles: state => { return !(state.files.length > 0); }
     }
 }
 
