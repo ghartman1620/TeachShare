@@ -27,6 +27,7 @@ class AttachmentViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Attachment model
     """
+    parser_classes = (JSONParser, )
     queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer
     filter_fields = ('post',)

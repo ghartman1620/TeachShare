@@ -35,7 +35,7 @@
       <p>
         Enter the embed url here
       </p>
-      <form v-on:submit.prevent="TestYoutube">
+      <form v-on:submit.prevent="DebounceSubmit">
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon3">Embed URL</span>
@@ -55,12 +55,12 @@
         <h4>
           Video Description (optional) :
         </h4>
-        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+        <textarea v-model="EmbedDescription" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
         <br>
         <div class="row">
           <div class="offset-3 col-6">
-            <button type="submit" :disabled="EmbedURL.length <= 0" class="btn btn-primary btn-block">
-              <span v-if="EmbedURL.length">Submit Video Link</span>
+            <button type="submit" :disabled="errors.any()" class="btn btn-primary btn-block">
+              <span v-if="!errors.any()">Submit Video Link</span>
               <span v-else>Please enter a valid link</span>
             </button>
           </div>
@@ -95,7 +95,7 @@
       <div class="media">
         <img class="mr-3" :src="videoThumbnail.url" alt="Generic placeholder image">
         <div class="media-body">
-          <h5 class="mt-0">media title</h5>
+          <h5 class="mt-0">{{ videoTitle }}</h5>
             {{videoDescription}}
         </div>
       </div>
@@ -108,6 +108,8 @@
 import Vue from 'vue';
 import FileUpload from '../FileUpload';
 import { mapGetters } from 'vuex';
+
+var _ = require('lodash');
 
 export default Vue.component('edit-video', {
     components: { FileUpload },
@@ -126,22 +128,44 @@ export default Vue.component('edit-video', {
         'link': '',
         'playlist': '',
         'loop': false,
-        'EmbedURL': ''
+        'EmbedURL': '',
+        'EmbedDescription': ''
       }
     },
     computed: {
       ...mapGetters([
         'hasFiles',
         'videoDescription',
-        'videoThumbnail'
+        'videoThumbnail',
+        'videoTitle'
       ])
     },
     methods: {
+      DebounceSubmit: _.throttle(
+        function() {
+          this.TestYoutube();
+        }, 3000),
+
       TestYoutube(){
         this.$store.dispatch('getYoutubeVideoInfo', this.EmbedURL)
+        var val = this.GenerateComponentJSON();
+        this.$store.dispatch('submitVideoEmbed', val);
+      },
+      GenerateComponentJSON() {
+        var obj = {
+          post: 2,
+          type: 'link',
+          url: this.EmbedURL,
+          title: this.videoTitle,
+          description: this.EmbedDescription || this.videoDescription,
+          thumbnail: this.videoThumbnail
+        }
+        console.log(obj);
+        return obj;
       }
     }
   })
+
 </script>
 
 

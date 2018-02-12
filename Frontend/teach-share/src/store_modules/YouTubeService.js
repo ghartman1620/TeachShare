@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import api from '../api';
 import axios from 'axios';
 // var { google } = require('googleapis')
 
@@ -70,6 +71,11 @@ const YouTubeService = {
             axios.get(ApiURL.toString())
                 .then(resp => state.commit('LOAD_VIDEO_DATA', resp.data))
                 .catch(err => console.log(err));
+        },
+        submitVideoEmbed: (state, data) => {
+            api.post('/attachments/', data)
+                .then(resp => console.log(resp))
+                .catch(err => console.log(err));
         }
     },
     getters: {
@@ -86,6 +92,12 @@ const YouTubeService = {
         videoThumbnail: state => {
             if (state.videoDetails && state.videoDetails.items.length > 0) {
                 return state.videoDetails.items[0].snippet.thumbnails.default;
+            }
+            return '';
+        },
+        videoTitle: state => {
+            if (state.videoDetails && state.videoDetails.items.length > 0) {
+                return state.videoDetails.items[0].snippet.title;
             }
             return '';
         }
