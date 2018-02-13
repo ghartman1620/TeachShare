@@ -62,13 +62,8 @@
 </div>
 <button v-on:click="submitPost">Publish</button>
 </div>
-<<<<<<< HEAD
 </div>
 
-=======
-</span>
-</base-page>
->>>>>>> parent of becf0ee... New navbar and bringing everything in line with our color scheme
 </body>
 
 </template>
@@ -119,7 +114,6 @@ export default {
     submitPost: function(event){
       console.log(this.$store.state.inProgressPostComponents);
       var obj = {
-<<<<<<< HEAD
         user : 1, 
         title : this.title, 
         content : this.$store.state.inProgressPostComponents,
@@ -127,15 +121,6 @@ export default {
         comments : [],
         tags: this.tags,
         attachments : [],
-=======
-        "user" : 1, 
-        "title" : this.title, 
-        "content" : JSON.stringify(this.$store.state.inProgressPostComponents),
-        "likes" : 0,
-        "comments" : [],
-        "tags": JSON.stringify(this.tags),
-        "attachments" : [],
->>>>>>> parent of becf0ee... New navbar and bringing everything in line with our color scheme
       }
       console.log(obj)
       this.$store.dispatch('createPost', obj)
@@ -229,23 +214,6 @@ export default {
   width:60%;  
   height: 300px;
 }
-<<<<<<< HEAD
-=======
-#arrange-btn-group {
-  /*position: absolute;
-  left: 23%;
-  width: 2%; */ 
-}
-.up-down-button {
-
-}
-.post-component {
-  /*position: absolute;
-  left: 25%;  
-  width: 50%;*/
-}
-
->>>>>>> parent of becf0ee... New navbar and bringing everything in line with our color scheme
 
 
 //The five buttons on the button bar
