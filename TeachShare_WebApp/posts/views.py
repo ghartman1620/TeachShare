@@ -32,6 +32,24 @@ class AttachmentViewSet(viewsets.ModelViewSet):
     serializer_class = AttachmentSerializer
     filter_fields = ('post',)
 
+    def create(self, request):
+        print(request)
+        print(dir(request))
+        print(request.data)
+        print(request.query_params)
+        id = request.query_params.get('uid', '')
+        print(id)
+    
+        p = Post.objects.get(id=request.data['post'])
+        a = Attachment.objects.create(post=p)
+        print(p)
+        return Response(data={
+            'status': 'OK',
+            'uid': id,
+            'attachment': AttachmentSerializer(a).data,
+            'post': p.pk,
+        }, status=201, )
+
 
 def SimpleMethod(request): 
     return render(request, 'test.html')

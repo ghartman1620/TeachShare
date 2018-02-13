@@ -12,12 +12,7 @@ export default new Vuex.Store({
         yts: YouTubeService
     },
     state: {
-        post: null,
         user: null,
-        comment: null,
-        comments: [],
-        posts: [],
-        token: null,
         inProgressPostComponents: [],
         inProgressPostEditedComponentType: '',
         postOpacity: { opacity: 1 }

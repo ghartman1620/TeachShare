@@ -28,9 +28,11 @@
         <ul class="list-group">
           <li v-bind:key="obj.file.name" v-for="obj in filesUploadStatus"
             class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="col-5">
               <span v-if="obj.url">
                 <a v-bind:href="'http://127.0.0.1:8000' + obj.url">{{ obj.file.name }}</a></span>
               <span v-else>{{ obj.file.name }}</span>
+              </div>
               <div v-on: class="col">
               <div class="progress">
                   <div class="progress-bar bg-success"
@@ -42,6 +44,11 @@
                       {{ obj.percent }}%
                     </div>
                 </div>
+              </div>
+              <div class="col-1">
+                <button class="btn btn-sm btn-outline-danger" type="button" @click="removeItem(obj)">
+                  X
+                </button>
               </div>
               <!-- <div class="col-2" v-if="obj.percent===100">
                 Done.
@@ -125,7 +132,6 @@ export default Vue.component('file-upload', {
           return;
 
         }
-
         Array.from(Array(fileList.length).keys())
           .map(x => {
             console.log(x);
@@ -134,6 +140,10 @@ export default Vue.component('file-upload', {
           });
         this.save(formData);
       },
+      removeItem(file) {
+        console.log(file);
+        this.$store.dispatch('removeFile', file);
+      }
     },
     mounted() {
       this.resetState();
@@ -172,5 +182,9 @@ export default Vue.component('file-upload', {
     background: lightblue;
   }
 
+  .progress {
+    height: 30px;
+    margin: auto;
+  }
 
 </style>

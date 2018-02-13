@@ -34,6 +34,11 @@ const FileService = {
                 return;
             }
         },
+        REMOVE_FILE: (state, file) => {
+            console.log(file);
+            let ind = state.files.indexOf(file);
+            state.files.splice(ind, 1);
+        }
     },
     actions: {
         fileUpload: (state, formData) => {
@@ -55,6 +60,9 @@ const FileService = {
                     .catch(err => console.log(err));
             });
         },
+        removeFile: (state, file) => {
+            state.commit('REMOVE_FILE', file);
+        }
     },
     getters: {
         filesUploadStatus: state => state.files,
@@ -64,7 +72,7 @@ const FileService = {
             })
             return res.length === state.files.length;
         },
-        hasFiles: state => { return !(state.files.length > 0); }
+        hasFiles: state => { return (state.files.length > 0); }
     }
 }
 

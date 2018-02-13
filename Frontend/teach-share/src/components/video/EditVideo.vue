@@ -1,7 +1,7 @@
 <template>
 <div class="row">
-  <div class="col-1"></div>
-  <div class="col">
+  <div class="col-xl-2 col-sm-1"></div>
+  <div class="col-xl-8 col-sm-10 col-xs-12">
     <div class="card">
 
     <nav>
@@ -71,22 +71,24 @@
       id="nav-profile"
       role="tabpanel"
       aria-labelledby="nav-profile-tab">
+      <form v-on:submit.prevent="DebounceFileSubmit">
       <file-upload title="Upload Video Files" fileAcceptType="VID"></file-upload>
        <br>
        <div class="row">
           <div class="offset-3 col-6">
-            <button type="button" :disabled="hasFiles" class="btn btn-primary btn-block">
-              <span v-if="hasFiles">Please Select File(s) to upload</span>
+            <button type="submit" :disabled="!hasFiles && allFilesUploadComplete" class="btn btn-primary btn-block">
+              <span v-if="!hasFiles">Please Select File(s) to upload</span>
               <span v-else>Submit Video(s)</span>
             </button>
           </div>
         </div>
+      </form>
     </div>
     </div>
     </div>
     </div>
   </div>
-  <!-- <div class="col-1"></div> -->
+  <div class="col-xl-2 col-sm-1"></div>
   <div class="container">
     <br>
     {{errors}}
@@ -137,21 +139,29 @@ export default Vue.component('edit-video', {
         'hasFiles',
         'videoDescription',
         'videoThumbnail',
-        'videoTitle'
+        'videoTitle',
+        'allFilesUploadComplete'
       ])
     },
     methods: {
       DebounceSubmit: _.throttle(
         function() {
-          this.TestYoutube();
+          this.GetYoutubeData();
         }, 3000),
+      DebounceFileSubmit: _.throttle(
+        function() {
+          this.GenerateComponentFileJSON();
+        }, 1000),
 
-      TestYoutube(){
+      GetYoutubeData(){
+        var self = this;
         this.$store.dispatch('getYoutubeVideoInfo', this.EmbedURL)
-        var val = this.GenerateComponentJSON();
-        this.$store.dispatch('submitVideoEmbed', val);
+          .then(function(){
+            var val = self.GenerateComponentJSON();
+            self.$store.dispatch('submitVideoEmbed', val)
+          }).catch(err => console.log(err));
       },
-      GenerateComponentJSON() {
+      GenerateComponentEmbedJSON() {
         var obj = {
           post: 2,
           type: 'link',
@@ -162,6 +172,22 @@ export default Vue.component('edit-video', {
         }
         console.log(obj);
         return obj;
+      },
+      GenerateComponentFileJSON() {
+        var output = new Array();
+
+        _.map(this.$store.state.fs.files, function(val, ind, arr){
+          console.log(val,ind, arr);
+          output.push({
+            'type': 'video_file',
+            'id': val.db_id,
+            'file': val.file,
+            'name': val.file.name,
+            'url': val.url
+          })
+        })
+        console.log(output);
+        return output;
       }
     }
   })

@@ -1,67 +1,30 @@
 import Vue from 'vue';
 import api from '../api';
 import axios from 'axios';
-// var { google } = require('googleapis')
 
 // Load some necessary libraries
 var _ = require('lodash');
+const uuidv4 = require('uuid/v4');
 
 var API_KEY = 'AIzaSyAOHmdMqDLrCvAxnbkdTabddnKRZkpqPJY';
-var DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest'];
-var SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
-
-function handleClientLoad() {
-    gapi.load('client:auth2', init);
-}
-
-function init() {
-    gapi.client.init({
-        discoveryDocs: DISCOVERY_DOCS,
-        apiKey: API_KEY,
-        scope: SCOPES
-    }).then((state) => {
-        google = gapi;
-        console.log('INIT!')
-    });
-}
-
-
-var google;
 
 // YouTubeService definition
 const YouTubeService = {
     state: {
-        ytInit: false,
-        videos: [],
+        newVideo: null,
         videoDetails: null
     },
     mutations: {
-        INIT: (state, data) => {
-            console.log(state, data)
-            state.ytInit = true;
-        },
-        LOAD_VIDEO_DATA: (state, data) => {
+        LOAD_YOUTUBE_VIDEO_DATA: (state, data) => {
             console.log(state, data);
             state.videoDetails = Object.assign({}, data);
+        },
+        LOAD_VIDEO_INSTANCE: (state, data) => {
+            state.newVideo = Object.assign({}, data);
         }
 
     },
     actions: {
-        initialize: (state) => {
-            console.log('STATE: ', state);
-            gapi.client.init({
-                discoveryDocs: DISCOVERY_DOCS,
-                apiKey: API_KEY,
-                // clientId: 'bryan.mccoid',
-                scope: SCOPES
-            }).then((state) => {
-                // console.log(resp)
-                google = gapi;
-                console.log('INIT!')
-
-                state.commit('INIT', true);
-            });
-        },
         getYoutubeVideoInfo: (state, data) => {
             console.log(data);
             var videoURL = new URL(data);
@@ -69,13 +32,11 @@ const YouTubeService = {
             let videoSection = 'snippet,statistics';
             var ApiURL = new URL(`https://www.googleapis.com/youtube/v3/videos?id=${videoID}&key=${API_KEY}&part=${videoSection}`);
             axios.get(ApiURL.toString())
-                .then(resp => state.commit('LOAD_VIDEO_DATA', resp.data))
+                .then(resp => state.commit('LOAD_YOUTUBE_VIDEO_DATA', resp.data))
                 .catch(err => console.log(err));
         },
         submitVideoEmbed: (state, data) => {
-            api.post('/attachments/', data)
-                .then(resp => console.log(resp))
-                .catch(err => console.log(err));
+            state.commit('LOAD_VIDEO_INSTANCE', data);
         }
     },
     getters: {

@@ -2,8 +2,8 @@
 <template>
 
 <body>
-<base-page>
-<!-- <span slot="body"> -->
+<router-view/>
+
 <component class="card container foreground" v-bind:component="editedComponent" :index="editedComponentIndex"v-bind:is="editedComponentType"></component>
 <div :style=opacity>
 <div id="buttonbar">
@@ -63,9 +63,7 @@
 </div>
 <button v-on:click="submitPost">Publish</button>
 </div>
-<!-- </span> -->
-</base-page>
-<router-view/>
+
 </body>
 
 </template>
