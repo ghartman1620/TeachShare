@@ -35,12 +35,13 @@
       <p>
         Enter the embed url here
       </p>
-      <form v-on:submit.prevent="DebounceSubmit">
+      <form>
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon3">Embed URL</span>
           </div>
           <input
+            v-on:input="DebounceSubmit"
             v-validate="'required|url|YoutubeEmbedURL'"
             :class="{'input': true, 'outline-danger': errors.has('embedurl') }"
             v-model="EmbedURL"
@@ -51,6 +52,32 @@
         </div>
          <span v-show="errors.has('embedurl')" class="help text-danger">{{ errors.first('embedurl') }}</span>
         <br>
+        <div v-if="ytVideoDescription || ytVideoThumbnail || ytVideoTitle" class="row">
+          <div class="col-1"></div>
+          <div class="col">
+            <div class="media">
+              <img class="mr-3" :src="ytVideoThumbnail.url" alt="Generic placeholder image">
+              <div class="media-body">
+                <h5 class="mt-0">{{ ytVideoTitle }}</h5>
+                  {{ytVideoDescription}}
+              </div>
+            </div>
+          <div class="col-1"></div>
+          <br>
+          <div class="row">
+            <div class="col-6"></div>
+            <div class="col-6">
+              <input class="form-check-input" type="checkbox" value="" id="ytcheck" required>
+              <label class="form-check-label" for="ytcheck">
+                <h5>
+                  Include YouTube Video Information
+                </h5>
+              </label>
+            </div>
+          </div>
+          </div>
+        </div>
+       
         <br>
         <h4>
           Video Description (optional) :
@@ -93,15 +120,7 @@
     <br>
     {{errors}}
     <br><br>
-    <div class="row">
-      <div class="media">
-        <img class="mr-3" :src="videoThumbnail.url" alt="Generic placeholder image">
-        <div class="media-body">
-          <h5 class="mt-0">{{ videoTitle }}</h5>
-            {{videoDescription}}
-        </div>
-      </div>
-    </div>
+    
   </div>
 </div>
 </template>
@@ -137,17 +156,17 @@ export default Vue.component('edit-video', {
     computed: {
       ...mapGetters([
         'hasFiles',
-        'videoDescription',
-        'videoThumbnail',
-        'videoTitle',
+        'ytVideoDescription',
+        'ytVideoThumbnail',
+        'ytVideoTitle',
         'allFilesUploadComplete'
       ])
     },
     methods: {
-      DebounceSubmit: _.throttle(
+      DebounceSubmit: _.debounce(
         function() {
           this.GetYoutubeData();
-        }, 3000),
+        }, 400),
       DebounceFileSubmit: _.throttle(
         function() {
           this.GenerateComponentFileJSON();
@@ -156,19 +175,16 @@ export default Vue.component('edit-video', {
       GetYoutubeData(){
         var self = this;
         this.$store.dispatch('getYoutubeVideoInfo', this.EmbedURL)
-          .then(function(){
-            var val = self.GenerateComponentJSON();
-            self.$store.dispatch('submitVideoEmbed', val)
-          }).catch(err => console.log(err));
+          .catch(err => console.log(err));
       },
       GenerateComponentEmbedJSON() {
         var obj = {
           post: 2,
           type: 'link',
           url: this.EmbedURL,
-          title: this.videoTitle,
-          description: this.EmbedDescription || this.videoDescription,
-          thumbnail: this.videoThumbnail
+          title: this.ytVideoTitle,
+          description: this.EmbedDescription || this.ytVideoDescription,
+          thumbnail: this.ytVideoThumbnail
         }
         console.log(obj);
         return obj;

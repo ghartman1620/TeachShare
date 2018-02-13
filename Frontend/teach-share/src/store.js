@@ -3,13 +3,15 @@ import Vuex from 'vuex';
 import api from '../src/api';
 import FileService from './store_modules/FileService';
 import YouTubeService from './store_modules/YouTubeService';
+import VideoService from './store_modules/VideoService';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     modules: {
         fs: FileService,
-        yts: YouTubeService
+        yts: YouTubeService,
+        video: VideoService
     },
     state: {
         user: null,

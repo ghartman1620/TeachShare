@@ -11,18 +11,13 @@ var API_KEY = 'AIzaSyAOHmdMqDLrCvAxnbkdTabddnKRZkpqPJY';
 // YouTubeService definition
 const YouTubeService = {
     state: {
-        newVideo: null,
-        videoDetails: null
+        ytVideoDetails: null
     },
     mutations: {
         LOAD_YOUTUBE_VIDEO_DATA: (state, data) => {
             console.log(state, data);
-            state.videoDetails = Object.assign({}, data);
-        },
-        LOAD_VIDEO_INSTANCE: (state, data) => {
-            state.newVideo = Object.assign({}, data);
+            state.ytVideoDetails = Object.assign({}, data);
         }
-
     },
     actions: {
         getYoutubeVideoInfo: (state, data) => {
@@ -34,31 +29,28 @@ const YouTubeService = {
             axios.get(ApiURL.toString())
                 .then(resp => state.commit('LOAD_YOUTUBE_VIDEO_DATA', resp.data))
                 .catch(err => console.log(err));
-        },
-        submitVideoEmbed: (state, data) => {
-            state.commit('LOAD_VIDEO_INSTANCE', data);
         }
     },
     getters: {
-        videoDescription: state => {
+        ytVideoDescription: state => {
             var ending = '';
-            if (state.videoDetails && state.videoDetails.items.length > 0) {
-                if (state.videoDetails.items[0].snippet.description.length > 300) {
+            if (state.ytVideoDetails && state.ytVideoDetails.items.length > 0) {
+                if (state.ytVideoDetails.items[0].snippet.description.length > 300) {
                     ending = '...';
                 }
-                return state.videoDetails.items[0].snippet.description.slice(0, 300) + ending;
+                return state.ytVideoDetails.items[0].snippet.description.slice(0, 300) + ending;
             }
             return null;
         },
-        videoThumbnail: state => {
-            if (state.videoDetails && state.videoDetails.items.length > 0) {
-                return state.videoDetails.items[0].snippet.thumbnails.default;
+        ytVideoThumbnail: state => {
+            if (state.ytVideoDetails && state.ytVideoDetails.items.length > 0) {
+                return state.ytVideoDetails.items[0].snippet.thumbnails.default;
             }
             return '';
         },
-        videoTitle: state => {
-            if (state.videoDetails && state.videoDetails.items.length > 0) {
-                return state.videoDetails.items[0].snippet.title;
+        ytVideoTitle: state => {
+            if (state.ytVideoDetails && state.ytVideoDetails.items.length > 0) {
+                return state.ytVideoDetails.items[0].snippet.title;
             }
             return '';
         }
