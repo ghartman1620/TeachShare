@@ -9,6 +9,7 @@ import EditText from '@/components/EditText';
 import VideoComponent from '@/components/video/VideoComponent';
 import EditVideo from '@/components/video/EditVideo';
 import HomePage from '@/components/HomePage';
+import PostFeed from '@/components/PostFeed';
 //a change
 Vue.use(Router);
 
@@ -41,6 +42,11 @@ export default new Router({
                             props: {}
                         }
                     ]
+                },
+                {
+                    name: 'dashboard',
+                    path: '/dashboard',
+                    component: PostFeed,
                 }
             ]
         },
@@ -103,7 +109,8 @@ export default new Router({
                     props: {}
                 }
             ]
-        }
+        },
+        
 
     ]
 });

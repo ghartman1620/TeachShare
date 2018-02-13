@@ -15,13 +15,30 @@ export default new Vuex.Store({
     },
     state: {
         user: null,
+        comment: null,
+        comments: [],
+        
+        token: null,
+        //file upload
+        files: [],
+        filesPercents: [],
+        //post create
         inProgressPostComponents: [],
         inProgressPostEditedComponentType: '',
-        postOpacity: { opacity: 1 }
+        postOpacity: { opacity: 1 },
+        //Post feed
+        posts: [],
+        maximumPostIndex: 0,
     },
     mutations: {
-        LOAD_POSTS: (state, data) => {
-            state.posts = Object.assign([], data);
+        ADD_POSTS: (state) => {
+            api.get("posts/?beginIndex="+ state.maximumPostIndex)
+                .then(response => response.data.forEach(function(post){
+                    state.posts.push(post); state.maximumPostIndex++;
+                    
+                })
+                )
+                .catch(err => console.log(err));
         },
         LOAD_POST: (state, data) => {
             state.post = Object.assign({}, data);
@@ -82,11 +99,9 @@ export default new Vuex.Store({
 
     },
     actions: {
-        fetchAllPosts: (state) => {
-            console.log('FETCH_POSTS');
-            api.get('posts/')
-                .then(response => state.commit('LOAD_POSTS', response.data))
-                .catch(err => console.log(err));
+        addMorePosts: (state) => {
+            state.commit("ADD_POSTS");
+
         },
         fetchPost: (state, postID) => {
             console.log('FETCH_POST');
@@ -165,5 +180,14 @@ export default new Vuex.Store({
             state.commit('EDIT_COMPONENT', editedComponent);
         }
     },
-    getters: {}
+    getters: {
+        filesUploadStatus: state => state.files,
+        // allFilesUploadComplete: state => {
+        //     console.log('allUploadFinished');
+        //     for (var obj in state.filesPercents.keys()) {
+        //         console.log('OBJECT: ', key, obj);
+        //     }
+        // }
+        getPosts: state => () => state.posts,
+    }
 })
