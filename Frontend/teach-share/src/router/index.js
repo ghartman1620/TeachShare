@@ -9,7 +9,7 @@ import EditText from '@/components/EditText';
 import VideoComponent from '@/components/video/VideoComponent';
 import EditVideo from '@/components/video/EditVideo';
 import HomePage from '@/components/HomePage';
-
+//a change
 Vue.use(Router);
 
 export default new Router({
