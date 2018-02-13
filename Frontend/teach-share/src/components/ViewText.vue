@@ -1,7 +1,10 @@
 <template>
 <body>
-
+<div class="container">
+<p> I'm a text view component! </p>
+{{component}}
 <p v-html="component.contents"></p>
+</div>
 </body>
 
 </template>

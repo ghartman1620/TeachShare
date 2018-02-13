@@ -12,19 +12,36 @@ Vue.use(Router);
 export default new Router({
     routes: [{
             path: '/',
-            name: 'HelloWorld',
-            component: HelloWorld
-        },
-        {
-            path: '/base',
             name: 'base',
-            component: Base
+            component: Base,
+            children:[
+                {
+                    path: '',
+                    name: 'home',
+                    component: 'Test',
+                },
+                {
+                    path: 'create',
+                    name: 'PostCreate',
+                    component: PostCreate,
+                    children: [
+                        {
+                            name: 'text',
+                            path: 'text',
+                            component: 'EditText',
+                            props: {
+                                component: {
+                                    type: 'text',
+                                    content: '', 
+                                },
+                                'index': 0,
+                            }
+                        }
+                    ]
+                },
+            ]
         },
-        {
-            path: '/create',
-            name: 'PostCreate',
-            component: PostCreate
-        },
+        
         {
             path: '/login',
             name: 'Login',

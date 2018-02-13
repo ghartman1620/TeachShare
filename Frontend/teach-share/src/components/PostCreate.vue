@@ -2,14 +2,13 @@
 <template>
 
 <body>
-<base-page>
-<span slot="body">
+
 <component class="card container foreground" v-bind:component="editedComponent" :index="editedComponentIndex"v-bind:is="editedComponentType"></component>
 <div :style=opacity>
 <div id="buttonbar">
 <!-- Text button -->
 
-<button type="button" v-on:click="createTextComponent"  class="btn btn-default btn-circle btn-xl" id="text-button"><span class="glyphicon glyphicon-asterisk"></span></button>
+<button type="button" class="btn btn-default btn-circle btn-xl" id="text-button"><router-link to="text"></router-link></button>
 <button type="button" v-on:click="createImageComponent" class="btn btn-default btn-circle btn-xl" id="image-button"><i class="glyphicon glyphicon-picture"></i></button>
 <button type="button" v-on:click="createAudioComponent" class="btn btn-default btn-circle btn-xl" id="audio-button"><i class="glyphicon glyphicons-music"></i></button>
 <button type="button" v-on:click="createVideoComponent" class="btn btn-default btn-circle btn-xl" id="video-button"><i class="glyphicons glyphicons-film"></i></button>
@@ -25,7 +24,7 @@
 
 </div>
 </div>
-
+<div class="container">
 <div class="container" v-for="(component,index) in storeComponents">
   <div class="row">
   <div class="col-1"><!-- col-xs-auto -->
@@ -42,16 +41,16 @@
     <div id="arrange-btn-group" class="btn-group-vertical">
       <button @click="removeComponent(index)"><font face="courier">x</font></button>
       <button @click="editComponent(index)"><font face="courier">E</font></button>
-    
+
     </div>
   </div>
-  
+
   </div>
 </div>
 <button v-on:click="submitPost">Publish</button>
 </div>
-</span>
-</base-page>
+</div>
+
 </body>
 
 </template>
@@ -68,7 +67,7 @@ import PostComponentView from "./PostComponentView";
 
 export default {
 
-  name: 'PostCreate',
+  name: 'post-create',
   data: function() {
     return {
       title: "",
@@ -124,11 +123,11 @@ export default {
         "contents" : "<p></p>",
       }
       this.editedComponentIndex = this.$store.state.inProgressPostComponents.length;
-      
+
       this.$store.dispatch("changeEditedComponent", "edit-text");
       console.log("create text component");
       this.opacity.opacity = .3;
-      
+
     },
     createImageComponent: function(event){
       this.$store.dispatch("changeEditedComponent", "edit-image");
@@ -138,31 +137,31 @@ export default {
 
       console.log("hi world");
       this.opacity.opacity = .3;
-      
+
     },
     createVideoComponent: function(event){
 
       console.log("hi world");
       this.opacity.opacity = .3;
-      
+
     },
     createFileComponent: function(event){
 
       console.log("hi world");
       this.opacity.opacity = .3;
-      
+
     },
     moveComponentUp: function(index){
       console.log("moveComponentUp:"  + index);
       if(index != 0){
-        this.$store.dispatch("swapComponents", [index,index-1]);   
-        //dispatch only allows one argument so we'll pass them as an array        
+        this.$store.dispatch("swapComponents", [index,index-1]);
+        //dispatch only allows one argument so we'll pass them as an array
       }
     },
     moveComponentDown: function(index){
       if(index != this.$store.state.inProgressPostComponents.length-1){
-        this.$store.dispatch("swapComponents", [index,index+1]);   
-        //dispatch only allows one argument so we'll pass them as an array        
+        this.$store.dispatch("swapComponents", [index,index+1]);
+        //dispatch only allows one argument so we'll pass them as an array
       }
     },
     removeComponent: function(index){
@@ -186,7 +185,7 @@ export default {
   top: 20%;
   width: 80%;
   margin: auto;
-  z-index: 2;  
+  z-index: 2;
   opacity: 1;
 }
 
@@ -199,16 +198,9 @@ export default {
 
 //Submitted components now being viewed
 .container-component {
-  width:60%;  
+  width:60%;
   height: 300px;
 }
-#arrange-btn-group {
-
-}
-.up-down-button {
-
-}
-
 
 
 //The five buttons on the button bar
