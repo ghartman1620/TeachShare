@@ -15,6 +15,7 @@ Vue.use(Router);
 export default new Router({
     routes: [{
             path: '/',
+<<<<<<< HEAD
             component: Base,
             children: [
                 { name: 'base', path: '', component: HomePage },
@@ -52,6 +53,10 @@ export default new Router({
             path: '/login',
             name: 'Login',
             component: Login
+=======
+            name: 'base',
+            component: Base
+>>>>>>> becf0ee24e2f832fe48d70c27671d386463c743f
         },
         {
             path: '/test',
@@ -108,4 +113,8 @@ export default new Router({
         }
 
     ]
+<<<<<<< HEAD
 });
+=======
+})
+>>>>>>> becf0ee24e2f832fe48d70c27671d386463c743f

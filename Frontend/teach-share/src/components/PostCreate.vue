@@ -25,7 +25,7 @@
 
 </div>
 </div>
-
+<div class="container">
 <div class="container" v-for="(component,index) in storeComponents">
   <div class="row">
   <div class="col-1"><!-- col-xs-auto -->
@@ -63,7 +63,6 @@
 </div>
 <button v-on:click="submitPost">Publish</button>
 </div>
-
 </body>
 
 </template>
