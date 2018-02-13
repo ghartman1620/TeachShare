@@ -67,7 +67,7 @@
           <div class="row">
             <div class="col-6"></div>
             <div class="col-6">
-              <input class="form-check-input" type="checkbox" value="" id="ytcheck" required>
+              <input v-model="includeYtData" class="form-check-input" type="checkbox" value="" id="ytcheck" required>
               <label class="form-check-label" for="ytcheck">
                 <h5>
                   Include YouTube Video Information
@@ -86,7 +86,7 @@
         <br>
         <div class="row">
           <div class="offset-3 col-6">
-            <button type="submit" :disabled="errors.any()" class="btn btn-primary btn-block">
+            <button type="button" @click="GenerateComponentEmbedJSON" :disabled="errors.any() || EmbedURL == ''" class="btn btn-primary btn-block">
               <span v-if="!errors.any()">Submit Video Link</span>
               <span v-else>Please enter a valid link</span>
             </button>
@@ -120,94 +120,111 @@
     <br>
     {{errors}}
     <br><br>
-    
+    <div v-if="submitted">
+      <video-component
+        height=480
+        width=640
+        :title="this.ytVideoTitle"
+        :source="this.EmbedURL"
+        isEmbed=True>
+      {{ActualDescription}}
+      </video-component>
+    </div>
   </div>
 </div>
 </template>
 
 <script>
-import Vue from 'vue';
-import FileUpload from '../FileUpload';
-import { mapGetters } from 'vuex';
+import Vue from "vue";
+import FileUpload from "../FileUpload";
+import { mapGetters } from "vuex";
 
-var _ = require('lodash');
+var _ = require("lodash");
 
-export default Vue.component('edit-video', {
-    components: { FileUpload },
-    props: [],
-    data() {
-      return {
-        'id': null,
-        'isEmbed': null,
-        'isFile': false,
-        'autoplay': false,
-        'width': null,
-        'height': null,
-        'controls': false,
-        'title': '',
-        'source': '',
-        'link': '',
-        'playlist': '',
-        'loop': false,
-        'EmbedURL': '',
-        'EmbedDescription': ''
+export default Vue.component("edit-video", {
+  components: { FileUpload },
+  props: [],
+  data() {
+    return {
+      id: null,
+      isEmbed: null,
+      isFile: false,
+      autoplay: false,
+      width: null,
+      height: null,
+      controls: false,
+      title: "",
+      source: "",
+      link: "",
+      playlist: "",
+      loop: false,
+      EmbedURL: "",
+      EmbedDescription: "",
+      includeYtData: true,
+      submitted: false
+    };
+  },
+  computed: {
+    ActualDescription() {
+      if (this.includeYtData) {
+        return this.ytVideoDescription;
+      } else {
+        return this.EmbedDescription;
       }
     },
-    computed: {
-      ...mapGetters([
-        'hasFiles',
-        'ytVideoDescription',
-        'ytVideoThumbnail',
-        'ytVideoTitle',
-        'allFilesUploadComplete'
-      ])
+    ...mapGetters([
+      "hasFiles",
+      "ytVideoDescription",
+      "ytVideoThumbnail",
+      "ytVideoTitle",
+      "allFilesUploadComplete"
+    ])
+  },
+  methods: {
+    DebounceSubmit: _.debounce(function() {
+      this.GetYoutubeData();
+    }, 400),
+    DebounceFileSubmit: _.throttle(function() {
+      this.GenerateComponentFileJSON();
+    }, 1000),
+
+    GetYoutubeData() {
+      var self = this;
+      this.$store
+        .dispatch("getYoutubeVideoInfo", this.EmbedURL)
+        .catch(err => console.log(err));
     },
-    methods: {
-      DebounceSubmit: _.debounce(
-        function() {
-          this.GetYoutubeData();
-        }, 400),
-      DebounceFileSubmit: _.throttle(
-        function() {
-          this.GenerateComponentFileJSON();
-        }, 1000),
+    GenerateComponentEmbedJSON() {
+      var obj = {
+        post: 2,
+        type: "link",
+        url: this.EmbedURL,
+        title: this.ytVideoTitle,
+        thumbnail: this.ytVideoThumbnail,
+        description: this.ActualDescription
+      };
+      console.log(obj);
+      this.submitted = true;
+      return obj;
+    },
+    GenerateComponentFileJSON() {
+      var output = new Array();
 
-      GetYoutubeData(){
-        var self = this;
-        this.$store.dispatch('getYoutubeVideoInfo', this.EmbedURL)
-          .catch(err => console.log(err));
-      },
-      GenerateComponentEmbedJSON() {
-        var obj = {
-          post: 2,
-          type: 'link',
-          url: this.EmbedURL,
-          title: this.ytVideoTitle,
-          description: this.EmbedDescription || this.ytVideoDescription,
-          thumbnail: this.ytVideoThumbnail
-        }
-        console.log(obj);
-        return obj;
-      },
-      GenerateComponentFileJSON() {
-        var output = new Array();
-
-        _.map(this.$store.state.fs.files, function(val, ind, arr){
-          console.log(val,ind, arr);
-          output.push({
-            'type': 'video_file',
-            'id': val.db_id,
-            'file': val.file,
-            'name': val.file.name,
-            'url': val.url
-          })
-        })
-        console.log(output);
-        return output;
-      }
+      _.map(this.$store.state.fs.files, function(val, ind, arr) {
+        console.log(val, ind, arr);
+        output.push({
+          type: "video_file",
+          id: val.db_id,
+          file: val.file,
+          name: val.file.name,
+          url: val.url
+        });
+      });
+      console.log(output);
+      return output;
     }
-  })
-
+  }
+});
 </script>
 
 
@@ -217,7 +234,5 @@ export default Vue.component('edit-video', {
   border-color: red;
   border-width: 0.1em;
 }
-
-
 </style>
 

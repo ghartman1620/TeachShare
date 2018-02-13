@@ -9,8 +9,9 @@
     :playlist="playlist"
     :loop="loop"
     :controls="controls"
+    :title="title"
     :autoplay="autoplay">
-    Some interesting text! Try changing the windows size. I'm responsive!
+    
   </embed-video>
 </div>
 <div v-else-if="isFile">
@@ -34,30 +35,28 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import EmbedVideo from './EmbedVideo.vue';
-import FileVideo from './FileVideo.vue';
+import Vue from "vue";
+import EmbedVideo from "./EmbedVideo.vue";
+import FileVideo from "./FileVideo.vue";
 
-export default Vue.component('video-component', {
-    components: { EmbedVideo, FileVideo },
-    props: [
-      'id',
-      'isEmbed',
-      'isFile',
-      'autoplay',
-      'width',
-      'height',
-      'controls',
-      'title',
-      'source',
-      'link',
-      'playlist',
-      'loop'
-    ],
-    data() {
-      return {
-
-      }
-    }
-  })
+export default Vue.component("video-component", {
+  components: { EmbedVideo, FileVideo },
+  props: [
+    "id",
+    "isEmbed",
+    "isFile",
+    "autoplay",
+    "width",
+    "height",
+    "controls",
+    "title",
+    "source",
+    "link",
+    "playlist",
+    "loop"
+  ],
+  data() {
+    return {};
+  }
+});
 </script>
