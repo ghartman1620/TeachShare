@@ -1,17 +1,12 @@
-from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer
-from .models import Post, Comment, Attachment
-from rest_framework import viewsets, views
-from rest_framework.parsers import FileUploadParser
-
-from django_filters import rest_framework as filters
-from rest_framework.response import Response
-from uuid import uuid4
-
-
 # test
-from django.http import HttpResponse
 from django.shortcuts import render
- 
+from rest_framework import viewsets, views
+from rest_framework.parsers import FileUploadParser, JSONParser
+from rest_framework.response import Response
+
+from .models import Post, Comment, Attachment
+from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer
+
 
 class PostViewSet(viewsets.ModelViewSet):
     """
@@ -32,9 +27,28 @@ class AttachmentViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Attachment model
     """
+    parser_classes = (JSONParser, )
     queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer
     filter_fields = ('post',)
+
+    def create(self, request):
+        print(request)
+        print(dir(request))
+        print(request.data)
+        print(request.query_params)
+        id = request.query_params.get('uid', '')
+        print(id)
+    
+        p = Post.objects.get(id=request.data['post'])
+        a = Attachment.objects.create(post=p)
+        print(p)
+        return Response(data={
+            'status': 'OK',
+            'uid': id,
+            'attachment': AttachmentSerializer(a).data,
+            'post': p.pk,
+        }, status=201, )
 
 
 def SimpleMethod(request): 
@@ -43,17 +57,26 @@ def SimpleMethod(request):
 
 # @TODO: figure out how to deal with bad url characters
 class FileUploadView(views.APIView):
-    parser_classes = (FileUploadParser,)
+    parser_classes = (FileUploadParser, JSONParser)
 
     def put(self, request, filename, format=None):
         file_obj = request.data['file']
+        print(request.content_type)
+        print(dir(request))
+        print(request.parsers)
+        print(request.query_params)
+        print(filename)
+        print(file_obj.name)
         p = Post.objects.first()
         a = Attachment.objects.create(post=p, file=file_obj)
+        print(a.file.url)
+        print(a.file.name)
         file_obj.close()
         
         return Response(data={
                 'status': 'OK', 
                 'id': a.pk,
+                'request_id': request.query_params['id'],
                 'url': a.file.url,
                 'filename': a.file.name
             }, 

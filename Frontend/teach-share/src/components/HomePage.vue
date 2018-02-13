@@ -1,24 +1,19 @@
 <template>
-  <div class="container-fluid body-fluid">
-    <nav-bar :query="queryParam"></nav-bar>
-    <router-view/>
-  </div>
+    <file-component>Some content!</file-component>
 </template>
 
 <script>
 import Vue from 'vue';
-import Navbar from './Navbar';
 import FileComponent from './FileComponent.vue';
 
 
 export default Vue.component('base-page', {
     components: { FileComponent },
-    props: ['items'],
+    props: [],
     data() {
       return {
-        queryParam: "",
       }
-    }
+    },
   })
 </script>
 

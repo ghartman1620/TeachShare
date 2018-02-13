@@ -2,6 +2,7 @@
 <template>
 
 <body>
+<router-view/>
 
 <component class="card container foreground" v-bind:component="editedComponent" :index="editedComponentIndex"v-bind:is="editedComponentType"></component>
 <div :style=opacity>
@@ -62,21 +63,17 @@
 </div>
 <button v-on:click="submitPost">Publish</button>
 </div>
-</div>
-
 </body>
 
 </template>
 
 
 <script>
-import Vue from "vue";
-import { mapState } from "vuex";
-import EditText from "./EditText";
-import EditImage from "./EditImage";
-
-
-import PostComponentView from "./PostComponentView";
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import EditText from './EditText';
+import EditImage from './images/EditImage';
+import ViewText from './ViewText';
 
 export default {
 

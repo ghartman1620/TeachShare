@@ -17,7 +17,7 @@
 
         <!-- create a post link -->
         <li class="nav-item">
-          <router-link class="nav-link" to="/">Create Post</router-link>
+          <router-link class="nav-link" :to="{name: 'create'}">Create Post</router-link>
         </li>
 
         <!-- just an example dropdown -->
@@ -45,7 +45,7 @@ import Vue from 'vue';
 import SearchBox from './SearchBox.vue';
 
 export default Vue.component('nav-bar', {
-    components: SearchBox,
+    components: { SearchBox },
     props: ['query'],
     data() {
       return {

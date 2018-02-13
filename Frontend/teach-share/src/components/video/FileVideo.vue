@@ -1,9 +1,8 @@
 <template>
 <div>
   <div class="card" :style="{width: cardWidth + 'px', padding: '10px'}">
-
     <video
-      class="align-self-start mr-5"
+      class="align-items-center"
       :id="id"
       :src="source"
       :autoplay="autoplay"
@@ -23,14 +22,6 @@
     </div>
   </div>
   </div>
-  <!-- <div class="row">
-    <div class="p-1">
-      <button @click.prevent="Play">Play |></button>
-    </div>
-    <div class="p-1">
-      <button @click.prevent="Pause">Pause ||</button>
-    </div>
-  </div> -->
 </template>
 
 <script>

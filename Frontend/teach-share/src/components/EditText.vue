@@ -30,9 +30,9 @@
         <!-- You can also add your own
         <button id="custom-button" @click="customButtonClick">[ Click me ]</button-->
       </div>
-
-
     </quill-editor>
+
+
     <div class="quill-code">
     </div>
   </div>

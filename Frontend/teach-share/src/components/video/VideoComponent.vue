@@ -1,25 +1,36 @@
 <template>
+<div class="row d-flex justify-content-md-center justify-content-start">
 <div v-if="isEmbed">
   <p>Embeded video</p>
-  <embed-video></embed-video>
+  <embed-video
+    :source="source"
+    :width="width"
+    :height="height"
+    :playlist="playlist"
+    :loop="loop"
+    :controls="controls"
+    :autoplay="autoplay">
+    Some interesting text! Try changing the windows size. I'm responsive!
+  </embed-video>
 </div>
 <div v-else-if="isFile">
   <p>Video File</p>
   <file-video
-    id="10"
-    width="500"
-    controls="true"
-    title="Wierd movie thingy.."
-    source="https://www.w3schools.com/html/mov_bbb.mp4"
-    link="https://www.w3schools.com/html/mov_bbb.mp4"
-    autoplay="true">
+    :id="id"
+    :width="width"
+    :height="height"
+    :controls="controls"
+    :title="title"
+    :source="source"
+    :link="link"
+    :autoplay="autoplay">
     This is where you would put a long (or short) section of text to explain a video.
   </file-video>
 </div>
 <div v-else>
   <p>Something went wrong...</p>
 </div>
-
+</div>
 </template>
 
 <script>
@@ -29,7 +40,20 @@ import FileVideo from './FileVideo.vue';
 
 export default Vue.component('video-component', {
     components: { EmbedVideo, FileVideo },
-    props: ['isEmbed', 'isFile'],
+    props: [
+      'id',
+      'isEmbed',
+      'isFile',
+      'autoplay',
+      'width',
+      'height',
+      'controls',
+      'title',
+      'source',
+      'link',
+      'playlist',
+      'loop'
+    ],
     data() {
       return {
 
