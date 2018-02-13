@@ -12,6 +12,11 @@ Vue.use(Router);
 export default new Router({
     routes: [{
             path: '/',
+            name: 'HelloWorld',
+            component: HelloWorld
+        },
+        {
+            path: '/base',
             name: 'base',
             component: Base,
             children:[

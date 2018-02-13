@@ -4,7 +4,6 @@
   <!--We can use any buttons we want in the toolbar!
   Check out the github for more examples, and the
   exact code needed for other types of buttons -->
-  <div class="container">
   <div class="custom-quill-editor">
     <quill-editor
        v-model="component.contents"
@@ -35,12 +34,11 @@
 
     </quill-editor>
     <div class="quill-code">
-  </div>
+    </div>
   </div>
 
 <button v-on:click="submit">Submit.</button>
 <button v-on:click="close">X</button>
-  </div>
 
 </body>
 </template>
@@ -81,7 +79,7 @@ export default Vue.component("edit-text", {
         }
 
         this.$store.dispatch("changeEditedComponent", "");
-
+        
       },
       close: function(event){
 
@@ -96,8 +94,7 @@ export default Vue.component("edit-text", {
 
   .quill-editor,
   .quill-code {
-    width: 100%;
-    height: 100%;
+    width: 50%;
   }
 
   .quill-code {
@@ -105,9 +102,8 @@ export default Vue.component("edit-text", {
     height: auto;
   }
 
-  .body{
+  body{
     background: #ffffff;
-    width: 50%;
     font-family: "Roboto", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

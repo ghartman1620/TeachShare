@@ -4,8 +4,21 @@
     <!-- This can be used as a template -->
     <!-- insert content here for pages,
     components will have to be separate of course -->
-    <router-view/>
+    <slot name="body"></slot>
+    <div class="row">
+      <file-upload
+        uploadFieldName="files"
+        acceptedFileTypes="file/*"
+      />
+    </div>
+    <!-- <video-component :isFile="true"></video-component>
 
+    <div class="row">
+      <video-component :isFile="true"></video-component>
+    </div>
+    <div class="row">
+      <file-component></file-component>
+    </div>-->
   </div>
 </template>
 

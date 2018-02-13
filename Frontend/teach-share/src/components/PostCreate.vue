@@ -24,7 +24,7 @@
 
 </div>
 </div>
-<div class="container">
+
 <div class="container" v-for="(component,index) in storeComponents">
   <div class="row">
   <div class="col-1"><!-- col-xs-auto -->
@@ -34,23 +34,41 @@
     </div>
   </div>
   <div class="col-10"> <!-- col-11 -->
-
-  <post-component class="card" :component="component"></post-component>
+  <div class="post-component card" v-if="component.type === 'text'">
+    <view-text :component="component"></view-text>
+  </div>
+  <div class="post-component card" v-else-if="component.type === 'image'">
+    <p>An image component!</p>  
+  </div>
+  <div class="post-component card" v-else-if="component.type === 'audio'">
+    <p>An audio component!</p>  
+  </div>
+  <div class="post-component card" v-else-if="component.type === 'video'">
+    <p>A video component!</p>  
+  </div>
+  <div class="post-component card" v-else>
+    <p>A file component!</p>  
+  </div>
   </div>
   <div class="col 11">
     <div id="arrange-btn-group" class="btn-group-vertical">
       <button @click="removeComponent(index)"><font face="courier">x</font></button>
       <button @click="editComponent(index)"><font face="courier">E</font></button>
-
+    
     </div>
   </div>
-
+  
   </div>
 </div>
 <button v-on:click="submitPost">Publish</button>
 </div>
+<<<<<<< HEAD
 </div>
 
+=======
+</span>
+</base-page>
+>>>>>>> parent of becf0ee... New navbar and bringing everything in line with our color scheme
 </body>
 
 </template>
@@ -101,6 +119,7 @@ export default {
     submitPost: function(event){
       console.log(this.$store.state.inProgressPostComponents);
       var obj = {
+<<<<<<< HEAD
         user : 1, 
         title : this.title, 
         content : this.$store.state.inProgressPostComponents,
@@ -108,6 +127,15 @@ export default {
         comments : [],
         tags: this.tags,
         attachments : [],
+=======
+        "user" : 1, 
+        "title" : this.title, 
+        "content" : JSON.stringify(this.$store.state.inProgressPostComponents),
+        "likes" : 0,
+        "comments" : [],
+        "tags": JSON.stringify(this.tags),
+        "attachments" : [],
+>>>>>>> parent of becf0ee... New navbar and bringing everything in line with our color scheme
       }
       console.log(obj)
       this.$store.dispatch('createPost', obj)
@@ -123,11 +151,11 @@ export default {
         "contents" : "<p></p>",
       }
       this.editedComponentIndex = this.$store.state.inProgressPostComponents.length;
-
+      
       this.$store.dispatch("changeEditedComponent", "edit-text");
       console.log("create text component");
       this.opacity.opacity = .3;
-
+      
     },
     createImageComponent: function(event){
       this.$store.dispatch("changeEditedComponent", "edit-image");
@@ -137,31 +165,31 @@ export default {
 
       console.log("hi world");
       this.opacity.opacity = .3;
-
+      
     },
     createVideoComponent: function(event){
 
       console.log("hi world");
       this.opacity.opacity = .3;
-
+      
     },
     createFileComponent: function(event){
 
       console.log("hi world");
       this.opacity.opacity = .3;
-
+      
     },
     moveComponentUp: function(index){
       console.log("moveComponentUp:"  + index);
       if(index != 0){
-        this.$store.dispatch("swapComponents", [index,index-1]);
-        //dispatch only allows one argument so we'll pass them as an array
+        this.$store.dispatch("swapComponents", [index,index-1]);   
+        //dispatch only allows one argument so we'll pass them as an array        
       }
     },
     moveComponentDown: function(index){
       if(index != this.$store.state.inProgressPostComponents.length-1){
-        this.$store.dispatch("swapComponents", [index,index+1]);
-        //dispatch only allows one argument so we'll pass them as an array
+        this.$store.dispatch("swapComponents", [index,index+1]);   
+        //dispatch only allows one argument so we'll pass them as an array        
       }
     },
     removeComponent: function(index){
@@ -185,7 +213,7 @@ export default {
   top: 20%;
   width: 80%;
   margin: auto;
-  z-index: 2;
+  z-index: 2;  
   opacity: 1;
 }
 
@@ -198,9 +226,26 @@ export default {
 
 //Submitted components now being viewed
 .container-component {
-  width:60%;
+  width:60%;  
   height: 300px;
 }
+<<<<<<< HEAD
+=======
+#arrange-btn-group {
+  /*position: absolute;
+  left: 23%;
+  width: 2%; */ 
+}
+.up-down-button {
+
+}
+.post-component {
+  /*position: absolute;
+  left: 25%;  
+  width: 50%;*/
+}
+
+>>>>>>> parent of becf0ee... New navbar and bringing everything in line with our color scheme
 
 
 //The five buttons on the button bar
