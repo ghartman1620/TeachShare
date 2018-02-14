@@ -1,7 +1,6 @@
 <template>
 <div class="row d-flex justify-content-md-center justify-content-start">
 <div v-if="isEmbed">
-  <p>Embeded video</p>
   <embed-video
     :source="source"
     :width="width"
@@ -11,7 +10,7 @@
     :controls="controls"
     :title="title"
     :autoplay="autoplay">
-    
+    <slot name="description"></slot>
   </embed-video>
 </div>
 <div v-else-if="isFile">
@@ -25,7 +24,6 @@
     :source="source"
     :link="link"
     :autoplay="autoplay">
-    This is where you would put a long (or short) section of text to explain a video.
   </file-video>
 </div>
 <div v-else>

@@ -1,28 +1,27 @@
 import Vue from 'vue';
 import api from '../api';
-import axios from 'axios';
-
-// Load some necessary libraries
-var _ = require('lodash');
-const uuidv4 = require('uuid/v4');
-
-var API_KEY = 'AIzaSyAOHmdMqDLrCvAxnbkdTabddnKRZkpqPJY';
 
 // YouTubeService definition
-const YouTubeService = {
+const VideoService = {
     state: {
-        newVideo: null
+        newVideos: []
     },
     mutations: {
         LOAD_VIDEO_INSTANCE: (state, data) => {
-            state.newVideo = Object.assign({}, data);
+            state.newVideos = Object.assign([], [data]);
+        },
+        LOAD_VIDEO_INSTANCES: (state, data) => {
+            state.newVideos = Object.assign([], data);
         }
-
     },
     actions: {
         submitVideoEmbed: (state, data) => {
             console.log(data)
             state.commit('LOAD_VIDEO_INSTANCE', data);
+        },
+        submitVideoFiles: (state, data) => {
+            console.log(data);
+            state.commit('LOAD_VIDEO_INSTANCES', data);
         }
     },
     getters: {
@@ -30,4 +29,4 @@ const YouTubeService = {
     }
 };
 
-export default YouTubeService;
+export default VideoService;

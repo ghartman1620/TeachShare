@@ -26,19 +26,27 @@ const YouTubeService = {
             var videoID = videoURL.searchParams.get('v');
             let videoSection = 'snippet,statistics';
             var ApiURL = new URL(`https://www.googleapis.com/youtube/v3/videos?id=${videoID}&key=${API_KEY}&part=${videoSection}`);
-            axios.get(ApiURL.toString())
-                .then(resp => state.commit('LOAD_YOUTUBE_VIDEO_DATA', resp.data))
-                .catch(err => console.log(err));
+            if (videoID.length > 10) {
+                axios.get(ApiURL.toString())
+                    .then(resp => state.commit('LOAD_YOUTUBE_VIDEO_DATA', resp.data))
+                    .catch(err => console.log(err));
+            }
         }
     },
     getters: {
-        ytVideoDescription: state => {
+        ytVideoDescriptionShort: state => {
             var ending = '';
             if (state.ytVideoDetails && state.ytVideoDetails.items.length > 0) {
                 if (state.ytVideoDetails.items[0].snippet.description.length > 300) {
                     ending = '...';
                 }
                 return state.ytVideoDetails.items[0].snippet.description.slice(0, 300) + ending;
+            }
+            return null;
+        },
+        ytVideoDescription: state => {
+            if (state.ytVideoDetails && state.ytVideoDetails.items.length > 0) {
+                return state.ytVideoDetails.items[0].snippet.description;
             }
             return null;
         },

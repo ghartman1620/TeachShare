@@ -46,7 +46,7 @@ export default Vue.component('file-video', {
       }
     },
     computed: {
-      cardWidth: function() { return parseInt(this.width) + 20 },
+
     },
     mounted: function(){
       this.video = document.getElementById(this.id);
