@@ -50,8 +50,11 @@
     {{errors}}
     <br><br>
 
+    <div class="container">
     <transition name="fade">
-    <div v-if="this.$store.state.video.newVideos.length > 0">
+    <div v-if="this.$store.state.video.newVideos.length > 0"
+      v-bind:style="styleObject"
+      class="">
       <video-component
 
         name="vid-comp"
@@ -65,6 +68,8 @@
 
     </div>
     </transition>
+    </div>
+    <br><br><br>
 
   </div>
 </div>
@@ -83,23 +88,14 @@ export default Vue.component('edit-video', {
   props: [],
   data() {
     return {
-      adjustHeight: 0,
+      styleObject: {
+        'max-height': 100
+      },
 
     };
   },
   computed: {
     DescriptionEmbed(){
-      console.log('$REFS: ', this.$children[4]);
-      console.log(this.$refs);
-      if (this.$children[4]) {
-        let height = this.$children[4].$children[0].$el.clientHeight;
-        let width = this.$children[4].$children[0].$el.clientWidth;
-        console.log('HEIGHT: ', height);
-        console.log('WIDTH: ', width);
-        if (height > 500) {
-          this.adjustHeight = {height: '500'};
-        }
-      }
       return this.$store.state.video.newVideos[0].description;
     }
   },
@@ -109,8 +105,9 @@ export default Vue.component('edit-video', {
   mounted () {
     this.$nextTick(() => {
       let h = this.$children[4].$el.clientHeight;
-      this.adjustHeight = h;
+      this.styleObject['max-height'] = 500;
       console.log('CLIENT HEIGHT: ', h);
+
     })
   }
 });
@@ -119,6 +116,10 @@ export default Vue.component('edit-video', {
 
 
 <style lang="scss" scoped>
+.video-component {
+  height: 100px;
+}
+
 .fade-transition {
   backface-visibility: hidden;
   transition: opacity 0.2s ease;

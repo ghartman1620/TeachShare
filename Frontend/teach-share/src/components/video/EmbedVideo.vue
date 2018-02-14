@@ -12,11 +12,17 @@
     </div>
   <div class="card-body">
     <h4 class="card-title">{{ title }}</h4>
-      <p class="card-text">
+    <transition name="fade">
+      <p :class="textClasses">
         <slot>
           There was no content provided.
         </slot>
       </p>
+    </transition>
+      <button type="button" @click.prevent="showOrHideAllText" class="btn btn-outline-primary btn-block">
+        <span v-if="!textShown">Read More...</span>
+        <span v-else>Collapse Text</span>
+      </button>
     </div>
   </div>
   </div>
@@ -38,7 +44,13 @@ export default Vue.component("embed-video", {
     "loop"
   ],
   data() {
-    return {};
+    return {
+      textClasses: [
+        'card-text',
+        'sizing-and-gradient'
+      ],
+      textShown: false,
+    };
   },
   computed: {
     cardWidth: function() {
@@ -86,11 +98,36 @@ export default Vue.component("embed-video", {
       }
       return `https://youtube.com/embed/${videoID}`;
     }
+  },
+  methods: {
+    showOrHideAllText() {
+      if (!this.textShown) {
+        this.textClasses.pop();
+      } else {
+        this.textClasses.push('sizing-and-gradient')
+      }
+      this.textShown = !this.textShown;
+    }
   }
 });
 </script>
 
 <style lang="scss" scoped>
+
+.sizing-and-gradient {
+  height: 200px;
+  overflow:hidden;
+  background: linear-gradient(#333, #eee);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 10s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
 
 </style>
 

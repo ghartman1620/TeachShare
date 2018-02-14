@@ -162,6 +162,7 @@ export default Vue.component('edit-video-embed', {
 </script>
 
 <style lang="scss" scoped>
+
 .outline-danger {
   border-color: red;
   border-width: 0.1em;

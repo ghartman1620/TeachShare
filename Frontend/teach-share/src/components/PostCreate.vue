@@ -207,7 +207,7 @@ export default {
 }
 
 
-//Submitted components now being viewed
+/* Submitted components now being viewed */
 .container-component {
   width:60%;
   height: 300px;
@@ -228,7 +228,7 @@ export default {
 
 
 
-//The five buttons on the button bar
+/* The five buttons on the button bar */
 #text-button { background: #FFAE03; }
 #image-button { background: #1D3461; }
 #audio-button { background: #42AA8B; }

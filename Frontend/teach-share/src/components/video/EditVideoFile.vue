@@ -23,7 +23,7 @@ import { mapGetters } from 'vuex';
 
 var _ = require("lodash");
 
-export default Vue.component('edit-video', {
+export default Vue.component('edit-video-file', {
   components: { FileUpload },
   props: [],
   data() {
