@@ -61,6 +61,12 @@ const YouTubeService = {
                 return state.ytVideoDetails.items[0].snippet.title;
             }
             return '';
+        },
+        ytVideoID: state => {
+            if (state.ytVideoDetails && state.ytVideoDetails.items.length > 0) {
+                return state.ytVideoDetails.items[0].id;
+            }
+            return '';
         }
     }
 };

@@ -56,7 +56,7 @@
       <div class="row">
       <div class="offset-3 col-6">
           <button type="submit" :disabled="!hasFiles && allFilesUploadComplete" class="btn btn-primary btn-block">
-            <span v-if="!hasFiles">Please Select File(s) to upload</span>
+            <span v-if="!hasFiles && allFilesUploadComplete">Please Select File(s) to upload</span>
             <span v-else>Submit Video(s)</span>
           </button>
         </div>
@@ -94,7 +94,7 @@ export default Vue.component("edit-video-file", {
         this.title = val;
       }
     },
-    ...mapGetters(["hasFiles", "allFilesUploadComplete"])
+    ...mapGetters(['hasFiles', 'allFilesUploadComplete'])
   },
   methods: {
     DebounceFileSubmit: _.throttle(function() {
@@ -107,7 +107,8 @@ export default Vue.component("edit-video-file", {
       _.map(this.$store.state.fs.files, function(val, ind, arr) {
         console.log(val, ind, arr);
         output.push({
-          type: "video_file",
+          post: 2,
+          type: 'video_file',
           id: val.db_id,
           height: self.height,
           title: self.ActualTitle,
@@ -118,17 +119,13 @@ export default Vue.component("edit-video-file", {
           description: self.fileDescription
         });
       });
-      console.log(output);
-      this.$store.dispatch("submitVideoFiles", output);
+      this.$store.dispatch('submitVideoFiles', output).then(()=> {
+        // this.$store.dispatch('removeNewVideos');
+      });
       return output;
     }
   },
-  mounted() {},
-  watch: {
-    uploadedFiles() {
-      this.$store.subscribe(REMOVE_FILE);
-    }
-  }
+  mounted() {}
 });
 </script>
 

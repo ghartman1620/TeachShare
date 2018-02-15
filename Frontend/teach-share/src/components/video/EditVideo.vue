@@ -51,40 +51,42 @@
     <br><br>
 
     <div class="container">
-<!--
-    <div v-if="this.$store.state.video.newVideos.length > 0"
-      v-bind:style="styleObject"
-      class="">
-      <video-component
-        name="vid-comp"
-        :height="this.$store.state.video.newVideos[0].height"
-        :width="this.$store.state.video.newVideos[0].width"
-        :title="this.$store.state.video.newVideos[0].title"
-        :source="this.$store.state.video.newVideos[0].url"
-        isEmbed=True>
-      <div slot="description">{{DescriptionEmbed}}</div>
-      </video-component>
 
-    </div> -->
-    <div v-if="this.$store.state.video.newVideos.length > 0"
+    <div v-if="this.$store.state.video.videos.length > 0"
       v-bind:style="styleObject"
       class="">
-      <div :key="v.id" v-for="v in this.$store.state.video.newVideos">
-        <video-component
-          name="vid-comp2"
-          :id="v.id"
-          :height="v.height"
-          :width="v.width"
-          :title="v.title"
-          :source="v.url"
-          controls="true"
-          autoplay="false"
-          isFile=true>
-        <div slot="description">{{v.description}}</div>
-        </video-component>
+      <div :key="v.id" v-for="v in this.$store.state.video.videos">
+        <div v-if="v.type === 'video_link'">
+          <video-component
+            name="vid-comp1"
+            :id="v.id"
+            :height="v.height"
+            :width="v.width"
+            :title="v.title"
+            :source="v.url"
+            controls="true"
+            autoplay="false"
+            isEmbed=true>
+          <div slot="description">{{v.description}}</div>
+          </video-component>
+        </div>
+          <div v-else>
+          <video-component
+            name="vid-comp2"
+            :id="v.id"
+            :height="v.height"
+            :width="v.width"
+            :title="v.title"
+            :source="v.url"
+            controls="true"
+            autoplay="false"
+            isFile=true>
+          <div slot="description">{{v.description}}</div>
+          </video-component>
+        </div>
+
       </div>
     </div>
-
     </div>
     <br><br><br>
 
@@ -107,19 +109,26 @@ export default Vue.component('edit-video', {
     return {
       styleObject: {
         'max-height': 100
-      },
-
+      }
     };
   },
   computed: {
     DescriptionEmbed(){
-      return this.$store.state.video.newVideos[0].description;
+      return this.$store.state.video.videos[0].description;
     },
     DescriptionFile(){
-      return this.$store.state.video.newVideos[0].description;
+      return this.$store.state.video.videos[0].description;
+    },
+    RemovedFile() {
+      var vm = this;
+      this.$on('RemoveItem', function(item){
+        console.log('Removed: ', item);
+        vm.$dispatch('removeVideo', item);
+      });
     }
   },
   methods: {
+
 
   },
   mounted () {

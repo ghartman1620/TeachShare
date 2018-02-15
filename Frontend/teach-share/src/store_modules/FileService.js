@@ -20,6 +20,7 @@ const FileService = {
                     });
                     var test = Vue.set(val, "url", data.data.url);
                 }
+
             });
         },
         CHANGE_UPLOADED_FILES: (state, data) => {

@@ -46,9 +46,8 @@ class AttachmentViewSet(viewsets.ModelViewSet):
         return Response(data={
             'status': 'OK',
             'uid': id,
-            'attachment': AttachmentSerializer(a).data,
             'post': p.pk,
-        }, status=201, )
+        }, status=201 )
 
 
 def SimpleMethod(request): 
