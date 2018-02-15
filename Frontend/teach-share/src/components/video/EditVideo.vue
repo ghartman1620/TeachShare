@@ -51,12 +51,11 @@
     <br><br>
 
     <div class="container">
-    <transition name="fade">
+<!--
     <div v-if="this.$store.state.video.newVideos.length > 0"
       v-bind:style="styleObject"
       class="">
       <video-component
-
         name="vid-comp"
         :height="this.$store.state.video.newVideos[0].height"
         :width="this.$store.state.video.newVideos[0].width"
@@ -66,8 +65,26 @@
       <div slot="description">{{DescriptionEmbed}}</div>
       </video-component>
 
+    </div> -->
+    <div v-if="this.$store.state.video.newVideos.length > 0"
+      v-bind:style="styleObject"
+      class="">
+      <div :key="v.id" v-for="v in this.$store.state.video.newVideos">
+        <video-component
+          name="vid-comp2"
+          :id="v.id"
+          :height="v.height"
+          :width="v.width"
+          :title="v.title"
+          :source="v.url"
+          controls="true"
+          autoplay="false"
+          isFile=true>
+        <div slot="description">{{v.description}}</div>
+        </video-component>
+      </div>
     </div>
-    </transition>
+
     </div>
     <br><br><br>
 
@@ -97,6 +114,9 @@ export default Vue.component('edit-video', {
   computed: {
     DescriptionEmbed(){
       return this.$store.state.video.newVideos[0].description;
+    },
+    DescriptionFile(){
+      return this.$store.state.video.newVideos[0].description;
     }
   },
   methods: {
@@ -104,9 +124,9 @@ export default Vue.component('edit-video', {
   },
   mounted () {
     this.$nextTick(() => {
-      let h = this.$children[4].$el.clientHeight;
-      this.styleObject['max-height'] = 500;
-      console.log('CLIENT HEIGHT: ', h);
+      // let h = this.$children[4].$el.clientHeight;
+      // this.styleObject['max-height'] = 500;
+      // console.log('CLIENT HEIGHT: ', h);
 
     })
   }

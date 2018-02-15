@@ -145,7 +145,7 @@ export default Vue.component('edit-video-embed', {
     GenerateComponentEmbedJSON() {
       var obj = {
         post: 2,
-        type: "link",
+        type: "video_link",
         url: this.EmbedURL,
         height: this.height,
         width: this.width,

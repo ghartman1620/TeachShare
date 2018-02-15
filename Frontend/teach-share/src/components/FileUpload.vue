@@ -24,7 +24,7 @@
         </form>
         </div>
         <div class="col">
-        <h4>Uploaded files: </h4>
+        <h4 v-if="this.$store.state.fs.files.length > 0">Uploaded files: </h4>
         <ul class="list-group">
           <li v-bind:key="obj.file.name" v-for="obj in filesUploadStatus"
             class="list-group-item d-flex justify-content-between align-items-center">
@@ -134,8 +134,6 @@ export default Vue.component('file-upload', {
         }
         Array.from(Array(fileList.length).keys())
           .map(x => {
-            console.log(x);
-            console.log(fieldName, fileList[x], fileList[x].name)
             formData.append(fieldName, fileList[x], fileList[x].name);
           });
         this.save(formData);

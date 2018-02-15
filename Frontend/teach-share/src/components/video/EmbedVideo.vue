@@ -12,14 +12,12 @@
     </div>
   <div class="card-body">
     <h4 class="card-title">{{ title }}</h4>
-    <transition name="fade">
-      <p :class="textClasses">
+      <p key="1" :class="textClasses">
         <slot>
           There was no content provided.
         </slot>
       </p>
-    </transition>
-      <button type="button" @click.prevent="showOrHideAllText" class="btn btn-outline-primary btn-block">
+      <button type="button" @click.prevent="showOrHideAllText" class="btn btn-dark btn-block">
         <span v-if="!textShown">Read More...</span>
         <span v-else>Collapse Text</span>
       </button>
@@ -123,7 +121,7 @@ export default Vue.component("embed-video", {
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity 10s;
+  transition: opacity 4s;
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;

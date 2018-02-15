@@ -4,7 +4,7 @@
     <video
       class="align-items-center"
       :id="id"
-      :src="source"
+      :src="url"
       :autoplay="autoplay"
       :width="width"
       :height="height"
@@ -18,7 +18,12 @@
           There was no content provided.
         </slot>
       </p>
-      <a href="#" class="btn btn-primary justify-center">Go somewhere</a>
+      <div class="row">
+        <div class="col-auto mr-auto"/>
+        <div class="col-auto">
+          <button type="button" class="btn btn-warning">Edit</button>
+        </div>
+      </div>
     </div>
   </div>
   </div>
@@ -46,7 +51,12 @@ export default Vue.component('file-video', {
       }
     },
     computed: {
-
+      cardWidth: function() {
+        return parseInt(this.width) + 20;
+      },
+      url: function() {
+        return `http://localhost:8000${this.source}`;
+      }
     },
     mounted: function(){
       this.video = document.getElementById(this.id);
