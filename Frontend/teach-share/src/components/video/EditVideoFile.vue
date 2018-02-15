@@ -1,7 +1,7 @@
 <template>
   <div>
     <form v-on:submit.prevent="DebounceFileSubmit">
-      <file-upload title="Upload Video Files" fileAcceptType="VID"></file-upload>
+      <file-upload :fileLimit="1" title="Upload Video Files" fileAcceptType="VID"></file-upload>
       <br>
       <div class="row">
         <div class="col-12">
@@ -66,14 +66,14 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import FileUpload from '../FileUpload';
-import EditVideoEmbed from './EditVideoEmbed';
-import { mapGetters } from 'vuex';
+import Vue from "vue";
+import FileUpload from "../FileUpload";
+import EditVideoEmbed from "./EditVideoEmbed";
+import { mapGetters } from "vuex";
 
 var _ = require("lodash");
 
-export default Vue.component('edit-video-file', {
+export default Vue.component("edit-video-file", {
   components: { FileUpload },
   props: [],
   data() {
@@ -82,7 +82,7 @@ export default Vue.component('edit-video-file', {
       height: 480,
       title: "",
       source: "",
-      fileDescription: ''
+      fileDescription: ""
     };
   },
   computed: {
@@ -94,10 +94,7 @@ export default Vue.component('edit-video-file', {
         this.title = val;
       }
     },
-    ...mapGetters([
-      "hasFiles",
-      "allFilesUploadComplete"
-    ])
+    ...mapGetters(["hasFiles", "allFilesUploadComplete"])
   },
   methods: {
     DebounceFileSubmit: _.throttle(function() {
@@ -122,12 +119,15 @@ export default Vue.component('edit-video-file', {
         });
       });
       console.log(output);
-      this.$store.dispatch('submitVideoFiles', output);
+      this.$store.dispatch("submitVideoFiles", output);
       return output;
     }
   },
-  mounted() {
-
+  mounted() {},
+  watch: {
+    uploadedFiles() {
+      this.$store.subscribe(REMOVE_FILE);
+    }
   }
 });
 </script>
@@ -139,9 +139,9 @@ export default Vue.component('edit-video-file', {
   transition: opacity 0.2s ease;
 }
 
-.fade-enter, .fade-leave {
+.fade-enter,
+.fade-leave {
   opacity: 0;
 }
-
 </style>
 

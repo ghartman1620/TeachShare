@@ -10,7 +10,7 @@
               type="file"
               multiple
               name="files"
-              :disabled="isSaving"
+              :disabled="isSaving || pastLimit"
               @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
               :accept="accept"
               class="input-file">
@@ -62,127 +62,123 @@
 
 <!-- Javascript -->
 <script>
-import Vue from 'vue';
-import { mapGetters } from 'vuex';
+import Vue from "vue";
+import { mapGetters } from "vuex";
 
 var fileTypes = Object.freeze({
-  'FILE': 'file/*',
-  'IMG': 'image/*',
-  'VID': 'video/*',
-  'AUD': 'audio/*'
-})
+  FILE: "file/*",
+  IMG: "image/*",
+  VID: "video/*",
+  AUD: "audio/*"
+});
 
-const UPLOAD_INITIAL = 0, UPLOAD_SAVING = 1, UPLOAD_SUCCESS = 2, UPLOAD_ERROR = 3;
+const UPLOAD_INITIAL = 0,
+  UPLOAD_SAVING = 1,
+  UPLOAD_SUCCESS = 2,
+  UPLOAD_ERROR = 3;
 
-export default Vue.component('file-upload', {
-    components: {},
-    //file/*
-    props: ['title', 'fileAcceptType'],
-    data() {
-      return {
-        currentStatus: null,
-        currentFileList: []
+export default Vue.component("file-upload", {
+  components: {},
+  //file/*
+  props: ["title", "fileAcceptType", "fileLimit"],
+  data() {
+    return {
+      currentStatus: null,
+      currentFileList: []
+    };
+  },
+  computed: {
+    accept() {
+      if (this.$route.query.type) {
+        return fileTypes[this.$route.query.type];
+      } else if (this.fileAcceptType) {
+        return fileTypes[this.fileAcceptType];
+      } else {
+        return fileTypes["FILE"];
       }
     },
-    computed: {
-      accept() {
-        if (this.$route.query.type) {
-          return fileTypes[this.$route.query.type];
-        } else if (this.fileAcceptType) {
-          return fileTypes[this.fileAcceptType];
-        } else {
-          return fileTypes['FILE'];
-        }
-      },
-      isInitial() {
-        return this.currentStatus === UPLOAD_INITIAL;
-      },
-      isSaving() {
-        return this.currentStatus === UPLOAD_SAVING;
-      },
-      isSuccess() {
-        return this.currentStatus === UPLOAD_SUCCESS;
-      },
-      isError() {
-        return this.currentStatus === UPLOAD_ERROR;
-      },
-      currentFiles() {
-        return this.$store.state.fs.files;
-      },
-      ...mapGetters([
-        'filesUploadStatus',
-        'allFilesUploadComplete'
-      ]),
+    isInitial() {
+      return this.currentStatus === UPLOAD_INITIAL;
     },
-    methods: {
-      save(formData) {
-        this.$store.dispatch('fileUpload', formData)
-
-      },
-      resetState() {
-        this.currentStatus = UPLOAD_INITIAL;
-        this.uploadError = null;
-      },
-      filesChange(fieldName, fileList) {
-        console.log(fieldName, fileList)
-        this.currentFileList.push(fileList)
-        const formData = new FormData();
-        if (!fileList.length) {
-          console.log('fileList is empty');
-          return;
-
-        }
-        Array.from(Array(fileList.length).keys())
-          .map(x => {
-            formData.append(fieldName, fileList[x], fileList[x].name);
-          });
-        this.save(formData);
-      },
-      removeItem(file) {
-        console.log(file);
-        this.$store.dispatch('removeFile', file);
+    isSaving() {
+      return this.currentStatus === UPLOAD_SAVING;
+    },
+    isSuccess() {
+      return this.currentStatus === UPLOAD_SUCCESS;
+    },
+    isError() {
+      return this.currentStatus === UPLOAD_ERROR;
+    },
+    currentFiles() {
+      return this.$store.state.fs.files;
+    },
+    ...mapGetters(["filesUploadStatus", "allFilesUploadComplete", "pastLimit"])
+  },
+  methods: {
+    save(formData) {
+      this.$store.dispatch("fileUpload", formData);
+    },
+    resetState() {
+      this.currentStatus = UPLOAD_INITIAL;
+      this.uploadError = null;
+    },
+    filesChange(fieldName, fileList) {
+      console.log(fieldName, fileList);
+      this.currentFileList.push(fileList);
+      const formData = new FormData();
+      if (!fileList.length) {
+        console.log("fileList is empty");
+        return;
       }
+      Array.from(Array(fileList.length).keys()).map(x => {
+        formData.append(fieldName, fileList[x], fileList[x].name);
+      });
+      this.save(formData);
     },
-    mounted() {
-      this.resetState();
+    removeItem(file) {
+      console.log(file);
+      this.$store.dispatch("removeFile", file);
     }
-  })
-
+  },
+  mounted() {
+    this.$store.dispatch("changeFileLimit", this.fileLimit);
+    this.resetState();
+  }
+});
 </script>
 
 <style lang="scss">
-  .dropbox {
-    outline: 2px dashed grey;
-    outline-offset: -10px;
-    background: lightcyan;
-    color: dimgray;
-    padding: 10px 10px;
-    min-height: 200px;
-    position: relative;
-    cursor: pointer;
-  }
+.dropbox {
+  outline: 2px dashed grey;
+  outline-offset: -10px;
+  background: lightcyan;
+  color: dimgray;
+  padding: 10px 10px;
+  min-height: 200px;
+  position: relative;
+  cursor: pointer;
+}
 
-  .input-file {
-    opacity: 0;
-    width: 100%;
-    height: 200px;
-    position: absolute;
-    cursor: pointer;
-  }
+.input-file {
+  opacity: 0;
+  width: 100%;
+  height: 200px;
+  position: absolute;
+  cursor: pointer;
+}
 
-  .dropbox p {
-    font-size: 1.2em;
-    text-align: center;
-    padding: 50px 0;
-  }
+.dropbox p {
+  font-size: 1.2em;
+  text-align: center;
+  padding: 50px 0;
+}
 
-  .dropbox:hover {
-    background: lightblue;
-  }
+.dropbox:hover {
+  background: lightblue;
+}
 
-  .progress {
-    height: 30px;
-    margin: auto;
-  }
-
+.progress {
+  height: 30px;
+  margin: auto;
+}
 </style>

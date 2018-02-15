@@ -1,5 +1,5 @@
-import Vue from 'vue';
-import api from '../api';
+import Vue from "vue";
+import api from "../api";
 
 // YouTubeService definition
 const VideoService = {
@@ -16,17 +16,15 @@ const VideoService = {
     },
     actions: {
         submitVideoEmbed: (state, data) => {
-            console.log(data)
-            state.commit('LOAD_VIDEO_INSTANCE', data);
+            console.log(data);
+            state.commit("LOAD_VIDEO_INSTANCE", data);
         },
         submitVideoFiles: (state, data) => {
             console.log(data);
-            state.commit('LOAD_VIDEO_INSTANCES', data);
+            state.commit("LOAD_VIDEO_INSTANCES", data);
         }
     },
-    getters: {
-
-    }
+    getters: {}
 };
 
 export default VideoService;
