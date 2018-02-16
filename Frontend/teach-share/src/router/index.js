@@ -9,7 +9,9 @@ import EditText from '@/components/EditText';
 import VideoComponent from '@/components/video/VideoComponent';
 import EditVideo from '@/components/video/EditVideo';
 import HomePage from '@/components/HomePage';
-//a change
+import AudioComponent from '@/components/audio/AudioComponent';
+import AudioEditComponent from '@/components/audio/AudioEditComponent';
+
 Vue.use(Router);
 
 export default new Router({
@@ -105,7 +107,28 @@ export default new Router({
                     props: {}
                 }
             ]
+        },
+        {
+            path: '/audio',
+            component: Base,
+            children: [{
+                    name: 'audio',
+                    path: '',
+                    component: AudioComponent,
+                    props: {
+                        body: 'This is some body content.',
+                        title: 'This is a title!',
+                        source: 'http://fakeurl.com/file.mp3',
+                        controls: true
+                    }
+                },
+                {
+                    name: 'audio-edit',
+                    path: 'edit',
+                    component: AudioEditComponent,
+                    props: {}
+                }
+            ]
         }
-
     ]
 });

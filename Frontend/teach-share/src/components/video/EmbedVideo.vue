@@ -113,7 +113,7 @@ export default Vue.component("embed-video", {
 <style lang="scss" scoped>
 
 .sizing-and-gradient {
-  height: 200px;
+  max-height: 200px;
   overflow:hidden;
   background: linear-gradient(#333, #eee);
   -webkit-background-clip: text;

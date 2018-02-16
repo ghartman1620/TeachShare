@@ -24,7 +24,7 @@
         </form>
         </div>
         <div class="col">
-        <h4 v-if="this.$store.state.fs.files.length > 0">Uploaded files: </h4>
+        <h4 v-if="this.$store.state.fs.uploadedFiles.length > 0">Uploaded files: </h4>
         <ul class="list-group">
           <li v-bind:key="obj.file.name" v-for="obj in filesUploadStatus"
             class="list-group-item d-flex justify-content-between align-items-center">
@@ -109,8 +109,8 @@ export default Vue.component("file-upload", {
     isError() {
       return this.currentStatus === UPLOAD_ERROR;
     },
-    currentFiles() {
-      return this.$store.state.fs.files;
+    currentUploadedFiles() {
+      return this.$store.state.fs.uploadedFiles;
     },
     ...mapGetters(["filesUploadStatus", "allFilesUploadComplete", "pastLimit"])
   },
@@ -127,7 +127,7 @@ export default Vue.component("file-upload", {
       this.currentFileList.push(fileList);
       const formData = new FormData();
       if (!fileList.length) {
-        console.log("fileList is empty");
+        console.log('fileList is empty');
         return;
       }
       Array.from(Array(fileList.length).keys()).map(x => {
@@ -138,14 +138,17 @@ export default Vue.component("file-upload", {
     removeItem(file) {
       console.log(file);
       var vm = this;
-      this.$store.dispatch("removeFile", file).then(function(){
+      this.$store.dispatch('removeFile', file).then(function(){
         vm.$emit('RemoveItem', file);
       });
     }
   },
   mounted() {
-    this.$store.dispatch("changeFileLimit", this.fileLimit);
+    this.$store.dispatch('changeFileLimit', this.fileLimit);
     this.resetState();
+  },
+  destroyed(){
+    this.$store.dispatch('clearFiles');
   }
 });
 </script>
