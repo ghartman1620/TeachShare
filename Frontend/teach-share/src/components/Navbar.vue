@@ -11,9 +11,8 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
 
-
           <!-- create a post link -->
-          <li class="nav-item">
+          <li class="nav-item text-off-white">
             <router-link class="nav-link" to="/create">Create Post</router-link>
           </li>
 
@@ -33,8 +32,10 @@
 
         <!-- search box component -->
         <div class="search-container">
+          <search-box>
             <input type="text" placeholder="Search.." name="search">
             <button type="button"> <!--class="btn btn-outline-basic"--><img class="img search-button" src="/static/search.svg"></button>
+          </search-box>
         </div>
       </div>
     </div>
@@ -69,16 +70,27 @@ export default Vue.component('nav-bar', {
 .nav {
   height: 100px;
 }
-.dark-green {
-  background-color: #3B896A
+
+navbar-nav li nav-item {
+  color: #FFFFFF;
 }
+
+.dark-green {
+  background-color: #3B896A;
+  color: #FFFFFF;
+}
+
 .ts-logo {
   height: 45px;
   width: auto;
 }
+
 .search-button {
   height: 20px;
   width: auto;
+}
+.text-off-white {
+  color: #FFFFFF;
 }
 
 </style>

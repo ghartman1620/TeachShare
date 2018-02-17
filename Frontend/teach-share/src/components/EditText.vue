@@ -4,8 +4,8 @@
   <!--We can use any buttons we want in the toolbar!
   Check out the github for more examples, and the
   exact code needed for other types of buttons -->
-  <div class="container">
-  <div class="custom-quill-editor">
+  <div class="container editor-container">
+  <div class="custom-quill-editor" style="height: 100%">
     <quill-editor
        v-model="component.contents"
        :options="editorOption"
@@ -98,10 +98,10 @@ export default Vue.component("edit-text", {
   .quill-code {
     width: 100%;
     height: 100%;
+    min-height: 200px;
   }
 
   .quill-code {
-    border: none;
     height: auto;
   }
 

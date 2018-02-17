@@ -1,4 +1,25 @@
+<template>
+  <body>
+  <div class="row">
+    <div class="col-sm-9">
+      Level 1: .col-sm-9
+      <div class="row">
+        <div class="col-8 col-sm-6">
+          Level 2: .col-8 .col-sm-6
+        </div>
+        <div class="col-4 col-sm-6">
+          Level 2: .col-4 .col-sm-6
+        </div>
+      </div>
+    </div>
+  </div>
 
+  </body>
+
+</template>
+
+
+<!--
 <template>
 
 <body>
@@ -7,7 +28,6 @@
 <component class="card container foreground" v-bind:component="editedComponent" :index="editedComponentIndex"v-bind:is="editedComponentType"></component>
 <div :style=opacity>
 <div id="buttonbar">
-<!-- Text button -->
 
 <button type="button" v-on:click="createTextComponent"  class="btn btn-default btn-circle btn-xl" id="text-button"><span class="glyphicon glyphicon-asterisk"></span></button>
 <button type="button" v-on:click="createImageComponent" class="btn btn-default btn-circle btn-xl" id="image-button"><i class="glyphicon glyphicon-picture"></i></button>
@@ -15,7 +35,7 @@
 <button type="button" v-on:click="createVideoComponent" class="btn btn-default btn-circle btn-xl" id="video-button"><i class="glyphicons glyphicons-film"></i></button>
 <button type="button" v-on:click="createFileComponent" class="btn btn-default btn-circle btn-xl" id="file-button"><i class="glyphicons glyphicons-folder-open"></i></button>
 </div>
-<div class="container">
+<div class="container title-tags">
 <input class="postheader" type="text" v-model="title" placeholder="title"></input><br>
 <div class="card">
 <div v-for="(tag,index) in tags"> <button @click="removeTag(index)">{{tag}}</button></div>
@@ -28,13 +48,13 @@
 <div class="container">
 <div class="container" v-for="(component,index) in storeComponents">
   <div class="row">
-  <div class="col-1"><!-- col-xs-auto -->
+  <div class="col-1">
     <div id="arrange-btn-group" class="btn-group-vertical">
       <button @click="moveComponentUp(index)" class="up-down-button"><font face="courier">^</font></button>
       <button @click="moveComponentDown(index)" class="up-down-button"><font face="courier">v</font></button>
     </div>
   </div>
-  <div class="col-10"> <!-- col-11 -->
+  <div class="col-10">
   <div class="post-component card" v-if="component.type === 'text'">
     <view-text :component="component"></view-text>
   </div>
@@ -238,8 +258,8 @@ export default {
 #file-button { background: #23528E; }
 #buttonbar {
   margin: auto;
-  width:368px;
-  height: 70px;
+  width:370px;
+  height: 80px;
   background-color: #99B5AA;
   border-radius: 15px;
 }
@@ -260,10 +280,16 @@ export default {
   line-height: 1.33;
   border-radius: 35px;
 }
-.btn-ciricle.btn-xl:hover {
+.btn-circle.btn-xl:hover {
   box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+.title-tags {
+  width: 380px;
+  padding: 10px;
+
 }
 
 
-
 </style>
+
+-->
