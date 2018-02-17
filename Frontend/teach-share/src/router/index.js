@@ -36,11 +36,17 @@ export default new Router({
                         //     props: { isFile: true }
                         // },
                         {
-                            name: 'text',
+                            name: 'edit-text',
                             path: 'text',
                             component: EditText,
-                            props: {}
-                        }
+                            props: {
+                                component: {
+                                    type: 'text',
+                                    content: '',
+                                },
+                                index: 0,
+                            }
+                        },
                     ]
                 },
                 {

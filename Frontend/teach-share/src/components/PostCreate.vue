@@ -2,14 +2,12 @@
 <template>
 
 <body>
-<router-view/>
 
-<component class="card container foreground" v-bind:component="editedComponent" :index="editedComponentIndex"v-bind:is="editedComponentType"></component>
 <div :style=opacity>
 <div id="buttonbar">
 <!-- Text button -->
 
-<button type="button" class="btn btn-default btn-circle btn-xl" id="text-button"><router-link to="text"></router-link></button>
+<router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}"><button type="button" class="btn btn-default btn-circle btn-xl" id="text-button"></button></router-link>
 <button type="button" v-on:click="createImageComponent" class="btn btn-default btn-circle btn-xl" id="image-button"><i class="glyphicon glyphicon-picture"></i></button>
 <button type="button" v-on:click="createAudioComponent" class="btn btn-default btn-circle btn-xl" id="audio-button"><i class="glyphicon glyphicons-music"></i></button>
 <button type="button" v-on:click="createVideoComponent" class="btn btn-default btn-circle btn-xl" id="video-button"><i class="glyphicons glyphicons-film"></i></button>
@@ -54,7 +52,7 @@
   <div class="col 11">
     <div id="arrange-btn-group" class="btn-group-vertical">
       <button @click="removeComponent(index)"><font face="courier">x</font></button>
-      <button @click="editComponent(index)"><font face="courier">E</font></button>
+      <router-link :to="{ name: 'edit-text', query: {index: index}}"><button @click="editComponent(index)"><font face="courier">E</font></button></router-link>
     
     </div>
   </div>
@@ -63,7 +61,10 @@
 </div>
 <button v-on:click="submitPost">Publish</button>
 </div>
+<router-view/>
+
 </body>
+
 
 </template>
 
@@ -88,9 +89,9 @@ export default {
     }
   },
   computed: mapState({
-    editedComponentType: state => state.inProgressPostEditedComponentType,
-    storeComponents: state => state.inProgressPostComponents,
-    opacity: state => state.postOpacity
+    editedComponentType: state => state.create.editedComponentType,
+    storeComponents: state => state.create.postComponents,
+    opacity: state => state.create.postOpacity
   }),
   methods: {
     nop: function(){},
@@ -109,11 +110,11 @@ export default {
       this.$store.dispatch('fetchUser', 1)
     },
     submitPost: function(event){
-      console.log(this.$store.state.inProgressPostComponents);
+      console.log(this.$store.state.create.postComponents);
       var obj = {
         user : 1, 
         title : this.title, 
-        content : this.$store.state.inProgressPostComponents,
+        content : this.$store.state.create.postComponents,
         likes : 0,
         comments : [],
         tags: this.tags,
@@ -123,16 +124,14 @@ export default {
       this.$store.dispatch('createPost', obj)
     },
     editComponent: function(index) {
-      this.editedComponent = this.$store.state.inProgressPostComponents[index];
-      this.editedComponentIndex = index;
-      this.$store.dispatch("changeEditedComponent", "edit-" + this.editedComponent.type);
+      this.$store.dispatch('setEditedComponent', this.$store.state.create.postComponents[index]);
     },
     createTextComponent: function(event){
       this.editedComponent = {
         "type": "text",
         "contents" : "<p></p>",
       }
-      this.editedComponentIndex = this.$store.state.inProgressPostComponents.length;
+      this.editedComponentIndex = this.$store.state.create.postComponents.length;
       
       this.$store.dispatch("changeEditedComponent", "edit-text");
       console.log("create text component");
@@ -169,17 +168,23 @@ export default {
       }
     },
     moveComponentDown: function(index){
-      if(index != this.$store.state.inProgressPostComponents.length-1){
+      if(index != this.$store.state.create.postComponents.length-1){
         this.$store.dispatch("swapComponents", [index,index+1]);   
         //dispatch only allows one argument so we'll pass them as an array        
       }
     },
     removeComponent: function(index){
       this.$store.dispatch("removeComponent", index);
+    },
+    maxComponentIndex() {
+      return this.$store.state.create.postComponents.length;
     }
   },
-  beforeMount(){
-    this.getUser()
+  mounted(){
+    this.getUser();
+    window.onpopstate = function() {
+      console.log("window pop");
+    }
   },
 }
 

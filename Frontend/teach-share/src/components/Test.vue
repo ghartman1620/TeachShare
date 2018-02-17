@@ -8,10 +8,8 @@
 import { mapState } from 'vuex';
 //removed { } from ListComponent because it generated a warning
 //possibly because ListComponent exports something?
-import  ListComponent  from './ListComponent';
 
 export default {
-  components: {ListComponent},
   name: 'Test',
   data: function() {
     return {
