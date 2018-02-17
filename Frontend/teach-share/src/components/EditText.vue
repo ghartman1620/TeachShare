@@ -81,7 +81,6 @@ export default Vue.component("edit-text", {
             "component": this.component
           });
         }
-        this.$store.dispatch("setEditedComponent", null)
         
       },
       close: function(event){

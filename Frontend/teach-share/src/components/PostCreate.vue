@@ -3,7 +3,7 @@
 
 <body>
 
-<div :style=opacity>
+<div >
 <div id="buttonbar">
 <!-- Text button -->
 
@@ -63,6 +63,7 @@
 </div>
 <router-view/>
 
+
 </body>
 
 
@@ -76,6 +77,7 @@ import EditText from './EditText';
 import EditImage from './images/EditImage';
 import ViewText from './ViewText';
 
+
 export default {
 
   name: 'post-create',
@@ -88,11 +90,12 @@ export default {
       tags: [],
     }
   },
-  computed: mapState({
-    editedComponentType: state => state.create.editedComponentType,
-    storeComponents: state => state.create.postComponents,
-    opacity: state => state.create.postOpacity
-  }),
+  computed:{
+    storeComponents() {
+      return this.$store.state.create.postComponents;
+    }
+  },
+
   methods: {
     nop: function(){},
     removeTag: function(index) {
@@ -135,7 +138,6 @@ export default {
       
       this.$store.dispatch("changeEditedComponent", "edit-text");
       console.log("create text component");
-      this.opacity.opacity = .3;
       
     },
     createImageComponent: function(event){
@@ -145,19 +147,16 @@ export default {
     createAudioComponent: function(event){
 
       console.log("hi world");
-      this.opacity.opacity = .3;
       
     },
     createVideoComponent: function(event){
 
       console.log("hi world");
-      this.opacity.opacity = .3;
       
     },
     createFileComponent: function(event){
 
       console.log("hi world");
-      this.opacity.opacity = .3;
       
     },
     moveComponentUp: function(index){
@@ -178,13 +177,14 @@ export default {
     },
     maxComponentIndex() {
       return this.$store.state.create.postComponents.length;
-    }
+    },
+
   },
   mounted(){
     this.getUser();
     window.onpopstate = function() {
-      console.log("window pop");
-    }
+      console.log("location: " + document.location + ", state: " + JSON.stringify(event.state));
+    };
   },
 }
 

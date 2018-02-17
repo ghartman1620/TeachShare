@@ -4,19 +4,15 @@ import Vue from 'vue';
 const PostCreateService = {
     state:{
         postComponents: [],
-        postOpacity: { opacity: 1 },
-        editedComponent: null,
     },
     mutations:{
-        SET_EDITED_COMPONENT: (state, component) => {
-            console.log('in set edited component mutation');
-            state.editedComponent = component;
+        emptyState() {
+            this.state.postComponents = [];    
         },
-        // Mutations for the currently edited post data: editedComponentType and postComponents
+
+        // Mutations for the currently edited post data:  and postComponents
         ADD_COMPONENT: (state, component) => {
-            console.log(state.postComponents);
             state.postComponents.push(component);
-            console.log(state.postComponents);
             console.log('add component mutation');
         },
         SWAP_COMPONENTS: (state, iAndJ) => {
@@ -40,9 +36,7 @@ const PostCreateService = {
     },
     actions:{
         // Actions for in progress posts
-        setEditedComponent: (state, component) => {
-            state.commit('SET_EDITED_COMPONENT', component);
-        },
+
         addComponent: (state, component) => {
             console.log('add_component action');
             state.commit('ADD_COMPONENT', component);
