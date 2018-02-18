@@ -46,8 +46,8 @@
     <router-link :to="{ name: 'edit-text', query: {index: index}}"><button><font face="courier">E</font></button></router-link>
 
   </div>
-  <div class="post-component card" v-else-if="component.type === 'image'">
-    <p>An image component!</p>  
+  <div class="post-component card" v-else-if="component.type === 'image_file'">
+    <image-component :title="component.title" :body="component.description" :images="component.content"/>
   </div>
   <div class="post-component card" v-else-if="component.type === 'audio'">
     <audio-component :id="component.content[0].id" 
@@ -59,11 +59,15 @@
     <router-link :to="{ name: 'edit-audio', query: {index: index}}"><button><font face="courier">E</font></button></router-link>
 
    </div>
-  <div class="post-component card" v-else-if="component.type === 'video'">
+  <div class="post-component card" v-else-if="component.type === 'video_embed' || component.type === 'video_file'">
     <p>A video component!</p>  
   </div>
-  <div class="post-component card" v-else>
+  <div class="post-component card" v-else-if="component.type === 'file'">
     <p>A file component!</p>  `
+  </div>
+  <div v-else>
+    Something bad!
+    {{component}}
   </div>
   </div>
   <div class="col 11">
@@ -94,6 +98,7 @@ import { mapState } from 'vuex';
 
 import ViewText from './ViewText';
 import AudioComponent from './audio/AudioComponent'
+import ImageComponent from './image/ImageComponent'
 
 export default {
 

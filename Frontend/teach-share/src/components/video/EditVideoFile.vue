@@ -37,20 +37,25 @@
             <span v-else>Submit Video(s)</span>
           </button>
         </div>
+        <div class="col-2">
+            <button type="button" class="btn btn-danger btn-block" @click.prevent="cancelEdit">
+                Cancel
+            </button>
+        </div>
       </div>
     </form>
   </div>
 </template>
 
 <script>
-import Vue from 'vue';
-import FileUpload from '../FileUpload';
-import DimensionPicker from '../DimensionPicker';
-import { mapGetters } from 'vuex';
+import Vue from "vue";
+import FileUpload from "../FileUpload";
+import DimensionPicker from "../DimensionPicker";
+import { mapGetters } from "vuex";
 
-var _ = require('lodash');
+var _ = require("lodash");
 
-export default Vue.component('edit-video-file', {
+export default Vue.component("edit-video-file", {
   components: { FileUpload, DimensionPicker },
   props: [],
   data() {
@@ -71,7 +76,7 @@ export default Vue.component('edit-video-file', {
         this.title = val;
       }
     },
-    ...mapGetters(['hasFiles', 'allFilesUploadComplete'])
+    ...mapGetters(["hasFiles", "allFilesUploadComplete"])
   },
   methods: {
     DebounceFileSubmit: _.throttle(function() {
@@ -85,7 +90,7 @@ export default Vue.component('edit-video-file', {
         console.log(val, ind, arr);
         output.push({
           post: 2,
-          type: 'video_file',
+          type: "video_file",
           id: val.db_id,
           height: self.height,
           title: self.ActualTitle,
@@ -96,19 +101,22 @@ export default Vue.component('edit-video-file', {
           description: self.fileDescription
         });
       });
-      console.log('data being submitted: ', output);
-      this.$store.dispatch('submitVideoFiles', output).then(()=> {
-        console.log('completed submit');
+      console.log("data being submitted: ", output);
+      this.$store.dispatch("submitVideoFiles", output).then(() => {
+        console.log("completed submit");
         // this.$store.dispatch('removeNewVideos');
       });
       return output;
+    },
+    cancelEdit() {
+      this.$router.push({ name: "create" });
     }
   },
   mounted() {
-    this.$on('changeHeight', function(h) {
+    this.$on("changeHeight", function(h) {
       this.height = h;
     });
-    this.$on('changeWidth', function(w){
+    this.$on("changeWidth", function(w) {
       this.width = w;
     });
   }

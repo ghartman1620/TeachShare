@@ -109,7 +109,9 @@ export default{
             var height = document.documentElement.offsetHeight;
 
             if (offset >= height) {
+                console.log("scroll to bototm");
                 this.getPosts();
+
             }        
         },
         checkHeights(){

@@ -13,8 +13,8 @@
               <p>some fake text here!</p>
             </div>
           </div>
-
-          <div v-bind:key="i.id" v-for="i in this.$store.state.image.images" class="carousel-item">
+          
+          <div v-bind:key="i.id" v-for="i in this.images" class="carousel-item">
             <img class="d-block w-100" :src="URL(i.url)">
             <div class="carousel-caption d-none d-md-block">
               <h3>{{i.title}}</h3>
@@ -34,16 +34,16 @@
 
 
           <br><br>
-          <h4 v-if="!editing" class="card-title">{{ localTitle }}</h4>
-          <input @change.prevent="changedTitle" class="col-12" v-if="editing" v-model="localTitle" type="text">
-          <p v-if="!editing" class="card-text">
+          <h4 v-if="!editing" @dblclick="ToggleEditText" class="card-title">{{ localTitle }}</h4>
+          <input @dblclick="ToggleEditText" @change.prevent="changedTitle" class="col-12" v-if="editing" v-model="localTitle" type="text">
+          <p v-if="!editing" @dblclick="ToggleEditText" class="card-text">
             {{localBody}}
           </p>
-          <textarea class="col-12" @change.prevent="changedBody" v-if="editing" v-model="localBody" rows="3"></textarea>
+          <textarea @dblclick="ToggleEditText" class="col-12" @change.prevent="changedBody" v-if="editing" v-model="localBody" rows="3"></textarea>
           <div class="row">
             <div class="col-auto mr-auto"/>
             <div class="col-auto">
-              <button type="button" @click.prevent="ToggleEditText" class="btn btn-warning">Edit</button>
+              <button type="button" class="btn btn-warning">Edit</button>
             </div>
           </div>
         </div>
@@ -56,11 +56,7 @@
 import Vue from "vue";
 
 export default Vue.component("image-component", {
-  props: [
-    'title',
-    'body',
-    'images'
-  ],
+  props: ["title", "body", "images"],
   data() {
     return {
       audio: null,
@@ -75,6 +71,8 @@ export default Vue.component("image-component", {
     }
   },
   mounted: function() {
+    console.log('in imagecomponent');
+    console.log(this.images);
     this.audio = document.getElementById(this.id);
   },
   methods: {
@@ -91,16 +89,16 @@ export default Vue.component("image-component", {
       return `http://localhost:8000${val}`;
     },
     ToggleEditText() {
-      console.log('editing text!')
+      console.log("editing text!");
       this.editing = !this.editing;
     },
     changedTitle() {
-      console.log('emit!');
-      this.$parent.$emit('changedTitle', this.localTitle);
+      console.log("emit!");
+      this.$parent.$emit("changedTitle", this.localTitle);
     },
     changedBody() {
-      console.log('emit!');
-      this.$parent.$emit('changedBody', this.localBody);
+      console.log("emit!");
+      this.$parent.$emit("changedBody", this.localBody);
     }
   }
 });

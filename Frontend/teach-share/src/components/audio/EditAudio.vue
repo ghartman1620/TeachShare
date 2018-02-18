@@ -75,10 +75,10 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import FileUpload from '../FileUpload';
-import { mapGetters } from 'vuex';
-import AudioComponent from './AudioComponent';
+import Vue from "vue";
+import FileUpload from "../FileUpload";
+import { mapGetters } from "vuex";
+import AudioComponent from "./AudioComponent";
 
 var _ = require("lodash");
 
