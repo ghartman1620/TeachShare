@@ -8,7 +8,7 @@ const VideoService = {
     },
     mutations: {
         LOAD_VIDEO_INSTANCE: (state, data) => {
-            let current = _.findIndex(state.videos, (v) => v.id === data.id);
+            let current = _.findIndex(state.videos, v => v.id === data.id);
             if (current > -1) {
                 console.log(data);
                 Vue.set(state.videos, current, data);
@@ -28,23 +28,26 @@ const VideoService = {
     },
     actions: {
         submitVideoEmbed: (state, data) => {
-            state.commit('LOAD_VIDEO_INSTANCE', data);
+            state.commit("LOAD_VIDEO_INSTANCE", data);
         },
         submitVideoFiles: (state, data) => {
-            console.log('submitVIDEOFiles: ', data)
+            console.log("submitVIDEOFiles: ", data);
             if (data.length) {
                 _.forEach(data, function(val) {
-                    state.commit('LOAD_VIDEO_INSTANCE', val);
+                    state.commit("LOAD_VIDEO_INSTANCE", val);
                 });
                 return;
             }
-            state.commit('LOAD_VIDEO_INSTANCE', data);
+            state.commit("LOAD_VIDEO_INSTANCE", data);
         },
-        removeNewVideos: (state, data) => {
-            state.commit('CLEAR_NEW_VIDEOS');
+        submitVideoFile: (state, data) => {
+            state.commit("LOAD_VIDEO_INSTANCE", data);
+        },
+        removeAllVideos: (state, data) => {
+            state.commit("CLEAR_VIDEOS");
         },
         removeVideo: (state, data) => {
-            state.commit('REMOVE_VIDEO', data);
+            state.commit("REMOVE_VIDEO", data);
         }
     },
     getters: {}

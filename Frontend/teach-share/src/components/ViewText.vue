@@ -1,6 +1,5 @@
 <template>
 <body>
-<p> I'm a text view component! </p>
 <p v-html="component.content"></p>
 </body>
 

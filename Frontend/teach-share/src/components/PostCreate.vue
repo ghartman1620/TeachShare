@@ -10,7 +10,7 @@
 <router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}">
   <button type="button" class="btn btn-default btn-circle btn-xl" id="text-button"></button>
 </router-link>
-<router-link :to="{name: 'edit-video', query: {index: this.maxComponentIndex()}}">
+<router-link :to="{name: 'edit-video', query: {index: this.maxComponentIndex(), videotype: 'embed'}}">
   <button type="button" class="btn btn-default btn-circle btn-xl" id="video-button"></button>
 </router-link>
 <router-link :to="{name: 'edit-audio', query: {index: this.maxComponentIndex()}}">
@@ -58,9 +58,37 @@
     autoplay="false"/>
     <router-link :to="{ name: 'edit-audio', query: {index: index}}"><button><font face="courier">E</font></button></router-link>
 
-   </div>
-  <div class="post-component card" v-else-if="component.type === 'video_embed' || component.type === 'video_file'">
-    <p>A video component!</p>  
+  </div>
+
+  <div class="post-component card" v-else-if="component.type === 'video_link' || component.type === 'video_file'">
+      <div v-if="component.type === 'video_link'">
+          <video-component
+            name="vid-comp1"
+            :id="component.content.id"
+            :height="component.content.height"
+            :width="component.content.width"
+            :title="component.content.title"
+            :source="component.content.url"
+            controls="true"
+            autoplay="false"
+            isEmbed=true>
+          <div slot="description">{{component.content.description}}</div>
+          </video-component>
+        </div>
+        <div v-else>
+          <video-component
+            name="vid-comp2"
+            :id="component.content.id"
+            :height="component.content.height"
+            :width="component.content.width"
+            :title="component.content.title"
+            :source="component.content.url"
+            controls="true"
+            autoplay="false"
+            isFile=true>
+          <div slot="description">{{component.content.description}}</div>
+          </video-component>
+       </div>
   </div>
   <div class="post-component card" v-else-if="component.type === 'file'">
     <p>A file component!</p>  `
@@ -99,160 +127,139 @@ import { mapState } from 'vuex';
 import ViewText from './ViewText';
 import AudioComponent from './audio/AudioComponent'
 import ImageComponent from './image/ImageComponent'
+import VideoComponent from "./video/VideoComponent";
 
 export default {
-
-  name: 'post-create',
+  name: "post-create",
+  components: { ViewText, AudioComponent, ImageComponent, VideoComponent },
   data: function() {
     return {
-      title: '',
+      title: "",
       editedComponent: {},
       editedComponentIndex: -1,
-      inProgressTag: '',
-      tags: [],
-    }
+      inProgressTag: "",
+      tags: []
+    };
   },
-  computed:{
+  computed: {
     storeComponents() {
       return this.$store.state.create.postComponents;
     },
     nextStateId() {
-      return this.$store.state.create.nextStateId;  
-    },
-
+      return this.$store.state.create.nextStateId;
+    }
   },
 
   methods: {
-    nop: function(){},
+    nop: function() {},
     removeTag: function(index) {
-      console.log('remove tag' + index);
+      console.log("remove tag" + index);
       this.tags.splice(index, 1);
     },
     createTag: function(e) {
-      if (e.keyCode === 13 && this.inProgressTag !== '') {
-        console.log('enter pressed');
+      if (e.keyCode === 13 && this.inProgressTag !== "") {
+        console.log("enter pressed");
         this.tags.push(this.inProgressTag);
-        this.inProgressTag = '';
+        this.inProgressTag = "";
       }
     },
-    getUser: function(){
-      this.$store.dispatch('fetchUser', 1)
+    getUser: function() {
+      this.$store.dispatch("fetchUser", 1);
     },
-    submitPost: function(event){
+    submitPost: function(event) {
       console.log(this.$store.state.create.postComponents);
       var obj = {
-        user : 1, 
-        title : this.title, 
-        content : this.$store.state.create.postComponents,
-        likes : 0,
-        comments : [],
+        user: 1,
+        title: this.title,
+        content: this.$store.state.create.postComponents,
+        likes: 0,
+        comments: [],
         tags: this.tags,
-        attachments : [],
-      }
-      console.log(obj)
-      this.$store.dispatch('createPost', obj)
+        attachments: []
+      };
+      console.log(obj);
+      this.$store.dispatch("createPost", obj);
+    },
+    editComponent: function(index) {
+      this.$store.dispatch(
+        "setEditedComponent",
+        this.$store.state.create.postComponents[index]
+      );
     },
 
-    createTextComponent: function(event){
-      this.editedComponent = {
-        'type': 'text',
-        'contents' : '<p></p>',
-      }
-      this.editedComponentIndex = this.$store.state.create.postComponents.length;
-      
-      this.$store.dispatch('changeEditedComponent', 'edit-text');
-      console.log('create text component');
-      
-    },
-    createImageComponent: function(event){
-      this.$store.dispatch('changeEditedComponent', 'edit-image');
-      console.log('create image component');
-    },
-    createAudioComponent: function(event){
-
-      console.log('hi world');
-      
-    },
-    createVideoComponent: function(event){
-
-      console.log('hi world');
-      
-    },
-    createFileComponent: function(event){
-
-      console.log('hi world');
-      
-    },
-    moveComponentUp: function(index){
-      console.log('moveComponentUp:'  + index);
-      if(index != 0){
-        this.$store.dispatch('swapComponents', [index,index-1]);   
-        //dispatch only allows one argument so we'll pass them as an array        
+    moveComponentUp: function(index) {
+      console.log("moveComponentUp:" + index);
+      if (index != 0) {
+        this.$store.dispatch("swapComponents", [index, index - 1]);
+        //dispatch only allows one argument so we'll pass them as an array
       }
     },
-    moveComponentDown: function(index){
-      if(index != this.$store.state.create.postComponents.length-1){
-        this.$store.dispatch('swapComponents', [index,index+1]);   
-        //dispatch only allows one argument so we'll pass them as an array        
+    moveComponentDown: function(index) {
+      if (index != this.$store.state.create.postComponents.length - 1) {
+        this.$store.dispatch("swapComponents", [index, index + 1]);
+        //dispatch only allows one argument so we'll pass them as an array
       }
     },
-    removeComponent: function(index){
-      this.$store.dispatch('removeComponent', index);
+    removeComponent: function(index) {
+      this.$store.dispatch("removeComponent", index);
     },
     maxComponentIndex() {
       return this.$store.state.create.postComponents.length;
     },
     undo() {
-      this.$store.dispatch('undo');
+      this.$store.dispatch("undo");
     },
     redo() {
-      this.$store.dispatch('redo');
+      this.$store.dispatch("redo");
     }
-  },
-
-}
-
+  }
+};
 </script>
 
 
 <style scoped>
-
-
 .foreground {
   position: fixed;
   left: 20%;
   top: 20%;
   width: 80%;
   margin: auto;
-  z-index: 2;  
+  z-index: 2;
   opacity: 1;
 }
 
-
 .postheader {
   height: 30px;
-  width:100%;
+  width: 100%;
 }
-
 
 /* Submitted components now being viewed */
 .container-component {
-  width:60%;  
+  width: 60%;
   height: 300px;
 }
 
-
 /* The five buttons on the button bar */
-#text-button { background: #FFAE03; }
-#image-button { background: #1D3461; }
-#audio-button { background: #42AA8B; }
-#video-button { background: #E07700; }
-#file-button { background: #23528E; }
+#text-button {
+  background: #ffae03;
+}
+#image-button {
+  background: #1d3461;
+}
+#audio-button {
+  background: #42aa8b;
+}
+#video-button {
+  background: #e07700;
+}
+#file-button {
+  background: #23528e;
+}
 #buttonbar {
   margin: auto;
-  width:368px;
+  width: 368px;
   height: 70px;
-  background-color: #99B5AA;
+  background-color: #99b5aa;
   border-radius: 15px;
 }
 .btn-circle {
@@ -273,9 +280,7 @@ export default {
   border-radius: 35px;
 }
 .btn-ciricle.btn-xl:hover {
-  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+  box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24),
+    0 17px 50px 0 rgba(0, 0, 0, 0.19);
 }
-
-
-
 </style>

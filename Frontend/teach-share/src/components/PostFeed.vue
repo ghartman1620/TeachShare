@@ -18,7 +18,8 @@
     </div>
        
 </div>
-<br><!-- this br is required so scroll() can function properly-->
+<br><br><!-- this br is required so scroll() can function properly-->
+<button @click="getPosts"></button>
 </body>
 </template>
 

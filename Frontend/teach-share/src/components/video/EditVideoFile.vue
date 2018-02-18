@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form v-on:submit.prevent="DebounceFileSubmit">
+    <form v-on:submit.prevent="submit">
       <file-upload :fileLimit="1" title="Upload Video Files" fileAcceptType="VID"></file-upload>
       <br>
       <div class="row">
@@ -80,33 +80,39 @@ export default Vue.component("edit-video-file", {
   },
   methods: {
     DebounceFileSubmit: _.throttle(function() {
-      this.GenerateComponentFileJSON();
+      this.generateFileJSON();
     }, 1000),
-    GenerateComponentFileJSON() {
-      var output = new Array();
-      var self = this;
-
-      _.map(this.$store.state.fs.uploadedFiles, function(val, ind, arr) {
-        console.log(val, ind, arr);
-        output.push({
-          post: 2,
-          type: "video_file",
-          id: val.db_id,
-          height: self.height,
-          title: self.ActualTitle,
-          width: self.width,
-          file: val.file,
-          name: val.file.name,
-          url: val.url,
-          description: self.fileDescription
+    submit() {
+      if (
+        this.$route.query.index ==
+        this.$store.state.create.postComponents.length
+      ) {
+        this.$store.dispatch("addComponent", this.generateFileJSON());
+      } else {
+        this.$store.dispatch("editComponent", {
+          index: this.$route.query.index,
+          component: this.generateFileJSON()
         });
-      });
-      console.log("data being submitted: ", output);
-      this.$store.dispatch("submitVideoFiles", output).then(() => {
-        console.log("completed submit");
-        // this.$store.dispatch('removeNewVideos');
-      });
-      return output;
+      }
+      this.$router.push({ name: "create" });
+    },
+    generateFileJSON() {
+      let val = this.$store.state.fs.uploadedFiles[0];
+      var obj = {
+        post: 2,
+        type: "video_file",
+        id: val.db_id,
+        height: this.height,
+        title: this.ActualTitle,
+        width: this.width,
+        file: val.file,
+        name: val.file.name,
+        url: val.url,
+        description: this.fileDescription
+      };
+      this.$store.dispatch("submitVideoFile", obj);
+      console.log(obj);
+      return { type: "video_file", content: obj };
     },
     cancelEdit() {
       this.$router.push({ name: "create" });
@@ -119,6 +125,9 @@ export default Vue.component("edit-video-file", {
     this.$on("changeWidth", function(w) {
       this.width = w;
     });
+  },
+  destroyed() {
+    this.$store.dispatch("removeAllVideos");
   }
 });
 </script>

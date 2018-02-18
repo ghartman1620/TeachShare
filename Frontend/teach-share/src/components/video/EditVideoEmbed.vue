@@ -4,7 +4,7 @@
     <p>
       Enter the embed url here
     </p>
-    <form v-on:submit.prevent="generateComponentEmbedJSON">
+    <form v-on:submit.prevent="submit">
       <div class="input-group mb-3">
         <div class="input-group-prepend">
           <span class="input-group-text" id="basic-addon3">Embed URL</span>
@@ -116,6 +116,19 @@ export default Vue.component("edit-video-embed", {
     DebounceSubmit: _.debounce(function() {
       this.getYoutubeData();
     }, 400),
+    submit() {
+      if (
+        this.$route.query.index ==
+        this.$store.state.create.postComponents.length
+      ) {
+        this.$store.dispatch("addComponent", this.generateEmbedJSON());
+      } else {
+        this.$store.dispatch("editComponent", {
+          index: this.$route.query.index,
+          component: this.generateEmbedJSON()
+        });
+      }
+    },
 
     getYoutubeData() {
       var self = this;
@@ -123,7 +136,7 @@ export default Vue.component("edit-video-embed", {
         .dispatch("getYoutubeVideoInfo", this.EmbedURL)
         .catch(err => console.log(err));
     },
-    generateComponentEmbedJSON() {
+    generateEmbedJSON() {
       var obj = {
         post: 2,
         type: "video_link",
@@ -137,6 +150,7 @@ export default Vue.component("edit-video-embed", {
       };
       this.$store.dispatch("submitVideoEmbed", obj);
       console.log(obj);
+      this.$router.push({ name: "create" });
       return { type: "video_link", content: obj };
     },
     cancelEdit() {
@@ -150,6 +164,9 @@ export default Vue.component("edit-video-embed", {
     this.$on("changeWidth", function(w) {
       this.width = w;
     });
+  },
+  destroyed() {
+    this.$store.dispatch("clearYoutubeData");
   }
 });
 </script>

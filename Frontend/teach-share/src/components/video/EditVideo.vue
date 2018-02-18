@@ -5,21 +5,21 @@
     <div class="card">
     <nav>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-      <router-link class="nav-item nav-link active"
+      <router-link :class="embedActiveStyle"
         id="nav-home-tab"
         data-toggle="tab"
         href="#nav-home"
-        to=""
+        :to="{name: 'edit-video', query: {index: this.$route.query.index, videotype: 'embed' }}"
         role="tab"
         aria-controls="nav-home"
         aria-selected="true">
           Video Link (YouTube, Vimeo, etc...)
       </router-link>
-      <router-link class="nav-item nav-link"
+      <router-link :class="uploadActiveStyle"
         id="nav-profile-tab"
         data-toggle="tab"
         href="#nav-profile"
-        to=""
+        :to="{name: 'edit-video', query: {index: this.$route.query.index, videotype: 'upload' }}"
         role="tab"
         aria-controls="nav-profile"
         aria-selected="false">
@@ -50,44 +50,6 @@
     {{errors}}
     <br><br>
 
-    <div class="container">
-
-    <div v-if="this.$store.state.video.videos.length > 0"
-      v-bind:style="styleObject"
-      class="">
-      <div :key="v.id" v-for="v in this.$store.state.video.videos">
-        <div v-if="v.type === 'video_link'">
-          <video-component
-            name="vid-comp1"
-            :id="v.id"
-            :height="v.height"
-            :width="v.width"
-            :title="v.title"
-            :source="v.url"
-            controls="true"
-            autoplay="false"
-            isEmbed=true>
-          <div slot="description">{{v.description}}</div>
-          </video-component>
-        </div>
-          <div v-else>
-          <video-component
-            name="vid-comp2"
-            :id="v.id"
-            :height="v.height"
-            :width="v.width"
-            :title="v.title"
-            :source="v.url"
-            controls="true"
-            autoplay="false"
-            isFile=true>
-          <div slot="description">{{v.description}}</div>
-          </video-component>
-        </div>
-
-      </div>
-    </div>
-    </div>
     <br><br><br>
 
   </div>
@@ -95,49 +57,59 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import EditVideoEmbed from './EditVideoEmbed';
-import EditVideoFile from './EditVideoFile';
-import { mapGetters } from 'vuex';
+import Vue from "vue";
+import EditVideoEmbed from "./EditVideoEmbed";
+import EditVideoFile from "./EditVideoFile";
+import { mapGetters } from "vuex";
 
 var _ = require("lodash");
 
-export default Vue.component('edit-video', {
+export default Vue.component("edit-video", {
   components: { EditVideoFile, EditVideoEmbed },
   props: [],
   data() {
     return {
       styleObject: {
-        'max-height': 100
+        "max-height": 100
       }
     };
   },
   computed: {
-    DescriptionEmbed(){
+    embedActiveStyle() {
+      let t = this.$route.query.videotype;
+      if (t === "embed") {
+        return "nav-item nav-link active";
+      }
+      return "nav-item nav-link";
+    },
+    uploadActiveStyle() {
+      let t = this.$route.query.videotype;
+      if (t === "upload") {
+        return "nav-item nav-link active";
+      }
+      return "nav-item nav-link";
+    },
+    DescriptionEmbed() {
       return this.$store.state.video.videos[0].description;
     },
-    DescriptionFile(){
+    DescriptionFile() {
       return this.$store.state.video.videos[0].description;
     },
     RemovedFile() {
       var vm = this;
-      this.$on('RemoveItem', function(item){
-        console.log('Removed: ', item);
-        vm.$dispatch('removeVideo', item);
+      this.$on("RemoveItem", function(item) {
+        console.log("Removed: ", item);
+        vm.$dispatch("removeVideo", item);
       });
     }
   },
-  methods: {
-
-
-  },
-  mounted () {
+  methods: {},
+  mounted() {
     this.$nextTick(() => {
       // let h = this.$children[4].$el.clientHeight;
       // this.styleObject['max-height'] = 500;
       // console.log('CLIENT HEIGHT: ', h);
-
-    })
+    });
   }
 });
 </script>
@@ -154,10 +126,10 @@ export default Vue.component('edit-video', {
   transition: opacity 0.2s ease;
 }
 
-.fade-enter, .fade-leave {
+.fade-enter,
+.fade-leave {
   backface-visibility: hidden;
   opacity: 0;
 }
-
 </style>
 
