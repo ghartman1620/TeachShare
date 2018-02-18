@@ -65,62 +65,60 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import FileUpload from '../FileUpload';
-import { mapGetters } from 'vuex';
-import AudioComponent from './AudioComponent';
+import Vue from "vue";
+import FileUpload from "../FileUpload";
+import { mapGetters } from "vuex";
+import AudioComponent from "./AudioComponent";
 
 var _ = require("lodash");
 
-export default Vue.component('audio-edit-component', {
+export default Vue.component("audio-edit-component", {
   components: { FileUpload, AudioComponent },
   props: [],
   data() {
     return {
-        title: '',
-        description: ''
+      title: "",
+      description: ""
     };
   },
   computed: {
-    changedTextRecv() {
-        
-    },
-    ...mapGetters(['hasFiles', 'allFilesUploadComplete'])
+    changedTextRecv() {},
+    ...mapGetters(["hasFiles", "allFilesUploadComplete"])
   },
   methods: {
-      SubmitAudio() {
-          console.log(this.title);
-          console.log(this.description);
-          this.$store.dispatch('submitAudioFiles', this.GenerateJSON());
-      },
-      GenerateJSON() {
-          let output = new Array();
-          var vm = this;
-          _.map(this.$store.state.fs.uploadedFiles, function(val, ind, arr) {
-            console.log(val, ind, arr);
-            output.push({
-                post: 2,
-                type: 'audio_file',
-                id: val.db_id,
-                title: vm.title,
-                file: val.file,
-                name: val.file.name, 
-                url: val.url,
-                description: vm.description
-            });
+    SubmitAudio() {
+      console.log(this.title);
+      console.log(this.description);
+      this.$store.dispatch("submitAudioFiles", this.GenerateJSON());
+    },
+    GenerateJSON() {
+      let output = new Array();
+      var vm = this;
+      _.map(this.$store.state.fs.uploadedFiles, function(val, ind, arr) {
+        console.log(val, ind, arr);
+        output.push({
+          post: 2,
+          type: "audio_file",
+          id: val.db_id,
+          title: vm.title,
+          filetype: val.file.type,
+          name: val.file.name,
+          url: val.url,
+          description: vm.description
         });
-        console.log(output);
-        return output;
-      }
+      });
+      console.log(output);
+      return output;
+    }
   },
-  created () {
-    this.$on('changedTitle', function(res) {
-            console.log('CHANGED!!!', res);
-            this.title = res;
+  created() {
+    this.$on("changedTitle", function(res) {
+      console.log("CHANGED!!!", res);
+      this.title = res;
     });
-    this.$on('changedBody', function(res) {
-        console.log('CHANGED!!!', res);
-        this.description = res;
+    this.$on("changedBody", function(res) {
+      console.log("CHANGED!!!", res);
+      this.description = res;
     });
   }
 });

@@ -4,7 +4,7 @@
     <p>
       Enter the embed url here
     </p>
-    <form v-on:submit.prevent="GenerateComponentEmbedJSON">
+    <form v-on:submit.prevent="generateComponentEmbedJSON">
       <div class="input-group mb-3">
         <div class="input-group-prepend">
           <span class="input-group-text" id="basic-addon3">Embed URL</span>
@@ -62,21 +62,26 @@
             <span v-else>Please enter a valid link</span>
           </button>
         </div>
+        <div class="col-2">
+            <button type="button" class="btn btn-danger btn-block" @click.prevent="cancelEdit">
+                Cancel
+            </button>
+        </div>
       </div>
     </form>
   </div>
 </template>
 
 <script>
-import Vue from 'vue';
-import FileUpload from '../FileUpload';
-import EditVideoEmbed from './EditVideoEmbed';
-import DimensionPicker from '../DimensionPicker';
-import { mapGetters } from 'vuex';
+import Vue from "vue";
+import FileUpload from "../FileUpload";
+import EditVideoEmbed from "./EditVideoEmbed";
+import DimensionPicker from "../DimensionPicker";
+import { mapGetters } from "vuex";
 
 var _ = require("lodash");
 
-export default Vue.component('edit-video-embed', {
+export default Vue.component("edit-video-embed", {
   components: { DimensionPicker },
   props: [],
   data() {
@@ -88,7 +93,7 @@ export default Vue.component('edit-video-embed', {
       EmbedURL: "",
       EmbedDescription: "",
       EmbedHeight: 480,
-      includeYtData: true,
+      includeYtData: true
     };
   },
   computed: {
@@ -109,16 +114,16 @@ export default Vue.component('edit-video-embed', {
   },
   methods: {
     DebounceSubmit: _.debounce(function() {
-      this.GetYoutubeData();
+      this.getYoutubeData();
     }, 400),
 
-    GetYoutubeData() {
+    getYoutubeData() {
       var self = this;
       this.$store
         .dispatch("getYoutubeVideoInfo", this.EmbedURL)
         .catch(err => console.log(err));
     },
-    GenerateComponentEmbedJSON() {
+    generateComponentEmbedJSON() {
       var obj = {
         post: 2,
         type: "video_link",
@@ -130,16 +135,19 @@ export default Vue.component('edit-video-embed', {
         thumbnail: this.ytVideoThumbnail,
         description: this.ActualDescription
       };
-      this.$store.dispatch('submitVideoEmbed', obj);
+      this.$store.dispatch("submitVideoEmbed", obj);
       console.log(obj);
-      return obj;
+      return { type: "video_link", content: obj };
+    },
+    cancelEdit() {
+      this.$router.push({ name: "create" });
     }
   },
   mounted() {
-    this.$on('changeHeight', function(h) {
+    this.$on("changeHeight", function(h) {
       this.height = h;
     });
-    this.$on('changeWidth', function(w){
+    this.$on("changeWidth", function(w) {
       this.width = w;
     });
   }
@@ -147,16 +155,16 @@ export default Vue.component('edit-video-embed', {
 </script>
 
 <style lang="scss" scoped>
-
 .outline-danger {
   border-color: red;
   border-width: 0.1em;
 }
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 1s;
 }
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
 }
-
 </style>
