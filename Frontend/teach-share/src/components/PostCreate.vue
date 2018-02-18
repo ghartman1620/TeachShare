@@ -19,7 +19,7 @@
 <router-link :to="{name: 'edit-image', query: {index: this.maxComponentIndex()}}">
   <button type="button" class="btn btn-default btn-circle btn-xl" id="image-button"></button>
 </router-link>
-<button type="button"  class="btn btn-default btn-circle btn-xl" id="file-button"><i class="glyphicons glyphicons-folder-open"></i></button>
+  <button type="button" class="btn btn-default btn-circle btn-xl" id="file-button"><i class="glyphicons glyphicons-folder-open"></i></button>
 </div>
 <div class="container">
 <input class="postheader" type="text" v-model="title" placeholder="title"></input><br>
@@ -43,13 +43,22 @@
   <div class="col-10"> <!-- col-11 -->
   <div class="post-component card" v-if="component.type === 'text'">
     <view-text :component="component"></view-text>
+    <router-link :to="{ name: 'edit-text', query: {index: index}}"><button><font face="courier">E</font></button></router-link>
+
   </div>
   <div class="post-component card" v-else-if="component.type === 'image'">
     <p>An image component!</p>  
   </div>
   <div class="post-component card" v-else-if="component.type === 'audio'">
-    <p>An audio component!</p>  
-  </div>
+    <audio-component :id="component.content[0].id" 
+    :title="component.content[0].title" 
+    :body="component.content[0].description" 
+    :controls="true" :source="component.content[0].url" 
+    :filetype="component.content[0].filetype" 
+    autoplay="false"/>
+    <router-link :to="{ name: 'edit-audio', query: {index: index}}"><button><font face="courier">E</font></button></router-link>
+
+   </div>
   <div class="post-component card" v-else-if="component.type === 'video'">
     <p>A video component!</p>  
   </div>
@@ -60,7 +69,6 @@
   <div class="col 11">
     <div id="arrange-btn-group" class="btn-group-vertical">
       <button @click="removeComponent(index)"><font face="courier">x</font></button>
-      <router-link :to="{ name: 'edit-text', query: {index: index}}"><button @click="editComponent(index)"><font face="courier">E</font></button></router-link>
     
     </div>
   </div>
@@ -83,9 +91,9 @@
 <script>
 import Vue from 'vue';
 import { mapState } from 'vuex';
-import EditText from './EditText';
-import ViewText from './ViewText';
 
+import ViewText from './ViewText';
+import AudioComponent from './audio/AudioComponent'
 
 export default {
 
@@ -139,9 +147,7 @@ export default {
       console.log(obj)
       this.$store.dispatch('createPost', obj)
     },
-    editComponent: function(index) {
-      this.$store.dispatch('setEditedComponent', this.$store.state.create.postComponents[index]);
-    },
+
     createTextComponent: function(event){
       this.editedComponent = {
         'type': 'text',
