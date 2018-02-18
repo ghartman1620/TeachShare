@@ -7,7 +7,7 @@
         <div class="carousel-inner">
 
           <div class="carousel-item active">
-            <img class="d-block w-100" src="//wallpapers.wallhaven.cc/wallpapers/full/wallhaven-620548.jpg" alt="First slide">
+            <img class="d-block w-100 img-fluid" src="//wallpapers.wallhaven.cc/wallpapers/full/wallhaven-620548.jpg" alt="First slide">
             <div class="carousel-caption d-none d-md-block">
               <h3>Test title!</h3>
               <p>some fake text here!</p>
