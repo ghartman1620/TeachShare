@@ -7,7 +7,7 @@
 <div id="buttonbar">
 <!-- Text button -->
 
-<router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}"><button type="button" class="btn btn-default btn-circle btn-xl" id="text-button"></button></router-link>
+<router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}"><button type="button" @click="pushStateId" class="btn btn-default btn-circle btn-xl" id="text-button"></button></router-link>
 <button type="button" v-on:click="createImageComponent" class="btn btn-default btn-circle btn-xl" id="image-button"><i class="glyphicon glyphicon-picture"></i></button>
 <button type="button" v-on:click="createAudioComponent" class="btn btn-default btn-circle btn-xl" id="audio-button"><i class="glyphicon glyphicons-music"></i></button>
 <button type="button" v-on:click="createVideoComponent" class="btn btn-default btn-circle btn-xl" id="video-button"><i class="glyphicons glyphicons-film"></i></button>
@@ -46,7 +46,7 @@
     <p>A video component!</p>  
   </div>
   <div class="post-component card" v-else>
-    <p>A file component!</p>  
+    <p>A file component!</p>  `
   </div>
   </div>
   <div class="col 11">
@@ -62,7 +62,7 @@
 <button v-on:click="submitPost">Publish</button>
 </div>
 <router-view/>
-
+<button @click="undo">undo </button>
 
 </body>
 
@@ -83,30 +83,33 @@ export default {
   name: 'post-create',
   data: function() {
     return {
-      title: "",
+      title: '',
       editedComponent: {},
       editedComponentIndex: -1,
-      inProgressTag: "",
+      inProgressTag: '',
       tags: [],
     }
   },
   computed:{
     storeComponents() {
       return this.$store.state.create.postComponents;
+    },
+    nextStateId() {
+      return this.$store.state.create.nextStateId;  
     }
   },
 
   methods: {
     nop: function(){},
     removeTag: function(index) {
-      console.log("remove tag" + index);
+      console.log('remove tag' + index);
       this.tags.splice(index, 1);
     },
     createTag: function(e) {
-      if (e.keyCode === 13 && this.inProgressTag !== "") {
-        console.log("enter pressed");
+      if (e.keyCode === 13 && this.inProgressTag !== '') {
+        console.log('enter pressed');
         this.tags.push(this.inProgressTag);
-        this.inProgressTag = "";
+        this.inProgressTag = '';
       }
     },
     getUser: function(){
@@ -131,60 +134,91 @@ export default {
     },
     createTextComponent: function(event){
       this.editedComponent = {
-        "type": "text",
-        "contents" : "<p></p>",
+        'type': 'text',
+        'contents' : '<p></p>',
       }
       this.editedComponentIndex = this.$store.state.create.postComponents.length;
       
-      this.$store.dispatch("changeEditedComponent", "edit-text");
-      console.log("create text component");
+      this.$store.dispatch('changeEditedComponent', 'edit-text');
+      console.log('create text component');
       
     },
     createImageComponent: function(event){
-      this.$store.dispatch("changeEditedComponent", "edit-image");
-      console.log("create image component");
+      this.$store.dispatch('changeEditedComponent', 'edit-image');
+      console.log('create image component');
     },
     createAudioComponent: function(event){
 
-      console.log("hi world");
+      console.log('hi world');
       
     },
     createVideoComponent: function(event){
 
-      console.log("hi world");
+      console.log('hi world');
       
     },
     createFileComponent: function(event){
 
-      console.log("hi world");
+      console.log('hi world');
       
     },
     moveComponentUp: function(index){
-      console.log("moveComponentUp:"  + index);
+      console.log('moveComponentUp:'  + index);
       if(index != 0){
-        this.$store.dispatch("swapComponents", [index,index-1]);   
+        this.$store.dispatch('swapComponents', [index,index-1]);   
         //dispatch only allows one argument so we'll pass them as an array        
       }
     },
     moveComponentDown: function(index){
       if(index != this.$store.state.create.postComponents.length-1){
-        this.$store.dispatch("swapComponents", [index,index+1]);   
+        this.$store.dispatch('swapComponents', [index,index+1]);   
         //dispatch only allows one argument so we'll pass them as an array        
       }
     },
     removeComponent: function(index){
-      this.$store.dispatch("removeComponent", index);
+      this.$store.dispatch('removeComponent', index);
     },
     maxComponentIndex() {
       return this.$store.state.create.postComponents.length;
     },
-
+    undo() {
+      this.$store.dispatch('undo');
+    },
+    pushStateId() {
+      this.$store.dispatch('pushStateId', this.$route.query.state);
+    }
   },
   mounted(){
-    this.getUser();
-    window.onpopstate = function() {
-      console.log("location: " + document.location + ", state: " + JSON.stringify(event.state));
+    this.$router.replace({name: "create", query: {state: this.$store.state.create.nextStateId}}); 
+    
+
+
+    const self = this;
+    
+    window.onpopstate = function(event) {
+      const currentStateId = self.$store.state.create.stateIdStack[self.$store.state.create.stateIdStack.length-1];
+      console.log(self.$store.state.create.stateIdStack);
+      self.$store.dispatch('popStateId');
+      console.log("in popstate");
+      console.log(self.$route.query.state);
+      console.log(self.$store.state.create.nextStateId);
+      console.log(currentStateId);
+      if(self.$route.query.state > currentStateId){
+        self.undo();
+        console.log("state going down - do undo")
+      }
+      else if(self.$route.query.state < currentStateId){
+        console.log("state going up - do redo");
+      }
+      else{
+        console.log("no state change - do nothing");
+      }
+      console.log(self.$store.state.create.nextStateId);
     };
+    this.$store.watch(this.$store.getters.getNextStateId, id => {
+      console.log("in watch nextid");
+      this.$router.replace({name: this.$route.name, query: {state: id}});
+    });
   },
 }
 

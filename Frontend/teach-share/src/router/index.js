@@ -25,6 +25,7 @@ export default new Router({
                     name: 'create',
                     component: PostCreate,
 
+
                     // the below are how they should be nested,
                     // but they don't currently work because of the
                     // tight coupling in the PostCreate class.
@@ -39,13 +40,7 @@ export default new Router({
                             name: 'edit-text',
                             path: 'text',
                             component: EditText,
-                            props: {
-                                component: {
-                                    type: 'text',
-                                    content: '',
-                                },
-                                index: 0,
-                            }
+                            
                         },
                     ]
                 },
