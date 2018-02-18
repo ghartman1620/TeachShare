@@ -1,8 +1,7 @@
 <template>
 <body>
 <p> I'm a text view component! </p>
-{{component}}
-<p v-html="component.contents"></p>
+<p v-html="component.content"></p>
 </body>
 
 </template>

@@ -14,10 +14,13 @@ import AudioEditComponent from '@/components/audio/AudioEditComponent';
 import ImageComponent from '@/components/image/ImageComponent';
 import ImageEditComponent from '@/components/image/ImageEditComponent';
 
+import PostFeed from '@/components/PostFeed';
+//a change
 Vue.use(Router);
 
 export default new Router({
-    routes: [{
+    routes: [
+        {
             path: '/',
             component: Base,
             children: [
@@ -26,6 +29,7 @@ export default new Router({
                     path: '/create',
                     name: 'create',
                     component: PostCreate,
+
 
                     // the below are how they should be nested,
                     // but they don't currently work because of the
@@ -38,20 +42,21 @@ export default new Router({
                         //     props: { isFile: true }
                         // },
                         {
-                            name: 'text',
+                            name: 'edit-text',
                             path: 'text',
                             component: EditText,
-                            props: {}
-                        }
+                            
+                        },
                     ]
+                },
+                {
+                    name: 'dashboard',
+                    path: '/dashboard',
+                    component: PostFeed,
                 }
             ]
         },
-        // {
-        //     path: '/create',
-        //     name: 'create',
-        //     component: PostCreate
-        // },
+
         {
             path: '/login',
             name: 'Login',
@@ -70,6 +75,7 @@ export default new Router({
 
         // this shows a correctly nested component. Uses
         // query parameters for certain settings
+
         {
             path: '/upload',
             component: Base,

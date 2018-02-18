@@ -6,7 +6,7 @@
   exact code needed for other types of buttons -->
   <div class="custom-quill-editor">
     <quill-editor
-       v-model="component.contents"
+       v-model="component.content"
        :options="editorOption"
        @blur="onEditorBlur($event)"
        @focus="onEditorFocus($event)"
@@ -36,9 +36,8 @@
     <div class="quill-code">
     </div>
   </div>
-
-<button v-on:click="submit">Submit.</button>
-<button v-on:click="close">X</button>
+<router-link :to="{ name: 'create'}"><button v-on:click="submit">Submit.</button></router-link>
+<router-link :to="{name: 'create'}"><button>close</button></router-link>
 
 </body>
 </template>
@@ -50,12 +49,13 @@ import VueQuillEditor from 'vue-quill-editor'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
+import { mapState } from "vuex";
 Vue.use(VueQuillEditor,)
 
 export default Vue.component("edit-text", {
-    props: ['component', 'index'],
     data() {
       return {
+        component: {},
         editorOption: {
           modules: {
             toolbar: '#toolbar'
@@ -63,29 +63,44 @@ export default Vue.component("edit-text", {
         } //sooooooooo many options to pass for customizing the editor.
       }
     },
-    mounted() {
-      console.log('This is a current quill instance object.', this.myQuillEditor)
+    computed: {
+
+
     },
+
     methods: {
       submit: function(event){
-        if(this.index == this.$store.state.inProgressPostComponents.length){
+        if(this.$route.query.index == this.$store.state.create.postComponents.length){
           this.$store.dispatch("addComponent", this.component);
         }
         else{
           this.$store.dispatch("editComponent", {
-            "index" : this.index,
+            "index" : this.$route.query.index,
             "component": this.component
           });
         }
-
-        this.$store.dispatch("changeEditedComponent", "");
-
+        
       },
       close: function(event){
 
-        this.$store.dispatch("changeEditedComponent", "");
         console.log("close");
+      },
+
+    },
+    mounted(){
+      this.$router.replace({name: 'edit-text', query: {index: this.$route.query.index}})
+      console.log("mounted edit text");
+      if(this.$route.query.index >= this.$store.state.create.postComponents.length){
+        this.component = {
+          type: "text",
+          content: "",
+        }
+      }else{
+        this.component = Object.assign({}, this.$store.state.create.postComponents[this.$route.query.index]);
       }
+    },
+    beforeDestroy(){
+      console.log("destroy");
     }
   })
 </script>

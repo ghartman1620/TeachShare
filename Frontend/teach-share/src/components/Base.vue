@@ -30,4 +30,5 @@ export default Vue.component('base-page', {
   padding-top: 100px;
 }
 
+
 </style>

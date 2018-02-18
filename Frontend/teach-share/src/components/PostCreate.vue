@@ -2,14 +2,12 @@
 <template>
 
 <body>
-<router-view/>
 
-<component class="card container foreground" v-bind:component="editedComponent" :index="editedComponentIndex"v-bind:is="editedComponentType"></component>
-<div :style=opacity>
+<div >
 <div id="buttonbar">
 <!-- Text button -->
 
-<button type="button" v-on:click="createTextComponent"  class="btn btn-default btn-circle btn-xl" id="text-button"><span class="glyphicon glyphicon-asterisk"></span></button>
+<router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}"><button type="button" class="btn btn-default btn-circle btn-xl" id="text-button"></button></router-link>
 <button type="button" v-on:click="createImageComponent" class="btn btn-default btn-circle btn-xl" id="image-button"><i class="glyphicon glyphicon-picture"></i></button>
 <button type="button" v-on:click="createAudioComponent" class="btn btn-default btn-circle btn-xl" id="audio-button"><i class="glyphicon glyphicons-music"></i></button>
 <button type="button" v-on:click="createVideoComponent" class="btn btn-default btn-circle btn-xl" id="video-button"><i class="glyphicons glyphicons-film"></i></button>
@@ -39,32 +37,37 @@
     <view-text :component="component"></view-text>
   </div>
   <div class="post-component card" v-else-if="component.type === 'image'">
-    <p>An image component!</p>
+    <p>An image component!</p>  
   </div>
   <div class="post-component card" v-else-if="component.type === 'audio'">
-    <p>An audio component!</p>
+    <p>An audio component!</p>  
   </div>
   <div class="post-component card" v-else-if="component.type === 'video'">
-    <p>A video component!</p>
+    <p>A video component!</p>  
   </div>
   <div class="post-component card" v-else>
-    <p>A file component!</p>
+    <p>A file component!</p>  `
   </div>
   </div>
   <div class="col 11">
     <div id="arrange-btn-group" class="btn-group-vertical">
       <button @click="removeComponent(index)"><font face="courier">x</font></button>
-      <button @click="editComponent(index)"><font face="courier">E</font></button>
-
+      <router-link :to="{ name: 'edit-text', query: {index: index}}"><button @click="editComponent(index)"><font face="courier">E</font></button></router-link>
+    
     </div>
   </div>
-
+  
   </div>
 </div>
 <button v-on:click="submitPost">Publish</button>
 </div>
+<router-view/>
+<button @click="undo">undo </button>
+
+<button @click="redo">redo </button>
 
 </body>
+
 
 </template>
 
@@ -75,112 +78,119 @@ import { mapState } from 'vuex';
 import EditText from './EditText';
 import ViewText from './ViewText';
 
+
 export default {
 
-  name: 'PostCreate',
+  name: 'post-create',
   data: function() {
     return {
-      title: "",
+      title: '',
       editedComponent: {},
       editedComponentIndex: -1,
-      inProgressTag: "",
+      inProgressTag: '',
       tags: [],
     }
   },
-  computed: mapState({
-    editedComponentType: state => state.inProgressPostEditedComponentType,
-    storeComponents: state => state.inProgressPostComponents,
-    opacity: state => state.postOpacity
-  }),
+  computed:{
+    storeComponents() {
+      return this.$store.state.create.postComponents;
+    },
+    nextStateId() {
+      return this.$store.state.create.nextStateId;  
+    },
+
+  },
+
   methods: {
     nop: function(){},
     removeTag: function(index) {
-      console.log("remove tag" + index);
+      console.log('remove tag' + index);
       this.tags.splice(index, 1);
     },
     createTag: function(e) {
-      if (e.keyCode === 13 && this.inProgressTag !== "") {
-        console.log("enter pressed");
+      if (e.keyCode === 13 && this.inProgressTag !== '') {
+        console.log('enter pressed');
         this.tags.push(this.inProgressTag);
-        this.inProgressTag = "";
+        this.inProgressTag = '';
       }
     },
     getUser: function(){
       this.$store.dispatch('fetchUser', 1)
     },
     submitPost: function(event){
-      console.log(this.$store.state.inProgressPostComponents);
+      console.log(this.$store.state.create.postComponents);
       var obj = {
-        "user" : 1,
-        "title" : this.title,
-        "content" : JSON.stringify(this.$store.state.inProgressPostComponents),
-        "likes" : 0,
-        "comments" : [],
-        "tags": JSON.stringify(this.tags),
-        "attachments" : [],
+        user : 1, 
+        title : this.title, 
+        content : this.$store.state.create.postComponents,
+        likes : 0,
+        comments : [],
+        tags: this.tags,
+        attachments : [],
       }
       console.log(obj)
       this.$store.dispatch('createPost', obj)
     },
     editComponent: function(index) {
-      this.editedComponent = this.$store.state.inProgressPostComponents[index];
-      this.editedComponentIndex = index;
-      this.$store.dispatch("changeEditedComponent", "edit-" + this.editedComponent.type);
+      this.$store.dispatch('setEditedComponent', this.$store.state.create.postComponents[index]);
     },
     createTextComponent: function(event){
       this.editedComponent = {
-        "type": "text",
-        "contents" : "<p></p>",
+        'type': 'text',
+        'contents' : '<p></p>',
       }
-      this.editedComponentIndex = this.$store.state.inProgressPostComponents.length;
-
-      this.$store.dispatch("changeEditedComponent", "edit-text");
-      console.log("create text component");
-      this.opacity.opacity = .3;
-
+      this.editedComponentIndex = this.$store.state.create.postComponents.length;
+      
+      this.$store.dispatch('changeEditedComponent', 'edit-text');
+      console.log('create text component');
+      
     },
     createImageComponent: function(event){
-      this.$store.dispatch("changeEditedComponent", "edit-image");
-      console.log("create image component");
+      this.$store.dispatch('changeEditedComponent', 'edit-image');
+      console.log('create image component');
     },
     createAudioComponent: function(event){
 
-      console.log("hi world");
-      this.opacity.opacity = .3;
-
+      console.log('hi world');
+      
     },
     createVideoComponent: function(event){
 
-      console.log("hi world");
-      this.opacity.opacity = .3;
-
+      console.log('hi world');
+      
     },
     createFileComponent: function(event){
 
-      console.log("hi world");
-      this.opacity.opacity = .3;
-
+      console.log('hi world');
+      
     },
     moveComponentUp: function(index){
-      console.log("moveComponentUp:"  + index);
+      console.log('moveComponentUp:'  + index);
       if(index != 0){
-        this.$store.dispatch("swapComponents", [index,index-1]);
-        //dispatch only allows one argument so we'll pass them as an array
+        this.$store.dispatch('swapComponents', [index,index-1]);   
+        //dispatch only allows one argument so we'll pass them as an array        
       }
     },
     moveComponentDown: function(index){
-      if(index != this.$store.state.inProgressPostComponents.length-1){
-        this.$store.dispatch("swapComponents", [index,index+1]);
-        //dispatch only allows one argument so we'll pass them as an array
+      if(index != this.$store.state.create.postComponents.length-1){
+        this.$store.dispatch('swapComponents', [index,index+1]);   
+        //dispatch only allows one argument so we'll pass them as an array        
       }
     },
     removeComponent: function(index){
-      this.$store.dispatch("removeComponent", index);
+      this.$store.dispatch('removeComponent', index);
+    },
+    maxComponentIndex() {
+      return this.$store.state.create.postComponents.length;
+    },
+    undo() {
+      this.$store.dispatch('undo');
+    },
+    redo() {
+      this.$store.dispatch('redo');
     }
   },
-  beforeMount(){
-    this.getUser()
-  },
+
 }
 
 </script>
@@ -195,7 +205,7 @@ export default {
   top: 20%;
   width: 80%;
   margin: auto;
-  z-index: 2;
+  z-index: 2;  
   opacity: 1;
 }
 
@@ -208,23 +218,9 @@ export default {
 
 /* Submitted components now being viewed */
 .container-component {
-  width:60%;
+  width:60%;  
   height: 300px;
 }
-#arrange-btn-group {
-  /*position: absolute;
-  left: 23%;
-  width: 2%; */
-}
-.up-down-button {
-
-}
-.post-component {
-  /*position: absolute;
-  left: 25%;
-  width: 50%;*/
-}
-
 
 
 /* The five buttons on the button bar */
