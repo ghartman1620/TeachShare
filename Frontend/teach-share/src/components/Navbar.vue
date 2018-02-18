@@ -42,35 +42,31 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import SearchBox from './SearchBox.vue';
+import Vue from "vue";
+import SearchBox from "./SearchBox.vue";
 
-export default Vue.component('nav-bar', {
-    components: SearchBox,
-    props: ['query'],
-    data() {
-      return {
-
-      }
-    }
-  })
+export default Vue.component("nav-bar", {
+  components: { SearchBox },
+  props: ["query"],
+  data() {
+    return {};
+  }
+});
 </script>
 
 
 <style lang="scss" scoped>
-
 // this is an example, not an end result
 .router-link-exact-active {
   text-decoration: underline;
   text-decoration-style: solid;
-  text-decoration-color: #46E;
-
+  text-decoration-color: #46e;
 }
 .nav {
   height: 100px;
 }
 .dark-green {
-  background-color: #3B896A
+  background-color: #3b896a;
 }
 .ts-logo {
   height: 45px;
@@ -80,5 +76,4 @@ export default Vue.component('nav-bar', {
   height: 20px;
   width: auto;
 }
-
 </style>
