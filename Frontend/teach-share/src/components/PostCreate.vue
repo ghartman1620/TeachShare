@@ -1,23 +1,92 @@
+
 <template>
   <body>
-  <div class="row">
-    <div class="col-sm-9">
-      Level 1: .col-sm-9
-      <div class="row">
-        <div class="col-8 col-sm-6">
-          Level 2: .col-8 .col-sm-6
-        </div>
-        <div class="col-4 col-sm-6">
-          Level 2: .col-4 .col-sm-6
-        </div>
-      </div>
+  <base-page>
+    <span slot="body">
+    <component class="card container foreground" v-bind:component="editedComponent" :index="editedComponentIndex"v-bind:is="editedComponentType"></component>
+    </span>
+
+  </base-page>
+  <div class="col-8 offset-2">
+  <div class="card container icon-card-container">
+  <h2></h2>
+    <h3></h3>
+    <h4></h4>
+    <h5></h5>
+    <div class="mx-auto card-deck">
+
+      <section class="icon card mb-5 icon" id="text-button">
+        <h2></h2>
+        <img class="card-img pencil" src="/static/ucla-yellow-text-button-icon.png" alt="text-icon">
+        <h3></h3>
+      </section>
+
+    <section class="icon card mb-5 icon" id="image-button">
+      <h2></h2>
+      <img class="card-img pencil1" src="/static/dark-blue-image-button-icon.png" alt="img-icon">
+      <h3></h3>
+    </section><!-- card -->
+
+      <section class="icon card mb-5 icon" id="audio-button">
+        <h2></h2>
+        <img class="card-img pencil2" src="/static/mint-green-audio-button-icon.png" alt="audio-icon">
+        <h3></h3>
+
+
+      </section><!-- card -->
+
+      <section class="icon card mb-5 icon" id="video-button">
+        <h2></h2>
+        <img class="card-img pencil3" src="/static/orange-video-button-icon.png" alt="video-icon">
+        <h3></h3>
+
+
+      </section><!-- card -->
+      <section class="icon card mb-5 icon" id="file-button">
+        <h2></h2>
+
+        <img class="card-img pencil4" src="/static/blue-file-button-icon-white.png" alt="file-icon">
+        <h3></h3>
+
+
+      </section><!-- card -->
+
     </div>
   </div>
+  </div>
+
 
   </body>
 
 </template>
 
+<style scoped>
+
+  .icon-card-container {
+    background-color: #99b5aa;
+  }
+
+
+
+  .card {
+    padding-left: 20px;
+    background-color: #99b5aa;
+  }
+
+  .icon {
+    background-color: #99b5aa;
+    border: 0;
+  }
+
+  .card-img {
+    max-height: 125px;
+    max-width: 125px;
+    height: fixed;
+    width: fixed;
+    background-color: #99b5aa;
+  }
+
+</style>
 
 <!--
 <template>
@@ -28,6 +97,8 @@
 <component class="card container foreground" v-bind:component="editedComponent" :index="editedComponentIndex"v-bind:is="editedComponentType"></component>
 <div :style=opacity>
 <div id="buttonbar">
+
+
 
 <button type="button" v-on:click="createTextComponent"  class="btn btn-default btn-circle btn-xl" id="text-button"><span class="glyphicon glyphicon-asterisk"></span></button>
 <button type="button" v-on:click="createImageComponent" class="btn btn-default btn-circle btn-xl" id="image-button"><i class="glyphicon glyphicon-picture"></i></button>
