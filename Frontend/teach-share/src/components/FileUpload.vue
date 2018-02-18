@@ -139,7 +139,13 @@ export default Vue.component("file-upload", {
       console.log(file);
       var vm = this;
       this.$store.dispatch('removeFile', file).then(function(){
-        vm.$emit('RemoveItem', file);
+        let i = vm.currentFileList.findIndex(function(f) {
+          return f[0].name === file.file.name;
+        });
+        console.log('INDEX: ', i);
+        vm.currentFileList.splice(i, 1);
+        console.log(vm.currentFileList);
+        vm.$parent.$emit('RemoveItem', file);
       });
     }
   },

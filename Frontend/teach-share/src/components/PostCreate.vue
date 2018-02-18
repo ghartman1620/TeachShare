@@ -73,7 +73,6 @@
 import Vue from 'vue';
 import { mapState } from 'vuex';
 import EditText from './EditText';
-import EditImage from './images/EditImage';
 import ViewText from './ViewText';
 
 export default {

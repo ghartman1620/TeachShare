@@ -35,40 +35,14 @@
           <div class="col-1"></div>
           <br>
           <div class="row">
-            <div class="col-4">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="basic-height">Height</span>
-                </div>
-                <input
-                  v-validate="'required|between:100,1024'"
-                  v-model="height"
-                  type="number"
-                  class="form-control"
-                  name="height"
-                  aria-describedby="basic-height">
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="basic-width">Width</span>
-                </div>
-                <input
-                  v-validate="'required|between:100,1024'"
-                  v-model="width"
-                  type="number"
-                  class="form-control"
-                  name="width"
-                  aria-describedby="basic-width">
-              </div>
+            <!-- dimension picker -->
+            <div class="col-8">
+              <dimension-picker></dimension-picker>
             </div>
             <div class="col-4">
               <input v-model="includeYtData" class="form-check-input" type="checkbox" value="" id="ytcheck">
               <label class="form-check-label" for="ytcheck">
-                <h5>
-                  Include YouTube Video Information
-                </h5>
+                <h5>Include YouTube Video Information</h5>
               </label>
             </div>
           </div>
@@ -97,12 +71,13 @@
 import Vue from 'vue';
 import FileUpload from '../FileUpload';
 import EditVideoEmbed from './EditVideoEmbed';
+import DimensionPicker from '../DimensionPicker';
 import { mapGetters } from 'vuex';
 
 var _ = require("lodash");
 
 export default Vue.component('edit-video-embed', {
-  components: {},
+  components: { DimensionPicker },
   props: [],
   data() {
     return {
@@ -159,6 +134,14 @@ export default Vue.component('edit-video-embed', {
       console.log(obj);
       return obj;
     }
+  },
+  mounted() {
+    this.$on('changeHeight', function(h) {
+      this.height = h;
+    });
+    this.$on('changeWidth', function(w){
+      this.width = w;
+    });
   }
 });
 </script>

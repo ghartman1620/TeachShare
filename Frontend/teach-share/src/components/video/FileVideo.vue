@@ -5,19 +5,23 @@
       class="align-items-center"
       :id="id"
       :src="url"
-      :autoplay="autoplay"
+      autostart="autoplay"
       :width="width"
       :height="height"
       :controls="controls"
     >
     </video>
     <div class="card-body">
-      <h5 class="card-title">{{ title }}</h5>
-      <p class="card-text">
+      <h4 class="card-title">{{ title }}</h4>
+      <p :class="textClasses">
         <slot>
           There was no content provided.
         </slot>
       </p>
+      <button type="button" @click.prevent="showOrHideAllText" class="btn btn-dark btn-block">
+        <span v-if="!textShown">read more...</span>
+        <span v-else>read less</span>
+      </button>
       <!-- <div class="row">
         <div class="col-auto mr-auto"/>
         <div class="col-auto">
@@ -45,7 +49,12 @@ export default Vue.component("file-video", {
   ],
   data() {
     return {
-      video: null
+      video: null,
+      textClasses: [
+        'card-text',
+        'sizing-and-gradient'
+      ],
+      textShown: false,
     };
   },
   computed: {
@@ -68,7 +77,25 @@ export default Vue.component("file-video", {
     Pause() {
       console.log("pause");
       this.video.pause();
+    },
+    showOrHideAllText() {
+      if (!this.textShown) {
+        this.textClasses.pop();
+      } else {
+        this.textClasses.push('sizing-and-gradient')
+      }
+      this.textShown = !this.textShown;
     }
   }
 });
 </script>
+
+<style lang="scss" scoped>
+.sizing-and-gradient {
+  max-height: 200px;
+  overflow:hidden;
+  background: linear-gradient(#333, #eee);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+</style>

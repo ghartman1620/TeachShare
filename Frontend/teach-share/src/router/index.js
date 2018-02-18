@@ -11,6 +11,8 @@ import EditVideo from '@/components/video/EditVideo';
 import HomePage from '@/components/HomePage';
 import AudioComponent from '@/components/audio/AudioComponent';
 import AudioEditComponent from '@/components/audio/AudioEditComponent';
+import ImageComponent from '@/components/image/ImageComponent';
+import ImageEditComponent from '@/components/image/ImageEditComponent';
 
 Vue.use(Router);
 
@@ -126,6 +128,23 @@ export default new Router({
                     name: 'audio-edit',
                     path: 'edit',
                     component: AudioEditComponent,
+                    props: {}
+                }
+            ]
+        },
+        {
+            path: '/image',
+            component: Base,
+            children: [{
+                    name: 'image',
+                    path: '',
+                    component: ImageComponent,
+                    props: {}
+                },
+                {
+                    name: 'image-edit',
+                    path: 'edit',
+                    component: ImageEditComponent,
                     props: {}
                 }
             ]

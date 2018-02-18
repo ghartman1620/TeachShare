@@ -85,11 +85,18 @@ const FileService = {
     },
     getters: {
         filesUploadStatus: state => state.uploadedFiles,
-        allFilesUploadComplete: (state, getters, rootState) => {
-            var res = _.filter(state.uploadedFiles, val => {
-                return val.percent === 100;
-            });
-            return res.length === state.uploadedFiles.length;
+        allFilesUploadComplete: (state) => {
+            if (state.uploadedFiles.length > 0) {
+                let oneHundredPercent =  _.every(state.uploadedFiles, {'percent': 100});
+                let hasURL = _.reduce(state.uploadedFiles, (res, val, key) => {
+                    if (val.url !== undefined) {
+                        return true;
+                    }
+                    return false;
+                }, false);
+                return oneHundredPercent === true && hasURL === true;
+            }
+            return false;
         },
         hasFiles: state => {
             return state.uploadedFiles.length > 0;

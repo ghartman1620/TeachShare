@@ -2,20 +2,24 @@
 <div>
   <div class="card" :style="{width: cardWidth + 'px', padding: '10px'}">
     <div class="card-body">
-      <h5 class="card-title">{{ title }}</h5>
       <audio
-        class="align-items-center"
+        class="col-12"
         :id="id"
         :src="url"
+        :type="filetype"
         :controls="controls">
-        </audio>
-      <p class="card-text">
-        {{body}}
+      </audio>
+      <br><br>
+      <h4 v-if="!editing" class="card-title">{{ localTitle }}</h4>
+      <input @change.prevent="changedTitle" class="col-12" v-if="editing" v-model="localTitle" type="text">
+      <p v-if="!editing" class="card-text">
+        {{localBody}}
       </p>
+      <textarea class="col-12" @change.prevent="changedBody" v-if="editing" v-model="localBody" rows="3"></textarea>
       <div class="row">
         <div class="col-auto mr-auto"/>
         <div class="col-auto">
-          <button type="button" class="btn btn-warning">Edit</button>
+          <button type="button" @click.prevent="ToggleEditText" class="btn btn-warning">Edit</button>
         </div>
       </div>
     </div>
@@ -26,7 +30,7 @@
 <script>
 import Vue from "vue";
 
-export default Vue.component("file-video", {
+export default Vue.component("audio-component", {
   props: [
     "id",
     "title",
@@ -38,7 +42,10 @@ export default Vue.component("file-video", {
   ],
   data() {
     return {
-      audio: null
+      audio: null,
+      editing: false,
+      localTitle: this.title,
+      localBody: this.body
     };
   },
   computed: {
@@ -56,11 +63,23 @@ export default Vue.component("file-video", {
     // basic play functionality (not needed)
     Play() {
       console.log("play");
-      this.video.play();
+      this.audio.play();
     },
     Pause() {
       console.log("pause");
-      this.video.pause();
+      this.audio.pause();
+    },
+    ToggleEditText() {
+      console.log('editing text!')
+      this.editing = !this.editing;
+    },
+    changedTitle() {
+      console.log('emit!');
+      this.$parent.$emit('changedTitle', this.localTitle);
+    },
+    changedBody() {
+      console.log('emit!');
+      this.$parent.$emit('changedBody', this.localBody);
     }
   }
 });

@@ -18,33 +18,10 @@
           </div>
         </div>
         <br><br><br>
-        <div class="col-4">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text" id="basic-height">Height</span>
-            </div>
-            <input
-              v-validate="'required|between:100,1024'"
-              v-model="height"
-              type="number"
-              class="form-control"
-              name="height"
-              aria-describedby="basic-height">
-          </div>
-        </div>
-        <div class="col-4">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text" id="basic-width">Width</span>
-            </div>
-            <input
-              v-validate="'required|between:100,1024'"
-              v-model="width"
-              type="number"
-              class="form-control"
-              name="width"
-              aria-describedby="basic-width">
-          </div>
+        <div class="col-12">
+          <br>
+          <!-- dimension picker -->
+          <dimension-picker></dimension-picker>
         </div>
       </div>
       <br>
@@ -55,8 +32,8 @@
       <br>
       <div class="row">
       <div class="offset-3 col-6">
-          <button type="submit" :disabled="!hasFiles && allFilesUploadComplete" class="btn btn-primary btn-block">
-            <span v-if="!hasFiles && allFilesUploadComplete">Please Select File(s) to upload</span>
+          <button type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
+            <span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
             <span v-else>Submit Video(s)</span>
           </button>
         </div>
@@ -66,15 +43,15 @@
 </template>
 
 <script>
-import Vue from "vue";
-import FileUpload from "../FileUpload";
-import EditVideoEmbed from "./EditVideoEmbed";
-import { mapGetters } from "vuex";
+import Vue from 'vue';
+import FileUpload from '../FileUpload';
+import DimensionPicker from '../DimensionPicker';
+import { mapGetters } from 'vuex';
 
-var _ = require("lodash");
+var _ = require('lodash');
 
-export default Vue.component("edit-video-file", {
-  components: { FileUpload },
+export default Vue.component('edit-video-file', {
+  components: { FileUpload, DimensionPicker },
   props: [],
   data() {
     return {
@@ -104,7 +81,7 @@ export default Vue.component("edit-video-file", {
       var output = new Array();
       var self = this;
 
-      _.map(this.$store.state.fs.files, function(val, ind, arr) {
+      _.map(this.$store.state.fs.uploadedFiles, function(val, ind, arr) {
         console.log(val, ind, arr);
         output.push({
           post: 2,
@@ -119,13 +96,22 @@ export default Vue.component("edit-video-file", {
           description: self.fileDescription
         });
       });
+      console.log('data being submitted: ', output);
       this.$store.dispatch('submitVideoFiles', output).then(()=> {
+        console.log('completed submit');
         // this.$store.dispatch('removeNewVideos');
       });
       return output;
     }
   },
-  mounted() {}
+  mounted() {
+    this.$on('changeHeight', function(h) {
+      this.height = h;
+    });
+    this.$on('changeWidth', function(w){
+      this.width = w;
+    });
+  }
 });
 </script>
 

@@ -12,14 +12,14 @@
     </div>
   <div class="card-body">
     <h4 class="card-title">{{ title }}</h4>
-      <p key="1" :class="textClasses">
+      <p :class="textClasses">
         <slot>
           There was no content provided.
         </slot>
       </p>
       <button type="button" @click.prevent="showOrHideAllText" class="btn btn-dark btn-block">
-        <span v-if="!textShown">Read More...</span>
-        <span v-else>Collapse Text</span>
+        <span v-if="!textShown">read more...</span>
+        <span v-else>read less</span>
       </button>
     </div>
   </div>
