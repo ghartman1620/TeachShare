@@ -10,9 +10,9 @@ import VideoComponent from '@/components/video/VideoComponent';
 import EditVideo from '@/components/video/EditVideo';
 import HomePage from '@/components/HomePage';
 import AudioComponent from '@/components/audio/AudioComponent';
-import AudioEditComponent from '@/components/audio/AudioEditComponent';
+import EditAudio from '@/components/audio/EditAudio';
 import ImageComponent from '@/components/image/ImageComponent';
-import ImageEditComponent from '@/components/image/ImageEditComponent';
+import EditImage from '@/components/image/EditImage';
 
 import PostFeed from '@/components/PostFeed';
 //a change
@@ -47,6 +47,21 @@ export default new Router({
                             component: EditText,
                             
                         },
+                        {
+                            name: 'edit-video',
+                            path: 'video',
+                            component: EditVideo
+                        },
+                        {
+                            name: 'edit-audio',
+                            path: 'audio',
+                            component: EditAudio
+                        },
+                        {
+                            name: 'edit-image',
+                            path: 'image',
+                            component: EditImage
+                        }
                     ]
                 },
                 {
@@ -108,12 +123,7 @@ export default new Router({
                         width: 600
                     }
                 },
-                {
-                    name: 'video-edit',
-                    path: 'edit',
-                    component: EditVideo,
-                    props: {}
-                }
+
             ]
         },
         {
@@ -133,7 +143,7 @@ export default new Router({
                 {
                     name: 'audio-edit',
                     path: 'edit',
-                    component: AudioEditComponent,
+                    component: EditAudio,
                     props: {}
                 }
             ]
@@ -150,7 +160,7 @@ export default new Router({
                 {
                     name: 'image-edit',
                     path: 'edit',
-                    component: ImageEditComponent,
+                    component: EditImage,
                     props: {}
                 }
             ]

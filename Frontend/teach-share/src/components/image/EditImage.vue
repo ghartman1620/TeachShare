@@ -67,7 +67,7 @@ import ImageComponent from './ImageComponent';
 
 var _ = require("lodash");
 
-export default Vue.component('image-edit-component', {
+export default Vue.component('edit-image', {
   components: { FileUpload, ImageComponent },
   props: [],
   data() {

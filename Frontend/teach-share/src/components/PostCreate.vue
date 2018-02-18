@@ -7,11 +7,19 @@
 <div id="buttonbar">
 <!-- Text button -->
 
-<router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}"><button type="button" class="btn btn-default btn-circle btn-xl" id="text-button"></button></router-link>
-<button type="button" v-on:click="createImageComponent" class="btn btn-default btn-circle btn-xl" id="image-button"><i class="glyphicon glyphicon-picture"></i></button>
-<button type="button" v-on:click="createAudioComponent" class="btn btn-default btn-circle btn-xl" id="audio-button"><i class="glyphicon glyphicons-music"></i></button>
-<button type="button" v-on:click="createVideoComponent" class="btn btn-default btn-circle btn-xl" id="video-button"><i class="glyphicons glyphicons-film"></i></button>
-<button type="button" v-on:click="createFileComponent" class="btn btn-default btn-circle btn-xl" id="file-button"><i class="glyphicons glyphicons-folder-open"></i></button>
+<router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}">
+  <button type="button" class="btn btn-default btn-circle btn-xl" id="text-button"></button>
+</router-link>
+<router-link :to="{name: 'edit-video', query: {index: this.maxComponentIndex()}}">
+  <button type="button" class="btn btn-default btn-circle btn-xl" id="video-button"></button>
+</router-link>
+<router-link :to="{name: 'edit-audio', query: {index: this.maxComponentIndex()}}">
+  <button type="button" class="btn btn-default btn-circle btn-xl" id="audio-button"></button>
+</router-link>
+<router-link :to="{name: 'edit-image', query: {index: this.maxComponentIndex()}}">
+  <button type="button" class="btn btn-default btn-circle btn-xl" id="image-button"></button>
+</router-link>
+<button type="button"  class="btn btn-default btn-circle btn-xl" id="file-button"><i class="glyphicons glyphicons-folder-open"></i></button>
 </div>
 <div class="container">
 <input class="postheader" type="text" v-model="title" placeholder="title"></input><br>

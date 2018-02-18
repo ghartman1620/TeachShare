@@ -75,8 +75,8 @@ export default Vue.component("edit-text", {
         }
         else{
           this.$store.dispatch("editComponent", {
-            "index" : this.$route.query.index,
-            "component": this.component
+            index : this.$route.query.index,
+            component : this.component
           });
         }
         
