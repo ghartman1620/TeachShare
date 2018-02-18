@@ -36,8 +36,8 @@
     <div class="quill-code">
     </div>
   </div>
-<router-link :to="{ name: 'create', query: {state: this.$store.state.create.nextStateId}}"><button v-on:click="submit">Submit.</button></router-link>
-<router-link :to="{name: 'create', query: {state: this.$store.state.create.nextStateId}}"><button>close</button></router-link>
+<router-link :to="{ name: 'create'}"><button v-on:click="submit">Submit.</button></router-link>
+<router-link :to="{name: 'create'}"><button>close</button></router-link>
 
 </body>
 </template>
@@ -88,7 +88,7 @@ export default Vue.component("edit-text", {
 
     },
     mounted(){
-      this.$router.replace({name: 'edit-text', query: {index: this.$route.query.index, state: this.$store.state.create.nextStateId}})
+      this.$router.replace({name: 'edit-text', query: {index: this.$route.query.index}})
       console.log("mounted edit text");
       if(this.$route.query.index >= this.$store.state.create.postComponents.length){
         this.component = {

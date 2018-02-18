@@ -7,7 +7,7 @@
 <div id="buttonbar">
 <!-- Text button -->
 
-<router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}"><button type="button" @click="pushStateId" class="btn btn-default btn-circle btn-xl" id="text-button"></button></router-link>
+<router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}"><button type="button" class="btn btn-default btn-circle btn-xl" id="text-button"></button></router-link>
 <button type="button" v-on:click="createImageComponent" class="btn btn-default btn-circle btn-xl" id="image-button"><i class="glyphicon glyphicon-picture"></i></button>
 <button type="button" v-on:click="createAudioComponent" class="btn btn-default btn-circle btn-xl" id="audio-button"><i class="glyphicon glyphicons-music"></i></button>
 <button type="button" v-on:click="createVideoComponent" class="btn btn-default btn-circle btn-xl" id="video-button"><i class="glyphicons glyphicons-film"></i></button>
@@ -64,6 +64,8 @@
 <router-view/>
 <button @click="undo">undo </button>
 
+<button @click="redo">redo </button>
+
 </body>
 
 
@@ -96,7 +98,8 @@ export default {
     },
     nextStateId() {
       return this.$store.state.create.nextStateId;  
-    }
+    },
+
   },
 
   methods: {
@@ -184,42 +187,11 @@ export default {
     undo() {
       this.$store.dispatch('undo');
     },
-    pushStateId() {
-      this.$store.dispatch('pushStateId', this.$route.query.state);
+    redo() {
+      this.$store.dispatch('redo');
     }
   },
-  mounted(){
-    this.$router.replace({name: "create", query: {state: this.$store.state.create.nextStateId}}); 
-    
 
-
-    const self = this;
-    
-    window.onpopstate = function(event) {
-      const currentStateId = self.$store.state.create.stateIdStack[self.$store.state.create.stateIdStack.length-1];
-      console.log(self.$store.state.create.stateIdStack);
-      self.$store.dispatch('popStateId');
-      console.log("in popstate");
-      console.log(self.$route.query.state);
-      console.log(self.$store.state.create.nextStateId);
-      console.log(currentStateId);
-      if(self.$route.query.state > currentStateId){
-        self.undo();
-        console.log("state going down - do undo")
-      }
-      else if(self.$route.query.state < currentStateId){
-        console.log("state going up - do redo");
-      }
-      else{
-        console.log("no state change - do nothing");
-      }
-      console.log(self.$store.state.create.nextStateId);
-    };
-    this.$store.watch(this.$store.getters.getNextStateId, id => {
-      console.log("in watch nextid");
-      this.$router.replace({name: this.$route.name, query: {state: id}});
-    });
-  },
 }
 
 </script>
