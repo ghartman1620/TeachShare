@@ -19,7 +19,9 @@
 <router-link :to="{name: 'edit-image', query: {index: this.maxComponentIndex()}}">
   <button type="button" class="btn btn-default btn-circle btn-xl" id="image-button"></button>
 </router-link>
-  <button type="button" class="btn btn-default btn-circle btn-xl" id="file-button"><i class="glyphicons glyphicons-folder-open"></i></button>
+<router-link :to="{name: 'edit-file', query: {index: this.maxComponentIndex()}}">
+  <button type="button" class="btn btn-default btn-circle btn-xl" id="file-button"></button>
+</router-link>
 </div>
 <div class="container">
 <input class="postheader" type="text" v-model="title" placeholder="title"></input><br>
@@ -91,7 +93,7 @@
        </div>
   </div>
   <div class="post-component card" v-else-if="component.type === 'file'">
-    <p>A file component!</p>  `
+    <file-component :component=component></file-component>
   </div>
   <div v-else>
     Something bad!

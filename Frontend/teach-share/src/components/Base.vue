@@ -2,7 +2,6 @@
   <div class="container-fluid body-fluid">
     <nav-bar :query="queryParam"></nav-bar>
     <router-view/>
-    <file-component>Some text!</file-component>
   </div>
 </template>
 

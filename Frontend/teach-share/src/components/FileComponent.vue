@@ -1,24 +1,26 @@
 <template>
+<body>
 	<ul style="list-style-type: none;">
 		<li>
 		<div class = "container">
-			<div class = "row">			
+			<div class = "row">
+				<div v-for="file in component.files">
 				<div class="card" style="width: 18rem;">
 				<div class="card-body">
 					<div class = "col-md"
 						<h5 class="card-title text-center">
-							<a href="#" class="card-link">Title</a>
+							<a :href="'http://127.0.0.1:8000' + file.url" class="card-link">{{file.name}}</a>
 						</h5>
 					</div>
-					<div class = "col-sm"
-						<button type="button" class="btn btn-primary btn-sm">Remove</button>
-					</div>
+
+				</div>
 				</div>
 				</div>
 			</div>
 		</div>
 		</li>
 	</ul>
+</body>
 </template>
 
 <style>
@@ -31,7 +33,7 @@
 import Vue from 'vue';
 
 export default Vue.component('file-component', {
-    props: ['title', 'filename'],
+    props: ['component'],
     data() {
       return {
 

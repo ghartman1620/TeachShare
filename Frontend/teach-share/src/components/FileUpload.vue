@@ -25,7 +25,7 @@
         </div>
         <div class="col">
         <h4 v-if="this.$store.state.fs.uploadedFiles.length > 0">Uploaded files: </h4>
-        <ul class="list-group">
+         <ul class="list-group">
           <li v-bind:key="obj.file.name" v-for="obj in filesUploadStatus"
             class="list-group-item d-flex justify-content-between align-items-center">
             <div class="col-5">
@@ -50,12 +50,9 @@
                   X
                 </button>
               </div>
-              <!-- <div class="col-2" v-if="obj.percent===100">
-                Done.
-              </div> -->
           </li>
         </ul>
-        </div>
+        </div> 
       </div>
     </div>
 </template>
