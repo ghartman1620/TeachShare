@@ -1,11 +1,103 @@
+<!--template>
+  <body>
+  <base-page>
+    <span slot="body">
+    <component class="card container foreground" v-bind:component="editedComponent" :index="editedComponentIndex"v-bind:is="editedComponentType"></component>
+    </span>
+
+  </base-page>
+  <div class="col-8 offset-2">
+    <div class="card container icon-card-container">
+      <h2></h2>
+      <h3></h3>
+      <h4></h4>
+      <h5></h5>
+      <div class="mx-auto card-deck">
+
+        <section class="icon card mb-5 icon" id="text-button">
+          <h2></h2>
+          <img class="card-img pencil" src="/static/text-button.png" alt="text-icon">
+          <h3></h3>
+        </section>
+
+        <section class="icon card mb-5 icon" id="image-button">
+          <h2></h2>
+          <img class="card-img pencil1" src="/static/image-button.png" alt="img-icon">
+          <h3></h3>
+        </section>
+
+        <section class="icon card mb-5 icon" id="audio-button">
+          <h2></h2>
+          <img class="card-img pencil2" src="/static/audio-button.png" alt="audio-icon">
+          <h3></h3>
+
+
+        </section>
+
+        <section class="icon card mb-5 icon" id="video-button">
+          <h2></h2>
+          <img class="card-img pencil3" src="/static/video-button.png" alt="video-icon">
+          <h3></h3>
+
+
+        </section>
+        <section class="icon card mb-5 icon" id="file-button">
+          <h2></h2>
+
+          <img class="card-img pencil4" src="/static/file-button.png" alt="file-icon">
+          <h3></h3>
+
+
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+
+  </body>
+
+</template>
+
+<style-- scoped>
+
+  .icon-card-container {
+    background-color: #99b5aa;
+  }
+
+
+
+  .card {
+    padding-left: 20px;
+    background-color: #99b5aa;
+  }
+
+  .icon {
+    background-color: #99b5aa;
+    border: 0;
+  }
+
+  .card-img {
+    max-height: 125px;
+    max-width: 125px;
+    min-height: 50px;
+    min-width: 50px;
+    height: fixed;
+    width: fixed;
+    background-color: #99b5aa;
+  }
+
+</style-->
+
+
+
 
 <template>
 
 <body>
 
-<div >
-<div id="buttonbar">
-<!-- Text button -->
+<div>
+<!--div id="buttonbar">
 
 <router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}">
   <button type="button" class="btn btn-default btn-circle btn-xl" id="text-button"></button>
@@ -20,28 +112,89 @@
   <button type="button" class="btn btn-default btn-circle btn-xl" id="image-button"></button>
 </router-link>
   <button type="button" class="btn btn-default btn-circle btn-xl" id="file-button"><i class="glyphicons glyphicons-folder-open"></i></button>
-</div>
-<div class="container">
-<input class="postheader" type="text" v-model="title" placeholder="title"></input><br>
-<div class="card">
-<div v-for="(tag,index) in tags"> <button @click="removeTag(index)">{{tag}}</button></div>
+</div-->
+
+    <div class="col-8 offset-2 card card-outline-danger container icon-card-container">
+      <div class="mx-auto card-deck">
+
+        <section class="icon card mb-5 icon" id="text-button">
+          <h2></h2>
+
+          <router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}">
+            <img class="card-img" src="/static/text-button.png" alt="text-icon">
+
+            </router-link>
+
+        </section>
+
+        <section class="icon card mb-5 icon" id="video-button">
+          <h2></h2>
+          <router-link :to="{name: 'edit-video', query: {index: this.maxComponentIndex(), videotype: 'embed'}}">
+
+        <img class="card-img" src="/static/video-button.png" alt="video-icon">
+        </router-link>
+
+
+        </section>
+
+
+        <section class="icon card mb-5 icon" id="audio-button">
+          <h2></h2>
+          <router-link :to="{name: 'edit-audio', query: {index: this.maxComponentIndex()}}">
+
+          <img class="card-img" src="/static/audio-button.png" alt="audio-icon">
+          </router-link>
+
+
+        </section>
+
+        <section class="icon card mb-5 icon" id="image-button">
+          <h2></h2>
+          <router-link :to="{name: 'edit-image', query: {index: this.maxComponentIndex()}}">
+
+          <img class="card-img" src="/static/image-button.png" alt="img-icon">
+          </router-link>
+        </section>
+
+        <section class="icon card mb-5 icon" id="file-button">
+          <h2></h2>
+
+          <img class="card-img" src="/static/file-button.png" alt="file-icon">
+
+
+        </section>
+
+      </div>
+
+
+    <!--/div-->
+
+
+  <div class="col-7 col-sm-10 col-xs-12 container">
+<input class="postheader form-control" type="text" v-model.lazy="title" placeholder="Title required"></input><br>
+<div class="mx-auto tag-card col-7 card">
+<div v-for="(tag,index) in tags"> {{tag}} <button type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button></div>
 <form v-on:submit.prevent="nop">
-<input class="postheader" v-model="inProgressTag" v-on:keyup="createTag" placeholder="tags"></input>
+<input class="postheader form-control" v-model="inProgressTag" v-on:keyup="createTag" placeholder="add a topic tag"></input>
 </form>
 
+
+
+
+
 </div>
 </div>
 
-<div class="container" v-for="(component,index) in storeComponents">
-  <div class="row">
-  <div class="col-1"><!-- col-xs-auto -->
+<div class="col- container" v-for="(component,index) in storeComponents">
+  <div class="card-row row">
+  <div class="col-1">
     <div id="arrange-btn-group" class="btn-group-vertical">
       <button @click="moveComponentUp(index)" class="up-down-button"><font face="courier">^</font></button>
       <button @click="moveComponentDown(index)" class="up-down-button"><font face="courier">v</font></button>
     </div>
   </div>
-  <div class="col-10"> <!-- col-11 -->
-  <div class="post-component card" v-if="component.type === 'text'">
+  <div class="col-10 container">
+  <div class="post-component container col-8" v-if="component.type === 'text'">
     <view-text :component="component"></view-text>
     <router-link :to="{ name: 'edit-text', query: {index: index}}"><button><font face="courier">E</font></button></router-link>
 
@@ -50,11 +203,11 @@
     <image-component :title="component.title" :body="component.description" :images="component.content"/>
   </div>
   <div class="post-component card" v-else-if="component.type === 'audio'">
-    <audio-component :id="component.content[0].id" 
-    :title="component.content[0].title" 
-    :body="component.content[0].description" 
-    :controls="true" :source="component.content[0].url" 
-    :filetype="component.content[0].filetype" 
+    <audio-component :id="component.content[0].id"
+    :title="component.content[0].title"
+    :body="component.content[0].description"
+    :controls="true" :source="component.content[0].url"
+    :filetype="component.content[0].filetype"
     autoplay="false"/>
     <router-link :to="{ name: 'edit-audio', query: {index: index}}"><button><font face="courier">E</font></button></router-link>
 
@@ -101,20 +254,39 @@
   <div class="col 11">
     <div id="arrange-btn-group" class="btn-group-vertical">
       <button @click="removeComponent(index)"><font face="courier">x</font></button>
-    
+
     </div>
   </div>
-  
-  </div>
-</div>
-<button v-on:click="submitPost">Publish</button>
-</div>
-<router-view/>
-<button @click="undo">undo </button>
 
-<button @click="redo">redo </button>
+  </div>
+
+
+</div>
+</div>
+
+<router-view/>
+
+
+</div>
+
+<nav class="navbar fixed-bottom navbar-light navbar-left bg-transparent">
+  <div class="title-display" v-if="title.type === string">{{title}}</div>
+  <v-else > </v-else>
+</nav>
+
+
+<nav class="navbar fixed-bottom justify-content-end bg-transparent">
+
+  <button type="button" class="undo-button align-right btn btn-sm btn-light btn-primary-spacing" @click="undo">undo </button>
+  <button type="button" class="redo-button align-right btn btn-sm btn-light btn-primary-spacing" @click="redo">redo </button>
+  <button type="button" class="submit-button btn btn-light btn-outline-info" v-on:click="submitPost">Publish post</button>
+
+
+</nav>
 
 </body>
+
+
 
 
 </template>
@@ -128,6 +300,10 @@ import ViewText from './ViewText';
 import AudioComponent from './audio/AudioComponent'
 import ImageComponent from './image/ImageComponent'
 import VideoComponent from "./video/VideoComponent";
+
+function isBlank(str) {
+  return (!str || /^\s*$/.test(str));
+};
 
 export default {
   name: "post-create",
@@ -151,6 +327,7 @@ export default {
   },
 
   methods: {
+
     nop: function() {},
     removeTag: function(index) {
       console.log("remove tag" + index);
@@ -239,48 +416,54 @@ export default {
   height: 300px;
 }
 
-/* The five buttons on the button bar */
-#text-button {
-  background: #ffae03;
+.icon-card-container {
+  background-color: #e5ffee;
+  border: 0;
 }
-#image-button {
-  background: #1d3461;
+
+
+
+.card {
+  padding-left: 5px;
+  padding-right: 5px;
+  /*background-color: #99b5aa;*/
+  background-color: #e5ffee;
 }
-#audio-button {
-  background: #42aa8b;
+
+.icon {
+  background-color: #e5ffee;
+  border: 0;
 }
-#video-button {
-  background: #e07700;
+
+.card-img {
+  max-height: 125px;
+  max-width: 125px;
+  min-height: 50px;
+  min-width: 50px;
+  height: fixed;
+  width: fixed;
+  background-color: #e5ffee;
 }
-#file-button {
-  background: #23528e;
+
+.title-display {
+  font-size: 1.5rem;
 }
-#buttonbar {
-  margin: auto;
-  width: 368px;
-  height: 70px;
-  background-color: #99b5aa;
-  border-radius: 15px;
+
+.undo-button {
+  margin-right: 1rem;
 }
-.btn-circle {
-  width: 30px;
-  height: 30px;
-  text-align: center;
-  padding: 6px 0;
-  font-size: 12px;
-  line-height: 1.428571429;
-  border-radius: 15px;
+
+.redo-button {
+  margin-right: 1rem;
 }
-.btn-circle.btn-xl {
-  width: 70px;
-  height: 70px;
-  margin: 0px;
-  font-size: 24px;
-  line-height: 1.33;
-  border-radius: 35px;
+
+.tag-card {
+  background-color: #FFFFFF;
+  margin-bottom: 30px;
 }
-.btn-ciricle.btn-xl:hover {
-  box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24),
-    0 17px 50px 0 rgba(0, 0, 0, 0.19);
+
+.post-component, card-row {
+  background-color: #FFFFFF;
 }
+
 </style>

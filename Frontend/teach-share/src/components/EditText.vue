@@ -1,9 +1,10 @@
 <template>
-  <body>
+  <div container class="mx-auto quill-container" col-8>
 
   <!--We can use any buttons we want in the toolbar!
   Check out the github for more examples, and the
   exact code needed for other types of buttons -->
+  <div editor-card col-8 card>
   <div class="custom-quill-editor">
     <quill-editor
        v-model="component.content"
@@ -36,10 +37,11 @@
     <div class="quill-code">
     </div>
   </div>
-<router-link :to="{ name: 'create'}"><button v-on:click="submit">Submit.</button></router-link>
+<router-link :to="{ name: 'create'}"><button v-on:click="submit">Submit</button></router-link>
 <router-link :to="{name: 'create'}"><button>close</button></router-link>
+  </div>
 
-</body>
+</div>
 </template>
 
 <script>
@@ -79,7 +81,7 @@ export default Vue.component("edit-text", {
             component : this.component
           });
         }
-        
+
       },
       close: function(event){
 
@@ -107,20 +109,31 @@ export default Vue.component("edit-text", {
 
 <style lang="scss" scoped>
 
-  .quill-editor,
-  .quill-code {
-    width: 50%;
+  .editor-card {
+    max-width: 1000px;
   }
 
+  .custom-quill-editor {
+    background: #F9F9F9;
+  }
+
+  .quill-editor,
   .quill-code {
-    border: none;
+    max-width: 1000px;
     height: auto;
   }
 
-  body{
-    background: #ffffff;
+  .quill-code {
+    border: 1px;
+    height: auto;
+  }
+
+  .quill-container{
+    width: 1000px;
+    /*background: #c0c0c0;*/
     font-family: "Roboto", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    border: 1;
   }
 </style>

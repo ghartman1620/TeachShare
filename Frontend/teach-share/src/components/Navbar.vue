@@ -33,8 +33,7 @@
 
         <!-- search box component -->
         <div class="search-container">
-            <input type="text" placeholder="Search.." name="search">
-            <button type="button"> <!--class="btn btn-outline-basic"--><img class="img search-button" src="/static/search.svg"></button>
+            <search-box></search-box>
         </div>
       </div>
     </div>
