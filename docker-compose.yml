@@ -19,6 +19,7 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - search
   vue:
     build: Frontend/.
     command: npm run dev 
