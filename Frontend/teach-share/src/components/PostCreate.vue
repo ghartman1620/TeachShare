@@ -67,11 +67,11 @@
         </div>
 
         <div class="mx-auto round-button" id="file-icon">
-          <a href="">
+          <router-link :to="{name: 'edit-file', query: {index: this.maxComponentIndex()}}">
             <img src="/static/file-button.png"
                  onmouseover="this.src='/static/file-button-hover.png'"
                  onmouseout="this.src='/static/file-button.png'">
-          </a>
+          </router-link>
         </div>
 
 
@@ -194,7 +194,7 @@
        </div>
   </div>
   <div class="post-component card" v-else-if="component.type === 'file'">
-    <p>A file component!</p>  `
+    <file-component :component=component></file-component>
   </div>
   <div v-else>
     Something bad!

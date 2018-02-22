@@ -1,23 +1,39 @@
 <template>
-<div class="card" style="width: 18rem;">
-  <!-- <img class="card-img-top" src="" alt="Card image cap"> -->
-  <div class="card-body">
-    <h5 class="card-title">{{filename}}</h5>
-    <p class="card-text">
-      <slot>
-        Alternate text
-      </slot>
-    </p>
+<body>
+	<ul style="list-style-type: none;">
+		<li>
+		<div class = "container">
+			<div class = "row">
+				<div v-for="file in component.files">
+				<div class="card" style="width: 18rem;">
+				<div class="card-body">
+					<div class = "col-md"
+						<h5 class="card-title text-center">
+							<a :href="'http://127.0.0.1:8000' + file.url" class="card-link">{{file.name}}</a>
+						</h5>
+					</div>
 
-  </div>
-</div>
+				</div>
+				</div>
+				</div>
+			</div>
+		</div>
+		</li>
+	</ul>
+</body>
 </template>
+
+<style>
+	li {
+    	float: left;
+	}
+</style>
 
 <script>
 import Vue from 'vue';
 
 export default Vue.component('file-component', {
-    props: ['title', 'filename'],
+    props: ['component'],
     data() {
       return {
 

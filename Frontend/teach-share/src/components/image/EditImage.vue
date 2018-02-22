@@ -66,6 +66,7 @@
             <div class="col-2"></div>
         </div>
         <br><br>
+        {{allFilesUploadComplete}}
     </div>
 </template>
 

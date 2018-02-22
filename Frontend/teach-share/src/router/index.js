@@ -13,6 +13,7 @@ import AudioComponent from "@/components/audio/AudioComponent";
 import EditAudio from "@/components/audio/EditAudio";
 import ImageComponent from "@/components/image/ImageComponent";
 import EditImage from "@/components/image/EditImage";
+import EditFile from "@/components/EditFile";
 
 import PostFeed from "@/components/PostFeed";
 //a change
@@ -65,6 +66,11 @@ export default new Router({
                             name: "edit-image",
                             path: "image",
                             component: EditImage
+                        },
+                        {
+                            name: "edit-file",
+                            path: "file",
+                            component: EditFile
                         }
                     ]
                 },
