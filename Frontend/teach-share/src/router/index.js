@@ -1,18 +1,17 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Base from "@/components/Base";
-import PostCreate from "@/components/PostCreate";
 import Login from "@/components/Login";
 import Test from "@/components/Test";
-import FileUpload from "@/components/FileUpload";
-import EditText from "@/components/EditText";
-import VideoComponent from "@/components/video/VideoComponent";
-import EditVideo from "@/components/video/EditVideo";
 import HomePage from "@/components/HomePage";
+
+
+import PostCreate from "@/components/PostCreate";
+import EditText from "@/components/text/EditText";
+import EditVideo from "@/components/video/EditVideo";
 import EditAudio from "@/components/audio/EditAudio";
-import ImageComponent from "@/components/image/ImageComponent";
 import EditImage from "@/components/image/EditImage";
-import EditFile from "@/components/EditFile";
+import EditFile from "@/components/file/EditFile";
 
 import PostFeed from "@/components/PostFeed";
 //a change

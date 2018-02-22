@@ -36,11 +36,11 @@
 
     <div class="quill-code">
     </div>
+    
   </div>
 <router-link :to="{ name: 'create'}"><button v-on:click="submit">Submit</button></router-link>
 <router-link :to="{name: 'create'}"><button>close</button></router-link>
   </div>
-
 </div>
 </template>
 

@@ -14,7 +14,7 @@ import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 Vue.use(VueQuillEditor, );
-export default Vue.component("view-text", {
+export default Vue.component("text-element", {
   props: ['component'],
   })
 </script>

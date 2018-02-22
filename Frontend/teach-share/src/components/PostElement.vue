@@ -5,18 +5,16 @@ Uses ViewText, ViewVideo, etc.
 
 <template>
 <body>
-  <div class="row">
 
-  <div class="col-10"> <!-- col-11 -->
   <div class="post-component card" v-if="component.type === 'text'">
-    <view-text :component="component"></view-text>
+    <text-element :component="component"></text-element>
 
   </div>
   <div class="post-component card" v-else-if="component.type === 'image_file'">
-    <image-component :title="component.title" :body="component.description" :images="component.content"/>
+    <image-element :title="component.title" :body="component.description" :images="component.content"/>
   </div>
   <div class="post-component card" v-else-if="component.type === 'audio'">
-    <audio-component :id="component.content[0].id" 
+    <audio-element :id="component.content[0].id" 
     :title="component.content[0].title" 
     :body="component.content[0].description" 
     :controls="true" :source="component.content[0].url" 
@@ -26,7 +24,7 @@ Uses ViewText, ViewVideo, etc.
 
   <div class="post-component card" v-else-if="component.type === 'video_link' || component.type === 'video_file'">
       <div v-if="component.type === 'video_link'">
-          <video-component
+          <video-element
             name="vid-comp1"
             :id="component.content.id"
             :height="component.content.height"
@@ -37,10 +35,10 @@ Uses ViewText, ViewVideo, etc.
             autoplay="false"
             isEmbed=true>
           <div slot="description">{{component.content.description}}</div>
-          </video-component>
+          </video-element>
         </div>
         <div v-else>
-          <video-component
+          <video-element
             name="vid-comp2"
             :id="component.content.id"
             :height="component.content.height"
@@ -51,23 +49,21 @@ Uses ViewText, ViewVideo, etc.
             autoplay="false"
             isFile=true>
           <div slot="description">{{component.content.description}}</div>
-          </video-component>
+          </video-element>
        </div>
   </div>
   <div class="post-component card" v-else-if="component.type === 'file'">
     <p>A file component!</p>  `
   </div>
-  </div>
-  </div>
+
 </body>
 </template>
 
 <script>
 import Vue from "vue";
-import ViewText from "./ViewText"
 //add other view components as appropriate
 
-export default Vue.component("post-component", {
+export default Vue.component("post-element", {
     props: ['component'],
 });
 </script>

@@ -1,14 +1,11 @@
 <template>
-    <file-component>Some content!</file-component>
 </template>
 
 <script>
 import Vue from 'vue';
-import FileComponent from './FileComponent.vue';
 
 
 export default Vue.component('base-page', {
-    components: { FileComponent },
     props: [],
     data() {
       return {

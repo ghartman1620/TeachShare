@@ -15,7 +15,7 @@
 
 <script>
 import Vue from "vue";
-import FileUpload from "./FileUpload";
+import FileUpload from "../FileUpload";
 import { mapGetters } from "vuex";
 export default Vue.component("edit-file", {
 	components: {FileUpload},

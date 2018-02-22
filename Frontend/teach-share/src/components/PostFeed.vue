@@ -10,7 +10,7 @@
         <div class="truncatedPostComponent">
         <div v-for="component in post.content">
             
-            <post-component :component="component"></post-component>
+            <post-element :component="component"></post-element>
         </div>
         </div>
         <div :style="getGradientStyle(index)"></div>
@@ -26,7 +26,7 @@
 <script>
 import Vue from "vue";
 import { mapState } from "vuex";
-import PostComponentView from './PostComponentView';
+import PostElement from './PostElement';
 const postContainerDefault = {
     maxHeight: "400px",
     height: "fit-content",

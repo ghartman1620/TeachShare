@@ -39,7 +39,7 @@ import Vue from "vue";
 import EmbedVideo from "./EmbedVideo.vue";
 import FileVideo from "./FileVideo.vue";
 
-export default Vue.component("video-component", {
+export default Vue.component("video-element", {
   components: { EmbedVideo, FileVideo },
   props: [
     "id",

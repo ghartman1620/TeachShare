@@ -6,30 +6,11 @@
 <body>
 
 <div>
-<!--div-- id="buttonbar">
 
-<router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}">
-  <button type="button" class="btn btn-default btn-circle btn-xl" id="text-button"></button>
-</router-link>
-<router-link :to="{name: 'edit-video', query: {index: this.maxComponentIndex(), videotype: 'embed'}}">
-  <button type="button" class="btn btn-default btn-circle btn-xl" id="video-button"></button>
-</router-link>
-<router-link :to="{name: 'edit-audio', query: {index: this.maxComponentIndex()}}">
-  <button type="button" class="btn btn-default btn-circle btn-xl" id="audio-button"></button>
-</router-link>
-<router-link :to="{name: 'edit-image', query: {index: this.maxComponentIndex()}}">
-  <button type="button" class="btn btn-default btn-circle btn-xl" id="image-button"></button>
-</router-link>
-  <button type="button" class="btn btn-default btn-circle btn-xl" id="file-button"><i class="glyphicons glyphicons-folder-open"></i></button>
-</div-->
 
     <div class="col-8 offset-2 card card-outline-danger container icon-card-container">
       <div class="mx-auto card-deck">
 
-        <!--router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}">
-            </router-link>
-
-        <!--/section-->
         <h2></h2>
 
         <div class="mx-auto round-button" id="text-icon">
@@ -77,47 +58,10 @@
 
 
 
-        <!--section class="icon card mb-5 icon" id="video-button">
-          <h2></h2>
-          <router-link :to="{name: 'edit-video', query: {index: this.maxComponentIndex(), videotype: 'embed'}}">
-
-        <img class="card-img" src="/static/video-button.png" alt="video-icon">
-        </router-link>
-
-
-        </section>
-
-
-        <section class="icon card mb-5 icon" id="audio-button">
-          <h2></h2>
-          <router-link :to="{name: 'edit-audio', query: {index: this.maxComponentIndex()}}">
-
-          <img class="card-img" src="/static/audio-button.png" alt="audio-icon">
-          </router-link>
-
-
-        </section>
-
-        <section class="icon card mb-5 icon" id="image-button">
-          <h2></h2>
-          <router-link :to="{name: 'edit-image', query: {index: this.maxComponentIndex()}}">
-
-          <img class="card-img" src="/static/image-button.png" alt="img-icon">
-          </router-link>
-        </section>
-
-        <section class="icon card mb-5 icon" id="file-button">
-          <h2></h2>
-
-          <img class="card-img" src="/static/file-button.png" alt="file-icon">
-
-
-        </section-->
 
       </div>
 
 
-    <!--/div-->
 
 
   <div class="title-tags-container col-7 col-sm-10 col-xs-12 container">
@@ -144,61 +88,8 @@
     </div>
   </div>
   <div class="col-10 container">
-  <div class="post-component container col-8" v-if="component.type === 'text'">
-    <view-text :component="component"></view-text>
-    <router-link :to="{ name: 'edit-text', query: {index: index}}"><button><font face="courier">E</font></button></router-link>
-
-  </div>
-  <div class="post-component card" v-else-if="component.type === 'image_file'">
-    <image-component :title="component.title" :body="component.description" :images="component.content"/>
-  </div>
-  <div class="post-component card" v-else-if="component.type === 'audio'">
-    <audio-element :id="component.content[0].id"
-    :title="component.content[0].title"
-    :body="component.content[0].description"
-    :controls="true" :source="component.content[0].url"
-    :filetype="component.content[0].filetype"
-    autoplay="false"/>
-    <router-link :to="{ name: 'edit-audio', query: {index: index}}"><button><font face="courier">E</font></button></router-link>
-
-  </div>
-
-  <div class="post-component card" v-else-if="component.type === 'video_link' || component.type === 'video_file'">
-      <div v-if="component.type === 'video_link'">
-          <video-component
-            name="vid-comp1"
-            :id="component.content.id"
-            :height="component.content.height"
-            :width="component.content.width"
-            :title="component.content.title"
-            :source="component.content.url"
-            controls="true"
-            autoplay="false"
-            isEmbed=true>
-          <div slot="description">{{component.content.description}}</div>
-          </video-component>
-        </div>
-        <div v-else>
-          <video-component
-            name="vid-comp2"
-            :id="component.content.id"
-            :height="component.content.height"
-            :width="component.content.width"
-            :title="component.content.title"
-            :source="component.content.url"
-            controls="true"
-            autoplay="false"
-            isFile=true>
-          <div slot="description">{{component.content.description}}</div>
-          </video-component>
-       </div>
-  </div>
-  <div class="post-component card" v-else-if="component.type === 'file'">
-    <file-component :component=component></file-component>
-  </div>
-  <div v-else>
-    Something bad!
-    {{component}}
+  <div class="post-component card">
+  <post-element :component="component"></post-element>
   </div>
   </div>
   <div class="col 11">
@@ -218,10 +109,10 @@
 
 
 </div>
-
+<br><br><br> <!-- this is so problems don't occur with bottmo of page button presses -->
 <nav class="navbar fixed-bottom navbar-light navbar-left bg-transparent">
-  <div class="title-display" v-if="title.type === string">{{title}}</div>
-  <v-else > </v-else>
+  <div class="title-display" v-if="title != ''">{{title}}</div>
+
 </nav>
 
 
@@ -246,10 +137,11 @@
 import Vue from 'vue';
 import { mapState } from 'vuex';
 
-import ViewText from './ViewText';
-import AudioElement from './audio/AudioElement'
-import ImageComponent from './image/ImageComponent'
-import VideoComponent from "./video/VideoComponent";
+import TextElement from './text/TextElement';
+import AudioElement from './audio/AudioElement';
+import ImageElement from './image/ImageElement';
+import VideoElement from "./video/VideoElement";
+import FileElement from "./file/FileElement";
 
 function isBlank(str) {
   return (!str || /^\s*$/.test(str));
@@ -257,7 +149,7 @@ function isBlank(str) {
 
 export default {
   name: "post-create",
-  components: { ViewText, AudioElement, ImageComponent, VideoComponent },
+  components: { TextElement, FileElement, AudioElement, ImageElement, VideoElement },
   data: function() {
     return {
       title: "",

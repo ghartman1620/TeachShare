@@ -74,12 +74,12 @@
 import Vue from "vue";
 import FileUpload from "../FileUpload";
 import { mapGetters } from "vuex";
-import ImageComponent from "./ImageComponent";
+import ImageElement from "./ImageElement";
 
 var _ = require("lodash");
 
 export default Vue.component("edit-image", {
-  components: { FileUpload, ImageComponent },
+  components: { FileUpload, ImageElement },
   props: [],
   data() {
     return {
