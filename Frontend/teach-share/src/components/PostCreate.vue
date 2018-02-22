@@ -153,7 +153,7 @@
     <image-component :title="component.title" :body="component.description" :images="component.content"/>
   </div>
   <div class="post-component card" v-else-if="component.type === 'audio'">
-    <audio-component :id="component.content[0].id"
+    <audio-element :id="component.content[0].id"
     :title="component.content[0].title"
     :body="component.content[0].description"
     :controls="true" :source="component.content[0].url"
@@ -247,7 +247,7 @@ import Vue from 'vue';
 import { mapState } from 'vuex';
 
 import ViewText from './ViewText';
-import AudioComponent from './audio/AudioComponent'
+import AudioElement from './audio/AudioElement'
 import ImageComponent from './image/ImageComponent'
 import VideoComponent from "./video/VideoComponent";
 
@@ -257,7 +257,7 @@ function isBlank(str) {
 
 export default {
   name: "post-create",
-  components: { ViewText, AudioComponent, ImageComponent, VideoComponent },
+  components: { ViewText, AudioElement, ImageComponent, VideoComponent },
   data: function() {
     return {
       title: "",

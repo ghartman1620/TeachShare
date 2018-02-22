@@ -9,7 +9,6 @@ import EditText from "@/components/EditText";
 import VideoComponent from "@/components/video/VideoComponent";
 import EditVideo from "@/components/video/EditVideo";
 import HomePage from "@/components/HomePage";
-import AudioComponent from "@/components/audio/AudioComponent";
 import EditAudio from "@/components/audio/EditAudio";
 import ImageComponent from "@/components/image/ImageComponent";
 import EditImage from "@/components/image/EditImage";
@@ -86,91 +85,6 @@ export default new Router({
             path: "/login",
             name: "Login",
             component: Login
-        },
-        {
-            path: "/test",
-            name: "Test",
-            component: Test,
-            children: [{
-                path: "child",
-                component: FileUpload
-            }]
-        },
-
-        // this shows a correctly nested component. Uses
-        // query parameters for certain settings
-
-        {
-            path: "/upload",
-            component: Base,
-            children: [{
-                name: "upload",
-                path: "",
-                component: FileUpload
-                    // props: { acceptedFileTypes: 'image/*' }
-            }]
-        },
-        {
-            path: "/video",
-            component: Base,
-            children: [{
-                name: "video",
-                path: "",
-                component: VideoComponent,
-                props: {
-                    isEmbed: true,
-                    source: "https://www.youtube.com/embed/-0asAVHvgDA",
-                    autoplay: true,
-                    // loop: true,
-                    playlist: "BHgYtKkSEDA,5uGG1cZXnoA",
-                    // source: 'https://www.w3schools.com/html/mov_bbb.mp4',
-                    // controls: true,
-                    // isFile: true,
-
-                    // these are generic
-                    height: 300,
-                    width: 600
-                }
-            }]
-        },
-        {
-            path: "/audio",
-            component: Base,
-            children: [{
-                    name: "audio",
-                    path: "",
-                    component: AudioComponent,
-                    props: {
-                        body: "This is some body content.",
-                        title: "This is a title!",
-                        source: "http://fakeurl.com/file.mp3",
-                        controls: true
-                    }
-                },
-                {
-                    name: "audio-edit",
-                    path: "edit",
-                    component: EditAudio,
-                    props: {}
-                }
-            ]
-        },
-        {
-            path: "/image",
-            component: Base,
-            children: [{
-                    name: "image",
-                    path: "",
-                    component: ImageComponent,
-                    props: {}
-                },
-                {
-                    name: "image-edit",
-                    path: "edit",
-                    component: EditImage,
-                    props: {}
-                }
-            ]
         }
     ]
 });
