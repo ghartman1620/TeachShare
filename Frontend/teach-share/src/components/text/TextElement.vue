@@ -1,6 +1,6 @@
 <template>
 <body>
-<p v-html="component.content"></p>
+<p v-html="element.content"></p>
 </body>
 
 </template>
@@ -15,7 +15,7 @@ import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 Vue.use(VueQuillEditor, );
 export default Vue.component("text-element", {
-  props: ['component'],
+  props: ['element'],
   })
 </script>
 

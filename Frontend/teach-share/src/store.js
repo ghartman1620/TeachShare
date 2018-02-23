@@ -134,13 +134,6 @@ export default new Vuex.Store({
         }
     },
     getters: {
-        // filesUploadStatus: state => state.files,
-        // allFilesUploadComplete: state => {
-        //     console.log('allUploadFinished');
-        //     for (var obj in state.filesPercents.keys()) {
-        //         console.log('OBJECT: ', key, obj);
-        //     }
-        // }
         getPosts: state => () => state.posts
     }
 });

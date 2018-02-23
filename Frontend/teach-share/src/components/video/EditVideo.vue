@@ -117,7 +117,7 @@ export default Vue.component("edit-video", {
 
 
 <style lang="scss" scoped>
-.video-component {
+.video-element {
   height: 100px;
 }
 

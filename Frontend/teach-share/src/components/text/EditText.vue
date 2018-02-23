@@ -5,13 +5,15 @@
   Check out the github for more examples, and the
   exact code needed for other types of buttons -->
   <div editor-card col-8 card>
+  <!-- These were in the editor but can't be commented out as part
+  of a tag so here they are. -->
+  <!-- @blur="onEditorBlur($event)"
+  @focus="onEditorFocus($event)" 
+  @ready="onEditorReady($event)" -->
   <div class="custom-quill-editor">
     <quill-editor
-       v-model="component.content"
-       :options="editorOption"
-       @blur="onEditorBlur($event)"
-       @focus="onEditorFocus($event)"
-       @ready="onEditorReady($event)">
+       v-model="element.content"
+       :options="editorOption">
       <div id="toolbar" slot="toolbar">
         <!-- Add a bold button -->
         <button class="ql-bold">Bold</button>
@@ -57,7 +59,7 @@ Vue.use(VueQuillEditor,)
 export default Vue.component("edit-text", {
     data() {
       return {
-        component: {},
+        element: {},
         editorOption: {
           modules: {
             toolbar: '#toolbar'
@@ -72,13 +74,13 @@ export default Vue.component("edit-text", {
 
     methods: {
       submit: function(event){
-        if(this.$route.query.index == this.$store.state.create.postComponents.length){
-          this.$store.dispatch("addComponent", this.component);
+        if(this.$route.query.index == this.$store.state.create.postElements.length){
+          this.$store.dispatch("addElement", this.element);
         }
         else{
-          this.$store.dispatch("editComponent", {
+          this.$store.dispatch("editElement", {
             index : this.$route.query.index,
-            component : this.component
+            element : this.element
           });
         }
 
@@ -92,13 +94,13 @@ export default Vue.component("edit-text", {
     mounted(){
       this.$router.replace({name: 'edit-text', query: {index: this.$route.query.index}})
       console.log("mounted edit text");
-      if(this.$route.query.index >= this.$store.state.create.postComponents.length){
-        this.component = {
+      if(this.$route.query.index >= this.$store.state.create.postElements.length){
+        this.element = {
           type: "text",
           content: "",
         }
       }else{
-        this.component = Object.assign({}, this.$store.state.create.postComponents[this.$route.query.index]);
+        this.element = Object.assign({}, this.$store.state.create.postElements[this.$route.query.index]);
       }
     },
     beforeDestroy(){

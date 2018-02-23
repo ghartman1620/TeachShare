@@ -33,7 +33,7 @@
                 <div class="row">
                 <div class="offset-3 col-6">
                     <router-link :to="{name: 'create'}">
-                    <button @click="submitComponent" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
+                    <button @click="submitElement" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
                         <span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
                         <span v-else>Submit Audio(s)</span>
                     </button>
@@ -122,14 +122,14 @@ export default Vue.component("edit-audio", {
             console.log(output);
             return output;
         },
-        submitComponent() {
-            if(this.$route.query.index == this.$store.state.create.postComponents.length){
-                this.$store.dispatch("addComponent", {type: "audio", content : this.generateJSON()});
+        submitElement() {
+            if(this.$route.query.index == this.$store.state.create.postElements.length){
+                this.$store.dispatch("addElement", {type: "audio", content : this.generateJSON()});
             }
             else{
-                this.$store.dispatch("editComponent", {
+                this.$store.dispatch("editElement", {
                     index : this.$route.query.index,
-                    component : {type: "audio", content : this.generateJSON()}
+                    element : {type: "audio", content : this.generateJSON()}
                 });
             }
         }

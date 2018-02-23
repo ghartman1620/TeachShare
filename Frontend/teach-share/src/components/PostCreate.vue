@@ -6,130 +6,102 @@
 <body>
 
 <div>
+  <div class="col-8 offset-2 card card-outline-danger container icon-card-container">
+    <div class="mx-auto card-deck">
 
+      <h2></h2>
+      <div class="mx-auto round-button" id="text-icon">
+        <router-link :to="{ name: 'edit-text', query: {index: this.maxElementIndex()}}">
+          <img src="/static/text-button.png"
+                onmouseover="this.src='/static/text-button-hover.png'"
+                onmouseout="this.src='/static/text-button.png'">
+        </router-link>
+      </div>
+      <h2></h2>
 
-    <div class="col-8 offset-2 card card-outline-danger container icon-card-container">
-      <div class="mx-auto card-deck">
+      <div class="mx-auto round-button" id="video-icon">
+        <router-link :to="{name: 'edit-video', query: {index: this.maxElementIndex(), videotype: 'embed'}}">
+          <img src="/static/video-button.png"
+                onmouseover="this.src='/static/video-button-hover.png'"
+                onmouseout="this.src='/static/video-button.png'">
 
-        <h2></h2>
+        </router-link>
+      </div>
+      <h2></h2>
 
-        <div class="mx-auto round-button" id="text-icon">
-          <router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}">
-            <img src="/static/text-button.png"
-                 onmouseover="this.src='/static/text-button-hover.png'"
-                 onmouseout="this.src='/static/text-button.png'">
-          </router-link>
-        </div>
-        <h2></h2>
+      <div class="mx-auto round-button" id="audio-icon">
+        <router-link :to="{name: 'edit-audio', query: {index: this.maxElementIndex()}}">
+          <img src="/static/audio-button.png"
+                onmouseover="this.src='/static/audio-button-hover.png'"
+                onmouseout="this.src='/static/audio-button.png'">
+        </router-link>
+      </div>
+      <h2></h2>
 
-        <div class="mx-auto round-button" id="video-icon">
-          <router-link :to="{name: 'edit-video', query: {index: this.maxComponentIndex(), videotype: 'embed'}}">
-            <img src="/static/video-button.png"
-                 onmouseover="this.src='/static/video-button-hover.png'"
-                 onmouseout="this.src='/static/video-button.png'">
-
-          </router-link>
-        </div>
-        <h2></h2>
-
-        <div class="mx-auto round-button" id="audio-icon">
-          <router-link :to="{name: 'edit-audio', query: {index: this.maxComponentIndex()}}">
-            <img src="/static/audio-button.png"
-                 onmouseover="this.src='/static/audio-button-hover.png'"
-                 onmouseout="this.src='/static/audio-button.png'">
-          </router-link>
-        </div>
-        <h2></h2>
-
-        <div class="mx-auto round-button" id="image-icon">
-          <router-link :to="{name: 'edit-image', query: {index: this.maxComponentIndex()}}">
-            <img src="/static/image-button.png" >
-          </router-link>
-        </div>
-
-        <div class="mx-auto round-button" id="file-icon">
-          <router-link :to="{name: 'edit-file', query: {index: this.maxComponentIndex()}}">
-            <img src="/static/file-button.png"
-                 onmouseover="this.src='/static/file-button-hover.png'"
-                 onmouseout="this.src='/static/file-button.png'">
-          </router-link>
-        </div>
-
-
-
-
-
+      <div class="mx-auto round-button" id="image-icon">
+        <router-link :to="{name: 'edit-image', query: {index: this.maxElementIndex()}}">
+          <img src="/static/image-button.png" >
+        </router-link>
       </div>
 
+      <div class="mx-auto round-button" id="file-icon">
+        <router-link :to="{name: 'edit-file', query: {index: this.maxElementIndex()}}">
+          <img src="/static/file-button.png"
+                onmouseover="this.src='/static/file-button-hover.png'"
+                onmouseout="this.src='/static/file-button.png'">
+        </router-link>
+      </div>
+    </div>
 
+    <div class="title-tags-container col-7 col-sm-10 col-xs-12 container">
+      <input class="postheader form-control" type="text" v-model.lazy="title" placeholder="Title required"></input>
+      <br>
+      <div class="mx-auto tag-card col-7 card">
+        <div v-for="(tag,index) in tags"> {{tag}} <button type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button>
+        </div>
+      
+        <form v-on:submit.prevent="nop">
+          <input class="postheader form-control" v-model="inProgressTag" v-on:keyup="createTag" placeholder="add a topic tag"></input>
+        </form>
+      </div>
+    </div>
 
+    <div class="col- container" v-for="(element,index) in storeElements">
+      <div class="card-row row">
+        <div class="col-1">
+          <div id="arrange-btn-group" class="btn-group-vertical">
+            <button @click="moveElementUp(index)" class="up-down-button"><font face="courier">^</font></button>
+            <button @click="moveElementDown(index)" class="up-down-button"><font face="courier">v</font></button>
+          </div>
+        </div>
+        <div class="col-10 container">
+          <div class="post-element card">
+            <post-element :element="element"></post-element>
+          </div>
+        </div>
+        <div class="col 11">
+          <div id="arrange-btn-group" class="btn-group-vertical">
+            <button @click="removeElement(index)"><font face="courier">x</font></button>
 
-  <div class="title-tags-container col-7 col-sm-10 col-xs-12 container">
-<input class="postheader form-control" type="text" v-model.lazy="title" placeholder="Title required"></input><br>
-<div class="mx-auto tag-card col-7 card">
-<div v-for="(tag,index) in tags"> {{tag}} <button type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button></div>
-<form v-on:submit.prevent="nop">
-<input class="postheader form-control" v-model="inProgressTag" v-on:keyup="createTag" placeholder="add a topic tag"></input>
-</form>
-
-
-
-
-
-</div>
-</div>
-
-<div class="col- container" v-for="(component,index) in storeComponents">
-  <div class="card-row row">
-  <div class="col-1">
-    <div id="arrange-btn-group" class="btn-group-vertical">
-      <button @click="moveComponentUp(index)" class="up-down-button"><font face="courier">^</font></button>
-      <button @click="moveComponentDown(index)" class="up-down-button"><font face="courier">v</font></button>
+          </div>    
+        </div>
+      </div>
     </div>
   </div>
-  <div class="col-10 container">
-  <div class="post-component card">
-  <post-element :component="component"></post-element>
-  </div>
-  </div>
-  <div class="col 11">
-    <div id="arrange-btn-group" class="btn-group-vertical">
-      <button @click="removeComponent(index)"><font face="courier">x</font></button>
-
-    </div>
-  </div>
-
-  </div>
-
-
-</div>
-</div>
-
-<router-view/>
-
-
+  <router-view/>
 </div>
 <br><br><br> <!-- this is so problems don't occur with bottmo of page button presses -->
 <nav class="navbar fixed-bottom navbar-light navbar-left bg-transparent">
   <div class="title-display" v-if="title != ''">{{title}}</div>
-
 </nav>
 
 
 <nav class="navbar fixed-bottom justify-content-end bg-transparent">
-
   <button type="button" class="undo-button align-right btn btn-sm btn-outline-dark btn-primary-spacing" @click="undo">undo </button>
   <button type="button" class="redo-button align-right btn btn-sm btn-outline-dark btn-primary-spacing" @click="redo">redo </button>
   <button type="button" class="submit-button btn btn-light btn-outline-info" v-on:click="submitPost">Publish post</button>
-
-
 </nav>
-
 </body>
-
-
-
-
 </template>
 
 
@@ -153,15 +125,15 @@ export default {
   data: function() {
     return {
       title: "",
-      editedComponent: {},
-      editedComponentIndex: -1,
+      editedElement: {},
+      editedElementIndex: -1,
       inProgressTag: "",
       tags: []
     };
   },
   computed: {
-    storeComponents() {
-      return this.$store.state.create.postComponents;
+    storeElements() {
+      return this.$store.state.create.postElements;
     },
     nextStateId() {
       return this.$store.state.create.nextStateId;
@@ -186,11 +158,11 @@ export default {
       this.$store.dispatch("fetchUser", 1);
     },
     submitPost: function(event) {
-      console.log(this.$store.state.create.postComponents);
+      console.log(this.$store.state.create.postElements);
       var obj = {
         user: 1,
         title: this.title,
-        content: this.$store.state.create.postComponents,
+        content: this.$store.state.create.postElements,
         likes: 0,
         comments: [],
         tags: this.tags,
@@ -199,31 +171,31 @@ export default {
       console.log(obj);
       this.$store.dispatch("createPost", obj);
     },
-    editComponent: function(index) {
+    editElement: function(index) {
       this.$store.dispatch(
-        "setEditedComponent",
-        this.$store.state.create.postComponents[index]
+        "setEditedElement",
+        this.$store.state.create.postElements[index]
       );
     },
 
-    moveComponentUp: function(index) {
-      console.log("moveComponentUp:" + index);
+    moveElementUp: function(index) {
+      console.log("moveElementUp:" + index);
       if (index != 0) {
-        this.$store.dispatch("swapComponents", [index, index - 1]);
+        this.$store.dispatch("swapElements", [index, index - 1]);
         //dispatch only allows one argument so we'll pass them as an array
       }
     },
-    moveComponentDown: function(index) {
-      if (index != this.$store.state.create.postComponents.length - 1) {
-        this.$store.dispatch("swapComponents", [index, index + 1]);
+    moveElementDown: function(index) {
+      if (index != this.$store.state.create.postElements.length - 1) {
+        this.$store.dispatch("swapElements", [index, index + 1]);
         //dispatch only allows one argument so we'll pass them as an array
       }
     },
-    removeComponent: function(index) {
-      this.$store.dispatch("removeComponent", index);
+    removeElement: function(index) {
+      this.$store.dispatch("removeElement", index);
     },
-    maxComponentIndex() {
-      return this.$store.state.create.postComponents.length;
+    maxElementIndex() {
+      return this.$store.state.create.postElements.length;
     },
     undo() {
       this.$store.dispatch("undo");
@@ -289,8 +261,8 @@ export default {
   width: 100%;
 }
 
-/* Submitted components now being viewed */
-.container-component {
+/* Submitted elements now being viewed */
+.container-element {
   width: 60%;
   height: 300px;
 }
@@ -324,7 +296,7 @@ export default {
   margin-bottom: 30px;
 }
 
-.post-component, card-row {
+.post-element, card-row {
   background-color: #FFFFFF;
 }
 

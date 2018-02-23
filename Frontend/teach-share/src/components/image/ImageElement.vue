@@ -71,7 +71,7 @@ export default Vue.component("image-element", {
     }
   },
   mounted: function() {
-    console.log('in imagecomponent');
+    console.log('in image element');
     console.log(this.images);
     this.audio = document.getElementById(this.id);
   },

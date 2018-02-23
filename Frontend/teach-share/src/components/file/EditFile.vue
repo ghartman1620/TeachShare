@@ -26,13 +26,13 @@ export default Vue.component("edit-file", {
 		submit() {
 			if (
 				this.$route.query.index ==
-				this.$store.state.create.postComponents.length
+				this.$store.state.create.postElements.length
 			) {
-				this.$store.dispatch("addComponent", this.generateJSON());
+				this.$store.dispatch("addElement", this.generateJSON());
 			} else {
-				this.$store.dispatch("editComponent", {
+				this.$store.dispatch("editElement", {
 				index: this.$route.query.index,
-				component: this.generateJSON()
+				element: this.generateJSON()
 				});
 			}
 		},

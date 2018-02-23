@@ -3,7 +3,7 @@ import Vue from "vue";
 
 const PostCreateService = {
     state: {
-        postComponents: [],
+        postElements: [],
         doneMutations: [],
         unDoneMutations: []
     },
@@ -14,81 +14,81 @@ const PostCreateService = {
         REDO: state => {
             state.unDoneMutations.pop();
         },
-        UNDO_ADD_COMPONENT: (state, index) => {
+        UNDO_ADD_ELEMENT: (state, index) => {
             state.unDoneMutations.push({
-                mutation: "ADD_COMPONENT",
-                arg: state.postComponents[index]
+                mutation: "ADD_ELEMENT",
+                arg: state.postElements[index]
             });
-            state.postComponents.splice(index, 1);
+            state.postElements.splice(index, 1);
             console.log(state.unDoneMutations);
         },
-        UNDO_REMOVE_COMPONENT: (state, arg) => {
+        UNDO_REMOVE_ELEMENT: (state, arg) => {
             state.unDoneMutations.push({
-                mutation: "REMOVE_COMPONENT",
+                mutation: "REMOVE_ELEMENT",
                 arg: arg.index
             });
-            state.postComponents.splice(arg.index, 0, arg.component);
+            state.postElements.splice(arg.index, 0, arg.element);
             console.log(state.unDoneMutations);
         },
-        UNDO_EDIT_COMPONENT: (state, arg) => {
+        UNDO_EDIT_ELEMENT: (state, arg) => {
             state.unDoneMutations.push({
-                mutation: "EDIT_COMPONENT",
-                arg: { index: arg.index, component: state.postComponents[arg.index] }
+                mutation: "EDIT_ELEMENT",
+                arg: { index: arg.index, element: state.postElements[arg.index] }
             });
-            state.postComponents.splice(arg.index, 1, arg.component);
+            state.postElements.splice(arg.index, 1, arg.element);
             console.log(state.unDoneMutations);
         },
-        UNDO_SWAP_COMPONENTS: (state, iAndJ) => {
-            state.unDoneMutations.push({ mutation: "SWAP_COMPONENTS", arg: iAndJ });
+        UNDO_SWAP_ELEMENTS: (state, iAndJ) => {
+            state.unDoneMutations.push({ mutation: "SWAP_ELEMENTS", arg: iAndJ });
             var i = iAndJ[0];
             var j = iAndJ[1];
-            var tmp = state.postComponents[i];
-            Vue.set(state.postComponents, i, state.postComponents[j]);
-            Vue.set(state.postComponents, j, tmp);
+            var tmp = state.postElements[i];
+            Vue.set(state.postElements, i, state.postElements[j]);
+            Vue.set(state.postElements, j, tmp);
             console.log(state.unDoneMutations);
         },
-        // Mutations for the currently edited post data:  and postComponents
-        ADD_COMPONENT: (state, component) => {
+        // Mutations for the currently edited post data:  and postElements
+        ADD_ELEMENT: (state, element) => {
             state.doneMutations.push({
-                mutation: "UNDO_ADD_COMPONENT",
-                arg: state.postComponents.length
+                mutation: "UNDO_ADD_ELEMENT",
+                arg: state.postElements.length
             });
-            state.postComponents.push(component);
-            console.log("add component mutation");
+            state.postElements.push(element);
+            console.log("add element mutation");
         },
-        SWAP_COMPONENTS: (state, iAndJ) => {
+        SWAP_ELEMENTS: (state, iAndJ) => {
             // I wrote this code because i'm triggered by being limited
             // to one function argument so I'm going to pretend I can pass two.
             state.doneMutations.push({
-                mutation: "UNDO_SWAP_COMPONENTS",
+                mutation: "UNDO_SWAP_ELEMENTS",
                 arg: iAndJ
             });
             var i = iAndJ[0];
             var j = iAndJ[1];
-            var tmp = state.postComponents[i];
-            Vue.set(state.postComponents, i, state.postComponents[j]);
-            Vue.set(state.postComponents, j, tmp);
-            console.log(state.postComponents);
+            var tmp = state.postElements[i];
+            Vue.set(state.postElements, i, state.postElements[j]);
+            Vue.set(state.postElements, j, tmp);
+            console.log(state.postElements);
         },
-        REMOVE_COMPONENT: (state, index) => {
+        REMOVE_ELEMENT: (state, index) => {
             state.doneMutations.push({
-                mutation: "UNDO_REMOVE_COMPONENT",
-                arg: { component: state.postComponents[index], index: index }
+                mutation: "UNDO_REMOVE_ELEMENT",
+                arg: { element: state.postElements[index], index: index }
             });
-            state.postComponents.splice(index, 1);
+            state.postElements.splice(index, 1);
         },
-        EDIT_COMPONENT: (state, editedComponent) => {
+        EDIT_ELEMENT: (state, editedElement) => {
             state.doneMutations.push({
-                mutation: "UNDO_EDIT_COMPONENT",
+                mutation: "UNDO_EDIT_ELEMENT",
                 arg: {
-                    component: state.postComponents[editedComponent.index],
-                    index: editedComponent.index
+                    element: state.postElements[editedElement.index],
+                    index: editedElement.index
                 }
             });
-            state.postComponents.splice(
-                editedComponent.index,
+            state.postElements.splice(
+                editedElement.index,
                 1,
-                editedComponent.component
+                editedElement.element
             );
         },
         CLEAR_REDO: state => {
@@ -119,26 +119,26 @@ const PostCreateService = {
                 context.commit(mut.mutation, mut.arg);
             }
         },
-        addComponent: (state, component) => {
-            console.log("add_component action");
-            state.commit("ADD_COMPONENT", component);
+        addElement: (state, element) => {
+            console.log("add_element action");
+            state.commit("ADD_ELEMENT", element);
             state.commit("CLEAR_REDO");
         },
         // Actions are only allowed to have one argument so iAndJ is
         // a list with index 0 as the first index to be swapped
         // and index 1 the second
-        swapComponents: (state, iAndJ) => {
+        swapElements: (state, iAndJ) => {
             console.log(iAndJ[0] + " " + iAndJ[1]);
-            state.commit("SWAP_COMPONENTS", iAndJ);
+            state.commit("SWAP_ELEMENTS", iAndJ);
             state.commit("CLEAR_REDO");
         },
-        removeComponent: (state, index) => {
-            state.commit("REMOVE_COMPONENT", index);
+        removeElement: (state, index) => {
+            state.commit("REMOVE_ELEMENT", index);
             state.commit("CLEAR_REDO");
         },
-        editComponent: (state, editedComponent) => {
-            console.log("in editComponent action");
-            state.commit("EDIT_COMPONENT", editedComponent);
+        editElement: (state, editedElement) => {
+            console.log("in editElement action");
+            state.commit("EDIT_ELEMENT", editedElement);
             state.commit("CLEAR_REDO");
         }
     }

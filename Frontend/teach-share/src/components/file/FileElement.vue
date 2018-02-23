@@ -4,7 +4,7 @@
 		<li>
 		<div class = "container">
 			<div class = "row">
-				<div v-for="file in component.files">
+				<div v-for="file in element.files">
 				<div class="card" style="width: 18rem;">
 				<div class="card-body">
 					<div class = "col-md"
@@ -32,8 +32,8 @@
 <script>
 import Vue from 'vue';
 
-export default Vue.component('file-component', {
-    props: ['component'],
+export default Vue.component('file-element', {
+    props: ['element'],
     data() {
       return {
 

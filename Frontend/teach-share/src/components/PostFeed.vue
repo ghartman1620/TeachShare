@@ -7,10 +7,10 @@
 <div v-for="(post,index) in posts">
     <div :id="index" :style="getPostContainerStyle(index)" class="container card">
         <h3>{{post.title}}</h3>
-        <div class="truncatedPostComponent">
-        <div v-for="component in post.content">
+        <div class="truncatedPostElement">
+        <div v-for="element in post.content">
             
-            <post-element :component="component"></post-element>
+            <post-element :element="element"></post-element>
         </div>
         </div>
         <div :style="getGradientStyle(index)"></div>
@@ -163,7 +163,7 @@ export default{
 
 <style lang="scss" scoped>
 
-.truncatedPostComponent {
+.truncatedPostElement {
     overflow: hidden;
 }
 

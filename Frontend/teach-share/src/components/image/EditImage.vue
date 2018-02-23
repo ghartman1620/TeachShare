@@ -57,11 +57,11 @@
         <div class="row">
             <div class="col-2"></div>
             <div class="col-8" v-if="this.$store.state.image.images.length > 0">
-                <image-component 
+                <image-element 
                     :images=this.$store.state.image.images
                     :body="description"
                     :title="title">
-                </image-component>
+                </image-element>
             </div>
             <div class="col-2"></div>
         </div>
@@ -96,11 +96,11 @@ export default Vue.component("edit-image", {
     submit() {
       if (
         this.$route.query.index ==
-        this.$store.state.create.postComponents.length
+        this.$store.state.create.postElements.length
       ) {
-        this.$store.dispatch("addComponent", this.generateJSON());
+        this.$store.dispatch("addElement", this.generateJSON());
       } else {
-        this.$store.dispatch("editComponent", {
+        this.$store.dispatch("editElement", {
           index: this.$route.query.index,
           component: this.generateJSON()
         });
