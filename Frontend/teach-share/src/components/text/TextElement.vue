@@ -1,37 +1,36 @@
 <template>
-<body>
-<p v-html="element.content"></p>
-</body>
+    <body>
+       <p v-html="element.content"></p>
+    </body>
 
 </template>
 
 <script>
 import Vue from "vue";
-
-import VueQuillEditor from 'vue-quill-editor'
-
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
+import VueQuillEditor from "vue-quill-editor"
+import "quill/dist/quill.core.css"
+import "quill/dist/quill.snow.css"
+import "quill/dist/quill.bubble.css"
 Vue.use(VueQuillEditor, );
+
 export default Vue.component("text-element", {
-  props: ['element'],
-  })
+    props: ["element"],
+})
 </script>
 
 <style>
 .ql-size-huge {
-  font-size: 30px;
+    font-size: 30px;
 }
 .ql-size-large {
-  font-size: 20px;
+    font-size: 20px;
 }
 
 .ql-font-monospace {
-  font-family: "Courier" ;
+    font-family: "Courier" ;
 }
 .ql-font-serif {
-  font-family: "Times New Roman", Times, serif;
+    font-family: "Times New Roman", Times, serif;
 }
 
 </style>

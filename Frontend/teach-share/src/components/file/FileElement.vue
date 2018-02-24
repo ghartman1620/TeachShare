@@ -30,10 +30,10 @@
 </style>
 
 <script>
-import Vue from 'vue';
+import Vue from "vue";
 
-export default Vue.component('file-element', {
-    props: ['element'],
+export default Vue.component("file-element", {
+    props: ["element"],
     data() {
       return {
 

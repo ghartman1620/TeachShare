@@ -3,9 +3,9 @@
 <template>
 
 <body>
-  <div id="app">
-    <router-view/>
-  </div>
+    <div id="app">
+        <router-view/>
+    </div>
 </body>
 </template>
 
@@ -26,9 +26,9 @@ export default {
 <style>
 
 body{
-  font-family: "Roboto", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #E5FFEE;
+    font-family: "Roboto", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #E5FFEE;
 }
 </style>

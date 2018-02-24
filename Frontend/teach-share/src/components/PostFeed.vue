@@ -26,7 +26,7 @@
 <script>
 import Vue from "vue";
 import { mapState } from "vuex";
-import PostElement from './PostElement';
+import PostElement from "./PostElement";
 const postContainerDefault = {
     maxHeight: "400px",
     height: "fit-content",
@@ -131,7 +131,7 @@ export default{
         //this isn't accessible in an anonymous function,
         //so we'll make it a variable so we can call scroll() 
         var t = this;
-        window.addEventListener('scroll', function() {t.scroll()}, false);
+        window.addEventListener("scroll", function() {t.scroll()}, false);
     },
     mounted() {
         this.$store.watch(this.$store.getters.getPosts, posts => {
@@ -154,7 +154,7 @@ export default{
         });
     },
     destroyed() {
-        window.removeEventListener('scroll', function() {t.scroll()}, false);
+        window.removeEventListener("scroll", function() {t.scroll()}, false);
     }
 
 }

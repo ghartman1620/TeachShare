@@ -34,9 +34,9 @@
 </template>
 
 <script>
-import Vue from 'vue';
+import Vue from "vue";
 
-export default Vue.component('dimension-picker', {
+export default Vue.component("dimension-picker", {
   components: {},
   props: [],
   data() {
@@ -51,11 +51,11 @@ export default Vue.component('dimension-picker', {
   methods: {
       changeWidth() {
           console.log(this.width);
-          this.$parent.$emit('changeWidth', Number(this.width));
+          this.$parent.$emit("changeWidth", Number(this.width));
       },
       changeHeight() {
           console.log(this.height)
-          this.$parent.$emit('changeHeight', Number(this.height));
+          this.$parent.$emit("changeHeight", Number(this.height));
       }
   }
 });

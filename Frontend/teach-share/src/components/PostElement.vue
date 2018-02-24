@@ -6,55 +6,55 @@ Uses TextElement, VideoElement, etc.
 <template>
 <body>
 
-  <div class="post-element card" v-if="element.type === 'text'">
-    <text-element :element="element"></text-element>
+    <div class="post-element card" v-if="element.type === 'text'">
+        <text-element :element="element"></text-element>
 
-  </div>
-  <div class="post-element card" v-else-if="element.type === 'image_file'">
-    <image-element :title="element.title" :body="element.description" :images="element.content"/>
-  </div>
-  <div class="post-element card" v-else-if="element.type === 'audio'">
-    <audio-element :id="element.content[0].id" 
-    :title="element.content[0].title" 
-    :body="element.content[0].description" 
-    :controls="true" :source="element.content[0].url" 
-    :filetype="element.content[0].filetype" 
-    autoplay="false"/>
-  </div>
+    </div>
+    <div class="post-element card" v-else-if="element.type === 'image_file'">
+        <image-element :title="element.title" :body="element.description" :images="element.content"/>
+    </div>
+    <div class="post-element card" v-else-if="element.type === 'audio'">
+        <audio-element :id="element.content[0].id" 
+        :title="element.content[0].title" 
+        :body="element.content[0].description" 
+        :controls="true" :source="element.content[0].url" 
+        :filetype="element.content[0].filetype" 
+        autoplay="false"/>
+    </div>
 
-  <div class="post-element card" v-else-if="element.type === 'video_link' || element.type === 'video_file'">
-      <div v-if="element.type === 'video_link'">
-          <video-element
-            name="vid-comp1"
-            :id="element.content.id"
-            :height="element.content.height"
-            :width="element.content.width"
-            :title="element.content.title"
-            :source="element.content.url"
-            controls="true"
-            autoplay="false"
-            isEmbed=true>
-          <div slot="description">{{element.content.description}}</div>
-          </video-element>
-        </div>
-        <div v-else>
-          <video-element
-            name="vid-comp2"
-            :id="element.content.id"
-            :height="element.content.height"
-            :width="element.content.width"
-            :title="element.content.title"
-            :source="element.content.url"
-            controls="true"
-            autoplay="false"
-            isFile=true>
-          <div slot="description">{{element.content.description}}</div>
-          </video-element>
-       </div>
-  </div>
-  <div class="post-element card" v-else-if="element.type === 'file'">
-    <file-element :element="element"/>
-  </div>
+    <div class="post-element card" v-else-if="element.type === 'video_link' || element.type === 'video_file'">
+            <div v-if="element.type === 'video_link'">
+                    <video-element
+                        name="vid-comp1"
+                        :id="element.content.id"
+                        :height="element.content.height"
+                        :width="element.content.width"
+                        :title="element.content.title"
+                        :source="element.content.url"
+                        controls="true"
+                        autoplay="false"
+                        isEmbed=true>
+                    <div slot="description">{{element.content.description}}</div>
+                    </video-element>
+                </div>
+                <div v-else>
+                    <video-element
+                        name="vid-comp2"
+                        :id="element.content.id"
+                        :height="element.content.height"
+                        :width="element.content.width"
+                        :title="element.content.title"
+                        :source="element.content.url"
+                        controls="true"
+                        autoplay="false"
+                        isFile=true>
+                    <div slot="description">{{element.content.description}}</div>
+                    </video-element>
+             </div>
+    </div>
+    <div class="post-element card" v-else-if="element.type === 'file'">
+        <file-element :element="element"/>
+    </div>
 
 </body>
 </template>
@@ -63,6 +63,6 @@ Uses TextElement, VideoElement, etc.
 import Vue from "vue";
 
 export default Vue.component("post-element", {
-    props: ['element'],
+        props: ["element"],
 });
 </script>

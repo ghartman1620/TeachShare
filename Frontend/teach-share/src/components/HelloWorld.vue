@@ -3,7 +3,7 @@
 
 <script>
 export default {
-  name: 'HelloWorld',
+    name: "HelloWorld",
 }
 </script>
 
@@ -11,6 +11,6 @@ export default {
 <style scoped>
 
 h1 {
-  font-weight: normal;
+    font-weight: normal;
 }
 </style>
