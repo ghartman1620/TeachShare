@@ -119,13 +119,13 @@ export default Vue.component("edit-video-embed", {
         submit() {
             if (
                 this.$route.query.index ==
-                this.$store.state.create.postComponents.length
+                this.$store.state.create.postElements.length
             ) {
-                this.$store.dispatch("addComponent", this.generateEmbedJSON());
+                this.$store.dispatch("addElement", this.generateEmbedJSON());
             } else {
-                this.$store.dispatch("editComponent", {
+                this.$store.dispatch("editElement", {
                     index: this.$route.query.index,
-                    component: this.generateEmbedJSON()
+                    element: this.generateEmbedJSON()
                 });
             }
         },

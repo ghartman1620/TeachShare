@@ -54,19 +54,23 @@
         </div>
 
         <div class="title-tags-container col-7 col-sm-10 col-xs-12 container">
-            <input class="postheader form-control" type="text" v-model.lazy="title" placeholder="Title required"></input>
+            <input class="postheader form-control" type="text" v-model.lazy="title" 
+                placeholder="Title required"></input>
             <br>
             <div class="mx-auto tag-card col-7 card">
-                <div v-for="(tag,index) in tags"> {{tag}} <button type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button>
+                <div :key="index" v-for="(tag,index) in tags"> 
+                    {{tag}} 
+                    <button type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button>
                 </div>
             
                 <form v-on:submit.prevent="nop">
-                    <input class="postheader form-control" v-model="inProgressTag" v-on:keyup="createTag" placeholder="add a topic tag"></input>
+                    <input class="postheader form-control" v-model="inProgressTag" v-on:keyup="createTag" 
+                        placeholder="add a topic tag"></input>
                 </form>
             </div>
         </div>
 
-        <div class="col- container" v-for="(element,index) in storeElements">
+        <div class="col- container" :key="index" v-for="(element,index) in storeElements">
             <div class="card-row row">
                 <div class="col-1">
                     <div id="arrange-btn-group" class="btn-group-vertical">

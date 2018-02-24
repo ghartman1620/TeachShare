@@ -1,14 +1,14 @@
 <template>
 <body>
-	<div class="container">
-	<file-upload :fileLimit="20" title="Upload Files">
-	</file-upload>
-	<router-link :to="{name: 'create'}">
-        <button @click="submit" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
-            <span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
-            <span v-else>Submit File(s)</span>
-        </button>
-	</router-link>
+	<div class="container card">
+		<file-upload :fileLimit="20" title="Upload Files">
+		</file-upload>
+		<router-link :to="{name: 'create'}">
+			<button @click="submit" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
+				<span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
+				<span v-else>Submit File(s)</span>
+			</button>
+		</router-link>
 	</div>
 </body>
 </template>

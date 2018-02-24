@@ -44,8 +44,8 @@ export default {
 }
 
 #container{
-margin-top: 1px;
-overflow: hidden;
+    margin-top: 1px;
+    overflow: hidden;
 }
 
 /*button style*/

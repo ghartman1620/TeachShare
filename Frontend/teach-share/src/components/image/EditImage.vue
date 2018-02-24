@@ -1,73 +1,73 @@
 <template>
-        <div>
-                <div class="container">
-                        <form v-on:submit.prevent="submit">
-                                <!-- file upload -->
-                                <file-upload :fileLimit="20" title="Upload Image Files" fileAcceptType="IMG"></file-upload>
-                                <br><br>
-                                
-                                <!-- Title -->
-                                <div class="row">
-                                        <div class="col-12">
-                                                <div class="input-group">
-                            <div class="input-group-prepend">
-                                                        <span class="input-group-text" id="basic-height">Title</span>
-                                                        </div>
-                                                        <input
-                                                        v-model="title"
-                                                        type="text"
-                                                        class="form-control"
-                                                        name="height"
-                                                        aria-describedby="basic-height">
-                                                </div>
-                                        </div>
-                                        <div class="col-12">
-                                                <br>
-                                                <dimension-picker></dimension-picker>
-                                        </div>
-                                </div>
-                                <br><br>
-                                <h4>Image Description(s) (optional):</h4>
+<div>
+    <div class="container card">
+        <form v-on:submit.prevent="submit">
+            <!-- file upload -->
+            <file-upload :fileLimit="20" title="Upload Image Files" fileAcceptType="IMG"></file-upload>
+            <br><br>
 
-                                <!-- Description -->
-                                <textarea v-model="description" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-                                <br>
-                                <div class="row">
-                                <div class="offset-3 col-6">
-                                        <router-link :to="{name: 'create'}">
-                                        <button @click="submit" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
-                                                <span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
-                                                <span v-else>Submit Image(s)</span>
-                                        </button>
-                                        </router-link>
-                                        </div>
-                                        <div class="col-2">
-                                        <router-link :to="{name:'create'}">
-                                        
-                                                <button type="button" class="btn btn-danger btn-block" @click.prevent="cancelEdit">
-                                                        Cancel
-                                                </button>
-                                        </router-link>
-                                        </div>
-                                </div>
-                        </form>
-                </div>
-                <br>
-                <br>
-                <div class="row">
-                        <div class="col-2"></div>
-                        <div class="col-8" v-if="this.$store.state.image.images.length > 0">
-                                <image-element 
-                                        :images=this.$store.state.image.images
-                                        :body="description"
-                                        :title="title">
-                                </image-element>
+            <!-- Title -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-height">Title</span>
                         </div>
-                        <div class="col-2"></div>
+                        <input
+                            v-model="title"
+                            type="text"
+                            class="form-control"
+                            name="height"
+                            aria-describedby="basic-height">
+                    </div>
                 </div>
-                <br><br>
-                {{allFilesUploadComplete}}
+                <div class="col-12">
+                    <br>
+                    <dimension-picker></dimension-picker>
+                </div>
+            </div>
+            <br><br>
+            <h4>Image Description(s) (optional):</h4>
+
+            <!-- Description -->
+            <textarea v-model="description" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+            <br>
+            <div class="row">
+                <div class="offset-3 col-6">
+                    <router-link :to="{name: 'create'}">
+                    <button @click="submit" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
+                        <span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
+                        <span v-else>Submit Image(s)</span>
+                    </button>
+                    </router-link>
+                </div>
+                <div class="col-2">
+                    <router-link :to="{name:'create'}">
+
+                    <button type="button" class="btn btn-danger btn-block" @click.prevent="cancelEdit">
+                    Cancel
+                    </button>
+                    </router-link>
+                </div>
+            </div>
+        </form>
+    </div>
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-2"></div>
+        <div class="col-8" v-if="this.$store.state.image.images.length > 0">
+            <image-element 
+                :images=this.$store.state.image.images
+                :body="description"
+                :title="title">
+            </image-element>
         </div>
+        <div class="col-2"></div>
+    </div>
+    <br><br>
+    {{allFilesUploadComplete}}
+</div>
 </template>
 
 <script>

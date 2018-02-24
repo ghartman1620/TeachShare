@@ -91,7 +91,7 @@ export default Vue.component("edit-video-file", {
             } else {
                 this.$store.dispatch("editElement", {
                     index: this.$route.query.index,
-                    component: this.generateFileJSON()
+                    element: this.generateFileJSON()
                 });
             }
             this.$router.push({ name: "create" });

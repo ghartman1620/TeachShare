@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="container">
+        <div class="container card">
             <form v-on:submit.prevent="submitAudio">
 
                 <!-- file upload -->

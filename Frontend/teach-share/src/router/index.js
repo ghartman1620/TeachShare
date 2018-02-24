@@ -27,17 +27,7 @@ export default new Router({
                     path: "/create",
                     name: "create",
                     component: PostCreate,
-
-                    // the below are how they should be nested,
-                    // but they don't currently work because of the
-                    // tight coupling in the PostCreate class.
                     children: [
-                        // {
-                        //     name: 'video',
-                        //     path: 'video',
-                        //     component: VideoComponent,
-                        //     props: { isFile: true }
-                        // },
                         {
                             name: "edit-text",
                             path: "text",
@@ -52,13 +42,6 @@ export default new Router({
                             name: "edit-audio",
                             path: "audio",
                             component: EditAudio
-                                // children: [
-                                //     {
-                                //         name: 'edit-video-embed',
-                                //         path: 'embed'
-                                //         component: EditVideoEmbed
-                                //     }
-                                // ]
                         },
                         {
                             name: "edit-image",

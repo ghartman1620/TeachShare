@@ -1,49 +1,49 @@
 <template>
-<div class="row">
-    <div class="col-xl-2 col-sm-1"></div>
-    <div class="col-xl-8 col-sm-10 col-xs-12">
+<div class="container">
+
+    <!-- <div class="col-xl-8 col-sm-10 col-xs-12"> -->
         <div class="card">
-        <nav>
-        <div class="nav nav-tabs" id="nav-tab" role="tablist">
-            <router-link :class="embedActiveStyle"
-                id="nav-home-tab"
-                data-toggle="tab"
-                href="#nav-home"
-                :to="{name: 'edit-video', query: {index: this.$route.query.index, videotype: 'embed' }}"
-                role="tab"
-                aria-controls="nav-home"
-                aria-selected="true">
-                    Video Link (YouTube, Vimeo, etc...)
-            </router-link>
-            <router-link :class="uploadActiveStyle"
-                id="nav-profile-tab"
-                data-toggle="tab"
-                href="#nav-profile"
-                :to="{name: 'edit-video', query: {index: this.$route.query.index, videotype: 'upload' }}"
-                role="tab"
-                aria-controls="nav-profile"
-                aria-selected="false">
-                    Video File
-            </router-link>
-        </div>
-    </nav>
-    <div class="card-body">
-    <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-                <!-- video embed -->
-                <edit-video-embed></edit-video-embed>
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <router-link :class="embedActiveStyle"
+                        id="nav-home-tab"
+                        data-toggle="tab"
+                        href="#nav-home"
+                        :to="{name: 'edit-video', query: {index: this.$route.query.index, videotype: 'embed' }}"
+                        role="tab"
+                        aria-controls="nav-home"
+                        aria-selected="true">
+                            Video Link (YouTube, Vimeo, etc...)
+                    </router-link>
+                    <router-link :class="uploadActiveStyle"
+                        id="nav-profile-tab"
+                        data-toggle="tab"
+                        href="#nav-profile"
+                        :to="{name: 'edit-video', query: {index: this.$route.query.index, videotype: 'upload' }}"
+                        role="tab"
+                        aria-controls="nav-profile"
+                        aria-selected="false">
+                            Video File
+                    </router-link>
+                </div>
+            </nav>
+            <div class="card-body">
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                    <!-- video embed -->
+                        <edit-video-embed></edit-video-embed>
+                    </div>
+                    <div class="tab-pane fade"
+                        id="nav-profile"
+                        role="tabpanel"
+                        aria-labelledby="nav-profile-tab">
+                            <!-- video file -->
+                            <edit-video-file></edit-video-file>
+                    </div>
+                </div>
             </div>
-            <div class="tab-pane fade"
-                id="nav-profile"
-                role="tabpanel"
-                aria-labelledby="nav-profile-tab">
-                    <!-- video file -->
-                    <edit-video-file></edit-video-file>
-            </div>
         </div>
-        </div>
-        </div>
-    </div>
+    <!-- </div> -->
     <div class="col-xl-2 col-sm-1"></div>
     <div class="container">
         <br>
