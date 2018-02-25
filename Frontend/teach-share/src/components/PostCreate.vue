@@ -5,7 +5,7 @@
 
 <body>
 
-<div>
+<div :style="getDisplayStyle()">
     <div class="col-8 offset-2 card card-outline-danger container icon-card-container">
         <div class="mx-auto card-deck">
 
@@ -92,19 +92,23 @@
             </div>
         </div>
     </div>
+    <br><br><br> <!-- this is so problems don't occur with bottmo of page button presses -->
+    <nav class="navbar fixed-bottom navbar-light navbar-left bg-transparent">
+        <div class="title-display" v-if="title != ''">{{title}}</div>
+    </nav>
+
+
+    <nav class="navbar fixed-bottom justify-content-end bg-transparent">
+        <button type="button" class="undo-button align-right btn btn-sm btn-outline-dark btn-primary-spacing" @click="undo">undo </button>
+        <button type="button" class="redo-button align-right btn btn-sm btn-outline-dark btn-primary-spacing" @click="redo">redo </button>
+        <button type="button" class="submit-button btn btn-light btn-outline-info" v-on:click="submitPost">Publish post</button>
+    </nav>
+</div>
+<div>
     <router-view/>
 </div>
-<br><br><br> <!-- this is so problems don't occur with bottmo of page button presses -->
-<nav class="navbar fixed-bottom navbar-light navbar-left bg-transparent">
-    <div class="title-display" v-if="title != ''">{{title}}</div>
-</nav>
 
 
-<nav class="navbar fixed-bottom justify-content-end bg-transparent">
-    <button type="button" class="undo-button align-right btn btn-sm btn-outline-dark btn-primary-spacing" @click="undo">undo </button>
-    <button type="button" class="redo-button align-right btn btn-sm btn-outline-dark btn-primary-spacing" @click="redo">redo </button>
-    <button type="button" class="submit-button btn btn-light btn-outline-info" v-on:click="submitPost">Publish post</button>
-</nav>
 </body>
 </template>
 
@@ -145,7 +149,16 @@ export default {
     },
 
     methods: {
-
+        getDisplayStyle() {
+            console.log("in display style");
+            if(!this.$store.state.create.editorOpen){
+                console.log("returning z index 2");
+                return { "z-index" : "2"};
+            }
+            else{
+                return { "z-index" : "2", "opacity" : ".3", "pointer-events" : "none"}
+            }
+        },
         nop: function() {},
         removeTag: function(index) {
             console.log("remove tag" + index);
@@ -206,6 +219,9 @@ export default {
         },
         redo() {
             this.$store.dispatch("redo");
+        },
+        beloud(msg) {
+            alert(msg);
         }
     }
 };
@@ -306,6 +322,15 @@ export default {
 
 .title-tags-container {
     padding-top: 1rem;
+}
+
+.editor {
+    position: fixed;
+    width: 80%;
+    left: 10%;
+    height: 80%;
+    top: 10%;
+    z-index: 1;
 }
 
 </style>
