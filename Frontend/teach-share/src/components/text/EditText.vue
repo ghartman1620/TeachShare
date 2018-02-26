@@ -1,47 +1,52 @@
 <template>
-    <div container class="mx-auto quill-container" col-8>
-
-        <!--We can use any buttons we want in the toolbar!
-        Check out the github for more examples, and the
-        exact code needed for other types of buttons -->
-        <div editor-card col-8 card>
-            <!-- These were in the editor but can't be commented out as part
-            of a tag so here they are. -->
-            <!-- @blur="onEditorBlur($event)"
-            @focus="onEditorFocus($event)" 
-            @ready="onEditorReady($event)" -->
-            <div class="custom-quill-editor">
-                <quill-editor v-model="element.content" :options="editorOption">
-                    <div id="toolbar" slot="toolbar">
-                        <!-- Add a bold button -->
-                        <button class="ql-bold">Bold</button>
-                        <button class="ql-italic">Italic</button>
-                        <!-- Add font size dropdown -->
-                        <select class="ql-size">
-                            <!-- Note a missing, thus falsy value, is used to reset to default -->
-                            <option selected></option>
-                            <option value="large"></option>
-                            <option value="huge"></option>
-                        </select>
-                        <select class="ql-font">
-                            <option selected="selected"></option>
-                            <option value="serif"></option>
-                            <option value="monospace"></option>
-                        </select>
-                        <!-- You can also add your own
-                        <button id="custom-button" @click="customButtonClick">[ Click me ]</button-->
-                    </div>
-                </quill-editor>
+<body>
 
 
-                <div class="quill-code">
+    <!--We can use any buttons we want in the toolbar!
+    Check out the github for more examples, and the
+    exact code needed for other types of buttons -->
+    <div class="row">
+        <!-- These were in the editor but can't be commented out as part
+        of a tag so here they are. -->
+        <!-- @blur="onEditorBlur($event)"
+        @focus="onEditorFocus($event)" 
+        @ready="onEditorReady($event)" -->
+        <div class="custom-quill-editor">
+            <quill-editor v-model="element.content" :options="editorOption">
+                <div id="toolbar" slot="toolbar">
+                    <!-- Add a bold button -->
+                    <button class="ql-bold">Bold</button>
+                    <button class="ql-italic">Italic</button>
+                    <button class="ql-list">List</button>
+                    <!-- Add font size dropdown -->
+                    <select class="ql-size">
+                        <!-- Note a missing, thus falsy value, is used to reset to default -->
+                        <option selected></option>
+                        <option value="large"></option>
+                        <option value="huge"></option>
+                    </select>
+                    <select class="ql-font">
+                        <option selected="selected"></option>
+                        <option value="serif"></option>
+                        <option value="monospace"></option>
+                    </select>
+                    <!-- You can also add your own
+                    <button id="custom-button" @click="customButtonClick">[ Click me ]</button-->
                 </div>
-                
+            </quill-editor>
+
+
+            <div class="quill-code">
             </div>
-            <router-link :to="{ name: 'create'}"><button v-on:click="submit">Submit</button></router-link>
-            <router-link :to="{name: 'create'}"><button>close</button></router-link>
+            
         </div>
+        
     </div>
+    <div class="row">
+        <router-link :to="{ name: 'create'}"><button v-on:click="submit">Submit</button></router-link>
+        <router-link :to="{name: 'create'}"><button>close</button></router-link>
+    </div>
+</body>
 </template>
 
 <script>
@@ -114,31 +119,35 @@ export default Vue.component("edit-text", {
 
 <style lang="scss" scoped>
 
-    .editor-card {
-        max-width: 1000px;
-    }
+.editor-card {
+    max-width: 1000px;
+}
 
-    .custom-quill-editor {
-        background: #F9F9F9;
-    }
+.custom-quill-editor {
+    background: #F9F9F9;
+    height: 100%;
+}
+.quill-editor {
+    height: 100%;
+}
 
-    .quill-editor,
-    .quill-code {
-        max-width: 1000px;
-        height: auto;
-    }
+.quill-code {
+    max-width: 1000px;
+    height: auto;
+}
 
-    .quill-code {
-        border: 1px;
-        height: auto;
-    }
 
-    .quill-container{
-        width: 1000px;
-        /*background: #c0c0c0;*/
-        font-family: "Roboto", sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        border: 1;
-    }
+.quill-code {
+    border: 1px;
+    height: auto;
+}
+
+.quill-container{
+    width: 1000px;
+    /*background: #c0c0c0;*/
+    font-family: "Roboto", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    border: 1;
+}
 </style>

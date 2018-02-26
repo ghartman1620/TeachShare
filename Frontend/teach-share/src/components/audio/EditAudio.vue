@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="container card">
+        <div class="card">
             <form v-on:submit.prevent="submitAudio">
 
                 <!-- file upload -->
@@ -30,47 +30,28 @@
                 <!-- Description -->
                 <textarea v-model="description" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
                 <br>
+ 
+
                 <div class="row">
-                <div class="offset-3 col-6">
-                    <router-link :to="{name: 'create'}">
-                    <button @click="submitElement" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
-                        <span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
-                        <span v-else>Submit Audio(s)</span>
-                    </button>
-                    </router-link>
-                </div>
-                </div>
-                <div class="row">
-                <div class="offset-3 col-6">
-                <router-link :to="{name: 'create'}">
-                    <button class="btn btn-primary btn-block">Cancel</button>
-                </router-link>
-                </div>
+                    <div class="offset-3 col-6">
+                        <router-link :to="{name: 'create'}">
+                            <button @click="submitElement" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
+                                <span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
+                                <span v-else>Submit Audio(s)</span>
+                            </button>
+                        </router-link>
+                    </div>
+                    <div class="col-2">
+                        <router-link :to="{name: 'create'}">
+                            <button type="button" class="btn btn-danger btn-block">
+                                    Cancel
+                            </button>
+                        </router-link>
+                    </div>
                 </div>
                 
             </form>
         </div>
-        <br>
-        <br>
-        <div class="row">
-            <div class="col-2"></div>
-            <div class="col-8" v-if="this.$store.state.audio.audio.length > 0">
-                <div :key="a.id" v-for="a in this.$store.state.audio.audio">
-                    <audio-element 
-                        :autoplay="false"
-                        :controls="true"
-                        :filetype="a.file.type"
-                        :id="a.id"
-                        :body="description"
-                        :title="title"
-                        :source="a.url">
-
-                    </audio-element>
-                </div>
-            </div>
-            <div class="col-2"></div>
-        </div>
-        <br><br>
     </div>
 </template>
 
@@ -154,6 +135,9 @@ export default Vue.component("edit-audio", {
 
 
 <style lang="scss" scoped>
+.card {
+    padding: 10px;
+}
 
 </style>
 

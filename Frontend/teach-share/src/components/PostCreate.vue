@@ -96,9 +96,9 @@
         </div>
     </div>
     <br><br><br> <!-- this is so problems don't occur with bottmo of page button presses -->
-    <nav class="navbar fixed-bottom navbar-light navbar-left bg-light">
+    <nav class="navbar fixed-bottom navbar-light navbar-left bg-light bottom-navbar">
         <div class="title" v-if="title != ''">{{title}}</div>
-        <div class="title title-placeholder" v-else> Your post needs a title! </div>
+        <div class="title title-placeholder" v-else></div>
     </nav>
 
 
@@ -138,14 +138,15 @@ const editorHidden = {
 }
 const editorVisible = {
     position: "fixed",
-    width: "80%",
-    left: "10%",
-    height: "80%",
+    width: "50%",
+    left: "25%",
+    "max-height": "75%",
     top: "20%",
     "z-index" : "1",
     "overflow-y" : "scroll",
     "overflow-x" : "hidden",
 }
+
 const bodyHidden = {
     opacity: ".3",
     "pointer-events" : "none",
@@ -179,6 +180,7 @@ export default {
     methods: {
         getEditorStyle() {
             if(this.$store.state.create.editorOpen){
+
                 return editorVisible;
             }
             else{
@@ -277,7 +279,7 @@ export default {
         padding-left: 1px;
         padding-right: 1px;
         background: #bececa;
-        border-radius: 35px;
+        border-radius: 50px;
         justify-content: center;
     }
     #text-icon {
@@ -392,4 +394,7 @@ export default {
     padding-top: 1rem;
 }
 
+.bottom-navbar {
+    height: 50px;
+}
 </style>
