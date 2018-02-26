@@ -22,6 +22,9 @@
                             Uploading {{ fileCount }} files...
                         </p>
                 </div>
+                <div v-else>
+                    Maximum {{fileLimit}} file(s)
+                </div>
             </form>
             </div>
             <div class="col">

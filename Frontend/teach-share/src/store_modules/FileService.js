@@ -1,5 +1,6 @@
 import api from "../api";
 import Vue from "vue";
+import axios from "axios";
 
 // Load some necessary libraries
 const uuidv4 = require("uuid/v4");
@@ -9,7 +10,8 @@ var _ = require("lodash");
 const FileService = {
     state: {
         uploadedFiles: [],
-        limit: 0
+        limit: 0,
+        cancelSource: null,
     },
     mutations: {
         UPDATE_UPLOAD_FILES: (state, data) => {
@@ -36,67 +38,96 @@ const FileService = {
                 return;
             }
         },
+        CANCEL_REQUEST: (state) => {
+            if(state.cancelSource != null){
+                state.cancelSource.cancel("Operation cancelled by the user");
+            }
+        },
         REMOVE_FILE: (state, file) => {
+            
             console.log(file);
             let ind = state.uploadedFiles.indexOf(file);
             state.uploadedFiles.splice(ind, 1);
+            
         },
         CHANGE_FILE_LIMIT: (state, data) => {
             state.limit = data;
         },
         CLEAR_UPLOADED_FILES: (state) => {
             state.uploadedFiles = [];
+        },
+        SET_CANCEL_TOKEN_SOURCE: (state, src) => {
+            state.cancelSource = src;
         }
     },
     actions: {
         fileUpload: (context, formData) => {
-            var files = formData.getAll('files');
+            var files = formData.getAll("files");
             console.log("in upload file");
+            var i = 0;
             _.forEach(files, function(file) {
                 var fileAlreadyUploaded = false;
+                console.log(i);
                 context.state.uploadedFiles.forEach(function(element){
                     if(element.file.name == file.name){
                         fileAlreadyUploaded = true;
                         return;
                     }
                 });
-                if(!fileAlreadyUploaded){
+                if(!fileAlreadyUploaded && i+context.state.uploadedFiles.length < context.state.limit){
+                    console.log("foo");
                     var identifier = uuidv4();
+                    var cancelToken = axios.CancelToken;
+                    console.log(cancelToken);
+                    var source = cancelToken.source();
+                    context.commit("SET_CANCEL_TOKEN_SOURCE", source);
                     let config = {
                         onUploadProgress: progressEvent => {
+                            console.log("foobar");
                             let percentCompleted = Math.floor(
                                 progressEvent.loaded * 100 / progressEvent.total
                             );
-                            context.commit('CHANGE_UPLOADED_FILES', {
+                            context.commit("CHANGE_UPLOADED_FILES", {
                                 percent: percentCompleted,
                                 file: file,
                                 request_id: identifier
                             });
-                        }
+                        },
+                        cancelToken: source.token,
                     };
                     api
                         .put(`upload/${file.name}?id=${identifier}`, file, config)
-                        .then(response => context.commit('UPDATE_UPLOAD_FILES', response))
-                        .catch(err => console.log(err));
+                        .then(response => context.commit("UPDATE_UPLOAD_FILES", response))
+                        .catch(function(err) {
+                            if(axios.isCancel(err)){
+                                console.log("Upload cancelled", err.message);
+                                context.commit("REMOVE_FILE", file)
+                            }
+                            else{
+                                console.log(err);
+                            }
+                        });
                 }
+                i++;
             });
         },
         removeFile: (state, file) => {
-            state.commit('REMOVE_FILE', file);
+            state.commit("CANCEL_REQUEST");
+            state.commit("REMOVE_FILE", file);
         },
         changeFileLimit: (state, data) => {
             console.log(data);
-            state.commit('CHANGE_FILE_LIMIT', data);
+            state.commit("CHANGE_FILE_LIMIT", data);
         },
         clearFiles: (state) => {
-            state.commit('CLEAR_UPLOADED_FILES');
+            state.commit("CLEAR_UPLOADED_FILES");
         }
     },
     getters: {
         filesUploadStatus: state => state.uploadedFiles,
         allFilesUploadComplete: (state) => {
             if (state.uploadedFiles.length > 0) {
-                let oneHundredPercent =  _.every(state.uploadedFiles, {'percent': 100});
+                let oneHundredPercent =  _.every(state.uploadedFiles, {"percent": 100});
                 let hasURL = _.reduce(state.uploadedFiles, (res, val, key) => {
                     if (val.url !== undefined) {
                         return true;
