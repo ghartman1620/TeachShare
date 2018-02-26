@@ -2,7 +2,7 @@
     <nav class="navbar fixed-top navbar-inverse navbar-expand-lg navbar-dark dark-green">
             <div class="container">
             <!-- brand section -->
-            <router-link class="navbar-brand" to="/"><img class="img-responsive ts-logo" src="/static/tslogo.png"></router-link>
+            <router-link class="navbar-brand" to="/"><img class="img-responsive ts-logo" src="/static/ts-logo.png"></router-link>
 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>

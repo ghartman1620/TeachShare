@@ -95,8 +95,9 @@
         </div>
     </div>
     <br><br><br> <!-- this is so problems don't occur with bottmo of page button presses -->
-    <nav class="navbar fixed-bottom navbar-light navbar-left bg-transparent">
-        <div class="title-display" v-if="title != ''">{{title}}</div>
+    <nav class="navbar fixed-bottom navbar-light navbar-left bg-light">
+        <div class="title" v-if="title != ''">{{title}}</div>
+        <div class="title title-placeholder" v-else> Your post needs a title! </div>
     </nav>
 
 
@@ -343,9 +344,7 @@ export default {
     width: 100%;
 }
 
-.title-placeholder {
-  opacity: 0.5;
-}
+
 
 /* Submitted elements now being viewed */
 .container-element {
@@ -365,8 +364,12 @@ export default {
     background-color: #e5ffee;
 }
 
-.title-display {
+.title {
     font-size: 1.5rem;
+}
+
+.title-placeholder {
+    opacity: 0.5;
 }
 
 .undo-button {
