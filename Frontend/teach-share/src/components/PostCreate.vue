@@ -234,7 +234,6 @@ export default {
         },
 
         moveElementUp: function(index) {
-            console.log("moveElementUp:" + index);
             if (index != 0) {
                 this.$store.dispatch("swapElements", [index, index - 1]);
                 //dispatch only allows one argument so we'll pass them as an array

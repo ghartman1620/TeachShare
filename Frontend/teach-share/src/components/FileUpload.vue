@@ -5,8 +5,9 @@
             <div class="col-12">
             <form enctype="multipart/form-data" novalidate multiple v-if="isInitial || isSaving">
                 <h1>{{title}}</h1>
-                <div class="dropbox">
+                <div class="dropbox" v-if="!pastLimit">
                     <input
+                        id="file-upload"
                         type="file"
                         multiple
                         name="files"
@@ -81,7 +82,6 @@ export default Vue.component("file-upload", {
     data() {
         return {
             currentStatus: null,
-            currentFileList: []
         };
     },
     computed: {
@@ -121,7 +121,7 @@ export default Vue.component("file-upload", {
         },
         filesChange(fieldName, fileList) {
             console.log(fieldName, fileList);
-            this.currentFileList.push(fileList);
+            
             const formData = new FormData();
             if (!fileList.length) {
                 console.log("fileList is empty");
@@ -131,17 +131,13 @@ export default Vue.component("file-upload", {
                 formData.append(fieldName, fileList[x], fileList[x].name);
             });
             this.save(formData);
+            document.getElementById("file-upload").value = null;
+            console.log("in filesChange2");
         },
         removeItem(file) {
             console.log(file);
             var vm = this;
             this.$store.dispatch("removeFile", file).then(function(){
-                let i = vm.currentFileList.findIndex(function(f) {
-                    return f[0].name === file.file.name;
-                });
-                console.log("INDEX: ", i);
-                vm.currentFileList.splice(i, 1);
-                console.log(vm.currentFileList);
                 vm.$parent.$emit("RemoveItem", file);
             });
         }

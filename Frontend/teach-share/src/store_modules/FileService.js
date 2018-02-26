@@ -9,7 +9,6 @@ var _ = require("lodash");
 const FileService = {
     state: {
         uploadedFiles: [],
-        files: [],
         limit: 0
     },
     mutations: {
@@ -50,26 +49,36 @@ const FileService = {
         }
     },
     actions: {
-        fileUpload: (state, formData) => {
+        fileUpload: (context, formData) => {
             var files = formData.getAll('files');
+            console.log("in upload file");
             _.forEach(files, function(file) {
-                var identifier = uuidv4();
-                let config = {
-                    onUploadProgress: progressEvent => {
-                        let percentCompleted = Math.floor(
-                            progressEvent.loaded * 100 / progressEvent.total
-                        );
-                        state.commit('CHANGE_UPLOADED_FILES', {
-                            percent: percentCompleted,
-                            file: file,
-                            request_id: identifier
-                        });
+                var fileAlreadyUploaded = false;
+                context.state.uploadedFiles.forEach(function(element){
+                    if(element.file.name == file.name){
+                        fileAlreadyUploaded = true;
+                        return;
                     }
-                };
-                api
-                    .put(`upload/${file.name}?id=${identifier}`, file, config)
-                    .then(response => state.commit('UPDATE_UPLOAD_FILES', response))
-                    .catch(err => console.log(err));
+                });
+                if(!fileAlreadyUploaded){
+                    var identifier = uuidv4();
+                    let config = {
+                        onUploadProgress: progressEvent => {
+                            let percentCompleted = Math.floor(
+                                progressEvent.loaded * 100 / progressEvent.total
+                            );
+                            context.commit('CHANGE_UPLOADED_FILES', {
+                                percent: percentCompleted,
+                                file: file,
+                                request_id: identifier
+                            });
+                        }
+                    };
+                    api
+                        .put(`upload/${file.name}?id=${identifier}`, file, config)
+                        .then(response => context.commit('UPDATE_UPLOAD_FILES', response))
+                        .catch(err => console.log(err));
+                }
             });
         },
         removeFile: (state, file) => {
