@@ -86,8 +86,9 @@
                 <div class="col 11">
                     <div id="arrange-btn-group" class="btn-group-vertical">
                         <button @click="removeElement(index)"><font face="courier">x</font></button>
-
-                    </div>      
+                        <button @click="editElement(index)"><font face="courier">E</font></button>
+                    </div>
+                          
                 </div>
             </div>
         </div>
@@ -136,10 +137,11 @@ const editorVisible = {
     position: "fixed",
     width: "80%",
     left: "10%",
-    height: "50%",
-    top: "25%",
+    height: "80%",
+    top: "20%",
     "z-index" : "1",
     "overflow-y" : "scroll",
+    "overflow-x" : "hidden",
 }
 const bodyHidden = {
     opacity: ".3", 
@@ -218,10 +220,7 @@ export default {
             this.$store.dispatch("createPost", obj);
         },
         editElement: function(index) {
-            this.$store.dispatch(
-                "setEditedElement",
-                this.$store.state.create.postElements[index]
-            );
+            this.$router.push({name: this.$store.state.create.postElements})
         },
 
         moveElementUp: function(index) {
