@@ -8,6 +8,7 @@
 				<span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
 				<span v-else>Submit File(s)</span>
 			</button>
+			<button class="btn btn-primary btn-block">Cancel</button>
 		</router-link>
 	</div>
 </body>

@@ -47,7 +47,6 @@
     <div class="col-xl-2 col-sm-1"></div>
     <div class="container">
         <br>
-        {{errors}}
         <br><br>
 
         <br><br><br>

@@ -7,10 +7,10 @@
 
 <div :style="getBodyStyle()">
     <div class="col-8 offset-2 card card-outline-danger container icon-card-container">
-        <div class="mx-auto card-deck">
+        <div class="col-8 mx-auto card-deck" id="button-bar">
 
             <h2></h2>
-            <div class="mx-auto round-button" id="text-icon">
+            <div class="col-0 round-button" id="text-icon">
                 <router-link :to="{ name: 'edit-text', query: {index: this.maxElementIndex()}}">
                     <img src="/static/text-button.png"
                                 onmouseover="this.src='/static/text-button-hover.png'"
@@ -19,7 +19,7 @@
             </div>
             <h2></h2>
 
-            <div class="mx-auto round-button" id="video-icon">
+            <div class="round-button" id="video-icon">
                 <router-link :to="{name: 'edit-video', query: {index: this.maxElementIndex(), videotype: 'embed'}}">
                     <img src="/static/video-button.png"
                                 onmouseover="this.src='/static/video-button-hover.png'"
@@ -29,7 +29,7 @@
             </div>
             <h2></h2>
 
-            <div class="mx-auto round-button" id="audio-icon">
+            <div class="round-button" id="audio-icon">
                 <router-link :to="{name: 'edit-audio', query: {index: this.maxElementIndex()}}">
                     <img src="/static/audio-button.png"
                                 onmouseover="this.src='/static/audio-button-hover.png'"
@@ -38,13 +38,13 @@
             </div>
             <h2></h2>
 
-            <div class="mx-auto round-button" id="image-icon">
+            <div class="round-button" id="image-icon">
                 <router-link :to="{name: 'edit-image', query: {index: this.maxElementIndex()}}">
                     <img src="/static/image-button.png" >
                 </router-link>
             </div>
 
-            <div class="mx-auto round-button" id="file-icon">
+            <div class="round-button" id="file-icon">
                 <router-link :to="{name: 'edit-file', query: {index: this.maxElementIndex()}}">
                     <img src="/static/file-button.png"
                                 onmouseover="this.src='/static/file-button-hover.png'"
@@ -53,24 +53,26 @@
             </div>
         </div>
 
-        <div class="title-tags-container col-7 col-sm-10 col-xs-12 container">
-            <input class="postheader form-control" type="text" v-model.lazy="title" 
+        <div class="title-tags-container col-7 container">
+            <input class="postheader form-control" type="text" v-model.lazy="title"
                 placeholder="Title required"></input>
             <br>
-            <div class="mx-auto tag-card col-7 card">
-                <div :key="index" v-for="(tag,index) in tags"> 
-                    {{tag}} 
-                    <button type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button>
-                </div>
-            
-                <form v-on:submit.prevent="nop">
-                    <input class="postheader form-control" v-model="inProgressTag" v-on:keyup="createTag" 
-                        placeholder="add a topic tag"></input>
-                </form>
-            </div>
         </div>
 
-        <div class="col- container" :key="index" v-for="(element,index) in storeElements">
+      <div class="mx-auto tag-card col-6 card">
+        <div :key="index" v-for="(tag,index) in tags">
+          {{tag}}
+          <button type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button>
+        </div>
+
+        <form v-on:submit.prevent="nop">
+            <input class="postheader form-control" v-model="inProgressTag" v-on:keyup="createTag"
+                placeholder="add a topic tag"></input>
+        </form>
+    </div>
+
+
+        <div class="col-12 container" :key="index" v-for="(element,index) in storeElements">
             <div class="card-row row">
                 <div class="col-1">
                     <div id="arrange-btn-group" class="btn-group-vertical">
@@ -144,7 +146,7 @@ const editorVisible = {
     "overflow-x" : "hidden",
 }
 const bodyHidden = {
-    opacity: ".3", 
+    opacity: ".3",
     "pointer-events" : "none",
 };
 const bodyVisible = {
@@ -220,7 +222,7 @@ export default {
             this.$store.dispatch("createPost", obj);
         },
         editElement: function(index) {
-            this.$router.push({name: this.$store.state.create.postElements})
+            this.$router.push({name: this.$store.state.create.postElements[index].type})
         },
 
         moveElementUp: function(index) {
@@ -247,9 +249,6 @@ export default {
         },
         redo() {
             this.$store.dispatch("redo");
-        },
-        beloud(msg) {
-            alert(msg);
         }
     }
 };
@@ -258,6 +257,8 @@ export default {
 
 <style scoped>
 
+
+
     .round-button {
             width: 10%;
             height: 0;
@@ -265,9 +266,41 @@ export default {
             border-radius: 50%;
             border: 0 solid #f5f5f5;
             overflow: hidden;
-            background: #e5ffee;
+            background: #bececa;
             box-shadow: 0 0 0px gray;
         }
+
+    #button-bar {
+        padding-top: 8px;
+        padding-bottom: 8px;
+        padding-left: 1px;
+        padding-right: 1px;
+        background: #bececa;
+        border-radius: 35px;
+        justify-content: center;
+    }
+    #text-icon {
+        margin-right: 1rem;
+    }
+    #audio-icon {
+      margin-left: 1rem;
+      margin-right: 1rem;
+
+    }
+    #video-icon {
+      margin-left: 1rem;
+      margin-right: 1rem;
+
+    }
+    #image-icon {
+      margin-left: 1rem;
+      margin-right: 1rem;
+
+    }
+    #file-icon {
+      margin-left: 1rem;
+
+    }
     #text-icon:hover {
         background: #bf8301;
     }
@@ -307,6 +340,10 @@ export default {
 .postheader {
     height: 30px;
     width: 100%;
+}
+
+.title-placeholder {
+  opacity: 0.5;
 }
 
 /* Submitted elements now being viewed */
@@ -350,15 +387,6 @@ export default {
 
 .title-tags-container {
     padding-top: 1rem;
-}
-
-.editor {
-    position: fixed;
-    width: 80%;
-    left: 10%;
-    height: 80%;
-    top: 10%;
-    z-index: 1;
 }
 
 </style>
