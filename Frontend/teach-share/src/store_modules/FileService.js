@@ -63,11 +63,9 @@ const FileService = {
     actions: {
         fileUpload: (context, formData) => {
             var files = formData.getAll("files");
-            console.log("in upload file");
             var i = 0;
             _.forEach(files, function(file) {
                 var fileAlreadyUploaded = false;
-                console.log(i);
                 context.state.uploadedFiles.forEach(function(element){
                     if(element.file.name == file.name){
                         fileAlreadyUploaded = true;
@@ -75,15 +73,12 @@ const FileService = {
                     }
                 });
                 if(!fileAlreadyUploaded && i+context.state.uploadedFiles.length < context.state.limit){
-                    console.log("foo");
                     var identifier = uuidv4();
                     var cancelToken = axios.CancelToken;
-                    console.log(cancelToken);
                     var source = cancelToken.source();
                     context.commit("SET_CANCEL_TOKEN_SOURCE", source);
                     let config = {
                         onUploadProgress: progressEvent => {
-                            console.log("foobar");
                             let percentCompleted = Math.floor(
                                 progressEvent.loaded * 100 / progressEvent.total
                             );
