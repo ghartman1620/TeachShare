@@ -102,7 +102,13 @@ export default Vue.component("edit-text", {
     },
     beforeDestroy(){
         console.log("destroy");
-    }
+    },
+    created() {
+		this.$store.dispatch("openEditor");
+	},
+	destroyed() {
+		this.$store.dispatch("closeEditor");
+	}
 })
 </script>
 

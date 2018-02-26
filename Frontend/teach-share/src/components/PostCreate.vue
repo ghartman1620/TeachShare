@@ -5,7 +5,7 @@
 
 <body>
 
-<div :style="getDisplayStyle()">
+<div :style="getBodyStyle()">
     <div class="col-8 offset-2 card card-outline-danger container icon-card-container">
         <div class="mx-auto card-deck">
 
@@ -104,7 +104,7 @@
         <button type="button" class="submit-button btn btn-light btn-outline-info" v-on:click="submitPost">Publish post</button>
     </nav>
 </div>
-<div>
+<div :style="getEditorStyle()">
     <router-view/>
 </div>
 
@@ -123,9 +123,32 @@ import ImageElement from "./image/ImageElement";
 import VideoElement from "./video/VideoElement";
 import FileElement from "./file/FileElement";
 
+
+
 function isBlank(str) {
     return (!str || /^\s*$/.test(str));
 };
+
+const editorHidden = {
+    "z-index" : "-1",
+}
+const editorVisible = {
+    position: "fixed",
+    width: "80%",
+    left: "10%",
+    height: "50%",
+    top: "25%",
+    "z-index" : "1",
+    "overflow-y" : "scroll",
+}
+const bodyHidden = {
+    opacity: ".3", 
+    "pointer-events" : "none",
+};
+const bodyVisible = {
+    opacity: "1",
+}
+
 
 export default {
     name: "post-create",
@@ -149,14 +172,20 @@ export default {
     },
 
     methods: {
-        getDisplayStyle() {
-            console.log("in display style");
-            if(!this.$store.state.create.editorOpen){
-                console.log("returning z index 2");
-                return { "z-index" : "2"};
+        getEditorStyle() {
+            if(this.$store.state.create.editorOpen){
+                return editorVisible;
             }
             else{
-                return { "z-index" : "2", "opacity" : ".3", "pointer-events" : "none"}
+                return editorHidden;
+            }
+        },
+        getBodyStyle() {
+            if(this.$store.state.create.editorOpen){
+                return bodyHidden;
+            }
+            else{
+                return bodyVisible;
             }
         },
         nop: function() {},

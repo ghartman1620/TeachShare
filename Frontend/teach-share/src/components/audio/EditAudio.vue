@@ -143,6 +143,10 @@ export default Vue.component("edit-audio", {
             console.log("CHANGED!!!", res);
             this.description = res;
         });
+        this.$store.dispatch("openEditor");
+    },
+    destroyed() {
+        this.$store.dispatch("closeEditor");
     }
 });
 </script>
