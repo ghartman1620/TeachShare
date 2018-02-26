@@ -72,27 +72,31 @@
     </div>
 
 
-        <div class="col-12 container" :key="index" v-for="(element,index) in storeElements">
-            <div class="card-row row">
-                <div class="col-1">
-                    <div id="arrange-btn-group" class="btn-group-vertical">
-                        <button @click="moveElementUp(index)" class="up-down-button"><font face="courier">^</font></button>
-                        <button @click="moveElementDown(index)" class="up-down-button"><font face="courier">v</font></button>
+        <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
+            <div class="post-element-container">
+                <div class="card-row row">
+                    <div class="col-1">
+                        <div id="arrange-btn-group" class="btn-group-vertical">
+
+                            <input type="image" width=50 height=50 style="z-index: 2" @click="moveElementUp(index)" src="/static/caret-square-up.png"/> 
+                            <input type="image" width=50 height=50 style="z-index: 2" @click="moveElementDown(index)" src="/static/caret-square-down.png"/> 
+                        </div>
                     </div>
-                </div>
-                <div class="col-10 container">
-                    <div class="post-element card">
-                        <post-element :element="element"></post-element>
+                    <div class="col-10 container">
+                        <div class="post-element card">
+                            <post-element :element="element"></post-element>
+                        </div>
                     </div>
-                </div>
-                <div class="col 11">
-                    <div id="arrange-btn-group" class="btn-group-vertical">
-                        <button @click="removeElement(index)"><font face="courier">x</font></button>
-                        <button @click="editElement(index)"><font face="courier">E</font></button>
+                    <div class="col 11">
+                        <div id="arrange-btn-group" class="btn-group-vertical">
+                            <button @click="removeElement(index)"><font face="courier">x</font></button>
+                            <button @click="editElement(index)"><font face="courier">E</font></button>
+                        </div>
+                            
                     </div>
-                          
                 </div>
             </div>
+            <br>
         </div>
     </div>
     <br><br><br> <!-- this is so problems don't occur with bottmo of page button presses -->
@@ -150,6 +154,7 @@ const editorVisible = {
 const bodyHidden = {
     opacity: ".3",
     "pointer-events" : "none",
+    overflow: "hidden",
 };
 const bodyVisible = {
     opacity: "1",
@@ -261,71 +266,74 @@ export default {
 <style scoped>
 
 
+.post-element-container {
+    padding: 50px;
+    background-color: #96E6B3;
+}
+.round-button {
+    width: 10%;
+    height: 0;
+    padding-bottom: 11%;
+    border-radius: 50%;
+    border: 0 solid #f5f5f5;
+    overflow: hidden;
+    background: #bececa;
+    box-shadow: 0 0 0px gray;
+}
 
-    .round-button {
-            width: 10%;
-            height: 0;
-            padding-bottom: 11%;
-            border-radius: 50%;
-            border: 0 solid #f5f5f5;
-            overflow: hidden;
-            background: #bececa;
-            box-shadow: 0 0 0px gray;
-        }
+#button-bar {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 1px;
+    padding-right: 1px;
+    background: #bececa;
+    border-radius: 50px;
+    justify-content: center;
+}
+#text-icon {
+    margin-right: 1rem;
+}
+#audio-icon {
+    margin-left: 1rem;
+    margin-right: 1rem;
 
-    #button-bar {
-        padding-top: 8px;
-        padding-bottom: 8px;
-        padding-left: 1px;
-        padding-right: 1px;
-        background: #bececa;
-        border-radius: 50px;
-        justify-content: center;
-    }
-    #text-icon {
-        margin-right: 1rem;
-    }
-    #audio-icon {
-      margin-left: 1rem;
-      margin-right: 1rem;
+}
+#video-icon {
+    margin-left: 1rem;
+    margin-right: 1rem;
 
-    }
-    #video-icon {
-      margin-left: 1rem;
-      margin-right: 1rem;
+}
+#image-icon {
+    margin-left: 1rem;
+    margin-right: 1rem;
 
-    }
-    #image-icon {
-      margin-left: 1rem;
-      margin-right: 1rem;
+}
+#file-icon {
+    margin-left: 1rem;
 
-    }
-    #file-icon {
-      margin-left: 1rem;
+}
+#text-icon:hover {
+    background: #bf8301;
+}
+#video-icon:hover {
+    background: #ad5c00;
+}
+#audio-icon:hover {
+    background: #3b685b;
+}
+#image-icon:hover {
+    background: #13213F;
+}
+#file-icon:hover {
+    background: #1a3c68;
+}
 
-    }
-    #text-icon:hover {
-        background: #bf8301;
-    }
-    #video-icon:hover {
-        background: #ad5c00;
-    }
-    #audio-icon:hover {
-        background: #3b685b;
-    }
-    #image-icon:hover {
-        background: #13213F;
-    }
-    #file-icon:hover {
-        background: #1a3c68;
-    }
-
-    .round-button img {
-        display: block;
-        width: 100%;
-        padding: 0%;
-        height: auto;
-    }
+.round-button img {
+    display: block;
+    width: 100%;
+    padding: 0%;
+    height: auto;
+}
 
 
 

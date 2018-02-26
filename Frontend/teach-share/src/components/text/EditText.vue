@@ -5,7 +5,8 @@
     <!--We can use any buttons we want in the toolbar!
     Check out the github for more examples, and the
     exact code needed for other types of buttons -->
-    <div class="row">
+    <h1>Text</h1>
+    <div>
         <!-- These were in the editor but can't be commented out as part
         of a tag so here they are. -->
         <!-- @blur="onEditorBlur($event)"
@@ -43,8 +44,21 @@
         
     </div>
     <div class="row">
-        <router-link :to="{ name: 'create'}"><button v-on:click="submit">Submit</button></router-link>
-        <router-link :to="{name: 'create'}"><button>close</button></router-link>
+
+        <div class="offset-3 col-6">
+            <router-link :to="{name: 'create'}">
+                <button @click="submit" class="btn btn-primary btn-block">
+                    Submit
+                </button>
+            </router-link>
+        </div>
+        <div class="col-2">
+            <router-link :to="{name: 'create'}">
+                <button type="button" class="btn btn-danger btn-block">
+                        Cancel
+                </button>
+            </router-link>
+        </div>
     </div>
 </body>
 </template>
@@ -140,6 +154,10 @@ export default Vue.component("edit-text", {
 .quill-code {
     border: 1px;
     height: auto;
+}
+body {
+    background-color: white;
+    padding: 10px;
 }
 
 .quill-container{

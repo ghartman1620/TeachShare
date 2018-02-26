@@ -1,6 +1,5 @@
 <template>
 <div>
-<div class="card">
     <div class="card-body">
         <div id="carouselExampleIndicators" data-interval="0" class="carousel slide" data-ride="carousel">
             <div class="carousel-inner">

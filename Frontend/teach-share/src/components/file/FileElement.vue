@@ -1,5 +1,5 @@
 <template>
-<body>
+
 	<ul style="list-style-type: none;">
 		<li>
 		<div class = "container">
@@ -20,7 +20,7 @@
 		</div>
 		</li>
 	</ul>
-</body>
+
 </template>
 
 <style>

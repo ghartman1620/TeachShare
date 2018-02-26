@@ -1,6 +1,6 @@
 <template>
 <div>
-    <div class="card" :style="{width: cardWidth + 'px', padding: '10px'}">
+    <div :style="{width: cardWidth + 'px', padding: '10px'}">
         <div class="card-body">
             <audio
                 class="col-12"

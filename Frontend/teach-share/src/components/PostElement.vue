@@ -5,7 +5,7 @@ Uses TextElement, VideoElement, etc.
 
 <template>
 <body>
-
+    <div class="everything">
     <div class="post-element card" v-if="element.type === 'text'">
         <text-element :element="element"></text-element>
 
@@ -56,8 +56,7 @@ Uses TextElement, VideoElement, etc.
         <file-element :element="element"/>
     </div>
 
-    <br>
-    <br>
+    </div>
 </body>
 
 </template>
@@ -91,3 +90,10 @@ export default Vue.component("post-element", {
         props: ["element"],
 });
 </script>
+
+<style scoped>
+.body {
+    background-color: white;
+    border: 3px solid blue;
+}
+</style>
