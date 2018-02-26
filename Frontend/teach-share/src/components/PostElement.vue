@@ -14,16 +14,16 @@ Uses TextElement, VideoElement, etc.
         <image-element :title="element.title" :body="element.description" :images="element.content"/>
     </div>
     <div class="post-element card" v-else-if="element.type === 'audio'">
-        <audio-element :id="element.content[0].id" 
-        :title="element.content[0].title" 
-        :body="element.content[0].description" 
-        :controls="true" :source="element.content[0].url" 
-        :filetype="element.content[0].filetype" 
+        <audio-element :id="element.content[0].id"
+        :title="element.content[0].title"
+        :body="element.content[0].description"
+        :controls="true" :source="element.content[0].url"
+        :filetype="element.content[0].filetype"
         autoplay="false"/>
     </div>
 
-    <div class="post-element card" v-else-if="element.type === 'video_link' || element.type === 'video_file'">
-            <div v-if="element.type === 'video_link'">
+    <div class="post-element card" id="outer-video-container" v-else-if="element.type === 'video_link' || element.type === 'video_file'">
+            <div class="post-element video-post" id="inner-video-container" v-if="element.type === 'video_link'">
                     <video-element
                         name="vid-comp1"
                         :id="element.content.id"
@@ -56,8 +56,33 @@ Uses TextElement, VideoElement, etc.
         <file-element :element="element"/>
     </div>
 
+    <br>
+    <br>
 </body>
+
 </template>
+
+<style>
+
+  #inner-video-container {
+    margin-top: 2rem;
+    margin-left: 2rem;
+    margin-right: 2rem;
+  }
+
+  #outer-video-container {
+
+  }
+
+  .post-element {
+    border: 0;
+  }
+  .video-post {
+    border: 0;
+  }
+
+
+</style>
 
 <script>
 import Vue from "vue";
