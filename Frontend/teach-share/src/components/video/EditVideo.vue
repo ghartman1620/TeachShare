@@ -110,7 +110,13 @@ export default Vue.component("edit-video", {
             // this.styleObject["max-height"] = 500;
             // console.log("CLIENT HEIGHT: ", h);
         });
-    }
+    },
+    created() {
+		this.$store.dispatch("openEditor");
+	},
+	destroyed() {
+		this.$store.dispatch("closeEditor");
+	}
 });
 </script>
 

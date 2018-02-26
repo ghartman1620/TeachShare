@@ -49,7 +49,12 @@ export default Vue.component("edit-file", {
 			return {type: "file", files: files}
 		}
 	},
-
+	created() {
+		this.$store.dispatch("openEditor");
+	},
+	destroyed() {
+		this.$store.dispatch("closeEditor");
+	}
 });
 </script>
 
