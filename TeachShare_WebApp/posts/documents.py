@@ -13,11 +13,15 @@ post.settings(
 @post.doc_type
 class PostDocument(DocType):
     title = fields.TextField()
-    content = fields.ObjectField(dynamic=True)
+    content = fields.NestedField()
     tags = fields.ObjectField()
     updated = fields.DateField()
     likes = fields.IntegerField()
     timestamp = fields.DateField()
+
+
+    def prepare_content(self, instance):
+        return instance.content
 
     class Meta:
         model = Post # The model associated with this DocType
