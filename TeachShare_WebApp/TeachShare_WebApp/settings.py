@@ -41,8 +41,6 @@ DEFAULT_FROM_EMAIL = 'teamteachbears@gmail.com'
 # Application definition
 
 INSTALLED_APPS = [
-    'accounts',
-    'posts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -57,6 +55,9 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'django_filters',
+
+    'accounts',
+    'posts',
 ]
 
 
