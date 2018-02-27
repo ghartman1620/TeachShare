@@ -1,6 +1,6 @@
 {{ object.title }}
 {% for item in object.content.main_content %}
     {% for k, v in item.items %}
-        {{ k }} {{ v }}
+        {{ v }}
     {% endfor %}
 {% endfor %}
