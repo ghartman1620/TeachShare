@@ -1,7 +1,7 @@
 <template>
-    <body>
+
        <p v-html="element.content"></p>
-    </body>
+
 
 </template>
 

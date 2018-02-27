@@ -1,6 +1,6 @@
 <template>
 <div>
-    <div class="container card">
+    <div class="card">
         <form v-on:submit.prevent="submit">
             <!-- file upload -->
             <file-upload :fileLimit="20" title="Upload Image Files" fileAcceptType="IMG"></file-upload>
@@ -52,21 +52,8 @@
             </div>
         </form>
     </div>
-    <br>
-    <br>
-    <div class="row">
-        <div class="col-2"></div>
-        <div class="col-8" v-if="this.$store.state.image.images.length > 0">
-            <image-element 
-                :images=this.$store.state.image.images
-                :body="description"
-                :title="title">
-            </image-element>
-        </div>
-        <div class="col-2"></div>
-    </div>
-    <br><br>
-    {{allFilesUploadComplete}}
+
+
 </div>
 </template>
 
@@ -153,6 +140,8 @@ export default Vue.component("edit-image", {
 
 
 <style lang="scss" scoped>
-
+.card {
+    padding: 10px;
+}
 </style>
 

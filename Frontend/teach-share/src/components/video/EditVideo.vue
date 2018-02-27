@@ -1,5 +1,5 @@
 <template>
-<div class="container">
+<div>
 
     <!-- <div class="col-xl-8 col-sm-10 col-xs-12"> -->
         <div class="card">
@@ -45,14 +45,7 @@
         </div>
     <!-- </div> -->
     <div class="col-xl-2 col-sm-1"></div>
-    <div class="container">
-        <br>
-        {{errors}}
-        <br><br>
 
-        <br><br><br>
-
-    </div>
 </div>
 </template>
 
