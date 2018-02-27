@@ -13,7 +13,8 @@ from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer
 # test
 from django.http import HttpResponse
 from django.shortcuts import render
- 
+
+
 class PostFilter(filters.FilterSet):
     beginIndex = django_filters.NumberFilter(name='beginIndex', label="beginIndex", method='filterNumberPosts')
     class Meta:
@@ -69,6 +70,9 @@ class AttachmentViewSet(viewsets.ModelViewSet):
 def SimpleMethod(request): 
     return render(request, 'test.html')
 
+#Known issues with backend upload:
+#Files removed from the post are not deleted
+#Attachment objects that are deleted do not delete the corresponding file
 
 # @TODO: figure out how to deal with bad url characters
 class FileUploadView(views.APIView):

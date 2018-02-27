@@ -114,7 +114,14 @@ export default Vue.component("edit-image", {
                 });
             });
             console.log(output);
-            return { type: "image_file", description: this.description, title: this.title, content: output };
+            return { 
+                type: "image_file", 
+                description: this.description, 
+                title: this.title, 
+                content: output,
+                width: this.width,
+                height: this.height  
+            };
         },
         cancelEdit() {
             this.$router.push({ name: "create" });

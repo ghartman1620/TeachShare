@@ -63,6 +63,15 @@
 
 <!-- Javascript -->
 <script>
+/*
+Known issues with frontend upload (backend in posts/views.py):
+If a file upload is in progress and you exit the file upload compoennt and re-enter it,
+the file will resume progress uploading (clicking cancel should cancel/remove all file uploads)
+
+If multiple files are in progress uploading and the first is clicked to cancel the final one will be 
+cancelled sometimes
+
+*/
 import Vue from "vue";
 import { mapGetters } from "vuex";
 

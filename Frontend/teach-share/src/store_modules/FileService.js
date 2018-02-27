@@ -46,6 +46,9 @@ const FileService = {
         REMOVE_FILE: (state, file) => {
             
             console.log(file);
+            if(file.cancelSource != null){
+                file.cancelSource.cancel("Operation cancelled by the user");
+            }
             let ind = state.uploadedFiles.indexOf(file);
             state.uploadedFiles.splice(ind, 1);
             
@@ -76,7 +79,6 @@ const FileService = {
                     var identifier = uuidv4();
                     var cancelToken = axios.CancelToken;
                     var source = cancelToken.source();
-                    context.commit("SET_CANCEL_TOKEN_SOURCE", source);
                     let config = {
                         onUploadProgress: progressEvent => {
                             let percentCompleted = Math.floor(
@@ -85,7 +87,8 @@ const FileService = {
                             context.commit("CHANGE_UPLOADED_FILES", {
                                 percent: percentCompleted,
                                 file: file,
-                                request_id: identifier
+                                request_id: identifier,
+                                cancelSource: source,
                             });
                         },
                         cancelToken: source.token,

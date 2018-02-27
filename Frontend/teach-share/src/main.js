@@ -10,6 +10,10 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 
+import { Carousel } from 'bootstrap-vue/es/components';
+
+Vue.use(Carousel);
+
 Validator.extend('YoutubeEmbedURL', {
     getMessage: field => 'The ' + field + ' value is not a valid YouTube link.',
     validate: value => {

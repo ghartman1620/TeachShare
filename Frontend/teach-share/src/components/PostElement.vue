@@ -11,7 +11,13 @@ Uses TextElement, VideoElement, etc.
 
     </div>
     <div class="post-element card" v-else-if="element.type === 'image_file'">
-        <image-element :title="element.title" :body="element.description" :images="element.content"/>
+        <image-element 
+            :title="element.title" 
+            :body="element.description" 
+            :images="element.content"
+            :width="element.width"
+            :height="element.height"
+        />
     </div>
     <div class="post-element card" v-else-if="element.type === 'audio'">
         <audio-element :id="element.content[0].id"
