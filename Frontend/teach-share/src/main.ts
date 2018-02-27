@@ -6,7 +6,7 @@ import VeeValidate from 'vee-validate';
 import { Validator } from 'vee-validate';
 
 // our stuff
-import App from './App.vue';
+// import App from './App.vue'; 
 import router from './router';
 import store from './store';
 
@@ -22,7 +22,7 @@ Validator.extend('YoutubeEmbedURL', {
     }
 });
 
-require('bootstrap');
+// require('bootstrap');
 
 Vue.use(Vuex);
 Vue.use(VeeValidate);
@@ -30,9 +30,8 @@ Vue.use(VeeValidate);
 /* eslint-disable no-new */
 new Vue({
     el: '#app',
-    router,
     store,
-    components: { App },
+    components: {  },
     template: '<App/>'
 
 });

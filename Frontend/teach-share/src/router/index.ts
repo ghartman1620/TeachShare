@@ -1,23 +1,24 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Base from "@/components/Base";
-import PostCreate from "@/components/PostCreate";
-import Login from "@/components/Login";
-import Test from "@/components/Test";
-import FileUpload from "@/components/FileUpload";
-import EditText from "@/components/EditText";
-import VideoComponent from "@/components/video/VideoComponent";
-import EditVideo from "@/components/video/EditVideo";
-import HomePage from "@/components/HomePage";
-import AudioComponent from "@/components/audio/AudioComponent";
-import EditAudio from "@/components/audio/EditAudio";
-import ImageComponent from "@/components/image/ImageComponent";
-import EditImage from "@/components/image/EditImage";
-import EditFile from "@/components/EditFile";
+import Base from "../components/Base.vue";
+import PostCreate from "../components/PostCreate.vue";
+import Login from "../components/Login.vue";
+import Test from "../components/Test.vue";
+import FileUpload from "../components/FileUpload.vue";
+import EditText from "../components/EditText.vue";
+import VideoComponent from "../components/video/VideoComponent.vue";
+import EditVideo from "../components/video/EditVideo.vue";
+import HomePage from "../components/HomePage.vue";
+import AudioComponent from "../components/audio/AudioComponent.vue";
+import EditAudio from "../components/audio/EditAudio.vue";
+import ImageComponent from "../components/image/ImageComponent.vue";
+import EditImage from "../components/image/EditImage.vue";
+import EditFile from "../components/EditFile.vue";
 
-import PostFeed from "@/components/PostFeed";
+import PostFeed from "../components/PostFeed.vue";
 //a change
 Vue.use(Router);
+
 
 export default new Router({
     routes: [{

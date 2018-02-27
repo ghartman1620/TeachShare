@@ -5,9 +5,9 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from 'vue';
-import Navbar from './Navbar';
+import Navbar from './Navbar.vue';
 import FileComponent from './FileComponent.vue';
 
 

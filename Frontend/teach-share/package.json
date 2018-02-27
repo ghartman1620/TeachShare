@@ -87,6 +87,8 @@
         "shelljs": "^0.7.6",
         "sinon": "^4.0.0",
         "sinon-chai": "^2.8.0",
+        "ts-loader": "^3.5.0",
+        "typescript": "^2.7.2",
         "uglifyjs-webpack-plugin": "^1.1.1",
         "url-loader": "^0.5.8",
         "vue-loader": "^13.3.0",

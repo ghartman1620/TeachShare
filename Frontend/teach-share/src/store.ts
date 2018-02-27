@@ -45,20 +45,17 @@ export default new Vuex.Store({
                 )
                 .catch(err => console.log(err));
         },
-        LOAD_POST: (state, data) => {
-            state.post = Object.assign({}, data);
-        },
         LOAD_USER: (state, data) => {
-            state.user = Object.assign({}, data);
+            state.user = data;
         },
         LOAD_COMMENT: (state, data) => {
-            state.comment = Object.assign({}, data);
+            state.comment = data;
         },
         LOAD_COMMENTS_FOR_POST: (state, data) => {
-            state.comments = Object.assign([], data);
+            state.comments = data;
         },
         LOAD_FILTERED_POSTS: (state, data) => {
-            state.posts = Object.assign([], data);
+            state.posts = data;
         },
         SET_TOKEN: (state, tok) => {
             state.token = tok;

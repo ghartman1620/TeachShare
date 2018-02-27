@@ -9,10 +9,8 @@
 </body>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from 'vue';
-
-window.bus = new Vue({});
 
 export default {
   name: 'App'

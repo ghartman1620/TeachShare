@@ -41,17 +41,18 @@
   </nav>
 </template>
 
-<script>
-import Vue from "vue";
-import SearchBox from "./SearchBox.vue";
+<script lang="ts">
+import SearchBox from './SearchBox.vue'
+import { Vue, Component, Prop } from "vue-property-decorator";
 
-export default Vue.component("nav-bar", {
-  components: { SearchBox },
-  props: ["query"],
-  data() {
-    return {};
+@Component 
+export default class Navbar extends Vue {
+  @Prop() query: string
+
+  search(query: string): string {
+    return "test"
   }
-});
+}
 </script>
 
 
