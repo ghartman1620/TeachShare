@@ -57,12 +57,14 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'django_filters',
-    'django_elasticsearch_dsl',
+    'haystack',
 ]
 
-ELASTICSEARCH_DSL={
+HAYSTACK_CONNECTIONS = {
     'default': {
-        'hosts': 'search:9200'
+        'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'teach',
     },
 }
 
@@ -153,7 +155,7 @@ DATABASES = {
         'NAME': 'teachshare',
         'USER': 'postgres',
         'PASSWORD': 'password123',
-        'HOST': 'db',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
     }
 }
