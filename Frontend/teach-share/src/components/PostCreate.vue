@@ -53,24 +53,24 @@
             </div>
         </div>
 
-        <div class="title-tags-container col-7 container">
+    <div id="title-tag-card" class="card mx-auto">
+        <div class="title-container container">
             <input class="postheader form-control" type="text" v-model.lazy="title"
                 placeholder="Title required"></input>
             <br>
         </div>
 
-    <div class="mx-auto tag-card col-6 card">
-        <span :key="index" v-for="(tag,index) in tags">
-            {{tag}}
-            <button type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button>
-        </span>
-
-        <form v-on:submit.prevent="nop">
-            <input class="postheader form-control" v-model="inProgressTag" v-on:keyup="createTag"
-                placeholder="add a topic tag"></input>
-        </form>
+        <div class="tag-card card">
+            <form id="tag-submit-box" v-on:submit.prevent="nop">
+                <input class="postheader form-control" v-model="inProgressTag" v-on:keyup="createTag"
+                    placeholder="add a topic tag"></input>
+            </form>
+            <span id="tag-container" :key="index" v-for="(tag,index) in tags">
+                {{tag}}
+                <button id="tag-delete-button" type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button>
+            </span>
+        </div>
     </div>
-
 
         <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
             <div class="post-element-container">
@@ -97,7 +97,7 @@
         </div>
     </div>
     <br><br><br> <!-- this is so problems don't occur with bottom of page button presses -->
-    <nav class="navbar fixed-bottom navbar-light navbar-left bg-light bottom-navbar">
+    <nav class="navbar fixed-bottom navbar-light navbar-left bottom-navbar bg-light">
         <div class="title" v-if="title != ''">{{title}}</div>
         <div class="title title-placeholder" v-else></div>
     </nav>
@@ -268,8 +268,10 @@ export default {
     padding-right: 20px;
     padding-left: 20px;
     padding-bottom: 10px;
+    box-shadow: 5px 8px #bdbdbd;
     background-color: #96E6B3;
 }
+
 .round-button {
     width: 10%;
     height: 0;
@@ -291,10 +293,13 @@ export default {
     background: #bececa;
     border-radius: 50px;
     justify-content: center;
+    box-shadow: 0px 8px #bdbdbd;
 }
+
 #text-icon {
     margin-right: 1rem;
 }
+
 #audio-icon {
     margin-left: 1rem;
     margin-right: 1rem;
@@ -328,6 +333,25 @@ export default {
 }
 #file-icon:hover {
     background: #1a3c68;
+}
+
+#title-tag-card {
+    background-color: #bececa;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    width: 300px;
+    padding: 1rem;
+    box-shadow: 5px 5px #bdbdbd;
+    border: 0;
+}
+
+#tag-submit-box {
+    margin-bottom: 5px;
+}
+
+
+#tag-delete-button {
+    margin-bottom: 5px;
 }
 
 #up-button {
@@ -409,21 +433,24 @@ export default {
 }
 
 .tag-card {
-    background-color: #FFFFFF;
+    background-color: #bececa;
+    border: 0;
+    width: 100%;
     display:inline;
-    margin-bottom: 30px;
     padding: 10px;
 }
+
 
 .post-element, card-row {
     background-color: #FFFFFF;
 }
 
-.title-tags-container {
-    padding-top: 1rem;
+.title-container {
+    width: 100%;
 }
 
 .bottom-navbar {
     height: 50px;
+    background-color: #bececa;
 }
 </style>
