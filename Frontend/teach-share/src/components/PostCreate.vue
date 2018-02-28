@@ -74,25 +74,22 @@
 
         <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
             <div class="post-element-container">
-                <div class="card-row row">
-                    <div class="col-1">
-                        <div id="arrange-btn-group" class="btn-group-vertical">
+                <div class="card-column column">
+                  <div class="col-12 container">
+                    <div class="post-element card">
+                      <post-element :element="element"></post-element>
+                    </div>
+                  </div>
 
-                            <input type="image" width=50 height=50 style="z-index: 2" @click="moveElementUp(index)" src="/static/caret-square-up.png"/> 
-                            <input type="image" width=50 height=50 style="z-index: 2" @click="moveElementDown(index)" src="/static/caret-square-down.png"/> 
+                  <div class="justify-content-start">
+                        <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
+
+                            <input type="image" id="up-button" width=30 height=30 style="z-index: 2" @click="moveElementUp(index)" src="/static/caret-square-up.png"/>
+                            <input type="image" id="down-button" width=30 height=30 style="z-index: 2" @click="moveElementDown(index)" src="/static/caret-square-down.png"/>
+                            <input type="image" id="garbage-button" width=30 height=30 @click="removeElement(index)" src="/static/trash-icon.png">
+                            <input type="image" id="edit-button" width=30 height=30 @click="editElement(index)" src="/static/edit-icon.png">
+
                         </div>
-                    </div>
-                    <div class="col-10 container">
-                        <div class="post-element card">
-                            <post-element :element="element"></post-element>
-                        </div>
-                    </div>
-                    <div class="col 11">
-                        <div id="arrange-btn-group" class="btn-group-vertical">
-                            <button @click="removeElement(index)"><font face="courier">x</font></button>
-                            <button @click="editElement(index)"><font face="courier">E</font></button>
-                        </div>
-                            
                     </div>
                 </div>
             </div>
@@ -267,7 +264,10 @@ export default {
 
 
 .post-element-container {
-    padding: 50px;
+    padding-top: 30px;
+    padding-right: 20px;
+    padding-left: 20px;
+    padding-bottom: 10px;
     background-color: #96E6B3;
 }
 .round-button {
@@ -282,6 +282,8 @@ export default {
 }
 
 #button-bar {
+    min-width: 500px;
+    max-height: 100px;
     padding-top: 8px;
     padding-bottom: 8px;
     padding-left: 1px;
@@ -328,6 +330,26 @@ export default {
     background: #1a3c68;
 }
 
+#up-button {
+    margin-top: 10px;
+    margin-left: 1rem;
+}
+
+#down-button {
+    margin-top: 10px;
+}
+
+#garbage-button {
+    margin-top: 10px;
+    margin-right: 1rem;
+    float: right;
+}
+
+#edit-button {
+    margin-top: 10px;
+    float: right;
+}
+
 .round-button img {
     display: block;
     width: 100%;
@@ -367,9 +389,6 @@ export default {
 }
 
 .card {
-    padding-left: 5px;
-    padding-right: 5px;
-    /*background-color: #99b5aa;*/
     background-color: #e5ffee;
 }
 
