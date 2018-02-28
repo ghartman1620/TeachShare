@@ -113,7 +113,11 @@
     </nav>
 </div>
 <div :style="getEditorStyle()">
-    <router-view/>
+  <div class="row">
+    <div class="col-12">
+      <router-view/>
+    </div>
+  </div>
 </div>
 
 
@@ -142,8 +146,8 @@ const editorHidden = {
 }
 const editorVisible = {
     position: "fixed",
-    width: "50%",
-    left: "25%",
+    width: "80%",
+    left: "10%",
     "max-height": "75%",
     top: "20%",
     "z-index" : "1",
@@ -272,13 +276,13 @@ export default {
 }
 .round-button {
     width: 10%;
-    height: 0;
-    padding-bottom: 11%;
+    height: auto;
+    /* padding-bottom: 11%; */
     border-radius: 50%;
     border: 0 solid #f5f5f5;
     overflow: hidden;
     background: #bececa;
-    box-shadow: 0 0 0px gray;
+    box-shadow: 1 1 4px gray;
 }
 
 #button-bar {

@@ -1,45 +1,42 @@
 <template>
-  <body>
+<div class="row">
+  <div class="col-12">
+    <!--We can use any buttons we want in the toolbar!
+    Check out the github for more examples, and the
+    exact code needed for other types of buttons -->
+    <div class="custom-quill-editor">
+      <quill-editor
+        v-model="component.content"
+        :options="editorOption">
+        <div id="toolbar" slot="toolbar">
+          <!-- Add a bold button -->
+          <button class="ql-bold">Bold</button>
+          <button class="ql-italic">Italic</button>
+          <!-- Add font size dropdown -->
+          <select class="ql-size">
+            <!-- Note a missing, thus falsy value, is used to reset to default -->
+            <option selected></option>
+            <option value="large"></option>
+            <option value="huge"></option>
+          </select>
+          <select class="ql-font">
+            <option selected="selected"></option>
+            <option value="serif"></option>
+            <option value="monospace"></option>
+          </select>
+          <!-- You can also add your own
+          <button id="custom-button" @click="customButtonClick">[ Click me ]</button-->
+        </div>
+      </quill-editor>
 
-  <!--We can use any buttons we want in the toolbar!
-  Check out the github for more examples, and the
-  exact code needed for other types of buttons -->
-  <div class="custom-quill-editor">
-    <quill-editor
-       v-model="component.content"
-       :options="editorOption"
-       @blur="onEditorBlur($event)"
-       @focus="onEditorFocus($event)"
-       @ready="onEditorReady($event)">
-      <div id="toolbar" slot="toolbar">
-        <!-- Add a bold button -->
-        <button class="ql-bold">Bold</button>
-        <button class="ql-italic">Italic</button>
-        <!-- Add font size dropdown -->
-        <select class="ql-size">
-          <!-- Note a missing, thus falsy value, is used to reset to default -->
-          <option selected></option>
-          <option value="large"></option>
-          <option value="huge"></option>
-        </select>
-        <select class="ql-font">
-          <option selected="selected"></option>
-          <option value="serif"></option>
-          <option value="monospace"></option>
-        </select>
-        <!-- You can also add your own
-        <button id="custom-button" @click="customButtonClick">[ Click me ]</button-->
+
+      <div class="quill-code">
       </div>
-    </quill-editor>
-
-
-    <div class="quill-code">
     </div>
+    <button class="btn btn-primary" @click.prevent="submit">Submit</button>
+    <button class="btn btn-danger" @click.prevent="close">Close</button>
   </div>
-<router-link :to="{ name: 'create'}"><button v-on:click="submit">Submit.</button></router-link>
-<router-link :to="{name: 'create'}"><button>close</button></router-link>
-
-</body>
+</div>
 </template>
 
 <script>
@@ -69,18 +66,19 @@ export default Vue.component("edit-text", {
     submit: function(event) {
       if (
         this.$route.query.index ==
-        this.$store.state.create.postComponents.length
+        this.$store.state.create.postElements.length
       ) {
-        this.$store.dispatch("addComponent", this.component);
+        this.$store.dispatch("addElement", this.component);
       } else {
-        this.$store.dispatch("editComponent", {
+        this.$store.dispatch("editElement", {
           index: this.$route.query.index,
           component: this.component
         });
       }
+      this.$router.push({ name: 'create'});
     },
     close: function(event) {
-      console.log("close");
+      this.$router.push({name: 'create'});
     }
   },
   mounted() {
@@ -90,7 +88,7 @@ export default Vue.component("edit-text", {
     });
     console.log("mounted edit text");
     if (
-      this.$route.query.index >= this.$store.state.create.postComponents.length
+      this.$route.query.index >= this.$store.state.create.postElements.length
     ) {
       this.component = {
         type: "text",
@@ -99,7 +97,7 @@ export default Vue.component("edit-text", {
     } else {
       this.component = Object.assign(
         {},
-        this.$store.state.create.postComponents[this.$route.query.index]
+        this.$store.state.create.postElements[this.$route.query.index]
       );
     }
   },
@@ -113,10 +111,14 @@ export default Vue.component("edit-text", {
 .quill-editor,
 .quill-code {
   height: 75%;
-  width: 50%;
+  width: 100%;
 }
 
 .custom-quill-editor {
+  background: #ffffff;
+  font-family: "Roboto", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   height: 13em;
 }
 
@@ -126,9 +128,6 @@ export default Vue.component("edit-text", {
 }
 
 body {
-  background: #ffffff;
-  font-family: "Roboto", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  
 }
 </style>

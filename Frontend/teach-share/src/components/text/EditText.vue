@@ -134,38 +134,35 @@ export default Vue.component("edit-text", {
 <style lang="scss" scoped>
 
 .editor-card {
-    max-width: 1000px;
+    max-width: 100px;
 }
 
 .custom-quill-editor {
-    background: #F9F9F9;
-    height: 100%;
+    // background: #F9F9F9;
+    width: 300px;
+    height: 100px;
 }
 .quill-editor {
     height: 100%;
 }
 
-.quill-code {
-    max-width: 1000px;
-    height: auto;
-}
+// .quill-code {
+//     max-width: 1000px;
+//     height: auto;
+//     border: 1px;
+// }
 
+// body {
+//     background-color: white;
+//     padding: 10px;
+// }
 
-.quill-code {
-    border: 1px;
-    height: auto;
-}
-body {
-    background-color: white;
-    padding: 10px;
-}
-
-.quill-container{
-    width: 1000px;
-    /*background: #c0c0c0;*/
-    font-family: "Roboto", sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    border: 1;
-}
+// .quill-container{
+//     width: 1000px;
+//     /*background: #c0c0c0;*/
+//     font-family: "Roboto", sans-serif;
+//     -webkit-font-smoothing: antialiased;
+//     -moz-osx-font-smoothing: grayscale;
+//     border: 1;
+// }
 </style>

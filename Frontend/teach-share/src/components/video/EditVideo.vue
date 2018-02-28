@@ -2,7 +2,7 @@
 <div>
 
     <!-- <div class="col-xl-8 col-sm-10 col-xs-12"> -->
-        <div class="card">
+        <div class="card col-12">
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <router-link :class="embedActiveStyle"

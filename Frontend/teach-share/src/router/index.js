@@ -3,18 +3,18 @@ import Router from "vue-router";
 import Base from "@/components/Base";
 import Login from "@/components/Login";
 import Test from "@/components/Test";
-import HomePage from "@/components/HomePage";
 
+// route-splitting to minimize necessary download size and will download javascript as-needed.
+//
+const Home = () => import(/* webpackChunkName: "home" */ "../components/HomePage.vue");
+const PostCreate = () => import(/* webpackChunkName: "post-create" */ "../components/PostCreate.vue");
+const EditText = () => import(/* webpackChunkName: "edit-text" */ "../components/EditText.vue");
+const EditVideo = () => import(/* webpackChunkName: "edit-video" */ "../components/video/EditVideo.vue");
+const EditAudio = () => import(/* webpackChunkName: "edit-audio" */ "../components/audio/EditAudio.vue");
+const EditImage = () => import(/* webpackChunkName: "edit-image" */ "../components/image/EditImage.vue");
+const EditFile = () => import(/* webpackChunkName: "edit-file" */ "../components/file/EditFile.vue");
+const PostFeed = () => import(/* webpackChunkName: "post-feed" */ "../components/PostFeed.vue");
 
-import PostCreate from "@/components/PostCreate";
-import EditText from "@/components/text/EditText";
-import EditVideo from "@/components/video/EditVideo";
-import EditAudio from "@/components/audio/EditAudio";
-import EditImage from "@/components/image/EditImage";
-import EditFile from "@/components/file/EditFile";
-
-import PostFeed from "@/components/PostFeed";
-//a change
 Vue.use(Router);
 
 export default new Router({
@@ -22,7 +22,7 @@ export default new Router({
             path: "/",
             component: Base,
             children: [
-                { name: "base", path: "", component: HomePage },
+                { name: "base", path: "", component: Home },
                 {
                     path: "/create",
                     name: "create",
