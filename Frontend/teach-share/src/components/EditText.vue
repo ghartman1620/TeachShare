@@ -112,12 +112,12 @@ export default Vue.component("edit-text", {
 <style lang="scss" scoped>
 .quill-editor,
 .quill-code {
-  height: 50%;
+  height: 75%;
   width: 50%;
 }
 
 .custom-quill-editor {
-  height: 500px;
+  height: 13em;
 }
 
 .quill-code {

@@ -56,24 +56,59 @@ export default Vue.component("nav-bar", {
 
 
 <style lang="scss" scoped>
-// this is an example, not an end result
-.router-link-exact-active {
-  text-decoration: underline;
-  text-decoration-style: solid;
-  text-decoration-color: #46e;
+
+$nav-background-color: #3b896a;
+$nav-background-color-hover: #204738;
+$nav-text-color: rgba(255, 255, 255, 1);
+$nav-hover-color: rgba(255, 255, 255, .5);
+
+.router-link-active {
+  font-weight: bold;
+  color: rgba(255, 255, 255, 1) !important; 
+  // text-decoration-style:solid;
+  // text-decoration-line: underline;
 }
-.nav {
-  height: 100px;
+
+.dropdown-menu {
+  background-color: $nav-background-color;
 }
+
+.dropdown-item {
+  font-weight: 400;
+  background-color: $nav-background-color;
+  color: $nav-text-color;
+}
+
+.dropdown-item:hover{
+  background-color: $nav-background-color-hover;
+  color: $nav-text-color;
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.924) !important;
+  font-weight: bold;
+}
+
+.nav-link:hover{
+  // color: rgba(255, 255, 255, .5) !important;
+  background-color: $nav-background-color-hover;
+  font-weight: bold;
+}
+
 .dark-green {
   background-color: #3b896a;
 }
 .ts-logo {
-  height: 45px;
+  height: 40px;
+  padding-bottom: 3px;
   width: auto;
 }
-.search-button {
-  height: 20px;
-  width: auto;
+.ts-logo:hover {
+  background-color:$nav-background-color-hover;
 }
+
+// .search-button {
+//   height: 20px;
+//   width: auto;
+// }
 </style>
