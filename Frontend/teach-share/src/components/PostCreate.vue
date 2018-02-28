@@ -1,288 +1,408 @@
 
+
+
 <template>
 
 <body>
 
-<div >
-<div id="buttonbar">
-<!-- Text button -->
+<div :style="getBodyStyle()">
+    <div class="col-8 offset-2 card card-outline-danger container icon-card-container">
+        <div class="col-8 mx-auto card-deck" id="button-bar">
 
-<router-link :to="{ name: 'edit-text', query: {index: this.maxComponentIndex()}}">
-  <button type="button" class="btn btn-default btn-circle btn-xl" id="text-button"></button>
-</router-link>
-<router-link :to="{name: 'edit-video', query: {index: this.maxComponentIndex(), videotype: 'embed'}}">
-  <button type="button" class="btn btn-default btn-circle btn-xl" id="video-button"></button>
-</router-link>
-<router-link :to="{name: 'edit-audio', query: {index: this.maxComponentIndex()}}">
-  <button type="button" class="btn btn-default btn-circle btn-xl" id="audio-button"></button>
-</router-link>
-<router-link :to="{name: 'edit-image', query: {index: this.maxComponentIndex()}}">
-  <button type="button" class="btn btn-default btn-circle btn-xl" id="image-button"></button>
-</router-link>
-<router-link :to="{name: 'edit-file', query: {index: this.maxComponentIndex()}}">
-  <button type="button" class="btn btn-default btn-circle btn-xl" id="file-button"></button>
-</router-link>
-</div>
-<div class="container">
-<input class="postheader" type="text" v-model="title" placeholder="title"></input><br>
-<div class="card">
-<div v-for="(tag,index) in tags"> <button @click="removeTag(index)">{{tag}}</button></div>
-<form v-on:submit.prevent="nop">
-<input class="postheader" v-model="inProgressTag" v-on:keyup="createTag" placeholder="tags"></input>
-</form>
+            <h2></h2>
+            <div class="col-0 round-button" id="text-icon">
+                <router-link :to="{ name: 'edit-text', query: {index: this.maxElementIndex()}}">
+                    <img src="/static/text-button.png"
+                                onmouseover="this.src='/static/text-button-hover.png'"
+                                onmouseout="this.src='/static/text-button.png'">
+                </router-link>
+            </div>
+            <h2></h2>
 
-</div>
-</div>
+            <div class="round-button" id="video-icon">
+                <router-link :to="{name: 'edit-video', query: {index: this.maxElementIndex(), videotype: 'embed'}}">
+                    <img src="/static/video-button.png"
+                                onmouseover="this.src='/static/video-button-hover.png'"
+                                onmouseout="this.src='/static/video-button.png'">
 
-<div class="container" v-for="(component,index) in storeComponents">
-  <div class="row">
-  <div class="col-1"><!-- col-xs-auto -->
-    <div id="arrange-btn-group" class="btn-group-vertical">
-      <button @click="moveComponentUp(index)" class="up-down-button"><font face="courier">^</font></button>
-      <button @click="moveComponentDown(index)" class="up-down-button"><font face="courier">v</font></button>
-    </div>
-  </div>
-  <div class="col-10"> <!-- col-11 -->
-  <div class="post-component card" v-if="component.type === 'text'">
-    <view-text :component="component"></view-text>
-    <router-link :to="{ name: 'edit-text', query: {index: index}}"><button><font face="courier">E</font></button></router-link>
+                </router-link>
+            </div>
+            <h2></h2>
 
-  </div>
-  <div class="post-component card" v-else-if="component.type === 'image_file'">
-    <image-component :title="component.title" :body="component.description" :images="component.content"/>
-  </div>
-  <div class="post-component card" v-else-if="component.type === 'audio'">
-    <audio-component :id="component.content[0].id" 
-    :title="component.content[0].title" 
-    :body="component.content[0].description" 
-    :controls="true" :source="component.content[0].url" 
-    :filetype="component.content[0].filetype" 
-    autoplay="false"/>
-    <router-link :to="{ name: 'edit-audio', query: {index: index}}"><button><font face="courier">E</font></button></router-link>
+            <div class="round-button" id="audio-icon">
+                <router-link :to="{name: 'edit-audio', query: {index: this.maxElementIndex()}}">
+                    <img src="/static/audio-button.png"
+                                onmouseover="this.src='/static/audio-button-hover.png'"
+                                onmouseout="this.src='/static/audio-button.png'">
+                </router-link>
+            </div>
+            <h2></h2>
 
-  </div>
+            <div class="round-button" id="image-icon">
+                <router-link :to="{name: 'edit-image', query: {index: this.maxElementIndex()}}">
+                    <img src="/static/image-button.png" >
+                </router-link>
+            </div>
 
-  <div class="post-component card" v-else-if="component.type === 'video_link' || component.type === 'video_file'">
-      <div v-if="component.type === 'video_link'">
-          <video-component
-            name="vid-comp1"
-            :id="component.content.id"
-            :height="component.content.height"
-            :width="component.content.width"
-            :title="component.content.title"
-            :source="component.content.url"
-            controls="true"
-            autoplay="false"
-            isEmbed=true>
-          <div slot="description">{{component.content.description}}</div>
-          </video-component>
+            <div class="round-button" id="file-icon">
+                <router-link :to="{name: 'edit-file', query: {index: this.maxElementIndex()}}">
+                    <img src="/static/file-button.png"
+                                onmouseover="this.src='/static/file-button-hover.png'"
+                                onmouseout="this.src='/static/file-button.png'">
+                </router-link>
+            </div>
         </div>
-        <div v-else>
-          <video-component
-            name="vid-comp2"
-            :id="component.content.id"
-            :height="component.content.height"
-            :width="component.content.width"
-            :title="component.content.title"
-            :source="component.content.url"
-            controls="true"
-            autoplay="false"
-            isFile=true>
-          <div slot="description">{{component.content.description}}</div>
-          </video-component>
-       </div>
-  </div>
-  <div class="post-component card" v-else-if="component.type === 'file'">
-    <file-component :component=component></file-component>
-  </div>
-  <div v-else>
-    Something bad!
-    {{component}}
-  </div>
-  </div>
-  <div class="col 11">
-    <div id="arrange-btn-group" class="btn-group-vertical">
-      <button @click="removeComponent(index)"><font face="courier">x</font></button>
-    
-    </div>
-  </div>
-  
-  </div>
-</div>
-<button v-on:click="submitPost">Publish</button>
-</div>
-<router-view/>
-<button @click="undo">undo </button>
 
-<button @click="redo">redo </button>
+        <div class="title-tags-container col-7 container">
+            <input class="postheader form-control" type="text" v-model.lazy="title"
+                placeholder="Title required"></input>
+            <br>
+        </div>
+
+      <div class="mx-auto tag-card col-6 card">
+        <div :key="index" v-for="(tag,index) in tags">
+          {{tag}}
+          <button type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button>
+        </div>
+
+        <form v-on:submit.prevent="nop">
+            <input class="postheader form-control" v-model="inProgressTag" v-on:keyup="createTag"
+                placeholder="add a topic tag"></input>
+        </form>
+    </div>
+
+
+        <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
+            <div class="post-element-container">
+                <div class="card-row row">
+                    <div class="col-1">
+                        <div id="arrange-btn-group" class="btn-group-vertical">
+
+                            <input type="image" width=50 height=50 style="z-index: 2" @click="moveElementUp(index)" src="/static/caret-square-up.png"/> 
+                            <input type="image" width=50 height=50 style="z-index: 2" @click="moveElementDown(index)" src="/static/caret-square-down.png"/> 
+                        </div>
+                    </div>
+                    <div class="col-10 container">
+                        <div class="post-element card">
+                            <post-element :element="element"></post-element>
+                        </div>
+                    </div>
+                    <div class="col 11">
+                        <div id="arrange-btn-group" class="btn-group-vertical">
+                            <button @click="removeElement(index)"><font face="courier">x</font></button>
+                            <button @click="editElement(index)"><font face="courier">E</font></button>
+                        </div>
+                            
+                    </div>
+                </div>
+            </div>
+            <br>
+        </div>
+    </div>
+    <br><br><br> <!-- this is so problems don't occur with bottmo of page button presses -->
+    <nav class="navbar fixed-bottom navbar-light navbar-left bg-light bottom-navbar">
+        <div class="title" v-if="title != ''">{{title}}</div>
+        <div class="title title-placeholder" v-else></div>
+    </nav>
+
+
+    <nav class="navbar fixed-bottom justify-content-end bg-transparent">
+        <button type="button" class="undo-button align-right btn btn-sm btn-outline-dark btn-primary-spacing" @click="undo">undo </button>
+        <button type="button" class="redo-button align-right btn btn-sm btn-outline-dark btn-primary-spacing" @click="redo">redo </button>
+        <button type="button" class="submit-button btn btn-light btn-outline-info" v-on:click="submitPost">Publish post</button>
+    </nav>
+</div>
+<div :style="getEditorStyle()">
+    <router-view/>
+</div>
+
 
 </body>
-
-
 </template>
 
 
 <script>
-import Vue from 'vue';
-import { mapState } from 'vuex';
+import Vue from "vue";
+import { mapState } from "vuex";
 
-import ViewText from './ViewText';
-import AudioComponent from './audio/AudioComponent'
-import ImageComponent from './image/ImageComponent'
-import VideoComponent from "./video/VideoComponent";
+import TextElement from "./text/TextElement";
+import AudioElement from "./audio/AudioElement";
+import ImageElement from "./image/ImageElement";
+import VideoElement from "./video/VideoElement";
+import FileElement from "./file/FileElement";
+
+
+
+function isBlank(str) {
+    return (!str || /^\s*$/.test(str));
+};
+
+const editorHidden = {
+    "z-index" : "-1",
+}
+const editorVisible = {
+    position: "fixed",
+    width: "50%",
+    left: "25%",
+    "max-height": "75%",
+    top: "20%",
+    "z-index" : "1",
+    "overflow-y" : "scroll",
+    "overflow-x" : "hidden",
+}
+
+const bodyHidden = {
+    opacity: ".3",
+    "pointer-events" : "none",
+    overflow: "hidden",
+};
+const bodyVisible = {
+    opacity: "1",
+}
+
 
 export default {
-  name: "post-create",
-  components: { ViewText, AudioComponent, ImageComponent, VideoComponent },
-  data: function() {
-    return {
-      title: "",
-      editedComponent: {},
-      editedComponentIndex: -1,
-      inProgressTag: "",
-      tags: []
-    };
-  },
-  computed: {
-    storeComponents() {
-      return this.$store.state.create.postComponents;
+    name: "post-create",
+    components: { TextElement, FileElement, AudioElement, ImageElement, VideoElement },
+    data: function() {
+        return {
+            title: "",
+            editedElement: {},
+            editedElementIndex: -1,
+            inProgressTag: "",
+            tags: []
+        };
     },
-    nextStateId() {
-      return this.$store.state.create.nextStateId;
-    }
-  },
-
-  methods: {
-    nop: function() {},
-    removeTag: function(index) {
-      console.log("remove tag" + index);
-      this.tags.splice(index, 1);
-    },
-    createTag: function(e) {
-      if (e.keyCode === 13 && this.inProgressTag !== "") {
-        console.log("enter pressed");
-        this.tags.push(this.inProgressTag);
-        this.inProgressTag = "";
-      }
-    },
-    getUser: function() {
-      this.$store.dispatch("fetchUser", 1);
-    },
-    submitPost: function(event) {
-      console.log(this.$store.state.create.postComponents);
-      var obj = {
-        user: 1,
-        title: this.title,
-        content: this.$store.state.create.postComponents,
-        likes: 0,
-        comments: [],
-        tags: this.tags,
-        attachments: []
-      };
-      console.log(obj);
-      this.$store.dispatch("createPost", obj);
-    },
-    editComponent: function(index) {
-      this.$store.dispatch(
-        "setEditedComponent",
-        this.$store.state.create.postComponents[index]
-      );
+    computed: {
+        storeElements() {
+            return this.$store.state.create.postElements;
+        },
+        nextStateId() {
+            return this.$store.state.create.nextStateId;
+        }
     },
 
-    moveComponentUp: function(index) {
-      console.log("moveComponentUp:" + index);
-      if (index != 0) {
-        this.$store.dispatch("swapComponents", [index, index - 1]);
-        //dispatch only allows one argument so we'll pass them as an array
-      }
-    },
-    moveComponentDown: function(index) {
-      if (index != this.$store.state.create.postComponents.length - 1) {
-        this.$store.dispatch("swapComponents", [index, index + 1]);
-        //dispatch only allows one argument so we'll pass them as an array
-      }
-    },
-    removeComponent: function(index) {
-      this.$store.dispatch("removeComponent", index);
-    },
-    maxComponentIndex() {
-      return this.$store.state.create.postComponents.length;
-    },
-    undo() {
-      this.$store.dispatch("undo");
-    },
-    redo() {
-      this.$store.dispatch("redo");
+    methods: {
+        getEditorStyle() {
+            if(this.$store.state.create.editorOpen){
+
+                return editorVisible;
+            }
+            else{
+                return editorHidden;
+            }
+        },
+        getBodyStyle() {
+            if(this.$store.state.create.editorOpen){
+                return bodyHidden;
+            }
+            else{
+                return bodyVisible;
+            }
+        },
+        nop: function() {},
+        removeTag: function(index) {
+            console.log("remove tag" + index);
+            this.tags.splice(index, 1);
+        },
+        createTag: function(e) {
+            if (e.keyCode === 13 && this.inProgressTag !== "") {
+                console.log("enter pressed");
+                this.tags.push(this.inProgressTag);
+                this.inProgressTag = "";
+            }
+        },
+        getUser: function() {
+            this.$store.dispatch("fetchUser", 1);
+        },
+        submitPost: function(event) {
+            console.log(this.$store.state.create.postElements);
+            var obj = {
+                user: 1,
+                title: this.title,
+                content: this.$store.state.create.postElements,
+                likes: 0,
+                comments: [],
+                tags: this.tags,
+                attachments: []
+            };
+            console.log(obj);
+            this.$store.dispatch("createPost", obj);
+        },
+        editElement: function(index) {
+            this.$router.push({name: this.$store.state.create.postElements[index].type})
+        },
+
+        moveElementUp: function(index) {
+            console.log("moveElementUp:" + index);
+            if (index != 0) {
+                this.$store.dispatch("swapElements", [index, index - 1]);
+                //dispatch only allows one argument so we'll pass them as an array
+            }
+        },
+        moveElementDown: function(index) {
+            if (index != this.$store.state.create.postElements.length - 1) {
+                this.$store.dispatch("swapElements", [index, index + 1]);
+                //dispatch only allows one argument so we'll pass them as an array
+            }
+        },
+        removeElement: function(index) {
+            this.$store.dispatch("removeElement", index);
+        },
+        maxElementIndex() {
+            return this.$store.state.create.postElements.length;
+        },
+        undo() {
+            this.$store.dispatch("undo");
+        },
+        redo() {
+            this.$store.dispatch("redo");
+        }
     }
-  }
 };
 </script>
 
 
 <style scoped>
+
+
+.post-element-container {
+    padding: 50px;
+    background-color: #96E6B3;
+}
+.round-button {
+    width: 10%;
+    height: 0;
+    padding-bottom: 11%;
+    border-radius: 50%;
+    border: 0 solid #f5f5f5;
+    overflow: hidden;
+    background: #bececa;
+    box-shadow: 0 0 0px gray;
+}
+
+#button-bar {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 1px;
+    padding-right: 1px;
+    background: #bececa;
+    border-radius: 50px;
+    justify-content: center;
+}
+#text-icon {
+    margin-right: 1rem;
+}
+#audio-icon {
+    margin-left: 1rem;
+    margin-right: 1rem;
+
+}
+#video-icon {
+    margin-left: 1rem;
+    margin-right: 1rem;
+
+}
+#image-icon {
+    margin-left: 1rem;
+    margin-right: 1rem;
+
+}
+#file-icon {
+    margin-left: 1rem;
+
+}
+#text-icon:hover {
+    background: #bf8301;
+}
+#video-icon:hover {
+    background: #ad5c00;
+}
+#audio-icon:hover {
+    background: #3b685b;
+}
+#image-icon:hover {
+    background: #13213F;
+}
+#file-icon:hover {
+    background: #1a3c68;
+}
+
+.round-button img {
+    display: block;
+    width: 100%;
+    padding: 0%;
+    height: auto;
+}
+
+
+
+
 .foreground {
-  position: fixed;
-  left: 20%;
-  top: 20%;
-  width: 80%;
-  margin: auto;
-  z-index: 2;
-  opacity: 1;
+    position: fixed;
+    left: 20%;
+    top: 20%;
+    width: 80%;
+    margin: auto;
+    z-index: 2;
+    opacity: 1;
 }
 
 .postheader {
-  height: 30px;
-  width: 100%;
+    height: 30px;
+    width: 100%;
 }
 
-/* Submitted components now being viewed */
-.container-component {
-  width: 60%;
-  height: 300px;
+
+
+/* Submitted elements now being viewed */
+.container-element {
+    width: 60%;
+    height: 300px;
 }
 
-/* The five buttons on the button bar */
-#text-button {
-  background: #ffae03;
+.icon-card-container {
+    background-color: #e5ffee;
+    border: 0;
 }
-#image-button {
-  background: #1d3461;
+
+.card {
+    padding-left: 5px;
+    padding-right: 5px;
+    /*background-color: #99b5aa;*/
+    background-color: #e5ffee;
 }
-#audio-button {
-  background: #42aa8b;
+
+.title {
+    font-size: 1.5rem;
 }
-#video-button {
-  background: #e07700;
+
+.title-placeholder {
+    opacity: 0.5;
 }
-#file-button {
-  background: #23528e;
+
+.undo-button {
+    margin-right: 1rem;
 }
-#buttonbar {
-  margin: auto;
-  width: 368px;
-  height: 70px;
-  background-color: #99b5aa;
-  border-radius: 15px;
+
+.redo-button {
+    margin-right: 1rem;
 }
-.btn-circle {
-  width: 30px;
-  height: 30px;
-  text-align: center;
-  padding: 6px 0;
-  font-size: 12px;
-  line-height: 1.428571429;
-  border-radius: 15px;
+
+.tag-card {
+    background-color: #FFFFFF;
+    margin-bottom: 30px;
 }
-.btn-circle.btn-xl {
-  width: 70px;
-  height: 70px;
-  margin: 0px;
-  font-size: 24px;
-  line-height: 1.33;
-  border-radius: 35px;
+
+.post-element, card-row {
+    background-color: #FFFFFF;
 }
-.btn-ciricle.btn-xl:hover {
-  box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24),
-    0 17px 50px 0 rgba(0, 0, 0, 0.19);
+
+.title-tags-container {
+    padding-top: 1rem;
+}
+
+.bottom-navbar {
+    height: 50px;
 }
 </style>

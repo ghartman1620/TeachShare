@@ -1,18 +1,15 @@
 <template>
-    <file-component>Some content!</file-component>
 </template>
 
 <script>
-import Vue from 'vue';
-import FileComponent from './FileComponent.vue';
+import Vue from "vue";
 
 
-export default Vue.component('base-page', {
-    components: { FileComponent },
+export default Vue.component("base-page", {
     props: [],
     data() {
-      return {
-      }
+        return {
+        }
     },
   })
 </script>
@@ -21,8 +18,8 @@ export default Vue.component('base-page', {
 
 // Adds some padding to the main body, so that it's not underneath the navbar
 .body-fluid {
-  position: relative;
-  padding-top: 100px;
+    position: relative;
+    padding-top: 100px;
 }
 
 </style>

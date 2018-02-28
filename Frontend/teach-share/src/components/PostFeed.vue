@@ -7,10 +7,10 @@
 <div v-for="(post,index) in posts">
     <div :id="index" :style="getPostContainerStyle(index)" class="container card">
         <h3>{{post.title}}</h3>
-        <div class="truncatedPostComponent">
-        <div v-for="component in post.content">
+        <div class="truncatedPostElement">
+        <div v-for="element in post.content">
             
-            <post-component :component="component"></post-component>
+            <post-element :element="element"></post-element>
         </div>
         </div>
         <div :style="getGradientStyle(index)"></div>
@@ -26,7 +26,7 @@
 <script>
 import Vue from "vue";
 import { mapState } from "vuex";
-import PostComponentView from './PostComponentView';
+import PostElement from "./PostElement";
 const postContainerDefault = {
     maxHeight: "400px",
     height: "fit-content",
@@ -131,7 +131,7 @@ export default{
         //this isn't accessible in an anonymous function,
         //so we'll make it a variable so we can call scroll() 
         var t = this;
-        window.addEventListener('scroll', function() {t.scroll()}, false);
+        window.addEventListener("scroll", function() {t.scroll()}, false);
     },
     mounted() {
         this.$store.watch(this.$store.getters.getPosts, posts => {
@@ -154,7 +154,7 @@ export default{
         });
     },
     destroyed() {
-        window.removeEventListener('scroll', function() {t.scroll()}, false);
+        window.removeEventListener("scroll", function() {t.scroll()}, false);
     }
 
 }
@@ -163,7 +163,7 @@ export default{
 
 <style lang="scss" scoped>
 
-.truncatedPostComponent {
+.truncatedPostElement {
     overflow: hidden;
 }
 

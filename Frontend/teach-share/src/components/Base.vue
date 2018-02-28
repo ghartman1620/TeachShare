@@ -6,14 +6,12 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import Navbar from './Navbar';
-import FileComponent from './FileComponent.vue';
+import Vue from "vue";
+import Navbar from "./Navbar";
 
 
-export default Vue.component('base-page', {
-    components: { FileComponent },
-    props: ['items'],
+export default Vue.component("base-page", {
+    props: ["items"],
     data() {
       return {
         queryParam: "",

@@ -1,58 +1,51 @@
 <template>
-<div class="row">
-  <div class="col-xl-2 col-sm-1"></div>
-  <div class="col-xl-8 col-sm-10 col-xs-12">
-    <div class="card">
-    <nav>
-    <div class="nav nav-tabs" id="nav-tab" role="tablist">
-      <router-link :class="embedActiveStyle"
-        id="nav-home-tab"
-        data-toggle="tab"
-        href="#nav-home"
-        :to="{name: 'edit-video', query: {index: this.$route.query.index, videotype: 'embed' }}"
-        role="tab"
-        aria-controls="nav-home"
-        aria-selected="true">
-          Video Link (YouTube, Vimeo, etc...)
-      </router-link>
-      <router-link :class="uploadActiveStyle"
-        id="nav-profile-tab"
-        data-toggle="tab"
-        href="#nav-profile"
-        :to="{name: 'edit-video', query: {index: this.$route.query.index, videotype: 'upload' }}"
-        role="tab"
-        aria-controls="nav-profile"
-        aria-selected="false">
-          Video File
-      </router-link>
-    </div>
-  </nav>
-  <div class="card-body">
-  <div class="tab-content" id="nav-tabContent">
-      <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-        <!-- video embed -->
-        <edit-video-embed></edit-video-embed>
-      </div>
-      <div class="tab-pane fade"
-        id="nav-profile"
-        role="tabpanel"
-        aria-labelledby="nav-profile-tab">
-          <!-- video file -->
-          <edit-video-file></edit-video-file>
-      </div>
-    </div>
-    </div>
-    </div>
-  </div>
-  <div class="col-xl-2 col-sm-1"></div>
-  <div class="container">
-    <br>
-    {{errors}}
-    <br><br>
+<div>
 
-    <br><br><br>
+    <!-- <div class="col-xl-8 col-sm-10 col-xs-12"> -->
+        <div class="card">
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <router-link :class="embedActiveStyle"
+                        id="nav-home-tab"
+                        data-toggle="tab"
+                        href="#nav-home"
+                        :to="{name: 'edit-video', query: {index: this.$route.query.index, videotype: 'embed' }}"
+                        role="tab"
+                        aria-controls="nav-home"
+                        aria-selected="true">
+                            Video Link (YouTube, Vimeo, etc...)
+                    </router-link>
+                    <router-link :class="uploadActiveStyle"
+                        id="nav-profile-tab"
+                        data-toggle="tab"
+                        href="#nav-profile"
+                        :to="{name: 'edit-video', query: {index: this.$route.query.index, videotype: 'upload' }}"
+                        role="tab"
+                        aria-controls="nav-profile"
+                        aria-selected="false">
+                            Video File
+                    </router-link>
+                </div>
+            </nav>
+            <div class="card-body">
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                    <!-- video embed -->
+                        <edit-video-embed></edit-video-embed>
+                    </div>
+                    <div class="tab-pane fade"
+                        id="nav-profile"
+                        role="tabpanel"
+                        aria-labelledby="nav-profile-tab">
+                            <!-- video file -->
+                            <edit-video-file></edit-video-file>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- </div> -->
+    <div class="col-xl-2 col-sm-1"></div>
 
-  </div>
 </div>
 </template>
 
@@ -65,71 +58,77 @@ import { mapGetters } from "vuex";
 var _ = require("lodash");
 
 export default Vue.component("edit-video", {
-  components: { EditVideoFile, EditVideoEmbed },
-  props: [],
-  data() {
-    return {
-      styleObject: {
-        "max-height": 100
-      }
-    };
-  },
-  computed: {
-    embedActiveStyle() {
-      let t = this.$route.query.videotype;
-      if (t === "embed") {
-        return "nav-item nav-link active";
-      }
-      return "nav-item nav-link";
+    components: { EditVideoFile, EditVideoEmbed },
+    props: [],
+    data() {
+        return {
+            styleObject: {
+                "max-height": 100
+            }
+        };
     },
-    uploadActiveStyle() {
-      let t = this.$route.query.videotype;
-      if (t === "upload") {
-        return "nav-item nav-link active";
-      }
-      return "nav-item nav-link";
+    computed: {
+        embedActiveStyle() {
+            let t = this.$route.query.videotype;
+            if (t === "embed") {
+                return "nav-item nav-link active";
+            }
+            return "nav-item nav-link";
+        },
+        uploadActiveStyle() {
+            let t = this.$route.query.videotype;
+            if (t === "upload") {
+                return "nav-item nav-link active";
+            }
+            return "nav-item nav-link";
+        },
+        DescriptionEmbed() {
+            return this.$store.state.video.videos[0].description;
+        },
+        DescriptionFile() {
+            return this.$store.state.video.videos[0].description;
+        },
+        RemovedFile() {
+            var vm = this;
+            this.$on("RemoveItem", function(item) {
+                console.log("Removed: ", item);
+                vm.$dispatch("removeVideo", item);
+            });
+        }
     },
-    DescriptionEmbed() {
-      return this.$store.state.video.videos[0].description;
+    methods: {},
+    mounted() {
+        this.$nextTick(() => {
+            // let h = this.$children[4].$el.clientHeight;
+            // this.styleObject["max-height"] = 500;
+            // console.log("CLIENT HEIGHT: ", h);
+        });
     },
-    DescriptionFile() {
-      return this.$store.state.video.videos[0].description;
-    },
-    RemovedFile() {
-      var vm = this;
-      this.$on("RemoveItem", function(item) {
-        console.log("Removed: ", item);
-        vm.$dispatch("removeVideo", item);
-      });
-    }
-  },
-  methods: {},
-  mounted() {
-    this.$nextTick(() => {
-      // let h = this.$children[4].$el.clientHeight;
-      // this.styleObject['max-height'] = 500;
-      // console.log('CLIENT HEIGHT: ', h);
-    });
-  }
+    created() {
+		this.$store.dispatch("openEditor");
+	},
+	destroyed() {
+		this.$store.dispatch("closeEditor");
+	}
 });
 </script>
 
 
 
 <style lang="scss" scoped>
-.video-component {
-  height: 100px;
+.video-element {
+    height: 100px;
 }
 
 .fade-transition {
-  backface-visibility: hidden;
-  transition: opacity 0.2s ease;
+    backface-visibility: hidden;
+    transition: opacity 0.2s ease;
 }
 
 .fade-enter,
 .fade-leave {
-  backface-visibility: hidden;
-  opacity: 0;
+    backface-visibility: hidden;
+    opacity: 0;
 }
 </style>
 
