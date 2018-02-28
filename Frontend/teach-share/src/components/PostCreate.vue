@@ -59,11 +59,11 @@
             <br>
         </div>
 
-      <div class="mx-auto tag-card col-6 card">
-        <div :key="index" v-for="(tag,index) in tags">
-          {{tag}}
-          <button type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button>
-        </div>
+    <div class="mx-auto tag-card col-6 card">
+        <span :key="index" v-for="(tag,index) in tags">
+            {{tag}}
+            <button type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button>
+        </span>
 
         <form v-on:submit.prevent="nop">
             <input class="postheader form-control" v-model="inProgressTag" v-on:keyup="createTag"
@@ -96,7 +96,7 @@
             <br>
         </div>
     </div>
-    <br><br><br> <!-- this is so problems don't occur with bottmo of page button presses -->
+    <br><br><br> <!-- this is so problems don't occur with bottom of page button presses -->
     <nav class="navbar fixed-bottom navbar-light navbar-left bg-light bottom-navbar">
         <div class="title" v-if="title != ''">{{title}}</div>
         <div class="title title-placeholder" v-else></div>
@@ -410,7 +410,9 @@ export default {
 
 .tag-card {
     background-color: #FFFFFF;
+    display:inline;
     margin-bottom: 30px;
+    padding: 10px;
 }
 
 .post-element, card-row {

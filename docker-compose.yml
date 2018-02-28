@@ -11,15 +11,15 @@ services:
       POSTGRES_PASSWORD: password123
       POSTGRES_USER: postgres
     
-#  web:
-#    build: ./TeachShare_WebApp/.
-#    command: bash -c "./TeachShare_WebApp/wait-for-it.sh -h db -p 5432 -- python3 TeachShare_WebApp/manage.py migrate && python3 TeachShare_WebApp/manage.py runserver 0.0.0.0:8000"
-#    volumes:
-#      - .:/code
-#    ports:
-#      - "8000:8000"
-#    depends_on:
-#      - db
+  web:
+    build: ./TeachShare_WebApp/.
+    command: bash -c "./TeachShare_WebApp/wait-for-it.sh -h db -p 5432 -- python3 TeachShare_WebApp/manage.py migrate && python3 TeachShare_WebApp/manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
   vue:
     build: Frontend/.
     command: npm run dev 
@@ -29,5 +29,5 @@ services:
       - "8080:8080"
     depends_on:
       - db
-#      - web
+      - web
     
