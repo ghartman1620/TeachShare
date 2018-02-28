@@ -38,7 +38,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 DEFAULT_FROM_EMAIL = 'teamteachbears@gmail.com'
 
 
-# Application definition
+# Application definition. 
 
 INSTALLED_APPS = [
     'accounts',
