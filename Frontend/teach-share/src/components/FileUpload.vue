@@ -156,6 +156,7 @@ export default Vue.component("file-upload", {
     },
     mounted() {
         this.$store.dispatch("changeFileLimit", this.fileLimit);
+
         this.resetState();
     },
     destroyed(){

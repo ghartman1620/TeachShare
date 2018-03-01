@@ -230,7 +230,21 @@ export default {
             this.$store.dispatch("createPost", obj);
         },
         editElement: function(index) {
-            this.$router.push({name: this.$store.state.create.postElements[index].type})
+            var type = this.$store.state.create.postElements[index].type;
+            var routeName = "edit-";
+            if(type === "text"){
+                routeName += "text";
+            } else if(type === "audio"){
+                routeName += "audio";
+            } else if(type === "video_file" || type === "video_link"){
+                routeName += "video";
+            } else if(type === "image_file"){
+                routeName += "image";
+            } else{
+                routeName += "file";
+            }
+            console.log(routeName);
+            this.$router.push({name: routeName, query: {index: index}});
         },
 
         moveElementUp: function(index) {

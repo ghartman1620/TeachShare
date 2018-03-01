@@ -68,6 +68,7 @@ const FileService = {
             var files = formData.getAll("files");
             var i = 0;
             _.forEach(files, function(file) {
+                console.log(file);
                 var fileAlreadyUploaded = false;
                 context.state.uploadedFiles.forEach(function(element){
                     if(element.file.name == file.name){
