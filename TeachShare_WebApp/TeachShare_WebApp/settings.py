@@ -55,17 +55,15 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'django_filters',
-    'haystack',
+    'django_elasticsearch_dsl',
 
     'accounts',
     'posts',
 ]
 
-HAYSTACK_CONNECTIONS = {
+ELASTICSEARCH_DSL={
     'default': {
-        'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
-        'INDEX_NAME': 'teach',
+        'hosts': '127.0.0.1:9200'
     },
 }
 
