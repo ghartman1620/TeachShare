@@ -1,42 +1,62 @@
 <template>
-<div class="row">
-  <div class="col-12">
-    <!--We can use any buttons we want in the toolbar!
-    Check out the github for more examples, and the
-    exact code needed for other types of buttons -->
-    <div class="custom-quill-editor">
-      <quill-editor
-        v-model="component.content"
-        :options="editorOption">
-        <div id="toolbar" slot="toolbar">
-          <!-- Add a bold button -->
-          <button class="ql-bold">Bold</button>
-          <button class="ql-italic">Italic</button>
-          <!-- Add font size dropdown -->
-          <select class="ql-size">
-            <!-- Note a missing, thus falsy value, is used to reset to default -->
-            <option selected></option>
-            <option value="large"></option>
-            <option value="huge"></option>
-          </select>
-          <select class="ql-font">
-            <option selected="selected"></option>
-            <option value="serif"></option>
-            <option value="monospace"></option>
-          </select>
-          <!-- You can also add your own
-          <button id="custom-button" @click="customButtonClick">[ Click me ]</button-->
+<body>
+  <div class="card">
+    <div class="row">
+      <div class="col-12">
+        <!--We can use any buttons we want in the toolbar!
+        Check out the github for more examples, and the
+        exact code needed for other types of buttons -->
+        <div class="custom-quill-editor">
+          <quill-editor
+            v-model="component.content"
+            :options="editorOption">
+            <div id="toolbar" slot="toolbar">
+              <!-- Add a bold button -->
+              <button class="ql-bold">Bold</button>
+              <button class="ql-italic">Italic</button>
+              <!-- Add font size dropdown -->
+              <select class="ql-size">
+                <!-- Note a missing, thus falsy value, is used to reset to default -->
+                <option selected></option>
+                <option value="large"></option>
+                <option value="huge"></option>
+              </select>
+              <select class="ql-font">
+                <option selected="selected"></option>
+                <option value="serif"></option>
+                <option value="monospace"></option>
+              </select>
+              <!-- You can also add your own
+              <button id="custom-button" @click="customButtonClick">[ Click me ]</button-->
+            </div>
+          </quill-editor>
+
+
+          <div class="quill-code">
+          </div>
         </div>
-      </quill-editor>
-
-
-      <div class="quill-code">
+        
       </div>
     </div>
-    <button class="btn btn-primary" @click.prevent="submit">Submit</button>
-    <button class="btn btn-danger" @click.prevent="close">Close</button>
+    <div class="row">
+      <div class="offset-3 col-6">
+        <router-link :to="{name: 'create'}">
+        <button @click="submit" class="btn btn-primary btn-block">
+          Submit Text
+        </button>
+        </router-link>
+      </div>
+      <div class="col-2">
+        <router-link :to="{name:'create'}">
+
+        <button type="button" class="btn btn-danger btn-block" @click.prevent="close">
+        Cancel
+        </button>
+        </router-link>
+      </div>
+    </div>
   </div>
-</div>
+</body>
 </template>
 
 <script>
@@ -82,6 +102,7 @@ export default Vue.component("edit-text", {
     }
   },
   mounted() {
+    this.$store.dispatch("openEditor");
     this.$router.replace({
       name: "edit-text",
       query: { index: this.$route.query.index }
@@ -103,6 +124,7 @@ export default Vue.component("edit-text", {
   },
   beforeDestroy() {
     console.log("destroy");
+    this.$store.dispatch("closeEditor");
   }
 });
 </script>

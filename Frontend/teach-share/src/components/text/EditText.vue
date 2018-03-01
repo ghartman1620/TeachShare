@@ -110,6 +110,8 @@ export default Vue.component("edit-text", {
     mounted(){
         this.$router.replace({name: "edit-text", query: {index: this.$route.query.index}})
         console.log("mounted edit text");
+        
+		this.$store.dispatch("openEditor");
         if(this.$route.query.index >= this.$store.state.create.postElements.length){
             this.element = {
                 type: "text",
@@ -118,12 +120,14 @@ export default Vue.component("edit-text", {
         }else{
             this.element = Object.assign({}, this.$store.state.create.postElements[this.$route.query.index]);
         }
+        
     },
     beforeDestroy(){
         console.log("destroy");
+        this.$store.dispatch("closeEditor");
     },
     created() {
-		this.$store.dispatch("openEditor");
+        console.log("creating textedit");
 	},
 	destroyed() {
 		this.$store.dispatch("closeEditor");
