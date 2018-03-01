@@ -102,7 +102,7 @@ import ImageElement from "./image/ImageElement";
 
 export default Vue.component("post-element", {
     props: ["element", "index"],
-    components: {SeeMore,},
+    components: {SeeMore, TextElement, VideoElement, FileElement, ImageElement},
 });
 </script>
 

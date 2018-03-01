@@ -112,7 +112,7 @@ export default Vue.component("embed-video", {
   max-height: 200px;
   overflow: hidden;
   background: linear-gradient(#333, #eee);
-  -webkit-background-clip: text;
+  -webkit-background-clip: text !important;
   background-clip: text;
   color: transparent;
 }
