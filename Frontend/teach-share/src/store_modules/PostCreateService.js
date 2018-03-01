@@ -149,6 +149,7 @@ const PostCreateService = {
             state.commit("CLEAR_REDO");
         },
         openEditor: (context) => {
+            console.log("in openeditor");
             context.commit("OPEN_EDITOR");
         },
         closeEditor: (context) => {

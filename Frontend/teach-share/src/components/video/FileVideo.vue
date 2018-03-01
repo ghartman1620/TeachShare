@@ -18,10 +18,7 @@
                     There was no content provided.
                 </slot>
             </p>
-            <button type="button" @click.prevent="showOrHideAllText" class="btn btn-dark btn-block">
-                <span v-if="!textShown">read more...</span>
-                <span v-else>read less</span>
-            </button>
+
             <!-- <div class="row">
                 <div class="col-auto mr-auto"/>
                 <div class="col-auto">

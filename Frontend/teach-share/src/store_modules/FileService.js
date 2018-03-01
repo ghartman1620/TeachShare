@@ -1,5 +1,6 @@
 import api from "../api";
 import Vue from "vue";
+import axios from "axios";
 
 // Load some necessary libraries
 const uuidv4 = require("uuid/v4");
@@ -9,8 +10,8 @@ var _ = require("lodash");
 const FileService = {
     state: {
         uploadedFiles: [],
-        files: [],
-        limit: 0
+        limit: 0,
+        cancelSource: null,
     },
     mutations: {
         UPDATE_UPLOAD_FILES: (state, data) => {
@@ -37,57 +38,94 @@ const FileService = {
                 return;
             }
         },
+        CANCEL_REQUEST: (state) => {
+            if(state.cancelSource != null){
+                state.cancelSource.cancel("Operation cancelled by the user");
+            }
+        },
         REMOVE_FILE: (state, file) => {
+            
             console.log(file);
+            if(file.cancelSource != null){
+                file.cancelSource.cancel("Operation cancelled by the user");
+            }
             let ind = state.uploadedFiles.indexOf(file);
             state.uploadedFiles.splice(ind, 1);
+            
         },
         CHANGE_FILE_LIMIT: (state, data) => {
             state.limit = data;
         },
         CLEAR_UPLOADED_FILES: (state) => {
             state.uploadedFiles = [];
+        },
+        SET_CANCEL_TOKEN_SOURCE: (state, src) => {
+            state.cancelSource = src;
         }
     },
     actions: {
-        fileUpload: (state, formData) => {
-            var files = formData.getAll('files');
+        fileUpload: (context, formData) => {
+            var files = formData.getAll("files");
+            var i = 0;
             _.forEach(files, function(file) {
-                var identifier = uuidv4();
-                let config = {
-                    onUploadProgress: progressEvent => {
-                        let percentCompleted = Math.floor(
-                            progressEvent.loaded * 100 / progressEvent.total
-                        );
-                        state.commit('CHANGE_UPLOADED_FILES', {
-                            percent: percentCompleted,
-                            file: file,
-                            request_id: identifier
-                        });
+                var fileAlreadyUploaded = false;
+                context.state.uploadedFiles.forEach(function(element){
+                    if(element.file.name == file.name){
+                        fileAlreadyUploaded = true;
+                        return;
                     }
-                };
-                api
-                    .put(`upload/${file.name}?id=${identifier}`, file, config)
-                    .then(response => state.commit('UPDATE_UPLOAD_FILES', response))
-                    .catch(err => console.log(err));
+                });
+                if(!fileAlreadyUploaded && i+context.state.uploadedFiles.length < context.state.limit){
+                    var identifier = uuidv4();
+                    var cancelToken = axios.CancelToken;
+                    var source = cancelToken.source();
+                    let config = {
+                        onUploadProgress: progressEvent => {
+                            let percentCompleted = Math.floor(
+                                progressEvent.loaded * 100 / progressEvent.total
+                            );
+                            context.commit("CHANGE_UPLOADED_FILES", {
+                                percent: percentCompleted,
+                                file: file,
+                                request_id: identifier,
+                                cancelSource: source,
+                            });
+                        },
+                        cancelToken: source.token,
+                    };
+                    api
+                        .put(`upload/${file.name}?id=${identifier}`, file, config)
+                        .then(response => context.commit("UPDATE_UPLOAD_FILES", response))
+                        .catch(function(err) {
+                            if(axios.isCancel(err)){
+                                console.log("Upload cancelled", err.message);
+                                context.commit("REMOVE_FILE", file)
+                            }
+                            else{
+                                console.log(err);
+                            }
+                        });
+                }
+                i++;
             });
         },
         removeFile: (state, file) => {
-            state.commit('REMOVE_FILE', file);
+            state.commit("CANCEL_REQUEST");
+            state.commit("REMOVE_FILE", file);
         },
         changeFileLimit: (state, data) => {
             console.log(data);
-            state.commit('CHANGE_FILE_LIMIT', data);
+            state.commit("CHANGE_FILE_LIMIT", data);
         },
         clearFiles: (state) => {
-            state.commit('CLEAR_UPLOADED_FILES');
+            state.commit("CLEAR_UPLOADED_FILES");
         }
     },
     getters: {
         filesUploadStatus: state => state.uploadedFiles,
         allFilesUploadComplete: (state) => {
             if (state.uploadedFiles.length > 0) {
-                let oneHundredPercent =  _.every(state.uploadedFiles, {'percent': 100});
+                let oneHundredPercent =  _.every(state.uploadedFiles, {"percent": 100});
                 let hasURL = _.reduce(state.uploadedFiles, (res, val, key) => {
                     if (val.url !== undefined) {
                         return true;

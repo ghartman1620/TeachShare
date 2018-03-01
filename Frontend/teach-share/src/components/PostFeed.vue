@@ -8,10 +8,10 @@
     <div :id="index" :style="getPostContainerStyle(index)" class="container card">
         <h3>{{post.title}}</h3>
         <div class="truncatedPostElement">
-        <div v-for="element in post.content">
-            
-            <post-element :element="element"></post-element>
-        </div>
+            <div v-for="element in post.content">
+                
+                <post-element :element="element" :index="index"></post-element>
+            </div>
         </div>
         <div :style="getGradientStyle(index)"></div>
         <p v-if="!isSmall(index)" id="seeMore" @click="expandPost(index)" v-html="seeMoreString(index)"></p>

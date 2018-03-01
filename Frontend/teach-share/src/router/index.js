@@ -8,7 +8,7 @@ import Test from "@/components/Test";
 //
 const Home = () => import(/* webpackChunkName: "home" */ "../components/HomePage.vue");
 const PostCreate = () => import(/* webpackChunkName: "post-create" */ "../components/PostCreate.vue");
-const EditText = () => import(/* webpackChunkName: "edit-text" */ "../components/EditText.vue");
+const EditText = () => import(/* webpackChunkName: "edit-text" */ "../components/text/EditText.vue");
 const EditVideo = () => import(/* webpackChunkName: "edit-video" */ "../components/video/EditVideo.vue");
 const EditAudio = () => import(/* webpackChunkName: "edit-audio" */ "../components/audio/EditAudio.vue");
 const EditImage = () => import(/* webpackChunkName: "edit-image" */ "../components/image/EditImage.vue");

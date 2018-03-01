@@ -82,13 +82,13 @@ export default Vue.component("edit-video", {
             }
             return "nav-item nav-link";
         },
-        DescriptionEmbed() {
+        descriptionEmbed() {
             return this.$store.state.video.videos[0].description;
         },
-        DescriptionFile() {
+        descriptionFile() {
             return this.$store.state.video.videos[0].description;
         },
-        RemovedFile() {
+        removedFile() {
             var vm = this;
             this.$on("RemoveItem", function(item) {
                 console.log("Removed: ", item);
