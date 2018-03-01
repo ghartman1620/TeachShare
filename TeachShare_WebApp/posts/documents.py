@@ -9,11 +9,18 @@ post.settings(
     number_of_replicas=0
 )
 
+def assembleContent(content, element):
+    for k,v in element.items():
+        if type(v) is dict:
+            content = assembleContent(content, v)
+        else:
+            content = content + " " + str(v)
+    return content
 
 @post.doc_type
 class PostDocument(DocType):
     title = fields.TextField()
-    content = fields.NestedField()
+    content = fields.TextField()
     tags = fields.ObjectField()
     updated = fields.DateField()
     likes = fields.IntegerField()
@@ -21,7 +28,10 @@ class PostDocument(DocType):
 
 
     def prepare_content(self, instance):
-        return instance.content
+        content = ""
+        for element in instance.content:
+            content = assembleContent(content, element)
+        return content
 
     class Meta:
         model = Post # The model associated with this DocType
