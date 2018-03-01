@@ -4,7 +4,6 @@
 <template>
 
 <body>
-
 <div :style="getBodyStyle()">
     <div class="col-8 offset-2 card card-outline-danger container icon-card-container">
         <div class="col-8 mx-auto card-deck" id="button-bar">
@@ -112,7 +111,6 @@
 <div :style="getEditorStyle()">
     <router-view/>
 </div>
-
 
 </body>
 </template>
