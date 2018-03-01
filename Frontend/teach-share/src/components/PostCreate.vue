@@ -4,7 +4,6 @@
 <template>
 
 <body>
-
 <div :style="getBodyStyle()">
     <div class="col-8 offset-2 card card-outline-danger container icon-card-container">
         <div class="col-8 mx-auto card-deck" id="button-bar">
@@ -53,54 +52,51 @@
             </div>
         </div>
 
-        <div class="title-tags-container col-7 container">
+    <div id="title-tag-card" class="card mx-auto">
+        <div class="title-container container">
             <input class="postheader form-control" type="text" v-model.lazy="title"
                 placeholder="Title required"></input>
             <br>
         </div>
 
-      <div class="mx-auto tag-card col-6 card">
-        <div :key="index" v-for="(tag,index) in tags">
-          {{tag}}
-          <button type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button>
+        <div class="tag-card card">
+            <form id="tag-submit-box" v-on:submit.prevent="nop">
+                <input class="postheader form-control" v-model="inProgressTag" v-on:keyup="createTag"
+                    placeholder="add a topic tag"></input>
+            </form>
+            <span id="tag-container" :key="index" v-for="(tag,index) in tags">
+                {{tag}}
+                <button id="tag-delete-button" type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button>
+            </span>
         </div>
-
-        <form v-on:submit.prevent="nop">
-            <input class="postheader form-control" v-model="inProgressTag" v-on:keyup="createTag"
-                placeholder="add a topic tag"></input>
-        </form>
     </div>
-
 
         <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
             <div class="post-element-container">
-                <div class="card-row row">
-                    <div class="col-1">
-                        <div id="arrange-btn-group" class="btn-group-vertical">
+                <div class="card-column column">
+                  <div class="col-12 container">
+                    <div class="post-element card">
+                      <post-element :element="element" :index="index"></post-element>
+                    </div>
+                  </div>
 
-                            <input type="image" width=50 height=50 style="z-index: 2" @click="moveElementUp(index)" src="/static/caret-square-up.png"/> 
-                            <input type="image" width=50 height=50 style="z-index: 2" @click="moveElementDown(index)" src="/static/caret-square-down.png"/> 
+                  <div class="justify-content-start">
+                        <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
+
+                            <input type="image" id="up-button" width=30 height=30 style="z-index: 2" @click="moveElementUp(index)" src="/static/caret-square-up.png"/>
+                            <input type="image" id="down-button" width=30 height=30 style="z-index: 2" @click="moveElementDown(index)" src="/static/caret-square-down.png"/>
+                            <input type="image" id="garbage-button" width=30 height=30 @click="removeElement(index)" src="/static/trash-icon.png">
+                            <input type="image" id="edit-button" width=30 height=30 @click="editElement(index)" src="/static/edit-icon.png">
+
                         </div>
-                    </div>
-                    <div class="col-10 container">
-                        <div class="post-element card">
-                            <post-element :element="element"></post-element>
-                        </div>
-                    </div>
-                    <div class="col 11">
-                        <div id="arrange-btn-group" class="btn-group-vertical">
-                            <button @click="removeElement(index)"><font face="courier">x</font></button>
-                            <button @click="editElement(index)"><font face="courier">E</font></button>
-                        </div>
-                            
                     </div>
                 </div>
             </div>
             <br>
         </div>
     </div>
-    <br><br><br> <!-- this is so problems don't occur with bottmo of page button presses -->
-    <nav class="navbar fixed-bottom navbar-light navbar-left bg-light bottom-navbar">
+    <br><br><br> <!-- this is so problems don't occur with bottom of page button presses -->
+    <nav class="navbar fixed-bottom navbar-light navbar-left bottom-navbar bg-light">
         <div class="title" v-if="title != ''">{{title}}</div>
         <div class="title title-placeholder" v-else></div>
     </nav>
@@ -119,7 +115,6 @@
     </div>
   </div>
 </div>
-
 
 </body>
 </template>
@@ -234,11 +229,24 @@ export default {
             this.$store.dispatch("createPost", obj);
         },
         editElement: function(index) {
-            this.$router.push({name: this.$store.state.create.postElements[index].type})
+            var type = this.$store.state.create.postElements[index].type;
+            var routeName = "edit-";
+            if(type === "text"){
+                routeName += "text";
+            } else if(type === "audio"){
+                routeName += "audio";
+            } else if(type === "video_file" || type === "video_link"){
+                routeName += "video";
+            } else if(type === "image_file"){
+                routeName += "image";
+            } else{
+                routeName += "file";
+            }
+            console.log(routeName);
+            this.$router.push({name: routeName, query: {index: index}});
         },
 
         moveElementUp: function(index) {
-            console.log("moveElementUp:" + index);
             if (index != 0) {
                 this.$store.dispatch("swapElements", [index, index - 1]);
                 //dispatch only allows one argument so we'll pass them as an array
@@ -271,9 +279,14 @@ export default {
 
 
 .post-element-container {
-    padding: 50px;
+    padding-top: 30px;
+    padding-right: 20px;
+    padding-left: 20px;
+    padding-bottom: 10px;
+    box-shadow: 5px 8px #bdbdbd;
     background-color: #96E6B3;
 }
+
 .round-button {
     width: 10%;
     height: auto;
@@ -286,6 +299,8 @@ export default {
 }
 
 #button-bar {
+    min-width: 500px;
+    max-height: 100px;
     padding-top: 8px;
     padding-bottom: 8px;
     padding-left: 1px;
@@ -293,10 +308,13 @@ export default {
     background: #bececa;
     border-radius: 50px;
     justify-content: center;
+    box-shadow: 0px 8px #bdbdbd;
 }
+
 #text-icon {
     margin-right: 1rem;
 }
+
 #audio-icon {
     margin-left: 1rem;
     margin-right: 1rem;
@@ -330,6 +348,45 @@ export default {
 }
 #file-icon:hover {
     background: #1a3c68;
+}
+
+#title-tag-card {
+    background-color: #bececa;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    width: 300px;
+    padding: 1rem;
+    box-shadow: 5px 5px #bdbdbd;
+    border: 0;
+}
+
+#tag-submit-box {
+    margin-bottom: 5px;
+}
+
+
+#tag-delete-button {
+    margin-bottom: 5px;
+}
+
+#up-button {
+    margin-top: 10px;
+    margin-left: 1rem;
+}
+
+#down-button {
+    margin-top: 10px;
+}
+
+#garbage-button {
+    margin-top: 10px;
+    margin-right: 1rem;
+    float: right;
+}
+
+#edit-button {
+    margin-top: 10px;
+    float: right;
 }
 
 .round-button img {
@@ -371,9 +428,6 @@ export default {
 }
 
 .card {
-    padding-left: 5px;
-    padding-right: 5px;
-    /*background-color: #99b5aa;*/
     background-color: #e5ffee;
 }
 
@@ -394,19 +448,24 @@ export default {
 }
 
 .tag-card {
-    background-color: #FFFFFF;
-    margin-bottom: 30px;
+    background-color: #bececa;
+    border: 0;
+    width: 100%;
+    display:inline;
+    padding: 10px;
 }
+
 
 .post-element, card-row {
     background-color: #FFFFFF;
 }
 
-.title-tags-container {
-    padding-top: 1rem;
+.title-container {
+    width: 100%;
 }
 
 .bottom-navbar {
     height: 50px;
+    background-color: #bececa;
 }
 </style>

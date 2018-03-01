@@ -5,24 +5,30 @@ Uses TextElement, VideoElement, etc.
 
 <template>
 <body>
-    <div class="everything">
-    <div class="post-element card" v-if="element.type === 'text'">
-        <text-element :element="element"></text-element>
+    <see-more :maxHeight="400">
+        <div class="post-element card" v-if="element.type === 'text'">
+            <text-element :element="element"></text-element>
 
-    </div>
-    <div class="post-element card" v-else-if="element.type === 'image_file'">
-        <image-element :title="element.title" :body="element.description" :images="element.content"/>
-    </div>
-    <div class="post-element card" v-else-if="element.type === 'audio'">
-        <audio-element :id="element.content[0].id"
-        :title="element.content[0].title"
-        :body="element.content[0].description"
-        :controls="true" :source="element.content[0].url"
-        :filetype="element.content[0].filetype"
-        autoplay="false"/>
-    </div>
+        </div>
+        <div class="post-element card" v-else-if="element.type === 'image_file'">
+            <image-element 
+                :title="element.title" 
+                :body="element.description" 
+                :images="element.content"
+                :width="element.width"
+                :height="element.height"
+            />
+        </div>
+        <div class="post-element card" v-else-if="element.type === 'audio'">
+            <audio-element :id="element.content[0].id"
+            :title="element.content[0].title"
+            :body="element.content[0].description"
+            :controls="true" :source="element.content[0].url"
+            :filetype="element.content[0].filetype"
+            autoplay="false"/>
+        </div>
 
-    <div class="post-element card" id="outer-video-container" v-else-if="element.type === 'video_link' || element.type === 'video_file'">
+        <div class="post-element card" id="outer-video-container" v-else-if="element.type === 'video_link' || element.type === 'video_file'">
             <div class="post-element video-post" id="inner-video-container" v-if="element.type === 'video_link'">
                     <video-element
                         name="vid-comp1"
@@ -50,13 +56,12 @@ Uses TextElement, VideoElement, etc.
                         isFile=true>
                     <div slot="description">{{element.content.description}}</div>
                     </video-element>
-             </div>
-    </div>
-    <div class="post-element card" v-else-if="element.type === 'file'">
-        <file-element :element="element"/>
-    </div>
-
-    </div>
+            </div>
+        </div>
+        <div class="post-element card" v-else-if="element.type === 'file'">
+            <file-element :element="element"/>
+        </div>
+    </see-more>
 </body>
 
 </template>
@@ -85,9 +90,11 @@ Uses TextElement, VideoElement, etc.
 
 <script>
 import Vue from "vue";
+import SeeMore from "./SeeMore"
 
 export default Vue.component("post-element", {
-        props: ["element"],
+    props: ["element", "index"],
+    components: {SeeMore,},
 });
 </script>
 

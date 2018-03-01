@@ -68,6 +68,15 @@
 
 <!-- Javascript -->
 <script>
+/*
+Known issues with frontend upload (backend in posts/views.py):
+If a file upload is in progress and you exit the file upload compoennt and re-enter it,
+the file will resume progress uploading (clicking cancel should cancel/remove all file uploads)
+
+If multiple files are in progress uploading and the first is clicked to cancel the final one will be 
+cancelled sometimes
+
+*/
 import Vue from "vue";
 import { mapGetters } from "vuex";
 
@@ -90,7 +99,6 @@ export default Vue.component("file-upload", {
     data() {
         return {
             currentStatus: null,
-            currentFileList: []
         };
     },
     computed: {
@@ -132,6 +140,8 @@ export default Vue.component("file-upload", {
             console.log(fieldName, fileList);
             this.currentFileList.push(fileList);
             const formData = new FormData(); 
+            
+            const formData = new FormData();
             if (!fileList.length) {
                 console.log("fileList is empty");
                 return;
@@ -140,23 +150,22 @@ export default Vue.component("file-upload", {
                 formData.append(fieldName, fileList[x], fileList[x].name);
             });
             this.save(formData);
+            document.getElementById("file-upload").value = null;
+            console.log("in filesChange2");
         },
         removeItem(file) {
             console.log(file);
             var vm = this;
             this.$store.dispatch("removeFile", file).then(function(){
-                let i = vm.currentFileList.findIndex(function(f) {
-                    return f[0].name === file.file.name;
-                });
-                console.log("INDEX: ", i);
-                vm.currentFileList.splice(i, 1);
-                console.log(vm.currentFileList);
                 vm.$parent.$emit("RemoveItem", file);
             });
         }
     },
     mounted() {
         this.$store.dispatch("changeFileLimit", this.fileLimit);
+        if(this.$store.state.create.postElements.length > this.$route.query.index){
+            console.log("im editing!");
+        }
         this.resetState();
     },
     destroyed(){
