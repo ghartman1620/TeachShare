@@ -48,14 +48,19 @@ export default Vue.component("edit-file", {
 			}
 		},
 		generateJSON() {
-			var files = []
+			var files = [];
 			console.log(this.$store.state.fs.uploadedFiles);
-			for (var i = 0; i < this.$store.state.fs.uploadedFiles.length; i++){
+			this.$store.state.fs.uploadedFiles.forEach(function(val){
+				console.log(val.file);
 				files.push({
-					url: this.$store.state.fs.uploadedFiles[i].url,
-					name: this.$store.state.fs.uploadedFiles[i].file.name,
-				})
-			}
+                    post: 2,
+                    type: "image_file",
+                    id: val.db_id,
+                    file: val.file,
+                    name: val.file.name,
+                    url: val.url,
+                });
+			});
 			console.log(files);
 			return {type: "file", files: files}
 		}

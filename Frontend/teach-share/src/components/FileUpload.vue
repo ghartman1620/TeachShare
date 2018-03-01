@@ -156,7 +156,9 @@ export default Vue.component("file-upload", {
     },
     mounted() {
         this.$store.dispatch("changeFileLimit", this.fileLimit);
-
+        if(this.$store.state.create.postElements.length > this.$route.query.index){
+            console.log("im editing!");
+        }
         this.resetState();
     },
     destroyed(){

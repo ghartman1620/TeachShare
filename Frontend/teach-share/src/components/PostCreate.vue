@@ -77,7 +77,7 @@
                 <div class="card-column column">
                   <div class="col-12 container">
                     <div class="post-element card">
-                      <post-element :element="element"></post-element>
+                      <post-element :element="element" :index="index"></post-element>
                     </div>
                   </div>
 
