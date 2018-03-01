@@ -19,12 +19,11 @@ import Vue from "vue";
 
 
 export default Vue.component("see-more", {
-    props: ["index", "maxHeight"],
+    props: ["maxHeight"],
     data: function (){
         return {
             expanded: false,
             elementHeight: 0,
-            contentStyleHidden: {},
             gradient: {},
         }
     },

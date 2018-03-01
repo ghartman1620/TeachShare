@@ -5,7 +5,7 @@ Uses TextElement, VideoElement, etc.
 
 <template>
 <body>
-    <see-more :index="index" :maxHeight="400">
+    <see-more :maxHeight="400">
         <div class="post-element card" v-if="element.type === 'text'">
             <text-element :element="element"></text-element>
 
