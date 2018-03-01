@@ -9,7 +9,7 @@ import ImageService from "./store_modules/ImageService";
 import PostCreateService from "./store_modules/PostCreateService";
 
 Vue.use(Vuex);
-
+ 
 export default new Vuex.Store({
     modules: {
         fs: FileService,

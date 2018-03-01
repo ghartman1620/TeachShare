@@ -3,55 +3,64 @@
         <!--UPLOAD-->
         <div class="row">
             <div class="col-12">
-            <form enctype="multipart/form-data" novalidate multiple v-if="isInitial || isSaving">
-                <h1>{{title}}</h1>
-                <div class="dropbox">
-                    <input
-                        type="file"
-                        multiple
-                        name="files"
-                        :disabled="isSaving || pastLimit"
-                        @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
-                        :accept="accept"
-                        class="input-file">
-                        <p v-if="isInitial">
-                            Drag your file(s) here to begin<br> or click to browse
-                        </p>
-                        <p v-if="isSaving">
-                            Uploading {{ fileCount }} files...
-                        </p>
-                </div>
-            </form>
+                
+                <form enctype="multipart/form-data" novalidate multiple v-if="isInitial || isSaving">
+                    <h1>{{title}}</h1>
+                    <div class="dropbox">
+                        <input
+                            type="file"
+                            multiple
+                            v-validate="'required|mimes:'+accept"
+                            name="files"
+                            :disabled="isSaving || pastLimit"
+                            @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
+                            :accept="accept"
+                            class="input-file">
+                            <p v-if="isInitial">
+                                Drag your file(s) here to begin<br> or click to browse
+                            </p>
+                            <p v-if="isSaving">
+                                Uploading {{ fileCount }} files...
+                            </p>
+                    </div>
+                </form>
             </div>
             <div class="col">
-            <h4 v-if="this.$store.state.fs.uploadedFiles.length > 0">Uploaded files: </h4>
-             <ul class="list-group">
-                <li v-bind:key="obj.file.name" v-for="obj in filesUploadStatus"
-                    class="list-group-item d-flex justify-content-between align-items-center">
-                    <div class="col-5">
-                        <span v-if="obj.url">
-                            <a v-bind:href="'http://127.0.0.1:8000' + obj.url">{{ obj.file.name }}</a></span>
-                        <span v-else>{{ obj.file.name }}</span>
-                        </div>
-                        <div v-on: class="col">
-                        <div class="progress">
-                                <div class="progress-bar bg-success"
-                                    role="progressbar"
-                                    :style="{width: obj.percent + '%'}"
-                                    :aria-valuenow="obj.percent"
-                                    aria-valuemin="0"
-                                    aria-valuemax="100">
-                                        {{ obj.percent }}%
-                                    </div>
+                <br>
+                <div v-show="errors.has('files')" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Holy guacamole!</strong> The file(s) you selected are not the correct type! Please remove them and try again, or upload them to a more suitable component.
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <h4 v-if="this.$store.state.fs.uploadedFiles.length > 0">Uploaded files: </h4>
+                <ul class="list-group">
+                    <li v-bind:key="obj.file.name" v-for="obj in filesUploadStatus"
+                        class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="col-5">
+                            <span v-if="obj.url">
+                                <a v-bind:href="'http://127.0.0.1:8000' + obj.url">{{ obj.file.name }}</a></span>
+                            <span v-else>{{ obj.file.name }}</span>
                             </div>
-                        </div>
-                        <div class="col-1">
-                            <button class="btn btn-sm btn-outline-danger" type="button" @click="removeItem(obj)">
-                                X
-                            </button>
-                        </div>
-                </li>
-            </ul>
+                            <div v-on: class="col">
+                            <div class="progress">
+                                    <div class="progress-bar bg-success"
+                                        role="progressbar"
+                                        :style="{width: obj.percent + '%'}"
+                                        :aria-valuenow="obj.percent"
+                                        aria-valuemin="0"
+                                        aria-valuemax="100">
+                                            {{ obj.percent }}%
+                                        </div>
+                                </div>
+                            </div>
+                            <div class="col-1">
+                                <button class="btn btn-sm btn-outline-danger" type="button" @click="removeItem(obj)">
+                                    X
+                                </button>
+                            </div>
+                    </li>
+                </ul>
             </div> 
         </div>
     </div>
@@ -122,7 +131,7 @@ export default Vue.component("file-upload", {
         filesChange(fieldName, fileList) {
             console.log(fieldName, fileList);
             this.currentFileList.push(fileList);
-            const formData = new FormData();
+            const formData = new FormData(); 
             if (!fileList.length) {
                 console.log("fileList is empty");
                 return;
