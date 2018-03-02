@@ -4,13 +4,14 @@
     <br>
 
 
-<div v-for="(post,index) in posts">
+<div :key="post.id" v-for="(post,index) in posts">
     <div :id="index" :style="getPostContainerStyle(index)" class="container card">
         <h3>{{post.title}}</h3>
         <div class="truncatedPostElement">
-            <div v-for="element in post.content">
-                
+            <div  :key="element.id" v-for="element in post.content">
+
                 <post-element :element="element" :index="index"></post-element>
+
             </div>
         </div>
         <div :style="getGradientStyle(index)"></div>
@@ -27,6 +28,8 @@
 import Vue from "vue";
 import { mapState } from "vuex";
 import PostElement from "./PostElement";
+import SeeMore from "./SeeMore";
+
 const postContainerDefault = {
     maxHeight: "400px",
     height: "fit-content",

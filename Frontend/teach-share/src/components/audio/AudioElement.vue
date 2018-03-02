@@ -7,21 +7,13 @@
                 :id="id"
                 :src="url"
                 :type="filetype"
-        :controls="controls">
+                :controls="controls">
             </audio>
             <br><br>
-            <h4 v-if="!editing" class="card-title">{{ localTitle }}</h4>
-            <input @change.prevent="changedTitle" class="col-12" v-if="editing" v-model="localTitle" type="text">
-            <p v-if="!editing" class="card-text">
+            <h4 class="card-title">{{ localTitle }}</h4>
+            <p class="card-text">
                 {{localBody}}
             </p>
-            <textarea class="col-12" @change.prevent="changedBody" v-if="editing" v-model="localBody" rows="3"></textarea>
-            <div class="row">
-                <div class="col-auto mr-auto"/>
-                <div class="col-auto">
-                    <button type="button" @click.prevent="ToggleEditText" class="btn btn-warning">Edit</button>
-                </div>
-            </div>
         </div>
     </div>
     </div>

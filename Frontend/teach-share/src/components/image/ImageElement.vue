@@ -1,50 +1,22 @@
 <template>
-<div>
-    <div class="card-body">
-        <b-carousel controls img-width="600" img-height="480">
-            <div :key="i.id" v-for="i in this.images">
-                <b-carousel-slide 
-                    :caption="i.title" 
-                    :text="i.description"
-                    :img-src="URL(i.url)"
-                    style="height: 600px"
-                />
-            </div>
-        </b-carousel>
-            <!-- <div v-bind:key="i.id" v-for="i in this.images" class="carousel-item">
-                <img class="d-block w-100" style="width: 100%" :src="URL(i.url)">
-                <div class="carousel-caption d-none d-md-block">
-                    <h3>{{i.title}}</h3>
-                    <p>{{i.description}}</p>
+    <div>
+        <div class="card-body">
+            <b-carousel controls img-width="600" img-height="480">
+                <div :key="i.id" v-for="i in this.images">
+                    <b-carousel-slide 
+                        :caption="i.title" 
+                        :text="i.description"
+                        :img-src="URL(i.url)"
+                        style="height: 600px"
+                    />
                 </div>
-            </div>
-
-            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a> -->
+            </b-carousel>
         </div>
-        <br><br>
-        <h4 v-if="!editing" @dblclick="toggleEditText" class="card-title">{{ localTitle }}</h4>
-        <input @dblclick="ToggleEditText" @change.prevent="changedTitle" class="col-12" v-if="editing" v-model="localTitle" type="text">
-        <p v-if="!editing" @dblclick="toggleEditText" class="card-text">
+        <h4 class="card-title">{{ localTitle }}</h4>
+        <p class="card-text">
             {{localBody}}
         </p>
-        <textarea @dblclick="toggleEditText" class="col-12" @change.prevent="changedBody" v-if="editing" v-model="localBody" rows="3"></textarea>
-        <div class="row">
-            <div class="col-auto mr-auto"/>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-warning">Edit</button>
-                </div>
-            </div>
-        </div>
-        </div>
     </div>
-</div>
 </template>
 
 <script>
@@ -85,6 +57,7 @@ export default Vue.component("image-element", {
             return `http://localhost:8000${val}`;
         },
         toggleEditText() {
+            //@deprecated: no longer in use
             console.log("editing text!");
             this.editing = !this.editing;
         },

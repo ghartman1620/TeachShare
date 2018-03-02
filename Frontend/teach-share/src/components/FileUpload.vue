@@ -9,8 +9,8 @@
                     <div class="dropbox">
                         <input
                             type="file"
+                            ref="fileUpload"
                             multiple
-                            v-validate="'required|mimes:'+accept"
                             name="files"
                             :disabled="isSaving || pastLimit"
                             @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
@@ -27,12 +27,6 @@
             </div>
             <div class="col">
                 <br>
-                <div v-show="errors.has('files')" class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>Holy guacamole!</strong> The file(s) you selected are not the correct type! Please remove them and try again, or upload them to a more suitable component.
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
                 <h4 v-if="this.$store.state.fs.uploadedFiles.length > 0">Uploaded files: </h4>
                 <ul class="list-group">
                     <li v-bind:key="obj.file.name" v-for="obj in filesUploadStatus"
@@ -147,7 +141,7 @@ export default Vue.component("file-upload", {
         formData.append(fieldName, fileList[x], fileList[x].name);
       });
       this.save(formData);
-      document.getElementById("file-upload").value = null;
+      this.$refs.fileUpload.value = null;
       console.log("in filesChange2");
     },
     removeItem(file) {

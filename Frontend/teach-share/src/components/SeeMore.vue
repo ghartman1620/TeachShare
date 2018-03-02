@@ -55,18 +55,18 @@ export default Vue.component("see-more", {
       overflow: "hidden",
       "max-height": this.maxHeight.toString() + "px"
     };
-    // const GRADIENT_BOTTOM = "37px";
-    // this.gradient = {
-    //   position: "absolute",
-    //   overflow: "hidden",
-    //   zIndex: "2",
-    //   right: "0px",
-    //   bottom: GRADIENT_BOTTOM,
-    //   left: "0px",
-    //   height: "300px",
-    //   background:
-    //     "linear-gradient(to bottom,  rgba(255,255,255,0) 70%,rgba(52,58,64, .9) 100%)"
-    // };
+    const GRADIENT_BOTTOM = "37px";
+    this.gradient = {
+      position: "absolute",
+      overflow: "hidden",
+      zIndex: "2",
+      right: "0px",
+      bottom: GRADIENT_BOTTOM,
+      left: "0px",
+      height: "300px",
+      background:
+        "linear-gradient(to bottom,  rgba(255,255,255,0) 70%,rgba(52,58,64, .9) 100%)"
+    };
   }
 });
 </script>
