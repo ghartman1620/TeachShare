@@ -20,20 +20,34 @@ from django.shortcuts import render
 #Contains a keyword
 #Contains all/any of multiple keywords
 
-
 class SearchPostsView(views.APIView):
 
-    queryset = Post.objects.all()
-    s = PostDocument.search()
+    #queryset = Post.objects.all() #this isn't used but it makes rest framework happy
+    #s = PostDocument.search()
+    def get_queryset(self):
+        print("in getqueryset")
+        queryset = PostDocument.search()
+        for hit in queryset:
+            print(hit._d_['title'])
+        term = self.request.query_params.get('term', None)
+        if term is not None:
+            print("term query param found")
+            queryset = queryset.query("multi_match", query=term, fields=['title', 'content', 'tags'])
+        for hit in queryset:
+            print(hit._d_['title'])
+        return queryset
     def get(self, request, format=None):
+        print("in get")
         response = []
-        for hit in self.s:
+        queryset = self.get_queryset()
+        for hit in queryset:
             try:
                 response.append(Post.objects.get(id=hit._d_['id']))
             except Post.DoesNotExist as e:
-                print(e)
-                print(hit._d_['id'])
+                pass
+            
         return Response(PostSerializer(response, many=True).data)
+    
 
 class PostFilter(filters.FilterSet):
     beginIndex = django_filters.NumberFilter(name='beginIndex', label="beginIndex", method='filterNumberPosts')
@@ -41,7 +55,7 @@ class PostFilter(filters.FilterSet):
         model = Post
         fields = ('user', 'title', 'updated', 'likes', 'timestamp')
     def filterNumberPosts(self, queryset, name, value):
-        
+        print("in filternumberposts")
         return queryset[value:value+10]
 
 class PostViewSet(viewsets.ModelViewSet):

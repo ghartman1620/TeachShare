@@ -14,16 +14,15 @@ class PostSearchTestCase(TestCase):
         u = User.objects.create(username='User1')
         u2 = User.objects.create(username='User2')
         with open('posts/testPostContent/columbus', encoding='utf8') as f:
-            p = Post.objects.create(
+            cls.p0 = Post.objects.create(
                 user=u, 
                 title='Christopher Columbus',
                 content=json.loads(f.read()),
                 tags=['history','columbus'],
                 likes=0,
             )
-            print(p.id)
         with open('posts/testPostContent/scratch', encoding='utf8') as f:
-            p = Post.objects.create(
+            cls.p1 = Post.objects.create(
                 user=u, 
                 title='Programming in Scratch',
                 content=json.loads(f.read()),
@@ -31,7 +30,7 @@ class PostSearchTestCase(TestCase):
                 likes=0,
             )
         with open('posts/testPostContent/garageband', encoding='utf8') as f:
-            p = Post.objects.create(
+            cls.p2 = Post.objects.create(
                 user=u2, 
                 title='Garage Band',
                 content=json.loads(f.read()),
@@ -46,12 +45,19 @@ class PostSearchTestCase(TestCase):
         assert(True)
 
     def test_search_with_no_query_params_returns_all_posts(self):
+        print("in search with no query params")
         resp = self.client.get('/api/search/')
         self.assertEqual(resp.status_code, 200)
 
         self.assertEqual(len(resp.data), 3)
 
+    def test_search_with_term_parameter_returns_appropriate_post(self):
+        print("in search with simple term")
+        resp = self.client.get('/api/search/?term=programming')
+        self.assertEqual(resp.status_code, 200)
 
+        self.assertEqual(resp.data[0], PostSerializer(self.p1).data)
+        self.assertEqual(len(resp.data), 1)
 
 class PostCreateTestCase(TestCase):
     def setUp(self):
