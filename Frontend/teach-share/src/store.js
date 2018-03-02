@@ -45,6 +45,9 @@ export default new Vuex.Store({
                 )
                 .catch(err => console.log(err));
         },
+        LOAD_ALL_POSTS: (state, data) => {
+            state.posts = Object.assign([], data);
+        },
         LOAD_POST: (state, data) => {
             state.post = Object.assign({}, data);
         },
@@ -70,6 +73,12 @@ export default new Vuex.Store({
     actions: {
         addMorePosts: state => {
             state.commit("ADD_POSTS");
+        },
+        fetchAllPosts: (state, postID) => {
+            console.log(api.defaults.headers.Authorization);
+            api.get(`posts/`)
+                .then(response => state.commit("LOAD_ALL_POSTS", response.data))
+                .catch(err => console.log(err));
         },
         fetchPost: (state, postID) => {
             console.log("FETCH_POST");

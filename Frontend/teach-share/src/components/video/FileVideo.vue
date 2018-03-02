@@ -1,5 +1,6 @@
 <template>
 <div>
+    <br>
     <div class="card" :style="{width: cardWidth + 'px', padding: '10px'}">
         <video
             class="align-items-center"
@@ -11,6 +12,7 @@
             :controls="controls"
         >
         </video>
+        
         <div class="card-body">
             <h4 class="card-title">{{ title }}</h4>
             <p :class="textClasses">
@@ -18,13 +20,6 @@
                     There was no content provided.
                 </slot>
             </p>
-
-            <!-- <div class="row">
-                <div class="col-auto mr-auto"/>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-warning">Edit</button>
-                </div>
-            </div> -->
         </div>
     </div>
     </div>

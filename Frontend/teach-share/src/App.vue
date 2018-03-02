@@ -1,12 +1,9 @@
 <!--Very very barebones. This will be improved shortly! -JL -->
 
 <template>
-
-<body>
     <div id="app">
         <router-view/>
     </div>
-</body>
 </template>
 
 <script>
@@ -23,12 +20,17 @@ export default {
 @import '../node_modules/bootstrap/scss/bootstrap.scss';
 </style>
 
-<style>
-
-body{
-    font-family: "Roboto", sans-serif;
+<style lang="scss">
+$main-font: "Roboto", sans-serif;
+@mixin antialiased {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #E5FFEE;
+}
+$background-color: #E5FFEE;
+
+body{
+    font-family: $main-font;
+    background-color: $background-color;
+    @include antialiased;
 }
 </style>

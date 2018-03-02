@@ -2,8 +2,7 @@
 
 
 <template>
-
-<body>
+<div>
 <div :style="getBodyStyle()">
     <div class="col-8 offset-2 card card-outline-danger container icon-card-container">
         <div class="col-8 mx-auto card-deck" id="button-bar">
@@ -116,7 +115,7 @@
   </div>
 </div>
 
-</body>
+</div>
 </template>
 
 

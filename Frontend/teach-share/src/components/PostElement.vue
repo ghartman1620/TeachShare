@@ -4,8 +4,7 @@ Uses TextElement, VideoElement, etc.
 -->
 
 <template>
-<body>
-    <see-more :maxHeight="400">
+    <div>
         <div class="post-element card" v-if="element.type === 'text'">
             <text-element :element="element"></text-element>
 
@@ -61,32 +60,8 @@ Uses TextElement, VideoElement, etc.
         <div class="post-element card" v-else-if="element.type === 'file'">
             <file-element :element="element"/>
         </div>
-    </see-more>
-</body>
-
+    </div>
 </template>
-
-<style>
-
-  #inner-video-container {
-    margin-top: 2rem;
-    margin-left: 2rem;
-    margin-right: 2rem;
-  }
-
-  #outer-video-container {
-
-  }
-
-  .post-element {
-    border: 0;
-  }
-  .video-post {
-    border: 0;
-  }
-
-
-</style>
 
 <script>
 import Vue from "vue";
@@ -107,6 +82,24 @@ export default Vue.component("post-element", {
 </script>
 
 <style scoped>
+
+ #inner-video-container {
+    margin-top: 2rem;
+    margin-left: 2rem;
+    margin-right: 2rem;
+  }
+
+  #outer-video-container {
+
+  }
+
+  .post-element {
+    border: 0;
+  }
+  .video-post {
+    border: 0;
+  }
+
 .body {
     background-color: white;
     border: 3px solid blue;

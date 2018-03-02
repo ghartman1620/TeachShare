@@ -15,7 +15,6 @@
     </embed-video>
 </div>
 <div v-else-if="isFile">
-    <p>Video File</p>
     <file-video
         :id="id"
         :width="width"

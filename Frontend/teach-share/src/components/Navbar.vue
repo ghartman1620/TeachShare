@@ -23,7 +23,7 @@
                             Profile
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Your post feed</a>
+                            <router-link class="dropdown-item" :to="{name: 'dashboard'}">Your post feed</router-link>
                             <a class="dropdown-item" href="#">Your posts</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#">Account details</a>
@@ -106,8 +106,4 @@ $nav-hover-color: rgba(255, 255, 255, .5);
   background-color:$nav-background-color-hover;
 }
 
-// .search-button {
-//   height: 20px;
-//   width: auto;
-// }
 </style>

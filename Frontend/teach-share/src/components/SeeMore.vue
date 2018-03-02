@@ -3,10 +3,9 @@
     <div ref="content" :style="getContentStyle()" :class="contentClass">
         <slot>
             
-
         </slot>
     </div>
-    <!-- <div v-if="!expanded" :style="getGradientStyle()"></div> -->
+    <div v-if="!expanded" :style="getGradientStyle()"></div>
     <div v-if="maxHeight < elementHeight">
         <button v-if="!expanded" @click="expanded = true; contentClass.pop();" ref="button" class="btn btn-dark btn-block">See More</button>
         <button v-if="expanded" @click="expanded = false; contentClass.push('gradient');" ref="button" class="btn btn-dark btn-block">See Less</button>
@@ -49,6 +48,7 @@ export default Vue.component("see-more", {
   },
   mounted() {
     var ele = this.$refs.content;
+    console.log(ele);
     this.elementHeight = ele.offsetHeight;
     console.log(this.elementHeight);
     this.contentStyleHidden = {
@@ -75,7 +75,7 @@ export default Vue.component("see-more", {
 </script>
 <style>
 .gradient {
-  pointer-events: none;
+  /* pointer-events: none; */
   /* that disables clicking through carousels/DL files on hidden things */
 }
 
@@ -90,7 +90,7 @@ export default Vue.component("see-more", {
                     rgba(255,255,255, 0), 
                     rgba(255,255,255, 1) 90%);
   width    : 100%;
-  height   : 8em;
+  height   : 4em;
 }
 </style>
 

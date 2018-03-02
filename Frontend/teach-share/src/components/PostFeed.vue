@@ -1,33 +1,27 @@
 <template>
-<body>
+<div>
 <router-view/>
-    <br>
-
-
-<div :key="post.id" v-for="(post,index) in posts">
-    <div :id="index" :style="getPostContainerStyle(index)" class="container card">
-        <h3>{{post.title}}</h3>
-        <div class="truncatedPostElement">
-            <div  :key="element.id" v-for="element in post.content">
-
-                <post-element :element="element" :index="index"></post-element>
-
-            </div>
-        </div>
-        <div :style="getGradientStyle(index)"></div>
-        <p v-if="!isSmall(index)" id="seeMore" @click="expandPost(index)" v-html="seeMoreString(index)"></p>
-    </div>
-       
+<div :key="post.title" v-for="(post, index) in posts">
+    <post
+        :maxHeight="600"
+        :post="post"
+        :index="index">
+    </post>
+    <br><br><br>   
 </div>
+
+<!-- Scroll to bottom functionality -->
+
 <br><br><!-- this br is required so scroll() can function properly-->
 <button @click="getPosts"></button>
-</body>
+</div>
 </template>
 
 <script>
 import Vue from "vue";
 import { mapState } from "vuex";
 import PostElement from "./PostElement";
+import Post from "./Post";
 import SeeMore from "./SeeMore";
 
 const postContainerDefault = {
@@ -53,19 +47,22 @@ const gradientExpanded = {
 
 export default{
     name: "PostFeed",
+    components: {Post},
     data: function() {
         return {
-            posts: [],
+            // posts: [],
             expandedPosts: [],
             smallPosts: [],
         }
     },
     computed: { 
+        posts: function() {
+            return this.$store.getters.getPosts();
+        }
 
     },
     methods: {
         isSmall(index){
-
             return this.smallPosts.includes(index);
         },
         getPostContainerStyle(index){     
@@ -86,7 +83,7 @@ export default{
         },
 
         getPosts: function() {
-            this.$store.dispatch("addMorePosts");
+            this.$store.dispatch("fetchAllPosts");
         },
 
         expandPost(index){
@@ -119,7 +116,6 @@ export default{
             }        
         },
         checkHeights(){
-            
             for(var i = 0; i < this.posts.length; i++){
                 var ele = document.getElementById(i.toString());
                 if(ele.offsetHeight <= 390){
@@ -133,28 +129,29 @@ export default{
         this.getPosts();
         //this isn't accessible in an anonymous function,
         //so we'll make it a variable so we can call scroll() 
-        var t = this;
-        window.addEventListener("scroll", function() {t.scroll()}, false);
+        // var t = this;
+        // window.addEventListener("scroll", function() {t.scroll()}, false);
     },
     mounted() {
-        this.$store.watch(this.$store.getters.getPosts, posts => {
-            console.log("posts changed");
-            this.posts = posts;
+        // this.$store.dispatch("fetchAllPosts");
+        // this.$store.watch(this.$store.getters.getPosts, posts => {
+        //     console.log("posts changed");
+        //     this.posts = posts;
            
 
 
-            //So with this watch function waiting until posts is updated,
-            //you'd think that it could also render the page so that we can
-            //determine the height of all of the post containers and 
-            //remove the gradient appropriately.
+        //     //So with this watch function waiting until posts is updated,
+        //     //you'd think that it could also render the page so that we can
+        //     //determine the height of all of the post containers and 
+        //     //remove the gradient appropriately.
 
-            //You'd THINK that.
+        //     //You'd THINK that.
 
-            //But you'd think wrong. So I had to write this nonsense.
-            var t = this;
-            //this.checkHeights();
-            setTimeout(function(){t.checkHeights()}, 0);
-        });
+        //     //But you'd think wrong. So I had to write this nonsense.
+        //     var t = this;
+        //     //this.checkHeights();
+        //     setTimeout(function(){t.checkHeights()}, 0);
+        // });
     },
     destroyed() {
         window.removeEventListener("scroll", function() {t.scroll()}, false);
