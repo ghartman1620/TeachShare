@@ -140,8 +140,6 @@ export default Vue.component("file-upload", {
             console.log(fieldName, fileList);
             this.currentFileList.push(fileList);
             const formData = new FormData(); 
-            
-            const formData = new FormData();
             if (!fileList.length) {
                 console.log("fileList is empty");
                 return;
