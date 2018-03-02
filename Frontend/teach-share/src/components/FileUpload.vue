@@ -114,8 +114,39 @@ export default Vue.component("file-upload", {
     isSuccess() {
       return this.currentStatus === UPLOAD_SUCCESS;
     },
-    isError() {
-      return this.currentStatus === UPLOAD_ERROR;
+    methods: {
+        save(formData) {
+            this.$store.dispatch("fileUpload", formData);
+        },
+        resetState() {
+            this.currentStatus = UPLOAD_INITIAL;
+            this.uploadError = null;
+        },
+        filesChange(fieldName, fileList) {
+            console.log(fieldName, fileList);
+            this.currentFileList.push(fileList);
+            const formData = new FormData(); 
+            if (!fileList.length) {
+                console.log("fileList is empty");
+                return;
+            }
+            Array.from(Array(fileList.length).keys()).map(x => {
+                formData.append(fieldName, fileList[x], fileList[x].name);
+            });
+            this.save(formData);
+            document.getElementById("file-upload").value = null;
+            console.log("in filesChange2");
+        },
+        removeItem(file) {
+            console.log(file);
+            var vm = this;
+            this.$store.dispatch("removeFile", file).then(function(){
+                vm.$parent.$emit("RemoveItem", file);
+            });
+        },
+        isError() {
+        return this.currentStatus === UPLOAD_ERROR;
+        },
     },
     currentUploadedFiles() {
       return this.$store.state.fs.uploadedFiles;

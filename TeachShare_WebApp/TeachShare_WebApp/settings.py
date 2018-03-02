@@ -63,7 +63,9 @@ INSTALLED_APPS = [
 
 ELASTICSEARCH_DSL={
     'default': {
-        'hosts': '127.0.0.1:9200'
+        'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
+        'URL': 'http://search:9200/',
+        'INDEX_NAME': 'teach',
     },
 }
 
@@ -154,7 +156,7 @@ DATABASES = {
         'NAME': 'teachshare',
         'USER': 'postgres',
         'PASSWORD': 'password123',
-        'HOST': '127.0.0.1',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
