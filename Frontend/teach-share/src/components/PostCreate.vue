@@ -124,13 +124,7 @@
 import Vue from "vue";
 import { mapState } from "vuex";
 
-import TextElement from "./text/TextElement";
-import AudioElement from "./audio/AudioElement";
-import ImageElement from "./image/ImageElement";
-import VideoElement from "./video/VideoElement";
-import FileElement from "./file/FileElement";
-
-
+import PostElement from "./PostElement";
 
 function isBlank(str) {
     return (!str || /^\s*$/.test(str));
@@ -162,7 +156,7 @@ const bodyVisible = {
 
 export default {
     name: "post-create",
-    components: { TextElement, FileElement, AudioElement, ImageElement, VideoElement },
+    components: { PostElement },
     data: function() {
         return {
             title: "",

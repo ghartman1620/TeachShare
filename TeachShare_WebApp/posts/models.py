@@ -7,10 +7,6 @@ import random
 import string
 from uuid import uuid4
 import os
-import simplejson
-from rest_framework import serializers
-# Create your models here.
-
 
 class Post(models.Model):
     user = models.ForeignKey(
@@ -22,9 +18,6 @@ class Post(models.Model):
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
     tags = JSONField()
 
-    def serialize_content(self):
-        print(self.content)
-        return self.content['main_content'].items()
 
 class Comment(models.Model):
     post = models.ForeignKey(

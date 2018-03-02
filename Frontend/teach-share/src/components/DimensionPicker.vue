@@ -19,9 +19,10 @@
                 :class="{'input': true, 'outline-danger': errors.has('height'), 'form-control': true }"
                 name="height"
                 aria-describedby="basic-height">
-            <div class="input-group-prepend"><span class="badge badge-dark"><h6>{{ height }}</h6></span></div>
-            </div>
             
+            </div>
+            <input class="fullwidth" type="range" min="100" max="1024" v-model="height">
+
             <span v-show="errors.has('height')" class="help text-danger">{{ errors.first('height') }}</span>
         </div>
         
@@ -40,6 +41,7 @@
                 aria-describedby="basic-width">
             </div>
              <span v-show="errors.has('width')" class="help text-danger">{{ errors.first('width') }}</span>
+             <input class="fullwidth" type="range" min="100" max="1024" v-model="width">
         </div>
        
     </div>
@@ -47,7 +49,7 @@
 
 <script>
 import Vue from "vue";
-import { mapFields } from 'vee-validate'
+import { mapFields } from "vee-validate";
 
 export default Vue.component("dimension-picker", {
   components: {},
@@ -62,29 +64,37 @@ export default Vue.component("dimension-picker", {
     //   ...mapFields(["width", "height"]),
   },
   methods: {
-      changeWidth() {
-        console.log(this.width);
-        var vm = this;
-        Vue.nextTick(function(){
-            console.log(vm.errors.collect("width"));
-            vm.$parent.$emit("changeWidth", {value: Number(vm.width), errors: vm.errors});
+    changeWidth() {
+      console.log(this.width);
+      var vm = this;
+      Vue.nextTick(function() {
+        console.log(vm.errors.collect("width"));
+        vm.$parent.$emit("changeWidth", {
+          value: Number(vm.width),
+          errors: vm.errors
         });
-      },
-      changeHeight() {
-        console.log(this.height);
-        var vm = this;
-        Vue.nextTick().then(function(){
-            vm.$parent.$emit("changeHeight", {value: Number(vm.height), errors: vm.errors});
+      });
+    },
+    changeHeight() {
+      console.log(this.height);
+      var vm = this;
+      Vue.nextTick().then(function() {
+        vm.$parent.$emit("changeHeight", {
+          value: Number(vm.height),
+          errors: vm.errors
         });
-      }
+      });
+    }
   }
 });
 </script>
 
 <style lang="scss" scoped>
 .outline-danger {
-    border-color: red;
-    border-width: 0.1em;
+  border-color: red;
+  border-width: 0.1em;
 }
-
+.fullwidth {
+  width: 100%;
+}
 </style>

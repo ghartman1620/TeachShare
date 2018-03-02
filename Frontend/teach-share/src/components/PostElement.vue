@@ -92,9 +92,17 @@ Uses TextElement, VideoElement, etc.
 import Vue from "vue";
 import SeeMore from "./SeeMore"
 
+import TextElement from "./text/TextElement";
+
+import AudioElement from "./audio/AudioElement";
+import VideoElement from "./video/VideoElement";
+import FileElement from "./file/FileElement";
+import ImageElement from "./image/ImageElement";
+
+
 export default Vue.component("post-element", {
     props: ["element", "index"],
-    components: {SeeMore,},
+    components: {SeeMore, TextElement, VideoElement, FileElement, ImageElement},
 });
 </script>
 
