@@ -26,7 +26,7 @@ SECRET_KEY = '(6dlx)23)(a%%g=8qs0b37$b+mqro=3d!i0f$mo@n4s+r*z)tt'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['testserver', '127.0.0.1']
 
 
 EMAIL_USE_TLS = True
@@ -64,7 +64,7 @@ INSTALLED_APPS = [
 ELASTICSEARCH_DSL={
     'default': {
         'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
-        'URL': 'http://search:9200/',
+        'URL': 'http://127.0.0.1:9200/',
         'INDEX_NAME': 'teach',
     },
 }
@@ -156,7 +156,7 @@ DATABASES = {
         'NAME': 'teachshare',
         'USER': 'postgres',
         'PASSWORD': 'password123',
-        'HOST': 'db',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
     }
 }

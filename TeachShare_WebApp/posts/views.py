@@ -9,11 +9,31 @@ from rest_framework.response import Response
 
 from .models import Post, Comment, Attachment
 from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer
+from .documents import PostDocument
 
 # test
 from django.http import HttpResponse
 from django.shortcuts import render
 
+
+#Post search parameters
+#Contains a keyword
+#Contains all/any of multiple keywords
+
+
+class SearchPostsView(views.APIView):
+
+    queryset = Post.objects.all()
+    s = PostDocument.search()
+    def get(self, request, format=None):
+        response = []
+        for hit in self.s:
+            try:
+                response.append(Post.objects.get(id=hit._d_['id']))
+            except Post.DoesNotExist as e:
+                print(e)
+                print(hit._d_['id'])
+        return Response(PostSerializer(response, many=True).data)
 
 class PostFilter(filters.FilterSet):
     beginIndex = django_filters.NumberFilter(name='beginIndex', label="beginIndex", method='filterNumberPosts')

@@ -25,12 +25,17 @@ class PostDocument(DocType):
     updated = fields.DateField()
     likes = fields.IntegerField()
     timestamp = fields.DateField()
+    id = fields.IntegerField()
 
 
     def prepare_content(self, instance):
         content = ""
-        for element in instance.content:
-            content = assembleContent(content, element)
+        if not type(instance.content) is dict:
+            for element in instance.content:
+                content = content + assembleContent(content, element)
+        else:
+            for k,v in instance.content.items():
+                content = content + " " + v
         return content
 
     class Meta:
