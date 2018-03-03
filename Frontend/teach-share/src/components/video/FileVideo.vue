@@ -3,6 +3,7 @@
     <br>
     <div class="card" :style="{width: cardWidth + 'px', padding: '10px'}">
         <video
+            ref="videoTag"
             class="align-items-center"
             :id="id"
             :src="url"
@@ -58,36 +59,22 @@ export default Vue.component("file-video", {
         }
     },
     mounted: function() {
-        this.video = document.getElementById(this.id);
+        this.video = this.$refs.videoTag;
     },
     methods: {
         // basic play functionality (not needed)
-        Play() {
+        play() {
             console.log("play");
             this.video.play();
         },
-        Pause() {
+        pause() {
             console.log("pause");
             this.video.pause();
-        },
-        showOrHideAllText() {
-            if (!this.textShown) {
-                this.textClasses.pop();
-            } else {
-                this.textClasses.push("sizing-and-gradient")
-            }
-            this.textShown = !this.textShown;
         }
     }
 });
 </script>
 
 <style lang="scss" scoped>
-.sizing-and-gradient {
-    max-height: 200px;
-    overflow:hidden;
-    background: linear-gradient(#333, #eee);
-    -webkit-background-clip: text;
-    color: transparent;
-}
+
 </style>

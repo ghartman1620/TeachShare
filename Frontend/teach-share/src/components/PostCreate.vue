@@ -8,7 +8,7 @@
         <div class="col-8 mx-auto card-deck" id="button-bar">
 
             <h2></h2>
-            <div class="col-0 round-button" id="text-icon">
+            <div class="round-button" id="text-icon">
                 <router-link :to="{ name: 'edit-text', query: {index: this.maxElementIndex()}}">
                     <img src="/static/text-button.png"
                                 onmouseover="this.src='/static/text-button-hover.png'"
@@ -50,26 +50,46 @@
                 </router-link>
             </div>
         </div>
-
-    <div id="title-tag-card" class="card mx-auto">
-        <div class="title-container container">
-            <input class="postheader form-control" type="text" v-model.lazy="title"
-                placeholder="Title required"></input>
-            <br>
-        </div>
-
-        <div class="tag-card card">
-            <form id="tag-submit-box" v-on:submit.prevent="nop">
-                <input class="postheader form-control" v-model="inProgressTag" v-on:keyup="createTag"
-                    placeholder="add a topic tag"></input>
-            </form>
-            <span id="tag-container" :key="index" v-for="(tag,index) in tags">
-                {{tag}}
-                <button id="tag-delete-button" type="button" class="btn btn-sm btn-light" @click="removeTag(index)">{{"X"}}</button>
-            </span>
-        </div>
     </div>
 
+    <div class="row">
+        <div class="col-2"></div>
+        <div class="col-8">
+            <form>
+                <div class="form-group">
+                    <div id="title-tag-card" class="card mx-auto">
+                        <br>
+                        <div class="title-container container">
+                            <br>
+                            <label for="titleTextbox"><h4><strong>Title: </strong></h4></label>
+                            <input class="form-control" type="text" v-model.lazy="title"
+                                placeholder="Title required" id="titleTextbox">
+                            <br>
+                        </div>
+
+                        <div class="tag-card card">
+                            <label for="tagTextbox">Tags: </label>
+                            <div class="row">
+                                <div class="col-8">
+                                    <input class="form-control" v-model="inProgressTag" v-on:keyup="createTag"
+                                        placeholder="add a topic tag" id="tagTextbox">
+                                </div>
+                                <div class="col-4">
+                                    <button @click="createTagBtn" class="btn btn-block btn-primary"><strong>Create Tag</strong></button>
+                                </div>
+                            </div>
+                            <hr>
+                            <span id="tag-container" :key="index" v-for="(tag,index) in tags">
+                                <span @click="removeTag(index)" class="tag-entry badge badge-dark">{{tag}} <span aria-hidden="true">&times;</span>
+                                    <!-- <button id="tag-delete-button" type="button" class="btn btn-sm btn-dark" >{{"x"}}</button> -->
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
         <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
             <div class="post-element-container">
                 <div class="card-column column">
@@ -106,7 +126,8 @@
         <button type="button" class="redo-button align-right btn btn-sm btn-outline-dark btn-primary-spacing" @click="redo">redo </button>
         <button type="button" class="submit-button btn btn-light btn-outline-info" v-on:click="submitPost">Publish post</button>
     </nav>
-</div>
+
+
 <div :style="getEditorStyle()">
   <div class="row">
     <div class="col-12">
@@ -199,10 +220,12 @@ export default {
         },
         createTag: function(e) {
             if (e.keyCode === 13 && this.inProgressTag !== "") {
-                console.log("enter pressed");
-                this.tags.push(this.inProgressTag);
-                this.inProgressTag = "";
+                this.createTagBtn();
             }
+        },
+        createTagBtn: function() {
+            this.tags.push(this.inProgressTag);
+            this.inProgressTag = "";
         },
         getUser: function() {
             this.$store.dispatch("fetchUser", 1);
@@ -268,63 +291,81 @@ export default {
 </script>
 
 
-<style scoped>
+<style lang="scss" scoped>
 
+// @import "../../node_modules/bootstrap/scss/_variables.scss";
+@import "../../node_modules/bootstrap/scss/_functions.scss";
+@import "../../node_modules/bootstrap/scss/_variables.scss";
+@import "../../node_modules/bootstrap/scss/_mixins.scss";
+
+$theme-colors: (
+    "primary": red
+);
 
 .post-element-container {
     padding-top: 30px;
     padding-right: 20px;
     padding-left: 20px;
     padding-bottom: 10px;
-    box-shadow: 5px 8px #bdbdbd;
-    background-color: #96E6B3;
+    // box-shadow: 5px 8px #bdbdbd;
+    background-color: rgb(255, 255, 255);
+}
+
+.tag-entry {
+    font-size: 12pt;
+    margin: 8px;
+    // padding-left: 20px;
+    // padding-right: 20px;
+}
+
+.tag-entry:hover {
+    background-color: blue;
 }
 
 .round-button {
-    width: 10%;
-    height: auto;
+    max-width: 100px;
+    max-height: 100px;
     /* padding-bottom: 11%; */
-    border-radius: 50%;
-    border: 0 solid #f5f5f5;
-    overflow: hidden;
-    background: #bececa;
-    box-shadow: 1 1 4px gray;
+    // border-radius: 50%;
+    // border: 0 solid #f5f5f5;
+    // overflow: hidden;
+    // background: #bececa;
+    /* box-shadow: 1 1 4px gray; */
 }
 
 #button-bar {
-    min-width: 500px;
-    max-height: 100px;
-    padding-top: 8px;
+    min-width: 600px;
+    /* max-height: 240px; */
+    /* padding-top: 8px;
     padding-bottom: 8px;
     padding-left: 1px;
-    padding-right: 1px;
-    background: #bececa;
-    border-radius: 50px;
+    padding-right: 1px; */
+    background: white;
     justify-content: center;
-    box-shadow: 0px 8px #bdbdbd;
+    /* box-shadow: 0px 8px #bdbdbd; */
 }
 
 #text-icon {
-    margin-right: 1rem;
+    margin-right: .2rem;
 }
 
 #audio-icon {
-    margin-left: 1rem;
-    margin-right: 1rem;
+    margin-left: .2rem;
+    margin-right: .2rem;
 
 }
 #video-icon {
-    margin-left: 1rem;
-    margin-right: 1rem;
+    margin-left: .2rem;
+    margin-right: .2rem;
 
 }
 #image-icon {
-    margin-left: 1rem;
-    margin-right: 1rem;
+    margin-left: .2rem;
+    margin-right: .2rem;
 
 }
 #file-icon {
-    margin-left: 1rem;
+    margin-left: .2rem;
 
 }
 #text-icon:hover {
@@ -346,15 +387,16 @@ export default {
 #title-tag-card {
     background-color: #bececa;
     margin-top: 2rem;
-    margin-bottom: 2rem;
-    width: 300px;
-    padding: 1rem;
-    box-shadow: 5px 5px #bdbdbd;
-    border: 0;
+    // margin-bottom: 2rem;
+    // width: 100%;
+    // max-width: 100%;
+    /* padding: 1rem; */
+    /* box-shadow: 5px 5px #bdbdbd; */
+    // border: 0;
 }
 
 #tag-submit-box {
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 
 
@@ -384,8 +426,7 @@ export default {
 
 .round-button img {
     display: block;
-    width: 100%;
-    padding: 0%;
+    width: 90px;
     height: auto;
 }
 
@@ -416,12 +457,12 @@ export default {
 }
 
 .icon-card-container {
-    background-color: #e5ffee;
+    background-color: white;
     border: 0;
 }
 
 .card {
-    background-color: #e5ffee;
+    background-color: white;
 }
 
 .title {
@@ -443,7 +484,7 @@ export default {
 .tag-card {
     background-color: #bececa;
     border: 0;
-    width: 100%;
+    // width: 100%;
     display:inline;
     padding: 10px;
 }
@@ -459,6 +500,6 @@ export default {
 
 .bottom-navbar {
     height: 50px;
-    background-color: #bececa;
+    background-color: gray;
 }
 </style>

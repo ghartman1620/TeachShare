@@ -1,16 +1,16 @@
 <template>
-<body>
-    <div ref="content" :style="getContentStyle()" :class="contentClass">
-        <slot>
-            
-        </slot>
+<div ref="content" :class="contentClasses">
+    <div :style="hideOrFullStyle">
+        <div>
+            <div>
+                <slot></slot>
+            </div>
+        </div>
     </div>
-    <div v-if="!expanded" :style="getGradientStyle()"></div>
-    <div v-if="maxHeight < elementHeight">
-        <button v-if="!expanded" @click="expanded = true; contentClass.pop();" ref="button" class="btn btn-dark btn-block">See More</button>
-        <button v-if="expanded" @click="expanded = false; contentClass.push('gradient');" ref="button" class="btn btn-dark btn-block">See Less</button>
+    <div>
+        <button v-if="needShowMore" @click="showOrHideContent" class="btn btn-dark btn-block">{{ expandedOrNotText }}</button>
     </div>
-</body>
+</div>
 </template>
 
 <script>
@@ -22,76 +22,75 @@ export default Vue.component("see-more", {
     return {
       expanded: false,
       elementHeight: 0,
-      contentClass: [],
+      contentClasses: [],
+      needShowMore: true,
     };
   },
+  computed: {
+    expandedOrNotText() {
+        return this.expanded ? "See Less" : "See More"
+    },
+    hideOrFullStyle() {
+        return this.expanded ? {
+            "max-height": "none",
+            "overflow": "hidden"
+        } : {
+            "max-height": this.maxHeight+"px",
+            "overflow": "hidden"
+        }
+    },
+  },
   methods: {
-    getContentId() {
-      console.log("in content id");
-      console.log(this.index);
-      return "content" + this.index;
-    },
-    getGradientStyle() {
-      if (this.elementHeight > this.maxHeight) {
-        return this.gradient;
+    showOrHideContent() {
+      if (!this.expanded) {
+        this.contentClasses.pop();
       } else {
-        return {};
+        this.contentClasses.push("gradient");
       }
-    },
-    getContentStyle() {
-      if (this.expanded || this.elementHeight <= this.maxHeight) {
-        return {};
-      } else {
-        return this.contentStyleHidden;
-      }
+      this.expanded = !this.expanded;
     }
   },
   mounted() {
-    var ele = this.$refs.content;
-    console.log(ele);
-    this.elementHeight = ele.offsetHeight;
-    console.log(this.elementHeight);
-    this.contentStyleHidden = {
-      overflow: "hidden",
-      "max-height": this.maxHeight.toString() + "px"
-    };
-    if(this.elementHeight > this.maxHeight){
-      this.contentClass.push('gradient');
-    }
-    // const GRADIENT_BOTTOM = "37px";
-    // this.gradient = {
-    //   position: "absolute",
-    //   overflow: "hidden",
-    //   zIndex: "2",
-    //   right: "0px",
-    //   bottom: GRADIENT_BOTTOM,
-    //   left: "0px",
-    //   height: "300px",
-    //   background:
-    //     "linear-gradient(to bottom,  rgba(255,255,255,0) 70%,rgba(52,58,64, .9) 100%)"
-    // };
+    //   this.contentClasses.push("gradient")
+      var vm = this;
+      Vue.nextTick().then(function() {
+          var ele = vm.$refs.content;
+          vm.elementHeight = ele.offsetHeight;
+          console.log("nextTick: ", vm.elementHeight)
+          if(vm.elementHeight > vm.maxHeight){
+              vm.contentClasses.push('gradient');
+              vm.needShowMore = true;
+              vm.expanded = false;
+          } else {
+              vm.needShowMore = false;
+          }
+      })
+      
   }
 });
 </script>
-<style>
+<style scoped>
+
 .gradient {
-  /* pointer-events: none; */
+  position: relative;
   /* that disables clicking through carousels/DL files on hidden things */
 }
-
 .gradient:after {
   content  : "";
   position : absolute;
   z-index  : 1;
-  bottom   : 37px;
-  left     : 0;
+  bottom   : 38px;
+  left     : 2%;
   pointer-events   : none;
   background-image : linear-gradient(to bottom, 
                     rgba(255,255,255, 0), 
-                    rgba(255,255,255, 1) 90%);
-  width    : 100%;
-  height   : 4em;
+                    rgba(255,255,255, 1) 80%);
+  width    : 96%;
+  height   : 6em;
 }
+
+
+
 </style>
 
 

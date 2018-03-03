@@ -49,7 +49,17 @@ export default new Vuex.Store({
             state.posts = Object.assign([], data);
         },
         LOAD_POST: (state, data) => {
-            state.post = Object.assign({}, data);
+            let index = state.posts.findIndex(function(val, ind, obj) {
+                console.log(ind, val, obj);
+                if (val === data) {
+                    return true;
+                }
+            })
+            if (index === -1) {
+                state.posts.push(data);
+            } else {
+                state.posts[index] = data;
+            }
         },
         LOAD_USER: (state, data) => {
             state.user = Object.assign({}, data);
@@ -140,9 +150,13 @@ export default new Vuex.Store({
                 .post("get_token/", body, head)
                 .then(response => state.commit("SET_TOKEN", response.data.token))
                 .catch(err => console.log(err));
-        }
+        },
+        
     },
     getters: {
-        getPosts: state => () => state.posts
+        getPosts: state => () => state.posts,
+        getPostById: state => (id) => {
+            return state.posts.filter(post => post.pk === Number(id))[0];
+        }
     }
 });

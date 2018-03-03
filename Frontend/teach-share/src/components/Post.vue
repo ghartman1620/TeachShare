@@ -1,5 +1,5 @@
 <template>
-    <see-more :maxHeight="maxHeight">
+    <see-more :maxHeight="actualMaxHeight">
         <div :id="index" class="container-fluid card">
             <div class="row">
                 <div class="col-12">
@@ -20,20 +20,22 @@
 <script>
 import Vue from "vue";
 import SeeMore from "./SeeMore";
+import PostElement from "./PostElement";
 
 export default {
     name: "Post",
-    components: {SeeMore},
+    components: {SeeMore, PostElement},
     props: ["post", "index", "maxHeight"],
     data: function() {
-        return {
-           
+        return {}
+    },
+    computed: {
+        actualMaxHeight() {
+            // @TODO: make this actually show the WHOLE content, not just an arbitrarily huge maxHeight
+            return this.maxHeight !== undefined ? this.maxHeight : 1000000
         }
     },
-    computed: {},
-    methods: {
-        
-    },
+    methods: {},
   
 }
 </script>

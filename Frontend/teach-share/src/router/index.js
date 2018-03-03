@@ -14,6 +14,7 @@ const EditAudio = () => import(/* webpackChunkName: "edit-audio" */ "../componen
 const EditImage = () => import(/* webpackChunkName: "edit-image" */ "../components/image/EditImage.vue");
 const EditFile = () => import(/* webpackChunkName: "edit-file" */ "../components/file/EditFile.vue");
 const PostFeed = () => import(/* webpackChunkName: "post-feed" */ "../components/PostFeed.vue");
+const PostDetail = () => import(/* webpackChunkName: "post-feed" */ "../components/PostDetail.vue");
 
 Vue.use(Router);
 
@@ -59,6 +60,11 @@ export default new Router({
                     name: "dashboard",
                     path: "/dashboard",
                     component: PostFeed
+                },
+                {
+                    name: "posts",
+                    path: "/posts/:post_id",
+                    component: PostDetail
                 }
             ]
         },

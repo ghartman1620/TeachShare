@@ -16,11 +16,23 @@ export default Vue.component("base-page", {
       return {
         queryParam: "",
       }
-    }
+    },
+    created() {}
   })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 1s;
+}
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+
 
 // Adds some padding to the main body, so that it's not underneath the navbar
 .body-fluid {

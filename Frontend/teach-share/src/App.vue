@@ -9,8 +9,6 @@
 <script>
 import Vue from 'vue';
 
-window.bus = new Vue({});
-
 export default {
   name: 'App'
 }
@@ -26,7 +24,7 @@ $main-font: "Roboto", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-$background-color: #E5FFEE;
+$background-color: white;
 
 body{
     font-family: $main-font;

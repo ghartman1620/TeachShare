@@ -106,4 +106,28 @@ $nav-hover-color: rgba(255, 255, 255, .5);
   background-color:$nav-background-color-hover;
 }
 
+.navbar {
+    border-bottom: 2px solid darken($nav-background-color, 10%);
+    height: 60px;
+}
+
+@media only screen and (max-width : 992px) {
+    .navbar-collapse {
+        background: darken($nav-background-color, 10%);
+    }
+}
+
+
+.collapsed {
+    background: darken($nav-background-color, 10%);
+}
+
+.nav-item > a {
+    padding-left: 20px;
+}
+
+.search-container > form {
+    padding-left: 20px;
+}
+
 </style>

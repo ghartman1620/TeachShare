@@ -17,10 +17,10 @@
                     There was no content provided.
                 </slot>
             </p>
-            <button type="button" @click.prevent="showOrHideAllText" class="btn btn-dark btn-block">
+            <!-- <button type="button" @click.prevent="showOrHideAllText" class="btn btn-dark btn-block">
                 <span v-if="!textShown">read more...</span>
                 <span v-else>read less</span>
-            </button>
+            </button> -->
         </div>
     </div>
     </div>
@@ -43,7 +43,7 @@ export default Vue.component("embed-video", {
   ],
   data() {
     return {
-      textClasses: ["card-text", "sizing-and-gradient"],
+      textClasses: ["card-text"],
       textShown: false
     };
   },
@@ -95,14 +95,14 @@ export default Vue.component("embed-video", {
     }
   },
   methods: {
-    showOrHideAllText() {
-      if (!this.textShown) {
-        this.textClasses.pop();
-      } else {
-        this.textClasses.push("sizing-and-gradient");
-      }
-      this.textShown = !this.textShown;
-    }
+    // showOrHideAllText() {
+    //   if (!this.textShown) {
+    //     this.textClasses.pop();
+    //   } else {
+    //     this.textClasses.push("sizing-and-gradient");
+    //   }
+    //   this.textShown = !this.textShown;
+    // }
   }
 });
 </script>
