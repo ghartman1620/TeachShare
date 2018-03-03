@@ -18,7 +18,13 @@ export default Vue.component("text-element", {
 });
 </script>
 
-<style lang="scss" scoped>
+<style>
+.ql-syntax {
+    background-color: #23241f;
+    color: #f8f8f2;
+    overflow: visible;
+}
+
 .ql-size-huge {
     font-size: 30px;
 }
@@ -30,5 +36,15 @@ export default Vue.component("text-element", {
 }
 .ql-font-serif {
     font-family: "Times New Roman", Times, serif;
+}
+
+.ql-align-right {
+    text-align: right;
+}
+.ql-align-center {
+    text-align: center;
+}
+.ql-align-justify {
+    text-align: justify;
 }
 </style>
