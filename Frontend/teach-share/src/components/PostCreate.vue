@@ -116,7 +116,7 @@
     </div>
     <br><br><br> <!-- this is so problems don't occur with bottom of page button presses -->
     <nav class="navbar fixed-bottom navbar-light navbar-left bottom-navbar bg-light">
-        <div class="title" v-if="title != ''">{{title}}</div>
+        <div id="bottomNavTitle" class="title" v-if="title != ''">{{title}}</div>
         <div class="title title-placeholder" v-else></div>
     </nav>
 

@@ -10,7 +10,7 @@ describe('Base.vue', () => {
         console.log(vm.$data)
         let re = new RegExp('([\\n]|[\\s])*', 'g')
         expect(vm.$el.querySelector('.navbar').textContent.trim().replace(re, ''))
-            .to.equal('CreatePostProfileYourpostfeedYourpostsAccountdetails')
+            .to.equal('CreatePostProfileYourpostfeedYourpostsAccountdetailsSearch')
     })
     it('should have a queryParam data item', () => {
         const Constructor = Vue.extend(Base)
