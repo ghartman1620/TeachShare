@@ -7,30 +7,28 @@
 
 <script>
 import Vue from "vue";
-import VueQuillEditor from "vue-quill-editor"
-import "quill/dist/quill.core.css"
-import "quill/dist/quill.snow.css"
-import "quill/dist/quill.bubble.css"
-Vue.use(VueQuillEditor, );
+import VueQuillEditor from "vue-quill-editor";
+require("quill/dist/quill.core.css");
+import "quill/dist/quill.snow.css";
+import "quill/dist/quill.bubble.css";
+Vue.use(VueQuillEditor);
 
 export default Vue.component("text-element", {
-    props: ["element"],
-})
+    props: ["element"]
+});
 </script>
 
-<style>
+<style lang="scss" scoped>
 .ql-size-huge {
     font-size: 30px;
 }
 .ql-size-large {
     font-size: 20px;
 }
-
 .ql-font-monospace {
-    font-family: "Courier" ;
+    font-family: "Courier";
 }
 .ql-font-serif {
     font-family: "Times New Roman", Times, serif;
 }
-
 </style>

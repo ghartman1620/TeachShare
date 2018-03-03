@@ -27,9 +27,9 @@
 import Vue from "vue";
 
 export default Vue.component("file-component", {
-  props: ["element"],
-  data() {
-    return {};
-  }
+    props: ["element"],
+    data() {
+        return {};
+    }
 });
 </script>

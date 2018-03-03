@@ -69,82 +69,84 @@ import { mapState } from "vuex";
 Vue.use(VueQuillEditor);
 
 export default Vue.component("edit-text", {
-  data() {
-    return {
-      component: {},
-      editorOption: {
-        modules: {
-          toolbar: "#toolbar"
-        }
-      } //sooooooooo many options to pass for customizing the editor.
-    };
-  },
-  computed: {},
-
-  methods: {
-    submit: function(event) {
-      if (
-        this.$route.query.index == this.$store.state.create.postElements.length
-      ) {
-        this.$store.dispatch("addElement", this.component);
-      } else {
-        this.$store.dispatch("editElement", {
-          index: this.$route.query.index,
-          component: this.component
-        });
-      }
-      this.$router.push({ name: "create" });
+    data() {
+        return {
+            component: {},
+            editorOption: {
+                modules: {
+                    toolbar: "#toolbar"
+                }
+            } //sooooooooo many options to pass for customizing the editor.
+        };
     },
-    close: function(event) {
-      this.$router.push({ name: "create" });
+    computed: {},
+
+    methods: {
+        submit: function(event) {
+            if (
+                this.$route.query.index ==
+                this.$store.state.create.postElements.length
+            ) {
+                this.$store.dispatch("addElement", this.component);
+            } else {
+                this.$store.dispatch("editElement", {
+                    index: this.$route.query.index,
+                    component: this.component
+                });
+            }
+            this.$router.push({ name: "create" });
+        },
+        close: function(event) {
+            this.$router.push({ name: "create" });
+        }
+    },
+    mounted() {
+        this.$store.dispatch("openEditor");
+        this.$router.replace({
+            name: "edit-text",
+            query: { index: this.$route.query.index }
+        });
+        console.log("mounted edit text");
+        if (
+            this.$route.query.index >=
+            this.$store.state.create.postElements.length
+        ) {
+            this.component = {
+                type: "text",
+                content: ""
+            };
+        } else {
+            this.component = Object.assign(
+                {},
+                this.$store.state.create.postElements[this.$route.query.index]
+            );
+        }
+    },
+    beforeDestroy() {
+        console.log("destroy");
+        this.$store.dispatch("closeEditor");
     }
-  },
-  mounted() {
-    this.$store.dispatch("openEditor");
-    this.$router.replace({
-      name: "edit-text",
-      query: { index: this.$route.query.index }
-    });
-    console.log("mounted edit text");
-    if (
-      this.$route.query.index >= this.$store.state.create.postElements.length
-    ) {
-      this.component = {
-        type: "text",
-        content: ""
-      };
-    } else {
-      this.component = Object.assign(
-        {},
-        this.$store.state.create.postElements[this.$route.query.index]
-      );
-    }
-  },
-  beforeDestroy() {
-    console.log("destroy");
-    this.$store.dispatch("closeEditor");
-  }
 });
 </script>
 
 <style lang="scss" scoped>
 .quill-editor,
 .quill-code {
-  height: 75%;
-  width: 100%;
+    height: 75%;
+    width: 100%;
 }
 
 .custom-quill-editor {
-  background: #ffffff;
-  font-family: "Roboto", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  height: 13em;
+    background: #ffffff;
+    font-family: "Roboto", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    height: 13em;
 }
 
 .quill-code {
-  border: none;
-  height: auto;
+    border: none;
+    height: auto;
 }
 
 body {
