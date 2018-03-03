@@ -42,11 +42,9 @@
                         </router-link>
                     </div>
                     <div class="col-2">
-                        <router-link :to="{name: 'create'}">
-                            <button type="button" class="btn btn-danger btn-block">
-                                    Cancel
-                            </button>
-                        </router-link>
+                        <button @click="close" type="button" class="btn btn-danger btn-block">
+                                Cancel
+                        </button>
                     </div>
                 </div>
                 
@@ -64,71 +62,76 @@ import AudioElement from "./AudioElement";
 var _ = require("lodash");
 
 export default Vue.component("edit-audio", {
-    components: { FileUpload, AudioElement },
-    props: [],
-    data() {
-        return {
-            title: "",
-            description: ""
-        };
+  components: { FileUpload, AudioElement },
+  props: [],
+  data() {
+    return {
+      title: "",
+      description: ""
+    };
+  },
+  computed: {
+    changedTextRecv() {},
+    ...mapGetters(["hasFiles", "allFilesUploadComplete"])
+  },
+  methods: {
+    submitAudio() {
+      console.log(this.title);
+      console.log(this.description);
+      this.$store.dispatch("submitAudioFiles", this.senerateJSON());
     },
-    computed: {
-        changedTextRecv() {
-                
-        },
-        ...mapGetters(["hasFiles", "allFilesUploadComplete"])
-    },
-    methods: {
-        submitAudio() {
-            console.log(this.title);
-            console.log(this.description);
-            this.$store.dispatch("submitAudioFiles", this.senerateJSON());
-        },
-        generateJSON() {
-            let output = new Array();
-            var vm = this;
-            _.map(this.$store.state.fs.uploadedFiles, function(val, ind, arr) {
-                console.log(val, ind, arr);
-                output.push({
-                    post: 2,
-                    type: "audio_file",
-                    id: val.db_id,
-                    title: vm.title,
-                    filetype: val.file.type,
-                    name: val.file.name, 
-                    url: val.url,
-                    description: vm.description
-                });
-            });
-            console.log(output);
-            return output;
-        },
-        submitElement() {
-            if(this.$route.query.index == this.$store.state.create.postElements.length){
-                this.$store.dispatch("addElement", {type: "audio", content : this.generateJSON()});
-            }
-            else{
-                this.$store.dispatch("editElement", {
-                    index : this.$route.query.index,
-                    element : {type: "audio", content : this.generateJSON()}
-                });
-            }
-        }
-    },
-    created () {
-        this.$on("changedTitle", function(res) {
-            console.log("CHANGED!!!", res);
-            this.title = res;
+    generateJSON() {
+      let output = new Array();
+      var vm = this;
+      _.map(this.$store.state.fs.uploadedFiles, function(val, ind, arr) {
+        console.log(val, ind, arr);
+        output.push({
+          post: 2,
+          type: "audio_file",
+          id: val.db_id,
+          title: vm.title,
+          filetype: val.file.type,
+          name: val.file.name,
+          url: val.url,
+          description: vm.description
         });
-        this.$on("changedBody", function(res) {
-            console.log("CHANGED!!!", res);
-            this.description = res;
-        });
-        this.$store.dispatch("openEditor");
+      });
+      console.log(output);
+      return output;
     },
-    destroyed() {
-        this.$store.dispatch("closeEditor");
+    submitElement() {
+      if (
+        this.$route.query.index == this.$store.state.create.postElements.length
+      ) {
+        this.$store.dispatch("addElement", {
+          type: "audio",
+          content: this.generateJSON()
+        });
+      } else {
+        this.$store.dispatch("editElement", {
+          index: this.$route.query.index,
+          element: { type: "audio", content: this.generateJSON() }
+        });
+      }
+    },
+    close: function(event) {
+      this.$router.push({ name: "create" });
     }
+  },
+  created() {
+    this.$on("changedTitle", function(res) {
+      console.log("CHANGED!!!", res);
+      this.title = res;
+    });
+    this.$on("changedBody", function(res) {
+      console.log("CHANGED!!!", res);
+      this.description = res;
+    });
+    this.$store.dispatch("openEditor");
+  },
+  destroyed() {
+    this.$store.dispatch("closeEditor");
+  }
 });
 </script>
 
@@ -136,8 +139,7 @@ export default Vue.component("edit-audio", {
 
 <style lang="scss" scoped>
 .card {
-    padding: 10px;
+  padding: 10px;
 }
-
 </style>
 

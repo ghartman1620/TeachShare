@@ -26,6 +26,7 @@
                 <option value="serif"></option>
                 <option value="monospace"></option>
               </select>
+              <button class="ql-list" value="bullet"></button>
               <!-- You can also add your own
               <button id="custom-button" @click="customButtonClick">[ Click me ]</button-->
             </div>
@@ -47,12 +48,10 @@
         </router-link>
       </div>
       <div class="col-2">
-        <router-link :to="{name:'create'}">
-
-        <button type="button" class="btn btn-danger btn-block" @click.prevent="close">
+        <button type="button" class="btn btn-danger btn-block" @click="close">
         Cancel
         </button>
-        </router-link>
+
       </div>
     </div>
   </div>
@@ -85,8 +84,7 @@ export default Vue.component("edit-text", {
   methods: {
     submit: function(event) {
       if (
-        this.$route.query.index ==
-        this.$store.state.create.postElements.length
+        this.$route.query.index == this.$store.state.create.postElements.length
       ) {
         this.$store.dispatch("addElement", this.component);
       } else {
@@ -95,10 +93,10 @@ export default Vue.component("edit-text", {
           component: this.component
         });
       }
-      this.$router.push({ name: 'create'});
+      this.$router.push({ name: "create" });
     },
     close: function(event) {
-      this.$router.push({name: 'create'});
+      this.$router.push({ name: "create" });
     }
   },
   mounted() {
@@ -150,6 +148,5 @@ export default Vue.component("edit-text", {
 }
 
 body {
-  
 }
 </style>

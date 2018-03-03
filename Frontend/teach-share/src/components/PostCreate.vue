@@ -4,7 +4,7 @@
 <template>
 <div>
 <div :style="getBodyStyle()">
-    <div class="col-8 offset-2 card card-outline-danger container icon-card-container">
+    <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container">
         <div class="col-8 mx-auto card-deck" id="button-bar">
 
             <h2></h2>
@@ -105,9 +105,9 @@
                             <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
                             <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="/static/caret-square-down.png"></button>
                             <!-- <input type="image" id="down-button" width=30 height=30 style="z-index: 2" @click="moveElementDown(index)" src="/static/caret-square-down.png"/> -->
-                            <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img width=20 height=20 src="/static/trash-icon.png"></button>
+                            <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button>
                             <!-- <input type="image" id="garbage-button" width=30 height=30 @click="removeElement(index)" src="/static/trash-icon.png"> -->
-                            <button class="btn btn-primary" id="edit-button" @click="editElement(index)"><img width=20 height=20 src="/static/edit-icon.png"></button>
+                            <button class="btn btn-primary" id="edit-button" @click="editElement(index)"><img height=20 src="/static/edit-icon.png"></button>
                             <!-- <input type="image" id="edit-button" width=30 height=30 @click="editElement(index)" src="/static/edit-icon.png"> -->
 
                         </div>
@@ -150,365 +150,370 @@ import { mapState } from "vuex";
 import PostElement from "./PostElement";
 
 function isBlank(str) {
-    return (!str || /^\s*$/.test(str));
-};
+  return !str || /^\s*$/.test(str);
+}
 
 const editorHidden = {
-    "z-index" : "-1",
-}
+  "z-index": "-1"
+};
 const editorVisible = {
-    position: "fixed",
-    width: "80%",
-    left: "10%",
-    "max-height": "75%",
-    top: "20%",
-    "z-index" : "1",
-    "overflow-y" : "scroll",
-    "overflow-x" : "hidden",
-}
+  position: "fixed",
+  width: "80%",
+  left: "10%",
+  "max-height": "70%",
+  top: "20%",
+  "z-index": "1",
+  "overflow-y": "scroll",
+  "overflow-x": "hidden"
+};
 
 const bodyHidden = {
-    opacity: ".3",
-    "pointer-events" : "none",
-    overflow: "hidden",
+  opacity: ".3",
+  "pointer-events": "none",
+  overflow: "hidden"
 };
 const bodyVisible = {
-    opacity: "1",
-}
-
+  opacity: "1"
+};
 
 export default {
-    name: "post-create",
-    components: { PostElement },
-    data: function() {
-        return {
-            title: "",
-            editedElement: {},
-            editedElementIndex: -1,
-            inProgressTag: "",
-            tags: []
-        };
+  name: "post-create",
+  components: { PostElement },
+  data: function() {
+    return {
+      title: "",
+      editedElement: {},
+      editedElementIndex: -1,
+      inProgressTag: "",
+      tags: []
+    };
+  },
+  computed: {
+    storeElements() {
+      return this.$store.state.create.postElements;
     },
-    computed: {
-        storeElements() {
-            return this.$store.state.create.postElements;
-        },
-        nextStateId() {
-            return this.$store.state.create.nextStateId;
-        }
-    },
-
-    methods: {
-        getEditorStyle() {
-            if(this.$store.state.create.editorOpen){
-
-                return editorVisible;
-            }
-            else{
-                return editorHidden;
-            }
-        },
-        getBodyStyle() {
-            if(this.$store.state.create.editorOpen){
-                return bodyHidden;
-            }
-            else{
-                return bodyVisible;
-            }
-        },
-        nop: function() {},
-        removeTag: function(index) {
-            console.log("remove tag" + index);
-            this.tags.splice(index, 1);
-        },
-        createTag: function(e) {
-            if (e.keyCode === 13 && this.inProgressTag !== "") {
-                this.createTagBtn();
-            }
-        },
-        createTagBtn: function() {
-            this.tags.push(this.inProgressTag);
-            this.inProgressTag = "";
-        },
-        getUser: function() {
-            this.$store.dispatch("fetchUser", 1);
-        },
-        submitPost: function(event) {
-            console.log(this.$store.state.create.postElements);
-            var obj = {
-                user: 1,
-                title: this.title,
-                content: this.$store.state.create.postElements,
-                likes: 0,
-                comments: [],
-                tags: this.tags,
-                attachments: []
-            };
-            console.log(obj);
-            this.$store.dispatch("createPost", obj);
-        },
-        editElement: function(index) {
-            var type = this.$store.state.create.postElements[index].type;
-            var routeName = "edit-";
-            if(type === "text"){
-                routeName += "text";
-            } else if(type === "audio"){
-                routeName += "audio";
-            } else if(type === "video_file" || type === "video_link"){
-                routeName += "video";
-            } else if(type === "image_file"){
-                routeName += "image";
-            } else{
-                routeName += "file";
-            }
-            console.log(routeName);
-            this.$router.push({name: routeName, query: {index: index}});
-        },
-
-        moveElementUp: function(index) {
-            if (index != 0) {
-                this.$store.dispatch("swapElements", [index, index - 1]);
-                //dispatch only allows one argument so we'll pass them as an array
-            }
-        },
-        moveElementDown: function(index) {
-            if (index != this.$store.state.create.postElements.length - 1) {
-                this.$store.dispatch("swapElements", [index, index + 1]);
-                //dispatch only allows one argument so we'll pass them as an array
-            }
-        },
-        removeElement: function(index) {
-            this.$store.dispatch("removeElement", index);
-        },
-        maxElementIndex() {
-            return this.$store.state.create.postElements.length;
-        },
-        undo() {
-            this.$store.dispatch("undo");
-        },
-        redo() {
-            this.$store.dispatch("redo");
-        }
+    nextStateId() {
+      return this.$store.state.create.nextStateId;
     }
+  },
+
+  methods: {
+    getEditorStyle() {
+      if (this.$store.state.create.editorOpen) {
+        return editorVisible;
+      } else {
+        return editorHidden;
+      }
+    },
+    getBodyStyle() {
+      if (this.$store.state.create.editorOpen) {
+        return bodyHidden;
+      } else {
+        return bodyVisible;
+      }
+    },
+    nop: function() {},
+    removeTag: function(index) {
+      console.log("remove tag" + index);
+      this.tags.splice(index, 1);
+    },
+    createTag: function(e) {
+      if (e.keyCode === 13 && this.inProgressTag !== "") {
+        this.createTagBtn();
+      }
+    },
+    createTagBtn: function() {
+      this.tags.push(this.inProgressTag);
+      this.inProgressTag = "";
+    },
+    getUser: function() {
+      this.$store.dispatch("fetchUser", 1);
+    },
+    submitPost: function(event) {
+      console.log(this.$store.state.create.postElements);
+      var obj = {
+        user: 1,
+        title: this.title,
+        content: this.$store.state.create.postElements,
+        likes: 0,
+        comments: [],
+        tags: this.tags,
+        attachments: []
+      };
+      console.log(obj);
+      this.$store.dispatch("createPost", obj);
+    },
+    editElement: function(index) {
+      var type = this.$store.state.create.postElements[index].type;
+      var routeName = "edit-";
+      if (type === "text") {
+        routeName += "text";
+      } else if (type === "audio") {
+        routeName += "audio";
+      } else if (type === "video_file" || type === "video_link") {
+        routeName += "video";
+      } else if (type === "image_file") {
+        routeName += "image";
+      } else {
+        routeName += "file";
+      }
+      console.log(routeName);
+      this.$router.push({ name: routeName, query: { index: index } });
+    },
+
+    moveElementUp: function(index) {
+      if (index != 0) {
+        this.$store.dispatch("swapElements", [index, index - 1]);
+        //dispatch only allows one argument so we'll pass them as an array
+      }
+    },
+    moveElementDown: function(index) {
+      if (index != this.$store.state.create.postElements.length - 1) {
+        this.$store.dispatch("swapElements", [index, index + 1]);
+        //dispatch only allows one argument so we'll pass them as an array
+      }
+    },
+    removeElement: function(index) {
+      this.$store.dispatch("removeElement", index);
+    },
+    maxElementIndex() {
+      return this.$store.state.create.postElements.length;
+    },
+    undo() {
+      this.$store.dispatch("undo");
+    },
+    redo() {
+      this.$store.dispatch("redo");
+    }
+  }
 };
 </script>
 
 
 <style lang="scss" scoped>
-
-$background-color: #E5FFEE;
-$title-tag-card-background: #bececa;
+$background-color: #e5ffee;
+$title-tag-card-background: darken(#bececa, 5%);
+$dark-green: #3b896a;
+$card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
+$card-color: #96e6b3;
 
 // @import "../../node_modules/bootstrap/scss/_variables.scss";
 @import "../../node_modules/bootstrap/scss/_functions.scss";
 @import "../../node_modules/bootstrap/scss/_variables.scss";
 @import "../../node_modules/bootstrap/scss/_mixins.scss";
 
-$theme-colors: (
-    "primary": red
-);
+$theme-colors: ("primary": red);
 
 .post-element-container {
-    padding-top: 30px;
-    padding-right: 20px;
-    padding-left: 20px;
-    padding-bottom: 10px;
-    // box-shadow: 5px 8px #bdbdbd;
-    background-color: transparent;
+  padding-top: 30px;
+  padding-right: 20px;
+  padding-left: 20px;
+  padding-bottom: 10px;
+  border-radius: 5px;
+  box-shadow: $card-shadow;
+  background-color: $card-color;
 }
 
 .tag-entry {
-    font-size: 12pt;
-    margin: 8px;
-    // padding-left: 20px;
-    // padding-right: 20px;
+  font-size: 12pt;
+  margin: 8px;
+  // padding-left: 20px;
+  // padding-right: 20px;
 }
 
 .tag-entry:hover {
-    background-color: darken(gray, 10%);
-    cursor: pointer;
+  background-color: darken(gray, 10%);
+  cursor: pointer;
 }
 
 .round-button {
-    max-width: 100px;
-    max-height: 100px;
-    /* padding-bottom: 11%; */
-    // border-radius: 50%;
-    // border: 0 solid #f5f5f5;
-    // overflow: hidden;
-    // background:  $title-tag-card-background;
-    /* box-shadow: 1 1 4px gray; */
+  max-width: 100px;
+  max-height: 100px;
+  padding-bottom: 11%;
+  border-radius: 50%;
+  border: 0 solid #f5f5f5;
+  overflow: hidden;
+  background: $title-tag-card-background;
+  box-shadow: 1 1 4px gray;
 }
 
 #button-bar {
-    min-width: 600px;
-    /* max-height: 240px; */
-    /* padding-top: 8px;
-    padding-bottom: 8px;
-    padding-left: 1px;
-    padding-right: 1px; */
-    background: $background-color;
-    justify-content: center;
-    /* box-shadow: 0px 8px #bdbdbd; */
+  min-width: 580px;
+  max-height: 240px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 1px;
+  padding-right: 1px;
+  border-radius: 60px;
+  background: $title-tag-card-background;
+  justify-content: center;
+  box-shadow: $card-shadow;
 }
 
 #text-icon {
-    margin-right: .2rem;
+  margin-right: 0.2rem;
 }
 
 #audio-icon {
-    margin-left: .2rem;
-    margin-right: .2rem;
-
+  margin-left: 0.2rem;
+  margin-right: 0.2rem;
 }
 #video-icon {
-    margin-left: .2rem;
-    margin-right: .2rem;
-
+  margin-left: 0.2rem;
+  margin-right: 0.2rem;
 }
 #image-icon {
-    margin-left: .2rem;
-    margin-right: .2rem;
-
+  margin-left: 0.2rem;
+  margin-right: 0.2rem;
 }
 #file-icon {
-    margin-left: .2rem;
-
+  margin-left: 0.2rem;
 }
 #text-icon:hover {
-    background: #bf8301;
+  background: #bf8301;
 }
 #video-icon:hover {
-    background: #ad5c00;
+  background: #ad5c00;
 }
 #audio-icon:hover {
-    background: #3b685b;
+  background: #3b685b;
 }
 #image-icon:hover {
-    background: #13213F;
+  background: #13213f;
 }
 #file-icon:hover {
-    background: #1a3c68;
+  background: #1a3c68;
 }
 
 #title-tag-card {
-    background-color: $title-tag-card-background;
-    margin-top: 2rem;
-    // margin-bottom: 2rem;
-    // width: 100%;
-    // max-width: 100%;
-    /* padding: 1rem; */
-    /* box-shadow: 5px 5px #bdbdbd; */
-    // border: 0;
+  background-color: $title-tag-card-background;
+  margin-top: 2rem;
+  border: none;
+  box-shadow: $card-shadow;
+  // margin-bottom: 2rem;
+  // width: 100%;
+  // max-width: 100%;
+  /* padding: 1rem; */
+  /* box-shadow: 5px 5px #bdbdbd; */
+  // border: 0;
 }
 
 #tag-submit-box {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
-
 #tag-delete-button {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 #up-button {
-    margin-top: 10px;
-    margin-left: 1rem;
+  margin-top: 10px;
+  margin-left: 1rem;
+  background-color: $dark-green;
+}
+
+#up-button:hover {
+  background-color: darken($dark-green, 10%);
 }
 
 #down-button {
-    margin-top: 10px;
-    margin-left: 6px;
+  margin-top: 10px;
+  margin-left: 6px;
+  background-color: $dark-green;
+}
+
+#down-button:hover {
+  background-color: darken($dark-green, 10%);
 }
 
 #garbage-button {
-    margin-left: 10px;
-    margin-top: 10px;
-    // margin-right: 1rem;
-    float: right;
+  margin-left: 10px;
+  margin-top: 10px;
+  // margin-right: 1rem;
+  float: right;
 }
 
 #edit-button {
-    margin-top: 10px;
-    float: right;
+  margin-top: 10px;
+  float: right;
 }
 
 .round-button img {
-    display: block;
-    width: 90px;
-    height: auto;
+  display: block;
+  width: 100%;
+  padding: 0%;
+  height: auto;
 }
 
-
-
-
 .foreground {
-    position: fixed;
-    left: 20%;
-    top: 20%;
-    width: 80%;
-    margin: auto;
-    z-index: 2;
-    opacity: 1;
+  position: fixed;
+  left: 20%;
+  top: 20%;
+  width: 80%;
+  margin: auto;
+  z-index: 2;
+  opacity: 1;
 }
 
 .postheader {
-    height: 30px;
-    width: 100%;
+  height: 30px;
+  width: 100%;
 }
-
-
 
 /* Submitted elements now being viewed */
 .container-element {
-    width: 60%;
-    height: 300px;
+  width: 60%;
+  height: 300px;
 }
 
 .icon-card-container {
-    background-color: white;
-    border: 0;
+  background-color: #e5ffee;
+  border: 0;
 }
 
 .card {
-    background-color:$background-color;
+  background-color: #e5ffee;
 }
 
 .title {
-    font-size: 1.5rem;
+  font-size: 1.5rem;
 }
 
 .title-placeholder {
-    opacity: 0.5;
+  opacity: 0.5;
 }
 
 .undo-button {
-    margin-right: 1rem;
+  margin-right: 1rem;
 }
 
 .redo-button {
-    margin-right: 1rem;
+  margin-right: 1rem;
 }
 
 .tag-card {
-    background-color: $title-tag-card-background;
-    border: 0;
-    // width: 100%;
-    display:inline;
-    padding: 10px;
+  background-color: $title-tag-card-background;
+  border: 0;
+  // width: 100%;
+  display: inline;
+  padding: 10px;
 }
 
-
-.post-element, card-row {
-    background-color:  $title-tag-card-background;
+.post-element,
+card-row {
+  background-color: $title-tag-card-background;
 }
 
 .title-container {
-    width: 100%;
+  width: 100%;
 }
 
 .bottom-navbar {
-    height: 50px;
-    background-color: lighten($title-tag-card-background, 15%) !important;
+  height: 50px;
+  background-color: lighten(
+    rgba($title-tag-card-background, 0.9),
+    15%
+  ) !important;
+  border-top: 1px solid darken($title-tag-card-background, 10%);
 }
 </style>

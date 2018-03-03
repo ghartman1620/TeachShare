@@ -55,17 +55,17 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'django_filters',
-    'django_elasticsearch_dsl',
+    # 'django_elasticsearch_dsl',
 
     'accounts',
     'posts',
 ]
 
-ELASTICSEARCH_DSL={
-    'default': {
-        'hosts': 'search:9200'
-    },
-}
+# ELASTICSEARCH_DSL = {
+#     'default': {
+#         'hosts': 'http://search:9200'
+#     },
+# }
 
 
 REST_FRAMEWORK = {
