@@ -14,6 +14,7 @@ from .documents import PostDocument
 # test
 from django.http import HttpResponse
 from django.shortcuts import render
+from urllib.parse import unquote
 
 
 #Post search parameters
@@ -25,19 +26,17 @@ class SearchPostsView(views.APIView):
     #queryset = Post.objects.all() #this isn't used but it makes rest framework happy
     #s = PostDocument.search()
     def get_queryset(self):
-        print("in getqueryset")
         queryset = PostDocument.search()
-        for hit in queryset:
-            print(hit._d_['title'])
-        term = self.request.query_params.get('term', None)
-        if term is not None:
-            print("term query param found")
-            queryset = queryset.query("multi_match", query=term, fields=['title', 'content', 'tags'])
-        for hit in queryset:
-            print(hit._d_['title'])
+
+        termParam = self.request.query_params.get('term', None)
+        if termParam is not None:
+            terms = unquote(termParam)
+            termlist = terms.split(' ')
+            for term in termlist:
+                print('querying' + term)
+                queryset = queryset.query('multi_match', query=term, fields=['title', 'content', 'tags'])
         return queryset
     def get(self, request, format=None):
-        print("in get")
         response = []
         queryset = self.get_queryset()
         for hit in queryset:
@@ -55,7 +54,6 @@ class PostFilter(filters.FilterSet):
         model = Post
         fields = ('user', 'title', 'updated', 'likes', 'timestamp')
     def filterNumberPosts(self, queryset, name, value):
-        print("in filternumberposts")
         return queryset[value:value+10]
 
 class PostViewSet(viewsets.ModelViewSet):

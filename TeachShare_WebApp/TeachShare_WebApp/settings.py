@@ -26,7 +26,7 @@ SECRET_KEY = '(6dlx)23)(a%%g=8qs0b37$b+mqro=3d!i0f$mo@n4s+r*z)tt'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['testserver', '127.0.0.1']
+ALLOWED_HOSTS = ['testserver', '127.0.0.1', 'localhost']
 
 
 EMAIL_USE_TLS = True

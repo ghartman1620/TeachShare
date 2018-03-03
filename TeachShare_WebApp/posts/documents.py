@@ -21,13 +21,18 @@ def assembleContent(content, element):
 class PostDocument(DocType):
     title = fields.TextField()
     content = fields.TextField()
-    tags = fields.ObjectField()
+    tags = fields.TextField()
     updated = fields.DateField()
     likes = fields.IntegerField()
     timestamp = fields.DateField()
     id = fields.IntegerField()
-
-
+    '''
+    def prepare_tags(self, instance):
+        tags = ""
+        for tag in instance.tags:
+            tags += tag + " "
+        return tags
+    '''
     def prepare_content(self, instance):
         content = ""
         if not type(instance.content) is dict:
