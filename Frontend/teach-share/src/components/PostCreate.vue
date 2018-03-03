@@ -102,10 +102,13 @@
                   <div class="justify-content-start">
                         <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
 
-                            <input type="image" id="up-button" width=30 height=30 style="z-index: 2" @click="moveElementUp(index)" src="/static/caret-square-up.png"/>
-                            <input type="image" id="down-button" width=30 height=30 style="z-index: 2" @click="moveElementDown(index)" src="/static/caret-square-down.png"/>
-                            <input type="image" id="garbage-button" width=30 height=30 @click="removeElement(index)" src="/static/trash-icon.png">
-                            <input type="image" id="edit-button" width=30 height=30 @click="editElement(index)" src="/static/edit-icon.png">
+                            <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
+                            <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="/static/caret-square-down.png"></button>
+                            <!-- <input type="image" id="down-button" width=30 height=30 style="z-index: 2" @click="moveElementDown(index)" src="/static/caret-square-down.png"/> -->
+                            <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img width=20 height=20 src="/static/trash-icon.png"></button>
+                            <!-- <input type="image" id="garbage-button" width=30 height=30 @click="removeElement(index)" src="/static/trash-icon.png"> -->
+                            <button class="btn btn-primary" id="edit-button" @click="editElement(index)"><img width=20 height=20 src="/static/edit-icon.png"></button>
+                            <!-- <input type="image" id="edit-button" width=30 height=30 @click="editElement(index)" src="/static/edit-icon.png"> -->
 
                         </div>
                     </div>
@@ -122,9 +125,9 @@
 
 
     <nav class="navbar fixed-bottom justify-content-end bg-transparent">
-        <button type="button" class="undo-button align-right btn btn-sm btn-outline-dark btn-primary-spacing" @click="undo">undo </button>
-        <button type="button" class="redo-button align-right btn btn-sm btn-outline-dark btn-primary-spacing" @click="redo">redo </button>
-        <button type="button" class="submit-button btn btn-light btn-outline-info" v-on:click="submitPost">Publish post</button>
+        <button type="button" class="undo-button align-right btn btn-sm btn-outline-danger btn-primary-spacing" @click="undo">undo </button>
+        <button type="button" class="redo-button align-right btn btn-sm btn-outline-success btn-primary-spacing" @click="redo">redo </button>
+        <button type="button" class="submit-button btn btn-primary" v-on:click="submitPost">Publish post</button>
     </nav>
 
 
@@ -293,6 +296,9 @@ export default {
 
 <style lang="scss" scoped>
 
+$background-color: #E5FFEE;
+$title-tag-card-background: #bececa;
+
 // @import "../../node_modules/bootstrap/scss/_variables.scss";
 @import "../../node_modules/bootstrap/scss/_functions.scss";
 @import "../../node_modules/bootstrap/scss/_variables.scss";
@@ -308,7 +314,7 @@ $theme-colors: (
     padding-left: 20px;
     padding-bottom: 10px;
     // box-shadow: 5px 8px #bdbdbd;
-    background-color: rgb(255, 255, 255);
+    background-color: transparent;
 }
 
 .tag-entry {
@@ -329,7 +335,7 @@ $theme-colors: (
     // border-radius: 50%;
     // border: 0 solid #f5f5f5;
     // overflow: hidden;
-    // background: #bececa;
+    // background:  $title-tag-card-background;
     /* box-shadow: 1 1 4px gray; */
 }
 
@@ -340,7 +346,7 @@ $theme-colors: (
     padding-bottom: 8px;
     padding-left: 1px;
     padding-right: 1px; */
-    background: white;
+    background: $background-color;
     justify-content: center;
     /* box-shadow: 0px 8px #bdbdbd; */
 }
@@ -385,7 +391,7 @@ $theme-colors: (
 }
 
 #title-tag-card {
-    background-color: #bececa;
+    background-color: $title-tag-card-background;
     margin-top: 2rem;
     // margin-bottom: 2rem;
     // width: 100%;
@@ -411,11 +417,13 @@ $theme-colors: (
 
 #down-button {
     margin-top: 10px;
+    margin-left: 6px;
 }
 
 #garbage-button {
+    margin-left: 10px;
     margin-top: 10px;
-    margin-right: 1rem;
+    // margin-right: 1rem;
     float: right;
 }
 
@@ -462,7 +470,7 @@ $theme-colors: (
 }
 
 .card {
-    background-color: white;
+    background-color:$background-color;
 }
 
 .title {
@@ -482,7 +490,7 @@ $theme-colors: (
 }
 
 .tag-card {
-    background-color: #bececa;
+    background-color: $title-tag-card-background;
     border: 0;
     // width: 100%;
     display:inline;
@@ -491,7 +499,7 @@ $theme-colors: (
 
 
 .post-element, card-row {
-    background-color: #FFFFFF;
+    background-color:  $title-tag-card-background;
 }
 
 .title-container {
@@ -500,6 +508,6 @@ $theme-colors: (
 
 .bottom-navbar {
     height: 50px;
-    background-color: gray;
+    background-color: lighten($title-tag-card-background, 15%) !important;
 }
 </style>

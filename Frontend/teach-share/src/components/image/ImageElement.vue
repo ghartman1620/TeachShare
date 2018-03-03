@@ -12,10 +12,10 @@
                 </div>
             </b-carousel>
         </div>
-        <h4 class="card-title">{{ localTitle }}</h4>
+        <!-- <h4 class="card-title">{{ localTitle }}</h4>
         <p class="card-text">
             {{localBody}}
-        </p>
+        </p> -->
     </div>
 </template>
 
