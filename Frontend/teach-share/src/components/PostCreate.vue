@@ -325,7 +325,8 @@ $theme-colors: (
 }
 
 .tag-entry:hover {
-    background-color: blue;
+    background-color: darken(gray, 10%);
+    cursor: pointer;
 }
 
 .round-button {
