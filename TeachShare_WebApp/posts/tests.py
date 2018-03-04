@@ -55,7 +55,6 @@ class PostSearchTestCase(TestCase):
     def test_search_with_no_query_params_returns_all_posts(self):
         resp = self.client.get('/api/search/')
         self.assertEqual(resp.status_code, 200)
-
         self.assertEqual(len(resp.data), 4)
 
     def test_search_with_term_parameter_returns_appropriate_post(self):
@@ -71,7 +70,7 @@ class PostSearchTestCase(TestCase):
         self.assertEqual(len(resp.data), 1)
 
     def test_search_with_multiple_parameters(self):
-        resp = self.client.get('/api/search/?term=programming&term=python')
+        resp = self.client.get('/api/search/?term=programming python')
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data[0], PostSerializer(self.p3).data)
         self.assertEqual(len(resp.data), 1)
