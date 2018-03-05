@@ -2,7 +2,6 @@ import Vue from "vue";
 import Router from "vue-router";
 import Base from "@/components/Base";
 import Login from "@/components/Login";
-import Test from "@/components/Test";
 
 // route-splitting to minimize necessary download size and will download javascript as-needed.
 //
@@ -20,59 +19,59 @@ Vue.use(Router);
 
 export default new Router({
     routes: [{
-            path: "/",
-            component: Base,
-            children: [
-                { name: "base", path: "", component: Home },
-                {
-                    path: "/create",
-                    name: "create",
-                    component: PostCreate,
-                    children: [
-                        {
-                            name: "edit-text",
-                            path: "text",
-                            component: EditText
-                        },
-                        {
-                            name: "edit-video",
-                            path: "video",
-                            component: EditVideo
-                        },
-                        {
-                            name: "edit-audio",
-                            path: "audio",
-                            component: EditAudio
-                        },
-                        {
-                            name: "edit-image",
-                            path: "image",
-                            component: EditImage
-                        },
-                        {
-                            name: "edit-file",
-                            path: "file",
-                            component: EditFile
-                        }
-                    ]
-                },
-                {
-                    name: "dashboard",
-                    path: "/dashboard",
-                    component: PostFeed
-                },
-                {
-                    name: "posts",
-                    path: "/posts/:post_id",
-                    component: PostDetail
-                }
-            ]
-        },
+        path: "/",
+        component: Base,
+        children: [
+            { name: "base", path: "", component: Home },
+            {
+                path: "/create",
+                name: "create",
+                component: PostCreate,
+                children: [
+                    {
+                        name: "edit-text",
+                        path: "text",
+                        component: EditText
+                    },
+                    {
+                        name: "edit-video",
+                        path: "video",
+                        component: EditVideo
+                    },
+                    {
+                        name: "edit-audio",
+                        path: "audio",
+                        component: EditAudio
+                    },
+                    {
+                        name: "edit-image",
+                        path: "image",
+                        component: EditImage
+                    },
+                    {
+                        name: "edit-file",
+                        path: "file",
+                        component: EditFile
+                    }
+                ]
+            },
+            {
+                name: "dashboard",
+                path: "/dashboard",
+                component: PostFeed
+            },
+            {
+                name: "posts",
+                path: "/posts/:post_id",
+                component: PostDetail
+            }
+        ]
+    },
 
-        {
-            path: "/login",
-            name: "Login",
-            component: Login
-        }
+    {
+        path: "/login",
+        name: "Login",
+        component: Login
+    }
     ]
 });

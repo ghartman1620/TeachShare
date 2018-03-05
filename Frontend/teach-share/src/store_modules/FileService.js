@@ -1,33 +1,35 @@
 import api from "../api";
 import Vue from "vue";
 import axios from "axios";
+import map from "lodash/map";
+import forEach from "lodash/forEach";
+import every from "lodash/every";
+import reduce from "lodash/reduce";
 
 // Load some necessary libraries
 const uuidv4 = require("uuid/v4");
-var _ = require("lodash");
 
 // FileService definition
 const FileService = {
     state: {
         uploadedFiles: [],
         limit: 0,
-        cancelSource: null,
+        cancelSource: null
     },
     mutations: {
         UPDATE_UPLOAD_FILES: (state, data) => {
-            _.map(state.uploadedFiles, val => {
+            map(state.uploadedFiles, val => {
                 if (data.data.request_id === val.request_id) {
                     var res = Object.assign(val, {
                         db_id: data.data.id
                     });
                     var test = Vue.set(val, "url", data.data.url);
                 }
-
             });
         },
         CHANGE_UPLOADED_FILES: (state, data) => {
             var exists = false;
-            _.map(state.uploadedFiles, function(val, ind) {
+            map(state.uploadedFiles, function (val, ind) {
                 if (val.request_id === data.request_id) {
                     state.uploadedFiles.splice(ind, 1, data);
                     exists = true;
@@ -35,23 +37,20 @@ const FileService = {
             });
             if (!exists) {
                 state.uploadedFiles.push(data);
-                return;
             }
         },
         CANCEL_REQUEST: (state) => {
-            if(state.cancelSource != null){
+            if (state.cancelSource != null) {
                 state.cancelSource.cancel("Operation cancelled by the user");
             }
         },
         REMOVE_FILE: (state, file) => {
-            
             console.log(file);
-            if(file.cancelSource != null){
+            if (file.cancelSource != null) {
                 file.cancelSource.cancel("Operation cancelled by the user");
             }
             let ind = state.uploadedFiles.indexOf(file);
             state.uploadedFiles.splice(ind, 1);
-            
         },
         CHANGE_FILE_LIMIT: (state, data) => {
             state.limit = data;
@@ -67,15 +66,14 @@ const FileService = {
         fileUpload: (context, formData) => {
             var files = formData.getAll("files");
             var i = 0;
-            _.forEach(files, function(file) {
+            forEach(files, function (file) {
                 var fileAlreadyUploaded = false;
-                context.state.uploadedFiles.forEach(function(element){
-                    if(element.file.name == file.name){
+                context.state.uploadedFiles.forEach(function (element) {
+                    if (element.file.name == file.name) {
                         fileAlreadyUploaded = true;
-                        return;
                     }
                 });
-                if(!fileAlreadyUploaded && i+context.state.uploadedFiles.length < context.state.limit){
+                if (!fileAlreadyUploaded && i + context.state.uploadedFiles.length < context.state.limit) {
                     var identifier = uuidv4();
                     var cancelToken = axios.CancelToken;
                     var source = cancelToken.source();
@@ -88,20 +86,19 @@ const FileService = {
                                 percent: percentCompleted,
                                 file: file,
                                 request_id: identifier,
-                                cancelSource: source,
+                                cancelSource: source
                             });
                         },
-                        cancelToken: source.token,
+                        cancelToken: source.token
                     };
                     api
                         .put(`upload/${file.name}?id=${identifier}`, file, config)
                         .then(response => context.commit("UPDATE_UPLOAD_FILES", response))
-                        .catch(function(err) {
-                            if(axios.isCancel(err)){
+                        .catch(function (err) {
+                            if (axios.isCancel(err)) {
                                 console.log("Upload cancelled", err.message);
-                                context.commit("REMOVE_FILE", file)
-                            }
-                            else{
+                                context.commit("REMOVE_FILE", file);
+                            } else {
                                 console.log(err);
                             }
                         });
@@ -125,8 +122,8 @@ const FileService = {
         filesUploadStatus: state => state.uploadedFiles,
         allFilesUploadComplete: (state) => {
             if (state.uploadedFiles.length > 0) {
-                let oneHundredPercent =  _.every(state.uploadedFiles, {"percent": 100});
-                let hasURL = _.reduce(state.uploadedFiles, (res, val, key) => {
+                let oneHundredPercent = every(state.uploadedFiles, {"percent": 100});
+                let hasURL = reduce(state.uploadedFiles, (res, val, key) => {
                     if (val.url !== undefined) {
                         return true;
                     }

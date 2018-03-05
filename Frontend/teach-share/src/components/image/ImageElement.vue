@@ -12,10 +12,6 @@
                 </div>
             </b-carousel>
         </div>
-        <!-- <h4 class="card-title">{{ localTitle }}</h4>
-        <p class="card-text">
-            {{localBody}}
-        </p> -->
     </div>
 </template>
 
@@ -33,11 +29,7 @@ export default Vue.component("image-element", {
             sizeStyle: {width: "100%", height: "600px", padding: "20px"}
         };
     },
-    computed: {
-        url: function() {
-            return `http://localhost:8000${this.source}`;
-        }
-    },
+    computed: {},
     mounted: function() {
         console.log("in image element");
         console.log(this.images);
@@ -54,7 +46,10 @@ export default Vue.component("image-element", {
             }
         },
         URL(val) {
-            return `http://localhost:8000${val}`;
+            if (val.indexOf('http') === -1) {
+                 return `http://localhost:8000${val}`;
+            }
+            return `${val}`;
         },
         toggleEditText() {
             //@deprecated: no longer in use

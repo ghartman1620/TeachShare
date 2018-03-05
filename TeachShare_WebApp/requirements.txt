@@ -9,11 +9,14 @@ django-braces==1.12.0
 django-cors-headers==2.1.0
 django-elasticsearch-dsl==0.4.4
 django-filter==1.1.0
+django-haystack==2.7.0
 django-oauth-toolkit==1.0.0
 django-rest-framework-social-oauth2==1.1.0
 djangorestframework==3.7.7
 elasticsearch==6.1.1
 elasticsearch-dsl==5.4.0
+factory-boy==2.10.0
+Faker==0.8.11
 idna==2.6
 ipython==6.2.1
 ipython-genutils==0.2.0
@@ -30,6 +33,7 @@ prompt-toolkit==1.0.15
 psycopg2==2.7.3.2
 ptyprocess==0.5.2
 pycodestyle==2.3.1
+pyelasticsearch==1.4
 Pygments==2.2.0
 PyJWT==1.5.3
 pylint==1.8.2
@@ -39,9 +43,11 @@ pytz==2017.3
 requests==2.18.4
 requests-oauthlib==0.8.0
 simplegeneric==0.8.1
+simplejson==3.13.2
 six==1.11.0
 social-auth-app-django==2.1.0
 social-auth-core==1.6.0
+text-unidecode==1.2
 traitlets==4.3.2
 urllib3==1.22
 wcwidth==0.1.7

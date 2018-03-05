@@ -81,24 +81,21 @@ export default Vue.component("post-element", {
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
- #inner-video-container {
+#inner-video-container {
     margin-top: 2rem;
     margin-left: 2rem;
     margin-right: 2rem;
-  }
+}
 
-  #outer-video-container {
-
-  }
-
-  .post-element {
+.post-element {
     border: 0;
-  }
-  .video-post {
+}
+
+.video-post {
     border: 0;
-  }
+}
 
 .body {
     background-color: white;

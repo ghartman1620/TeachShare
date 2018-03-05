@@ -55,7 +55,10 @@ export default Vue.component("file-video", {
             return parseInt(this.width) + 20;
         },
         url: function() {
-            return `http://localhost:8000${this.source}`;
+            if (this.source.indexOf('http') === -1) {
+                 return `http://localhost:8000${this.source}`;
+            }
+            return `${this.source}`;
         }
     },
     mounted: function() {

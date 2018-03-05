@@ -62,48 +62,48 @@ $nav-text-color: rgba(255, 255, 255, 1);
 $nav-hover-color: rgba(255, 255, 255, .5);
 
 .router-link-active {
-  font-weight: bold;
-  color: rgba(255, 255, 255, 1) !important; 
-  // text-decoration-style:solid;
-  // text-decoration-line: underline;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 1) !important; 
+    // text-decoration-style:solid;
+    // text-decoration-line: underline;
 }
 
 .dropdown-menu {
-  background-color: $nav-background-color;
+    background-color: $nav-background-color;
 }
 
 .dropdown-item {
-  font-weight: 400;
-  background-color: $nav-background-color;
-  color: $nav-text-color;
+    font-weight: 400;
+    background-color: $nav-background-color;
+    color: $nav-text-color;
 }
 
 .dropdown-item:hover{
-  background-color: $nav-background-color-hover;
-  color: $nav-text-color;
+    background-color: $nav-background-color-hover;
+    color: $nav-text-color;
 }
 
 .nav-link {
-  color: rgba(255, 255, 255, 0.924) !important;
-  font-weight: bold;
+    color: rgba(255, 255, 255, 0.924) !important;
+    font-weight: bold;
 }
 
 .nav-link:hover{
-  // color: rgba(255, 255, 255, .5) !important;
-  background-color: $nav-background-color-hover;
-  font-weight: bold;
+    // color: rgba(255, 255, 255, .5) !important;
+    background-color: $nav-background-color-hover;
+    font-weight: bold;
 }
 
 .dark-green {
     background-color: #3b896a;
 }
 .ts-logo {
-  height: 40px;
-  padding-bottom: 3px;
-  width: auto;
+    height: 40px;
+    padding-bottom: 3px;
+    width: auto;
 }
 .ts-logo:hover {
-  background-color:$nav-background-color-hover;
+    background-color:$nav-background-color-hover;
 }
 
 .navbar {

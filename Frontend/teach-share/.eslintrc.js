@@ -6,7 +6,7 @@ module.exports = {
         parser: "babel-eslint"
     },
     env: {
-        browser: true
+        browser: true,
     },
     extends: [
         // https://github.com/vuejs/eslint-plugin-vue#priority-a-essential-error-prevention
@@ -16,16 +16,18 @@ module.exports = {
         "standard"
     ],
     // required to lint *.vue files
-    plugins: ["vue"],
+    plugins: [
+        "vue"
+    ],
     // add your custom rules here
     rules: {
-        semi: 0,
-        // indent: 4,
+        "semi": ["error", "always"],
+        "indent": ["error", 4], 
         "eol-last": 0,
-        // allow async-await
-        indent: [4],
-        "generator-star-spacing": "off",
-        // allow debugger during development
+        // "allow async-await": true,
+        // "generator-star-spacing": "off",
+        "quotes":  ["error", "double", { "allowTemplateLiterals": true }],
+       
         "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off"
     }
-};
+}

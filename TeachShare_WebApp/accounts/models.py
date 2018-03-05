@@ -14,11 +14,6 @@ import string
 import os
 
 # Create your models here.
-
-
-
-
-
 # userprofile & related models
 
 class UserProfile(models.Model):

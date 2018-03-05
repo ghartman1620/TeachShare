@@ -7,9 +7,10 @@ import VideoService from "./store_modules/VideoService";
 import AudioService from "./store_modules/AudioService";
 import ImageService from "./store_modules/ImageService";
 import PostCreateService from "./store_modules/PostCreateService";
+import NotificationService from "./store_modules/NotificationService";
 
 Vue.use(Vuex);
- 
+
 export default new Vuex.Store({
     modules: {
         fs: FileService,
@@ -17,7 +18,8 @@ export default new Vuex.Store({
         video: VideoService,
         audio: AudioService,
         image: ImageService,
-        create: PostCreateService
+        create: PostCreateService,
+        notifications: NotificationService
     },
     state: {
         user: null,
@@ -25,11 +27,11 @@ export default new Vuex.Store({
         comments: [],
 
         token: null,
-        //file upload
+        // file upload
         files: [],
         filesPercents: [],
 
-        //Post feed
+        // Post feed
         posts: [],
         maximumPostIndex: 0
     },
@@ -38,7 +40,7 @@ export default new Vuex.Store({
             api
                 .get("posts/?beginIndex=" + state.maximumPostIndex)
                 .then(response =>
-                    response.data.forEach(function(post) {
+                    response.data.forEach(function (post) {
                         state.posts.push(post);
                         state.maximumPostIndex++;
                     })
@@ -49,12 +51,12 @@ export default new Vuex.Store({
             state.posts = Object.assign([], data);
         },
         LOAD_POST: (state, data) => {
-            let index = state.posts.findIndex(function(val, ind, obj) {
+            let index = state.posts.findIndex(function (val, ind, obj) {
                 console.log(ind, val, obj);
                 if (val === data) {
                     return true;
                 }
-            })
+            });
             if (index === -1) {
                 state.posts.push(data);
             } else {
@@ -150,8 +152,8 @@ export default new Vuex.Store({
                 .post("get_token/", body, head)
                 .then(response => state.commit("SET_TOKEN", response.data.token))
                 .catch(err => console.log(err));
-        },
-        
+        }
+
     },
     getters: {
         getPosts: state => () => state.posts,

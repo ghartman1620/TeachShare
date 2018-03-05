@@ -54,7 +54,7 @@ export default Vue.component("edit-file", {
 				console.log(val.file);
 				files.push({
                     post: 2,
-                    type: "image_file",
+                    type: "file",
                     id: val.db_id,
                     file: val.file,
                     name: val.file.name,
