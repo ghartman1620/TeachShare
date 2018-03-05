@@ -1,8 +1,11 @@
 <template>
     <div class="container-fluid body-fluid">
-        <nav-bar :query="queryParam"></nav-bar>
         <notify></notify>
-        <router-view/>
+        <nav-bar :query="queryParam"></nav-bar>
+        <!--  -->
+        <transition name="fade">
+            <router-view/>
+        </transition>
     </div>
 </template>
 
@@ -20,8 +23,7 @@ export default Vue.component("base-page", {
         }
     },
     mounted() {
-        this.$notify("primary", "Hey, that all worked out!");
-        this.$notify("warning", "Hey, it's a warning..");
+        // this.$notifyLight("Hey this is some stuff! <strong>BOLD</strong>.")
     }
   })
 </script>

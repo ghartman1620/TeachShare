@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="notify-above fixed-top">
       <div :key="n.id" v-for="n in getAllNotifications">
             <div class="row">
                 <div class="col-2"></div>
@@ -32,7 +32,7 @@ export default {
     methods: {
         close(note) {
             console.log(note);
-            // this.$store.dispatch("removeNotification", note);
+            this.$store.dispatch("removeNotification", note.id);
         }
         
     }
@@ -41,5 +41,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+.notify-above {
+    padding-top: 65px;
+}
 
 </style>

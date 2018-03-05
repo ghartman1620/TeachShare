@@ -17,12 +17,12 @@ def generate_video_link_dict():
             'post': random.randint(1, Post.objects.count()) if Post.objects.count() >= 1 else 1,
             'title': f.sentence(nb_words=12, variable_nb_words=True),
             'type': t,
-            'thumbnail': {
-                'height': 90,
-                'width': 120,
-                'url': 'https://i.ytimg.com/vi/0X5xql1G4QY/default.jpg'
-            },
-            'url': 'https://www.youtube.com/watch?v=0X5xql1G4QY'
+            # 'thumbnail': {
+            #     'height': 90,
+            #     'width': 120,
+            #     'url': 'https://i.ytimg.com/vi/0X5xql1G4QY/default.jpg'
+            # },
+            'url': YOUTUBE_LIST[random.randint(0, len(YOUTUBE_LIST)-1)]
         }
     }
 
@@ -95,6 +95,26 @@ def generate_file_dict():
             'url': f.url()
         } for a in range(1, random.randint(2, 20)) ]
     }
+
+YOUTUBE_LIST = [
+    'https://www.youtube.com/watch?v=DsuTwV0jwaY',
+    'https://www.youtube.com/watch?v=z6hQqgvGI4Y',
+    'https://www.youtube.com/watch?v=Fa4cRMaTDUI',
+    'https://www.youtube.com/watch?v=IUgstalu6zo',
+    'https://www.youtube.com/watch?v=yDv5FIAeyoY',
+    'https://www.youtube.com/watch?v=2yXfUPwlZTw',
+    'https://www.youtube.com/watch?v=we4zuQIXmnw',
+    'https://www.youtube.com/watch?v=1j8xTOmR8pw',
+    'https://www.youtube.com/watch?v=5LYrN_cAJoA&list=PL4cUxeGkcC9gQcYgjhBoeQH7wiAyZNrYa',
+    'https://www.youtube.com/watch?v=XK9N5d_ORN4',
+    'https://www.youtube.com/watch?v=5Bi-Mcg_2Y0',
+    'https://www.youtube.com/watch?v=gyuP-DztlmM',
+    'https://www.youtube.com/watch?v=FNQxxpM1yOs',
+    'https://www.youtube.com/watch?v=D6esTdOLXh4',
+    'https://www.youtube.com/watch?v=0Jo_Q8NYd3I',
+    'https://www.youtube.com/watch?v=jgWnccjXR4I'
+
+]
 
 FUNCTION_LIST = [
     generate_video_link_dict, 

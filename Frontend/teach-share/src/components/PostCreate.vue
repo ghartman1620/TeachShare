@@ -141,7 +141,7 @@
 <script>
 import Vue from "vue";
 import { mapState } from "vuex";
-
+import forEach from "lodash/forEach";
 import PostElement from "./PostElement";
 
 function isBlank(str) {
@@ -236,7 +236,24 @@ export default {
                 attachments: []
             };
             console.log(obj);
-            this.$store.dispatch("createPost", obj);
+            var vm = this;
+            this.$store.dispatch("createPost", obj).then(function(ret){
+                console.log("RETURNED: ", ret);
+                if (ret === undefined) {
+                    vm.$notifyDanger("There was a problem submitting your post.");
+                }
+                else if (ret.status < 300) {
+                    vm.$notifySuccess("Post submitted successfully!");
+                } else {
+                    let total = "";
+                    forEach(ret, function(val, key) {
+                        let currentValue = val.join(" ");
+                        total = `${total} "${key}: ${currentValue}" `;
+                    });
+                    vm.$notifyDanger(`There was a problem submitting your post. ${total}`);
+                }
+                
+            });
         },
         editElement: function(index) {
             var type = this.$store.state.create.postElements[index].type;

@@ -14,10 +14,12 @@ const EditImage = () => import(/* webpackChunkName: "edit-image" */ "../componen
 const EditFile = () => import(/* webpackChunkName: "edit-file" */ "../components/file/EditFile.vue");
 const PostFeed = () => import(/* webpackChunkName: "post-feed" */ "../components/PostFeed.vue");
 const PostDetail = () => import(/* webpackChunkName: "post-feed" */ "../components/PostDetail.vue");
+const Comments = () => import(/* webpackChunkName: "comments" */ "../components/comments/Comments.vue");
 
 Vue.use(Router);
 
 export default new Router({
+    mode: "history",
     routes: [{
         path: "/",
         component: Base,
@@ -64,10 +66,24 @@ export default new Router({
                 name: "posts",
                 path: "/posts/:post_id",
                 component: PostDetail
+            },
+            {
+                path: "/comments",
+                name: "Comments",
+                component: Comments,
+                props: {
+                    comments: [
+                        {
+                            user: 1,
+                            id: 1,
+                            content: "some fake text!"
+
+                        }
+                    ]
+                }
             }
         ]
     },
-
     {
         path: "/login",
         name: "Login",

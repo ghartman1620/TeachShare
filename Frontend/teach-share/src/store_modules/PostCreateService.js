@@ -6,7 +6,7 @@ const PostCreateService = {
         postElements: [],
         doneMutations: [],
         unDoneMutations: [],
-        editorOpen: false,
+        editorOpen: false
     },
     mutations: {
         UNDO: state => {
@@ -118,9 +118,7 @@ const PostCreateService = {
         redo: context => {
             if (context.state.unDoneMutations.length > 0) {
                 var mut =
-                    context.state.unDoneMutations[
-                        context.state.unDoneMutations.length - 1
-                    ];
+                    context.state.unDoneMutations[context.state.unDoneMutations.length - 1];
                 console.log(mut);
                 context.commit("REDO");
                 context.commit(mut.mutation, mut.arg);
@@ -154,7 +152,7 @@ const PostCreateService = {
         },
         closeEditor: (context) => {
             context.commit("CLOSE_EDITOR");
-        },
+        }
     }
 };
 

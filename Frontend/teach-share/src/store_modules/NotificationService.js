@@ -20,11 +20,22 @@ const NotificationService = {
             } else {
                 state.pendingNotifications[current] = notification;
             }
+        },
+        REMOVE_NOTIFICATION: (state, notificationID) => {
+            console.log(notificationID);
+            let current = findIndex(state.pendingNotifications, (n) => n.id === notificationID);
+            console.log(current);
+            if (current !== -1) {
+                state.pendingNotifications.splice(current, 1);
+            }
         }
     },
     actions: {
         sendNotification: (state, notification) => {
             state.commit("SEND_NOTIFICATION", notification);
+        },
+        removeNotification: (state, notificationID) => {
+            state.commit("REMOVE_NOTIFICATION", notificationID);
         }
     },
     getters: {
