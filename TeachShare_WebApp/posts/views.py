@@ -9,11 +9,44 @@ from rest_framework.response import Response
 
 from .models import Post, Comment, Attachment
 from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer
+from .documents import PostDocument
 
 # test
 from django.http import HttpResponse
 from django.shortcuts import render
+from urllib.parse import unquote
 
+
+#Post search parameters
+#Contains a keyword
+#Contains all/any of multiple keywords
+
+class SearchPostsView(views.APIView):
+
+    #queryset = Post.objects.all() #this isn't used but it makes rest framework happy
+    #s = PostDocument.search()
+    def get_queryset(self):
+        queryset = PostDocument.search()
+
+        termParam = self.request.query_params.get('term', None)
+        if termParam is not None:
+            terms = unquote(termParam)
+            termlist = terms.split(' ')
+            for term in termlist:
+                print('querying' + term)
+                queryset = queryset.query('multi_match', query=term, fields=['title', 'content', 'tags'])
+        return queryset
+    def get(self, request, format=None):
+        response = []
+        queryset = self.get_queryset()
+        for hit in queryset:
+            try:
+                response.append(Post.objects.get(id=hit._d_['id']))
+            except Post.DoesNotExist as e:
+                pass
+            
+        return Response(PostSerializer(response, many=True).data)
+    
 
 class PostFilter(filters.FilterSet):
     beginIndex = django_filters.NumberFilter(name='beginIndex', label="beginIndex", method='filterNumberPosts')
@@ -21,7 +54,6 @@ class PostFilter(filters.FilterSet):
         model = Post
         fields = ('user', 'title', 'updated', 'likes', 'timestamp')
     def filterNumberPosts(self, queryset, name, value):
-        
         return queryset[value:value+10]
 
 class PostViewSet(viewsets.ModelViewSet):
