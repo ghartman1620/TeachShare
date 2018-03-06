@@ -43,7 +43,7 @@ export default{
 
             if (offset >= height) {
                 console.log("scroll to bototm");
-                this.getPosts();
+                //this.getPosts();
             }        
         },
     },

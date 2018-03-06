@@ -86,7 +86,7 @@ export default new Vuex.Store({
         },
         fetchAllPosts: (state, postID) => {
             console.log(api.defaults.headers.Authorization);
-            api.get(`posts/`)
+            api.get(`search/`)
                 .then(response => state.commit("LOAD_ALL_POSTS", response.data))
                 .catch(err => console.log(err));
         },
