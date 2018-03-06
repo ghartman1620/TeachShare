@@ -3,6 +3,7 @@
 <router-view/>
 <div :key="post.pk" v-for="(post, index) in posts">
     <post
+        class="card-shadow"
         :maxHeight="500"
         :post="post"
         :index="index">
@@ -66,11 +67,16 @@ export default{
 
 <style lang="scss" scoped>
 
+$card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
+
 .invisible-button {
     background: transparent;
     border: none !important;
     font-size:0;
 }
 
+.card-shadow {
+    box-shadow: $card-shadow;
+}
 
 </style>

@@ -19,7 +19,7 @@ class PostFilter(filters.FilterSet):
     beginIndex = django_filters.NumberFilter(name='beginIndex', label="beginIndex", method='filterNumberPosts')
     class Meta:
         model = Post
-        fields = ('user', 'title', 'updated', 'likes', 'timestamp')
+        fields = ('user', 'title', 'updated', 'likes', 'timestamp', 'comments')
     def filterNumberPosts(self, queryset, name, value):
         
         return queryset[value:value+10]

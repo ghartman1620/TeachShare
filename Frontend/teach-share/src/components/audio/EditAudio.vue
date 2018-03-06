@@ -34,12 +34,10 @@
 
                 <div class="row">
                     <div class="offset-3 col-6">
-                        <router-link :to="{name: 'create'}">
-                            <button @click="submitElement" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
-                                <span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
-                                <span v-else>Submit Audio(s)</span>
-                            </button>
-                        </router-link>
+                        <button @click.prevent="submit" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
+                            <span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
+                            <span v-else>Submit Audio(s)</span>
+                        </button>
                     </div>
                     <div class="col-2">
                         <button @click="close" type="button" class="btn btn-danger btn-block">
@@ -78,7 +76,7 @@ export default Vue.component("edit-audio", {
     submitAudio() {
       console.log(this.title);
       console.log(this.description);
-      this.$store.dispatch("submitAudioFiles", this.senerateJSON());
+      this.$store.dispatch("submitAudioFiles", this.generateJSON());
     },
     generateJSON() {
       let output = new Array();
@@ -99,19 +97,22 @@ export default Vue.component("edit-audio", {
       console.log(output);
       return output;
     },
-    submitElement() {
-      if (
-        this.$route.query.index == this.$store.state.create.postElements.length
-      ) {
-        this.$store.dispatch("addElement", {
-          type: "audio",
-          content: this.generateJSON()
-        });
-      } else {
-        this.$store.dispatch("editElement", {
-          index: this.$route.query.index,
-          element: { type: "audio", content: this.generateJSON() }
-        });
+    submit() {
+        var vm = this;
+        if (this.$route.query.index === this.$store.state.create.postElements.length) {
+            this.$store.dispatch("addElement", {
+                type: "audio",
+                content: this.generateJSON()
+            }).then(function(){
+                vm.$router.push({name: "create"});
+            });
+        } else {
+            this.$store.dispatch("editElement", {
+                index: this.$route.query.index,
+                element: { type: "audio", content: this.generateJSON() }
+            }).then(function(){
+                vm.$router.push({name: "create"});
+            });
       }
     },
     close: function(event) {

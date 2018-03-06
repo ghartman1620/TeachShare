@@ -34,20 +34,15 @@
             <br>
             <div class="row">
                 <div class="offset-3 col-6">
-                    <router-link :to="{name: 'create'}">
-                    <button @click="submit" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
+                    <button @click.prevent="submit" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
                         <span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
                         <span v-else>Submit Image(s)</span>
                     </button>
-                    </router-link>
                 </div>
                 <div class="col-2">
-                    <router-link :to="{name:'create'}">
-
                     <button type="button" class="btn btn-danger btn-block" @click.prevent="cancelEdit">
                     Cancel
                     </button>
-                    </router-link>
                 </div>
             </div>
         </form>
@@ -62,11 +57,12 @@ import Vue from "vue";
 import FileUpload from "../FileUpload";
 import { mapGetters } from "vuex";
 import ImageElement from "./ImageElement";
+import DimensionPicker from "../DimensionPicker";
 
 var _ = require("lodash");
 
 export default Vue.component("edit-image", {
-    components: { FileUpload, ImageElement },
+    components: { FileUpload, ImageElement, DimensionPicker },
     props: [],
     data() {
     return {
@@ -81,21 +77,22 @@ export default Vue.component("edit-image", {
     },
     methods: {
         submit() {
-            if (
-                this.$route.query.index ==
-                this.$store.state.create.postElements.length
-            ) {
-                this.$store.dispatch("addElement", this.generateJSON());
+            var vm = this;
+            if (this.$route.query.index === this.$store.state.create.postElements.length) {
+                this.$store.dispatch("addElement", this.generateJSON())
+                    .then(function(){
+                        vm.$router.push({name: "create"});
+                });
             } else {
                 this.$store.dispatch("editElement", {
                     index: this.$route.query.index,
                     component: this.generateJSON()
+                }).then(function(){
+                    vm.$router.push({name: "create"});
                 });
             }
-
-            console.log(this.title);
-            console.log(this.description);
-            this.$store.dispatch("LoadImages", this.generateJSON());
+            // this.$store.dispatch("LoadImages", this.generateJSON());
+            // this.$router.push({name: "create"});
         },
         generateJSON() {
             let output = new Array();

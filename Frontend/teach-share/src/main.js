@@ -10,10 +10,14 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 
-import { Carousel, Alert } from "bootstrap-vue/es/components";
+import { Carousel, Alert, Card, FormTextarea, Button, Layout } from "bootstrap-vue/es/components";
 
 Vue.use(Carousel);
 Vue.use(Alert);
+Vue.use(Card);
+Vue.use(FormTextarea);
+Vue.use(Button);
+Vue.use(Layout);
 
 Vue.use(Notifications);
 

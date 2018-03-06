@@ -15,6 +15,7 @@ const EditFile = () => import(/* webpackChunkName: "edit-file" */ "../components
 const PostFeed = () => import(/* webpackChunkName: "post-feed" */ "../components/PostFeed.vue");
 const PostDetail = () => import(/* webpackChunkName: "post-feed" */ "../components/PostDetail.vue");
 const Comments = () => import(/* webpackChunkName: "comments" */ "../components/comments/Comments.vue");
+const CommentEntry = () => import(/* webpackChunkName: "comments" */ "../components/comments/CommentEntry.vue");
 
 Vue.use(Router);
 
@@ -80,6 +81,18 @@ export default new Router({
 
                         }
                     ]
+                }
+            },
+            {
+                path: "/comments/:comment_id",
+                name: "Comment",
+                component: CommentEntry,
+                props: {
+                    comment: {
+                        user: 1,
+                        id: 1,
+                        content: "some fake text 2!"
+                    }
                 }
             }
         ]

@@ -56,19 +56,14 @@
         </div>
         <div class="row">
             <div class="offset-3 col-6">
-                <router-link :to="{name: 'create'}">
                 <button @click="submit" class="btn btn-primary btn-block">
                     Submit Text
                 </button>
-                </router-link>
             </div>
             <div class="col-2">
-                <router-link :to="{name:'create'}">
-
                 <button type="button" class="btn btn-danger btn-block" @click.prevent="close">
                 Cancel
                 </button>
-                </router-link>
             </div>
         </div>
     </div>
@@ -119,10 +114,10 @@ export default Vue.component("edit-text", {
     },
     mounted() {
         this.$store.dispatch("openEditor");
-        this.$router.replace({
-            name: "edit-text",
-            query: { index: this.$route.query.index }
-        });
+        // this.$router.replace({
+        //     name: "edit-text",
+        //     query: { index: this.$route.query.index }
+        // });
         console.log("mounted edit text");
         if (
             this.$route.query.index >=

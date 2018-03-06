@@ -53,39 +53,43 @@
     <div class="row">
         <div class="col-2"></div>
         <div class="col-8">
-            <form>
-                <div class="form-group">
-                    <div id="title-tag-card" class="card mx-auto">
-                        <br>
-                        <div class="title-container container">
-                            <br>
-                            <label for="titleTextbox"><h4><strong>Title: </strong></h4></label>
-                            <input class="form-control" type="text" v-model.lazy="title"
-                                placeholder="Title required" id="titleTextbox">
-                            <br>
-                        </div>
-
-                        <div class="tag-card card">
-                            <label for="tagTextbox">Tags: </label>
-                            <div class="row">
-                                <div class="col-8">
-                                    <input class="form-control" v-model="inProgressTag" v-on:keyup="createTag"
-                                        placeholder="add a topic tag" id="tagTextbox">
-                                </div>
-                                <div class="col-4">
-                                    <button @click="createTagBtn" class="btn btn-block btn-primary"><strong>Create Tag</strong></button>
-                                </div>
+            <div class="form-group">
+                <div id="title-tag-card" class="card">
+                    <br>
+                    <div class="title-container container">
+                        <div class="row">
+                            <div class="col-2">
+                                <label for="titleTextbox"><h4><strong>Title: </strong></h4></label>
                             </div>
-                            <hr>
-                            <span id="tag-container" :key="index" v-for="(tag,index) in tags">
-                                <span @click="removeTag(index)" class="tag-entry badge badge-dark">{{tag}} <span aria-hidden="true">&times;</span>
-                                    <!-- <button id="tag-delete-button" type="button" class="btn btn-sm btn-dark" >{{"x"}}</button> -->
-                                </span>
-                            </span>
+                            
+                            <div class="col-10">
+                                <input class="form-control" type="text" v-model.lazy="title"
+                                    placeholder="Title required" id="titleTextbox">
+                            </div>
                         </div>
                     </div>
+                    <div class="container tag-card card">
+                        <div class="row">
+                            <div class="col-2">
+                                <label for="tagTextbox"><h4><strong>Tags: </strong></h4></label>
+                            </div>
+                            <div class="col-8">
+                                <input class="form-control" v-model="inProgressTag" v-on:keyup="createTag"
+                                    placeholder="add a topic tag" id="tagTextbox">
+                            </div>
+                            <div class="col-2">
+                                <button @click="createTagBtn" class="btn btn-block btn-primary"><strong>+ Create</strong></button>
+                            </div>
+                        </div>
+                        <hr>
+                        <span id="tag-container" :key="index" v-for="(tag,index) in tags">
+                            <span @click="removeTag(index)" class="tag-entry badge badge-dark">{{tag}} <span aria-hidden="true">&times;</span>
+                                <!-- <button id="tag-delete-button" type="button" class="btn btn-sm btn-dark" >{{"x"}}</button> -->
+                            </span>
+                        </span>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
         <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
@@ -498,7 +502,6 @@ $theme-colors: ("primary": red);
 .tag-card {
     background-color: $title-tag-card-background;
     border: 0;
-    // width: 100%;
     display: inline;
     padding: 10px;
 }

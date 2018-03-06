@@ -5,19 +5,15 @@
 		</file-upload>
 		<div class="row">
 			<div class="offset-3 col-6">
-				<router-link :to="{name: 'create'}">
-					<button @click="submit" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
+				<button @click.prevent="submit" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
 					<span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
 					<span v-else>Submit File(s)</span>
 				</button>
-				</router-link>
 			</div>
 			<div class="col-2">
-				<router-link :to="{name: 'create'}">
-					<button type="button" class="btn btn-danger btn-block">
-							Cancel
-					</button>
-				</router-link>
+				<button @click.prevent="cancel" type="button" class="btn btn-danger btn-block">
+						Cancel
+				</button>
 			</div>
 		</div>
 	</div>
@@ -35,16 +31,19 @@ export default Vue.component("edit-file", {
 	},
 	methods: {
 		submit() {
-			if (
-				this.$route.query.index ==
-				this.$store.state.create.postElements.length
-			) {
-				this.$store.dispatch("addElement", this.generateJSON());
+			var vm = this;
+			if (this.$route.query.index === this.$store.state.create.postElements.length) {
+				this.$store.dispatch("addElement", this.generateJSON())
+					.then(function(){
+						vm.$router.push({name: "create"});
+					});
 			} else {
 				this.$store.dispatch("editElement", {
-				index: this.$route.query.index,
-				element: this.generateJSON()
-				});
+					index: this.$route.query.index,
+					element: this.generateJSON()
+				}).then(function(){
+                    vm.$router.push({name: "create"});
+                });
 			}
 		},
 		generateJSON() {
@@ -63,7 +62,10 @@ export default Vue.component("edit-file", {
 			});
 			console.log(files);
 			return {type: "file", files: files}
-		}
+		},
+		cancel() {
+            this.$router.push({ name: "create" });
+        }
 	},
 	created() {
 		this.$store.dispatch("openEditor");

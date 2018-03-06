@@ -72,6 +72,11 @@ export default new Vuex.Store({
         LOAD_COMMENTS_FOR_POST: (state, data) => {
             state.comments = Object.assign([], data);
         },
+        CREATE_COMMENT: (state, comment) => {
+            console.log("CREATE_COMMENT: ", comment);
+            let index = state.comments.findIndex(val => val.id === comment.id);
+            console.log("create index: ", index);
+        },
         LOAD_FILTERED_POSTS: (state, data) => {
             state.posts = Object.assign([], data);
         },
@@ -174,6 +179,16 @@ export default new Vuex.Store({
                 .post("get_token/", body, head)
                 .then(response => state.commit("SET_TOKEN", response.data.token))
                 .catch(err => console.log(err));
+        },
+        createComment: (state, comment) => {
+            return new Promise((resolve, reject) => {
+                api.post("comments/", comment)
+                    .then(response => {
+                        state.commit("CREATE_COMMENT");
+                        return resolve(response);
+                    })
+                    .catch(err => reject(err));
+            });
         }
 
     },
