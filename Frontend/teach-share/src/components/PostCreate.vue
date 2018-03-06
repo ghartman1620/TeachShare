@@ -61,7 +61,7 @@
                             <div class="col-2">
                                 <label for="titleTextbox"><h4><strong>Title: </strong></h4></label>
                             </div>
-                            
+
                             <div class="col-10">
                                 <input class="form-control" type="text" v-model.lazy="title"
                                     placeholder="Title required" id="titleTextbox">
@@ -73,12 +73,12 @@
                             <div class="col-2">
                                 <label for="tagTextbox"><h4><strong>Tags: </strong></h4></label>
                             </div>
-                            <div class="col-8">
+                            <div class="col-9">
                                 <input class="form-control" v-model="inProgressTag" v-on:keyup="createTag"
                                     placeholder="add a topic tag" id="tagTextbox">
                             </div>
-                            <div class="col-2">
-                                <button @click="createTagBtn" class="btn btn-block btn-primary"><strong>+ Create</strong></button>
+                            <div class="col-1">
+                                <button @click="createTagBtn" id="create-tag-button" class="btn btn-block btn-primary float-right"><a id="create-plus">+</a></button>
                             </div>
                         </div>
                         <hr>
@@ -256,7 +256,7 @@ export default {
                     });
                     vm.$notifyDanger(`There was a problem submitting your post. ${total}`);
                 }
-                
+
             });
         },
         editElement: function(index) {
@@ -404,6 +404,21 @@ $theme-colors: ("primary": red);
     margin-top: 2rem;
     border: none;
     box-shadow: $card-shadow;
+}
+
+#create-tag-button {
+    padding: 0;
+    margin-right: 5px;
+    margin-left: 10px;
+    width: 40px;
+    height: auto;
+
+}
+
+#create-plus {
+    font-size: 1.5rem;
+    text-align: center;
+    vertical-align: middle;
 }
 
 #tag-submit-box {
