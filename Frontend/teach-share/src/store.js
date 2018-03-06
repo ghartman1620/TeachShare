@@ -31,20 +31,8 @@ export default new Vuex.Store({
 
         //Post feed
         posts: [],
-        maximumPostIndex: 0
     },
     mutations: {
-        ADD_POSTS: state => {
-            api
-                .get("posts/?beginIndex=" + state.maximumPostIndex)
-                .then(response =>
-                    response.data.forEach(function(post) {
-                        state.posts.push(post);
-                        state.maximumPostIndex++;
-                    })
-                )
-                .catch(err => console.log(err));
-        },
         LOAD_ALL_POSTS: (state, data) => {
             state.posts = Object.assign([], data);
         },
@@ -81,10 +69,13 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        addMorePosts: state => {
-            state.commit("ADD_POSTS");
+        simplePostSearch: (state, term) => {
+            console.log("doing search for" + term);
+            api.get("search/?term="+term)
+                .then(response => state.commit("LOAD_ALL_POSTS", response.data))
+                .catch(err => console.log(err))
         },
-        fetchAllPosts: (state, postID) => {
+        fetchAllPosts: (state) => {
             console.log(api.defaults.headers.Authorization);
             api.get(`search/`)
                 .then(response => state.commit("LOAD_ALL_POSTS", response.data))
