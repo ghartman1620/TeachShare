@@ -7,12 +7,12 @@
                 <br>
                 <b-row>
                     <b-col offset="4" cols="4">
-                        <b-button
+                        <b-btn
                             block
                             variant="info"
                             @click="editing = !editing">
                             Edit Comment
-                        </b-button>
+                        </b-btn>
                     </b-col>
                 </b-row>
             </b-container>
@@ -26,21 +26,21 @@
                 <b-row>
                     <b-col offset="2" cols="5">
                         <br>
-                        <b-button
+                        <b-btn
                             @click="submit"
                             block
                             variant="primary">
                             Submit Comment
-                        </b-button>
+                        </b-btn>
                     </b-col>
                     <b-col cols="2">
                         <br>
-                        <b-button
+                        <b-btn
                             @click="cancel"
                             block
                             variant="danger">
                             Cancel
-                        </b-button>
+                        </b-btn>
                     </b-col>
                 </b-row>
             </b-container>
