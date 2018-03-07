@@ -21,16 +21,26 @@ def assembleContent(content, element):
 class PostDocument(DocType):
     title = fields.TextField()
     content = fields.TextField()
-    tags = fields.ObjectField()
+    tags = fields.TextField()
     updated = fields.DateField()
     likes = fields.IntegerField()
     timestamp = fields.DateField()
-
-
+    id = fields.IntegerField()
+    '''
+    def prepare_tags(self, instance):
+        tags = ""
+        for tag in instance.tags:
+            tags += tag + " "
+        return tags
+    '''
     def prepare_content(self, instance):
         content = ""
-        for element in instance.content:
-            content = assembleContent(content, element)
+        if not type(instance.content) is dict:
+            for element in instance.content:
+                content = content + assembleContent(content, element)
+        else:
+            for k,v in instance.content.items():
+                content = content + " " + v
         return content
 
     class Meta:

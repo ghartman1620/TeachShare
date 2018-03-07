@@ -8,7 +8,7 @@
                 exact code needed for other types of buttons -->
                 <div class="custom-quill-editor">
                     <quill-editor
-                        v-model="component.content"
+                        v-model="element.content"
                         :options="editorOption">
                         <div id="toolbar" slot="toolbar">
                             <!-- Add a bold button -->
@@ -83,7 +83,7 @@ Vue.use(VueQuillEditor);
 export default Vue.component("edit-text", {
     data() {
         return {
-            component: {},
+            element: {},
             editorOption: {
                 modules: {
                     toolbar: "#toolbar"
@@ -99,11 +99,11 @@ export default Vue.component("edit-text", {
                 this.$route.query.index ==
                 this.$store.state.create.postElements.length
             ) {
-                this.$store.dispatch("addElement", this.component);
+                this.$store.dispatch("addElement", this.element);
             } else {
                 this.$store.dispatch("editElement", {
                     index: this.$route.query.index,
-                    component: this.component
+                    element: this.element
                 });
             }
             this.$router.push({ name: "create" });
@@ -123,12 +123,12 @@ export default Vue.component("edit-text", {
             this.$route.query.index >=
             this.$store.state.create.postElements.length
         ) {
-            this.component = {
+            this.element = {
                 type: "text",
                 content: ""
             };
         } else {
-            this.component = Object.assign(
+            this.element = Object.assign(
                 {},
                 this.$store.state.create.postElements[this.$route.query.index]
             );

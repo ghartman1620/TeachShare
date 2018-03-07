@@ -6,7 +6,7 @@ const PostCreateService = {
         postElements: [],
         doneMutations: [],
         unDoneMutations: [],
-        editorOpen: false
+        editorOpen: false 
     },
     mutations: {
         UNDO: state => {

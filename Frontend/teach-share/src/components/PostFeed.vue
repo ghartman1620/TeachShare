@@ -14,7 +14,7 @@
 <!-- Scroll to bottom functionality -->
 
 <br><br><!-- this br is required so scroll() can function properly-->
-<button @click="getPosts" class="invisible-button"></button>
+<button class="invisible-button"></button>
 </div>
 </template>
 
@@ -35,21 +35,28 @@ export default{
 
     },
     methods: {
-        getPosts: function() {
-            this.$store.dispatch("fetchAllPosts");
-        },
+
         scroll(){
             var offset = document.documentElement.scrollTop + window.innerHeight;
             var height = document.documentElement.offsetHeight;
 
             if (offset >= height) {
                 console.log("scroll to bototm");
-                this.getPosts();
+                //this.getPosts();
             }        
         },
+        reloadPosts(){
+            if(this.$route.query.term != undefined){
+                this.$store.dispatch("simplePostSearch", this.$route.query.term);
+            }
+            else{
+                this.$store.dispatch("fetchAllPosts");
+            }
+        }
     },
     beforeMount(){
-        this.getPosts();
+        this.reloadPosts();
+        
         var t = this;
         window.addEventListener("scroll", function() {t.scroll()}, false);
         console.log(this.$router.params)
@@ -59,6 +66,11 @@ export default{
     },
     destroyed() {
         window.removeEventListener("scroll", function() {t.scroll()}, false);
+    },
+    watch: {
+        $route (to, from){
+            this.reloadPosts();
+        }
     }
 
 }

@@ -1,0 +1,40 @@
+[
+            {
+                "type": "text",
+                "content": "<p><span class=\"ql-size-large\">Garage Band </span>is software you can use to make songs!</p>"
+            },
+            {
+                "type": "audio",
+                "content": [
+                    {
+                        "id": 1380,
+                        "url": "/media/uploads/2018/03/02/cd1ff7c8-c3b9-4fa8-a7c5-50d4da0defde/SoundHelix-Song-1.mp3",
+                        "name": "SoundHelix-Song-1.mp3",
+                        "post": 2,
+                        "type": "audio_file",
+                        "title": "",
+                        "filetype": "audio/mp3",
+                        "description": "Like this one!"
+                    }
+                ]
+            },
+            {
+                "type": "audio",
+                "content": [
+                    {
+                        "id": 1382,
+                        "url": "/media/uploads/2018/03/02/015fe95a-0ac9-42db-8ae5-22228ddf2d01/SoundHelix-Song-2.mp3",
+                        "name": "SoundHelix-Song-2.mp3",
+                        "post": 2,
+                        "type": "audio_file",
+                        "title": "",
+                        "filetype": "audio/mp3",
+                        "description": "...or this one."
+                    }
+                ]
+            },
+            {
+                "type": "text",
+                "content": "<p>I don't actually know if those songs were made in garage band but this is an example</p>"
+            }
+        ]

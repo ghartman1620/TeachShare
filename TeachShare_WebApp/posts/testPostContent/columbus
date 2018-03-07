@@ -1,0 +1,43 @@
+[
+            {
+                "type": "text",
+                "content": "<p>The year was 1492, Columbus sailed the ocean blue!</p>"
+            },
+            {
+                "type": "image_file",
+                "title": "",
+                "width": 640,
+                "height": 480,
+                "content": [
+                    {
+                        "id": 1379,
+                        "url": "/media/uploads/2018/03/02/b9c53f5c-ec5c-450e-acec-3c8b8c36ceb4/columbus.jpg",
+                        "file": {},
+                        "name": "columbus.jpg",
+                        "post": 2,
+                        "type": "image_file",
+                        "title": "",
+                        "description": "According to Google, this is the ship Columbus sailed on!"
+                    }
+                ],
+                "description": "According to Google, this is the ship Columbus sailed on!"
+            },
+            {
+                "type": "video_link",
+                "content": {
+                    "id": "CMiReDGqs3Q",
+                    "url": "https://www.youtube.com/watch?v=CMiReDGqs3Q",
+                    "post": 2,
+                    "type": "video_link",
+                    "title": "Columbus Song - 1492",
+                    "width": 640,
+                    "height": 480,
+                    "thumbnail": {
+                        "url": "https://i.ytimg.com/vi/CMiReDGqs3Q/default.jpg",
+                        "width": 120,
+                        "height": 90
+                    },
+                    "description": "in “I Will Be Your Friend: Songs and Activities for Young Peacemakers”\nTeaching Tolerance - Southern Poverty Law Center 2003\nFirst Edition\nWords and Music by Nancy Schimmel\n\n(Malvina Reynold's daughter). http://www.sisterschoice.com/. \nThe recording is by Sally Rogers. It is on her \"What Can One Little Person Do?\" CD: http://sallyrogers.com/site/store/what-can-one-little-person-do/.\n\nSally is an amazing award-winning children's musician. Check out her website http://sallyrogers.com."
+                }
+            }
+        ]

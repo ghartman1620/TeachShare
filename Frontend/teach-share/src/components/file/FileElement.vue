@@ -26,7 +26,7 @@
 <script>
 import Vue from "vue";
 
-export default Vue.component("file-component", {
+export default Vue.component("file-element", {
     props: ["element"],
     data() {
         return {};
