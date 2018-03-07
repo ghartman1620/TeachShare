@@ -14,13 +14,15 @@
 
                     <!-- create a post link -->
                     <li class="nav-item">
-                        <router-link class="nav-link" :to="{name:'create', query: { index: 0 } }">Create Post</router-link>
+                        <router-link class="nav-link" :to="{name:'create', query: { index: 0 } }">
+                            <font-awesome-icon icon="edit" fixed-width></font-awesome-icon> Create Post
+                        </router-link>
                     </li>
 
                     <!-- just an example dropdown -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="Account Profile" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            Profile
+                            <font-awesome-icon icon="user-circle" fixed-width></font-awesome-icon> Profile
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <router-link class="dropdown-item" :to="{name: 'dashboard'}">Your post feed</router-link>
@@ -43,9 +45,10 @@
 <script>
 import Vue from "vue";
 import SearchBox from "./SearchBox.vue";
+import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 
 export default Vue.component("nav-bar", {
-    components: { SearchBox },
+    components: { SearchBox, FontAwesomeIcon },
     props: ["query"],
     data() {
         return {};
@@ -55,15 +58,14 @@ export default Vue.component("nav-bar", {
 
 
 <style lang="scss" scoped>
-
 $nav-background-color: #3b896a;
 $nav-background-color-hover: #204738;
 $nav-text-color: rgba(255, 255, 255, 1);
-$nav-hover-color: rgba(255, 255, 255, .5);
+$nav-hover-color: rgba(255, 255, 255, 0.5);
 
 .router-link-active {
     font-weight: bold;
-    color: rgba(255, 255, 255, 1) !important; 
+    color: rgba(255, 255, 255, 1) !important;
     // text-decoration-style:solid;
     // text-decoration-line: underline;
 }
@@ -78,7 +80,7 @@ $nav-hover-color: rgba(255, 255, 255, .5);
     color: $nav-text-color;
 }
 
-.dropdown-item:hover{
+.dropdown-item:hover {
     background-color: $nav-background-color-hover;
     color: $nav-text-color;
 }
@@ -88,7 +90,7 @@ $nav-hover-color: rgba(255, 255, 255, .5);
     font-weight: bold;
 }
 
-.nav-link:hover{
+.nav-link:hover {
     // color: rgba(255, 255, 255, .5) !important;
     background-color: $nav-background-color-hover;
     font-weight: bold;
@@ -103,7 +105,7 @@ $nav-hover-color: rgba(255, 255, 255, .5);
     width: auto;
 }
 .ts-logo:hover {
-    background-color:$nav-background-color-hover;
+    background-color: $nav-background-color-hover;
 }
 
 .navbar {
@@ -111,12 +113,11 @@ $nav-hover-color: rgba(255, 255, 255, .5);
     height: 60px;
 }
 
-@media only screen and (max-width : 992px) {
+@media only screen and (max-width: 992px) {
     .navbar-collapse {
         background: darken($nav-background-color, 10%);
     }
 }
-
 
 .collapsed {
     background: darken($nav-background-color, 10%);
@@ -129,5 +130,4 @@ $nav-hover-color: rgba(255, 255, 255, .5);
 .search-container > form {
     padding-left: 20px;
 }
-
 </style>

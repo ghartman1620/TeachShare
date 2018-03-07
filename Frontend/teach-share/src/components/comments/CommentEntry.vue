@@ -11,6 +11,7 @@
                             block
                             variant="info"
                             @click="editing = !editing">
+                            <font-awesome-icon icon="edit" fixed-width></font-awesome-icon>
                             Edit Comment
                         </b-btn>
                     </b-col>
@@ -30,6 +31,7 @@
                             @click="submit"
                             block
                             variant="primary">
+                            <font-awesome-icon icon="check" fixed-width></font-awesome-icon>
                             Submit Comment
                         </b-btn>
                     </b-col>
@@ -39,7 +41,7 @@
                             @click="cancel"
                             block
                             variant="danger">
-                            Cancel
+                            <font-awesome-icon icon="times" fixed-width></font-awesome-icon> Cancel
                         </b-btn>
                     </b-col>
                 </b-row>
@@ -51,34 +53,33 @@
 <script>
 import TextElement from "../text/TextElement";
 import EditText from "../text/EditText";
+import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 
 export default {
     name: "comment-entry",
     props: ["comment"],
-    components: {TextElement, EditText},
+    components: { TextElement, EditText, FontAwesomeIcon },
     data: function() {
         return {
             editing: false,
             text: ""
-        }
+        };
     },
-    computed: {
-    },
+    computed: {},
     methods: {
         submit() {
             console.log("Text: ", this.text);
             this.editing = false;
         },
         cancel() {
-            console.log("Cancelling comment.")
+            console.log("Cancelling comment.");
             this.editing = false;
         }
-
     },
     mounted() {
         this.text = this.comment.content;
     }
-}
+};
 </script>
 
 <style lang="scss" scoped>

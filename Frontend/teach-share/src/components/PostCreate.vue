@@ -73,12 +73,16 @@
                             <div class="col-2">
                                 <label for="tagTextbox"><h4><strong>Tags: </strong></h4></label>
                             </div>
-                            <div class="col-9">
+                            <div class="col-8">
                                 <input class="form-control" v-model="inProgressTag" v-on:keyup="createTag"
                                     placeholder="add a topic tag" id="tagTextbox">
                             </div>
-                            <div class="col-1">
-                                <button @click="createTagBtn" id="create-tag-button" class="btn btn-block btn-primary float-right"><a id="create-plus">+</a></button>
+                            <div class="col-2">
+                                <button @click="createTagBtn" id="create-tag-button" class="btn btn-block btn-primary">
+                                    <span>
+                                        <font-awesome-icon icon="plus"></font-awesome-icon>
+                                    </span>
+                                </button>
                             </div>
                         </div>
                         <hr>
@@ -124,9 +128,15 @@
 
 
     <nav class="navbar fixed-bottom justify-content-end bg-transparent">
-        <button type="button" class="undo-button align-right btn btn-sm btn-outline-danger btn-primary-spacing" @click="undo">undo </button>
-        <button type="button" class="redo-button align-right btn btn-sm btn-outline-success btn-primary-spacing" @click="redo">redo </button>
-        <button type="button" class="submit-button btn btn-primary" v-on:click="submitPost">Publish post</button>
+        <button type="button" class="undo-button align-right btn btn-sm btn-outline-danger btn-primary-spacing" @click="undo">
+            <font-awesome-icon icon="undo" fixed-width></font-awesome-icon> undo 
+        </button>
+        <button type="button" class="redo-button align-right btn btn-sm btn-outline-success btn-primary-spacing" @click="redo">
+            <font-awesome-icon icon="redo" fixed-width></font-awesome-icon> redo 
+        </button>
+        <button type="button" class="submit-button btn btn-primary" v-on:click="submitPost">
+            <font-awesome-icon icon="check" fixed-width></font-awesome-icon> Publish post
+        </button>
     </nav>
 
 
@@ -147,6 +157,7 @@ import Vue from "vue";
 import { mapState } from "vuex";
 import forEach from "lodash/forEach";
 import PostElement from "./PostElement";
+import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 
 function isBlank(str) {
     return !str || /^\s*$/.test(str);
@@ -177,7 +188,7 @@ const bodyVisible = {
 
 export default {
     name: "post-create",
-    components: { PostElement },
+    components: { PostElement, FontAwesomeIcon },
     data: function() {
         return {
             title: "",
@@ -241,12 +252,13 @@ export default {
             };
             console.log(obj);
             var vm = this;
-            this.$store.dispatch("createPost", obj).then(function(ret){
+            this.$store.dispatch("createPost", obj).then(function(ret) {
                 console.log("RETURNED: ", ret);
                 if (ret === undefined) {
-                    vm.$notifyDanger("There was a problem submitting your post.");
-                }
-                else if (ret.status < 300) {
+                    vm.$notifyDanger(
+                        "There was a problem submitting your post."
+                    );
+                } else if (ret.status < 300) {
                     vm.$notifySuccess("Post submitted successfully!");
                 } else {
                     let total = "";
@@ -254,9 +266,10 @@ export default {
                         let currentValue = val.join(" ");
                         total = `${total} "${key}: ${currentValue}" `;
                     });
-                    vm.$notifyDanger(`There was a problem submitting your post. ${total}`);
+                    vm.$notifyDanger(
+                        `There was a problem submitting your post. ${total}`
+                    );
                 }
-
             });
         },
         editElement: function(index) {
@@ -407,19 +420,18 @@ $theme-colors: ("primary": red);
 }
 
 #create-tag-button {
-    padding: 0;
-    margin-right: 5px;
-    margin-left: 10px;
-    width: 40px;
-    height: auto;
-
+    // padding: 10px;
+    // margin-right: 10px;
+    // margin-left: 10px;
+    // width: 40px;
+    // height: auto;
 }
 
-#create-plus {
-    font-size: 1.5rem;
-    text-align: center;
-    vertical-align: middle;
-}
+// #create-plus {
+//     font-size: 1.5rem;
+//     text-align: center;
+//     vertical-align: middle;
+// }
 
 #tag-submit-box {
     margin-bottom: 10px;
