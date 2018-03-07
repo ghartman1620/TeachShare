@@ -16,7 +16,8 @@ import {
     Card,
     FormTextarea,
     Button,
-    Layout
+    Layout,
+    Badge
 } from "bootstrap-vue/es/components";
 
 // font-awesome icons
@@ -41,12 +42,16 @@ fontawesome.library.add(
     faUserCircle
 );
 
+// moment.js for date formatting
+Vue.use(require("vue-moment"));
+
 Vue.use(Carousel);
 Vue.use(Alert);
 Vue.use(Card);
 Vue.use(FormTextarea);
 Vue.use(Button);
 Vue.use(Layout);
+Vue.use(Badge);
 
 Vue.use(Notifications);
 
