@@ -1,5 +1,5 @@
 <template>
-    <div class="container-fluid body-fluid">
+    <div class="container body-fluid">
         <notify></notify>
         <nav-bar :query="queryParam"></nav-bar>
         <!--  -->
@@ -15,21 +15,20 @@ import Navbar from "./Navbar";
 import Notify from "./Notify";
 
 export default Vue.component("base-page", {
-    components: {Notify, Navbar},
+    components: { Notify, Navbar },
     props: ["items"],
     data() {
         return {
-            queryParam: "",
-        }
+            queryParam: ""
+        };
     },
     mounted() {
         // this.$notifyLight("Hey this is some stuff! <strong>BOLD</strong>.")
     }
-  })
+});
 </script>
 
 <style lang="scss">
-
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 1s;
@@ -45,5 +44,7 @@ export default Vue.component("base-page", {
     padding-top: 100px;
 }
 
-
+body {
+    zoom: 90%;
+}
 </style>

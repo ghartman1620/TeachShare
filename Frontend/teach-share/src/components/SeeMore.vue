@@ -23,22 +23,24 @@ export default Vue.component("see-more", {
             expanded: false,
             elementHeight: 0,
             contentClasses: [],
-            needShowMore: true,
+            needShowMore: true
         };
     },
     computed: {
         expandedOrNotText() {
-            return this.expanded ? "See Less" : "See More"
+            return this.expanded ? "See Less" : "See More";
         },
         hideOrFullStyle() {
-            return this.expanded ? {
-                "max-height": "none",
-                "overflow": "hidden"
-            } : {
-                "max-height": this.maxHeight+"px",
-                "overflow": "hidden"
-            }
-        },
+            return this.expanded
+                ? {
+                      "max-height": "none",
+                      overflow: "hidden"
+                  }
+                : {
+                      "max-height": this.maxHeight + "px",
+                      overflow: "hidden"
+                  };
+        }
     },
     methods: {
         showOrHideContent() {
@@ -55,9 +57,9 @@ export default Vue.component("see-more", {
         Vue.nextTick().then(function() {
             var ele = vm.$refs.content;
             vm.elementHeight = ele.offsetHeight;
-            console.log("nextTick: ", vm.elementHeight)
-            if(vm.elementHeight > vm.maxHeight){
-                vm.contentClasses.push('gradient');
+            console.log("nextTick: ", vm.elementHeight);
+            if (vm.elementHeight > vm.maxHeight) {
+                vm.contentClasses.push("gradient");
                 vm.needShowMore = true;
                 vm.expanded = false;
             } else {
@@ -68,25 +70,24 @@ export default Vue.component("see-more", {
 });
 </script>
 <style>
-
 .gradient {
     position: relative;
     /* that disables clicking through carousels/DL files on hidden things */
 }
 .gradient:after {
-    content  : "";
-    position : absolute;
-    z-index  : 1;
-    bottom   : 38px;
-    left     : 2%;
-    pointer-events   : none;
-    background-image : linear-gradient(to bottom, 
-                        rgba(255,255,255, 0), 
-                        rgba(255,255,255, 1) 80%);
-    width    : 96%;
-    height   : 6em;
+    content: "";
+    position: absolute;
+    z-index: 1;
+    bottom: 38px;
+    pointer-events: none;
+    background-image: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 1) 80%
+    );
+    width: 100%;
+    height: 6em;
 }
-
 </style>
 
 

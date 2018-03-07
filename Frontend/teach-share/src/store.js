@@ -58,13 +58,55 @@ export default new Vuex.Store({
             state.comment = Object.assign({}, data);
         },
         LOAD_COMMENTS_FOR_POST: (state, data) => {
+            console.log("PostID: ", data.post);
+            console.log("Comments: ", data.comments);
+            let index = state.posts.findIndex(val => val.pk === data.post);
+            if (index !== -1) {
+                state.posts[index].comments = Object.assign([], data.comments);
+            }
             state.comments = Object.assign([], data);
         },
-        CREATE_COMMENT: (state, comment) => {
+        CREATE_UPDATE_COMMENT: (state, comment) => {
             console.log("CREATE_COMMENT: ", comment);
-            let index = state.comments.findIndex(val => val.id === comment.id);
-            console.log("create index: ", index);
+            let postindex = state.posts.findIndex(val => val.pk === comment.post);
+            if (postindex === -1) {
+                console.log("it couldn't find it!");
+            } else {
+                let post = state.posts[postindex];
+                let comments = post.comments;
+                // comments.push(comment);
+                console.log("Comments now... ", comments);
+                let commentindex = post.comments.findIndex(val => val.pk === comment.pk);
+                if (commentindex === -1) {
+                    comments.push(comment);
+                    // Vue.$set(state.posts.postindex.comments, comments);
+                } else {
+                    comments.splice(commentindex, comment);
+                    // Vue.$set(state.posts.postindex.comments, comments);
+                }
+            }
         },
+        // UPDATE_COMMENT: (state, comment) => {
+        //     console.log("UPDATE_COMMENT: ", comment);
+        //     let index = state.comments.findIndex(val => val.id === comment.id);
+        //     console.log("update index: ", index);
+        //     if (index === -1) {
+        //         state.comments.push(comment);
+        //         let postindex = state.posts.findIndex(val => val.pk === comment.post.pk);
+        //         if (index === -1) {
+        //             // what happened to the post
+        //         } else {
+        //             let commentindex = state.posts[postindex].comments.findIndex(val => val.pk === comment.pk);
+        //             if (commentindex === -1) {
+        //                 state.posts[postindex].comments.push(comment);
+        //             } else {
+        //                 state.posts[postindex].comments.splice(commentindex, comment);
+        //             }
+        //         }
+        //     } else {
+        //         state.comments.splice(index, 1);
+        //     }
+        // },
         LOAD_FILTERED_POSTS: (state, data) => {
             state.posts = Object.assign([], data);
         },
@@ -121,7 +163,7 @@ export default new Vuex.Store({
             console.log("FETCH_COMMENT");
             api
                 .get(`comments/?post=${postID}`)
-                .then(response => state.commit("LOAD_COMMENTS_FOR_POST", response.data))
+                .then(response => state.commit("LOAD_COMMENTS_FOR_POST", { comments: response.data, post: postID }))
                 .catch(err => console.log(err));
         },
         fetchFilteredPosts: (state, filterParams) => {
@@ -171,22 +213,35 @@ export default new Vuex.Store({
                 .then(response => state.commit("SET_TOKEN", response.data.token))
                 .catch(err => console.log(err));
         },
-        createComment: (state, comment) => {
-            return new Promise((resolve, reject) => {
-                api.post("comments/", comment)
-                    .then(response => {
-                        state.commit("CREATE_COMMENT");
-                        return resolve(response);
-                    })
-                    .catch(err => reject(err));
-            });
+        createOrUpdateComment: (state, comment) => {
+            if (comment.pk !== undefined) {
+                return new Promise((resolve, reject) => {
+                    api.put(`comments/${comment.pk}/`, comment)
+                        .then(response => {
+                            state.commit("CREATE_UPDATE_COMMENT", response.data);
+                            return resolve(response);
+                        })
+                        .catch(err => reject(err));
+                });
+            } else {
+                return new Promise((resolve, reject) => {
+                    api.post("comments/", comment)
+                        .then(response => {
+                            state.commit("CREATE_UPDATE_COMMENT", response.data);
+                            return resolve(response);
+                        })
+                        .catch(err => resolve(err.response.data));
+                });
+            }
         }
-
     },
     getters: {
         getPosts: state => () => state.posts,
         getPostById: state => (id) => {
             return state.posts.filter(post => post.pk === Number(id))[0];
+        },
+        getCommentsByPost: (state, getters) => (postid) => {
+            return getters.getPostById(postid).comments;
         }
     }
 });

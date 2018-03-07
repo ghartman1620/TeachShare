@@ -2,12 +2,15 @@
 <div>
 <router-view/>
 <div :key="post.pk" v-for="(post, index) in posts">
-    <post
-        class="card-shadow"
-        :maxHeight="500"
-        :post="post"
-        :index="index">
-    </post>
+    <div class="card post-container-card card-shadow">
+        <div class="card-body">
+            <post
+                :maxHeight="500"
+                :post="post"
+                :index="index">
+            </post>
+        </div>
+    </div>
     <br><br> 
 </div>
 
@@ -22,22 +25,24 @@
 import Vue from "vue";
 import Post from "./Post";
 
-export default{
+export default {
     name: "PostFeed",
-    components: {Post},
+    components: { Post },
     data: function() {
-        return {}
+        return {};
     },
-    computed: { 
+    computed: {
         posts: function() {
             return this.$store.getters.getPosts();
         }
-
     },
     methods: {
-
-        scroll(){
-            var offset = document.documentElement.scrollTop + window.innerHeight;
+        getPosts: function() {
+            this.$store.dispatch("fetchAllPosts");
+        },
+        scroll() {
+            var offset =
+                document.documentElement.scrollTop + window.innerHeight;
             var height = document.documentElement.offsetHeight;
 
             if (offset >= height) {
@@ -58,11 +63,17 @@ export default{
         this.reloadPosts();
         
         var t = this;
-        window.addEventListener("scroll", function() {t.scroll()}, false);
-        console.log(this.$router.params)
+        window.addEventListener(
+            "scroll",
+            function() {
+                t.scroll();
+            },
+            false
+        );
+        console.log(this.$router.params);
     },
     mounted() {
-        console.log(this.$router)
+        console.log(this.$router);
     },
     destroyed() {
         window.removeEventListener("scroll", function() {t.scroll()}, false);
@@ -72,23 +83,24 @@ export default{
             this.reloadPosts();
         }
     }
-
-}
-
+};
 </script>
 
 <style lang="scss" scoped>
-
 $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
+$card-color: #96e6b3;
 
 .invisible-button {
     background: transparent;
     border: none !important;
-    font-size:0;
+    font-size: 0;
 }
 
 .card-shadow {
     box-shadow: $card-shadow;
 }
 
+.post-container-card {
+    background-color: $card-color;
+}
 </style>

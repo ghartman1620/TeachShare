@@ -1,8 +1,10 @@
 <template>
     <div>
-        <div :key="comment.id" v-for="comment in comments">
+        <div :key="comment.pk" v-for="comment in watchComments">
             <comment-entry
-            :comment="comment">
+                :post="post"
+                :user="1"
+                :comment="comment">
             </comment-entry>
         </div>
     </div>
@@ -13,8 +15,16 @@ import CommentEntry from "./CommentEntry";
 
 export default {
     name: "comments",
-    props: ["comments"],
-    components: { CommentEntry }
+    props: ["post"],
+    components: { CommentEntry },
+    computed: {
+        watchComments() {
+            return this.$store.getters.getCommentsByPost(this.post.pk);
+        }
+    },
+    mounted() {
+        this.$store.dispatch("fetchCommentsForPost", this.post.pk);
+    }
 }
 </script>
 
