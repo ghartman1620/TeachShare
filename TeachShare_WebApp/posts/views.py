@@ -18,6 +18,7 @@ from django.db.models import Q
 from urllib.parse import unquote
 from enum import Enum
 from elasticsearch_dsl.query import MultiMatch
+from rest_framework import status
 
 #Post search parameters
 #?term=string - searching for this string
@@ -200,12 +201,25 @@ def SimpleMethod(request):
 
 # @TODO: figure out how to deal with bad url characters
 
+# @TODO: write tests for uploading restricted files
 def isBinary(f):
     chunk = f.read(1024)
     if '\0' in chunk:
         return True
     else:
         return False
+ 
+def fileExt(filename):
+    ext = ""
+    for i in reversed(range(0, len(filename))):
+        if filename[i] == '.':
+            break
+        ext = filename[i] + ext
+
+    print(ext)
+    return ext
+#these are allowed binary filetypes
+whitelist = ['pdf','doc', 'ppt','docx', 'odt']
 
 class FileUploadView(views.APIView):
     parser_classes = (FileUploadParser, JSONParser)
@@ -222,7 +236,12 @@ class FileUploadView(views.APIView):
         a = Attachment.objects.create(post=p, file=file_obj)
         
         print(a.file.url)
-        print(isBinary(open(a.file.url[1:], encoding='utf8')))
+        with open(a.file.url[1:], encoding='latin1') as f:
+            if isBinary(f) and not fileExt(a.file.url) in whitelist:
+                print('bad filetype!') 
+                return Response(data={
+                    'error' : fileExt(a.file.url) + ' files are allowed. Allowed filetypes are: ' + str(whitelist)
+                }, status=status.HTTP_400_BAD_REQUEST)
         print(a.file.name)
         file_obj.close()
         
