@@ -8,15 +8,38 @@ import string
 from uuid import uuid4
 import os
 
+
+class Subject(models.Model):
+    name = models.CharField(max_length=80)
+
+
 class Post(models.Model):
+    GRADES = (
+        (0, 'Preschool'),
+        (1, 'Kindergarten'),
+        (2, 'First Grade')
+    )
+
+    CONTENT_TYPE = (
+        (0, 'Game'),
+        (1, 'Lab'),
+        (2, 'Lecture')
+    )
+
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="posts")
-    title = models.CharField(max_length=100, default='')
+    title = models.CharField(max_length=100, default='', blank=True)
     content = JSONField()
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
     likes = models.IntegerField(default=0)
+    draft = models.BooleanField(default=True)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
     tags = JSONField()
+    grade = models.IntegerField(choices=GRADES)
+    subject = models.ForeignKey(
+        Subject, on_delete=models.DO_NOTHING, null=True)
+    length = models.DurationField()
+    content_type = models.IntegerField(choices=CONTENT_TYPE)
 
 
 class Comment(models.Model):
@@ -46,5 +69,3 @@ class Attachment(models.Model):
         Post, related_name='attachments', on_delete=models.SET_NULL, null=True)
     file = models.FileField(null=True, blank=True, upload_to=upload_to)
 # Creates list of tags for every post
-
-

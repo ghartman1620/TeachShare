@@ -5,6 +5,8 @@ services:
     image: postgres
     ports: 
       - "5432:5432"
+    networks:
+      - teachnet
     restart: always
     environment:
       POSTGRES_DB: teachshare
@@ -15,6 +17,8 @@ services:
     command: bash -c "./TeachShare_WebApp/wait-for-it.sh -h db -p 5432 -- python3 TeachShare_WebApp/manage.py makemigrations && python3 TeachShare_WebApp/manage.py migrate && python3 TeachShare_WebApp/manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
+    networks:
+      - teachnet
     ports:
       - "8000:8000"
     depends_on:
@@ -25,13 +29,16 @@ services:
     command: npm run dev 
     volumes:
       - ./Frontend/teach-share/.:/code/.
+    networks:
+      - teachnet
     ports:
       - "8080:8080"
     depends_on:
       - db
 
   search:
-    image: elasticsearch:5.6.8
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.2
+    hostname: search
     environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
@@ -40,10 +47,14 @@ services:
       memlock:
         soft: -1
         hard: -1
+    networks:
+      - teachnet
     volumes:
-      - esdata1:/usr/share/elasticsearch/data
+      - esdata2:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
 volumes:
-  esdata1:
+  esdata2:
     driver: local
+networks:
+  teachnet:

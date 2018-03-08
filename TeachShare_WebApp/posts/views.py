@@ -17,13 +17,13 @@ from django.shortcuts import render
 from urllib.parse import unquote
 
 
-#Post search parameters
-#Contains a keyword
-#Contains all/any of multiple keywords
+# Post search parameters
+# Contains a keyword
+# Contains all/any of multiple keywords
 
 class SearchPostsView(views.APIView):
 
-    #queryset = Post.objects.all() #this isn't used but it makes rest framework happy
+    # queryset = Post.objects.all() #this isn't used but it makes rest framework happy
     #s = PostDocument.search()
     def get_queryset(self):
         queryset = PostDocument.search()
@@ -34,8 +34,10 @@ class SearchPostsView(views.APIView):
             termlist = terms.split(' ')
             for term in termlist:
                 print('querying' + term)
-                queryset = queryset.query('multi_match', query=term, fields=['title', 'content', 'tags'])
+                queryset = queryset.query('multi_match', query=term, fields=[
+                                          'title', 'content', 'tags'])
         return queryset
+
     def get(self, request, format=None):
         response = []
         queryset = self.get_queryset()
@@ -44,27 +46,33 @@ class SearchPostsView(views.APIView):
                 response.append(Post.objects.get(id=hit._d_['id']))
             except Post.DoesNotExist as e:
                 pass
-            
+
         return Response(PostSerializer(response, many=True).data)
-    
+
 
 class PostFilter(filters.FilterSet):
-    beginIndex = django_filters.NumberFilter(name='beginIndex', label="beginIndex", method='filterNumberPosts')
+    beginIndex = django_filters.NumberFilter(
+        name='beginIndex', label="beginIndex", method='filterNumberPosts')
+
     class Meta:
         model = Post
         fields = ('user', 'title', 'updated', 'likes', 'timestamp', 'comments')
+
     def filterNumberPosts(self, queryset, name, value):
         return queryset[value:value+10]
+
 
 class PostViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Post model
     """
-    queryset = Post.objects.all()
+    queryset = Post.objects.filter()
     serializer_class = PostSerializer
     filter_class = PostFilter
+
     def get_queryset(self):
         return self.queryset
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
@@ -88,7 +96,7 @@ class AttachmentViewSet(viewsets.ModelViewSet):
         print(request.query_params)
         id = request.query_params.get('uid', '')
         print(id)
-    
+
         p = Post.objects.get(id=request.data['post'])
         a = Attachment.objects.create(post=p)
         print(p)
@@ -96,17 +104,19 @@ class AttachmentViewSet(viewsets.ModelViewSet):
             'status': 'OK',
             'uid': id,
             'post': p.pk,
-        }, status=201 )
+        }, status=201)
 
 
-def SimpleMethod(request): 
+def SimpleMethod(request):
     return render(request, 'test.html')
 
-#Known issues with backend upload:
-#Files removed from the post are not deleted
-#Attachment objects that are deleted do not delete the corresponding file
+# Known issues with backend upload:
+# Files removed from the post are not deleted
+# Attachment objects that are deleted do not delete the corresponding file
 
 # @TODO: figure out how to deal with bad url characters
+
+
 class FileUploadView(views.APIView):
     parser_classes = (FileUploadParser, JSONParser)
 
@@ -123,13 +133,12 @@ class FileUploadView(views.APIView):
         print(a.file.url)
         print(a.file.name)
         file_obj.close()
-        
-        return Response(data={
-                'status': 'OK', 
-                'id': a.pk,
-                'request_id': request.query_params['id'],
-                'url': a.file.url,
-                'filename': a.file.name
-            }, 
-            status=201)
 
+        return Response(data={
+            'status': 'OK',
+            'id': a.pk,
+            'request_id': request.query_params['id'],
+            'url': a.file.url,
+            'filename': a.file.name
+        },
+            status=201)

@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 # -*- coding: utf-8 -*-
 
 import os
-import socket
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -62,13 +61,10 @@ INSTALLED_APPS = [
     'posts',
 ]
 
-searchip = socket.gethostbyname('search') + ':9200'
-print('SEARCH_IP: ' + searchip)
-
 # ELASTICSEARCH_DSL = {
 #     'default': {
 #         'ENGINE': 'elasticsearch2_backend.Elasticsearch2SearchEngine',
-#         'URL': 'http://search:9200',  # 172.18.0.3:9200
+#         'URL': 'search:9200',
 #         'INDEX_NAME': 'teach',
 #     },
 # }
@@ -160,7 +156,7 @@ DATABASES = {
         'NAME': 'teachshare',
         'USER': 'postgres',
         'PASSWORD': 'password123',
-        'HOST': 'db',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
     }
 }
