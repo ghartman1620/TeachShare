@@ -1,6 +1,6 @@
 <template>
     <nav class="navbar fixed-top navbar-inverse navbar-expand-lg navbar-dark dark-green">
-            <div class="container">
+        <div class="container">
             <!-- brand section -->
             <router-link class="navbar-brand" to="/"><img class="img-responsive ts-logo" src="/static/ts-logo.png"></router-link>
 

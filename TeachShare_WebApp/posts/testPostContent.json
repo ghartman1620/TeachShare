@@ -1,0 +1,420 @@
+[
+    {
+        "pk": 58,
+        "title": "Christopher Columbus",
+        "content": [
+            {
+                "type": "text",
+                "content": "<p>The year was 1492, Columbus sailed the ocean blue!</p>"
+            },
+            {
+                "type": "image_file",
+                "title": "",
+                "width": 640,
+                "height": 480,
+                "content": [
+                    {
+                        "id": 1379,
+                        "url": "/media/uploads/2018/03/02/b9c53f5c-ec5c-450e-acec-3c8b8c36ceb4/columbus.jpg",
+                        "file": {},
+                        "name": "columbus.jpg",
+                        "post": 2,
+                        "type": "image_file",
+                        "title": "",
+                        "description": "According to Google, this is the ship Columbus sailed on!"
+                    }
+                ],
+                "description": "According to Google, this is the ship Columbus sailed on!"
+            },
+            {
+                "type": "video_link",
+                "content": {
+                    "id": "CMiReDGqs3Q",
+                    "url": "https://www.youtube.com/watch?v=CMiReDGqs3Q",
+                    "post": 2,
+                    "type": "video_link",
+                    "title": "Columbus Song - 1492",
+                    "width": 640,
+                    "height": 480,
+                    "thumbnail": {
+                        "url": "https://i.ytimg.com/vi/CMiReDGqs3Q/default.jpg",
+                        "width": 120,
+                        "height": 90
+                    },
+                    "description": "in “I Will Be Your Friend: Songs and Activities for Young Peacemakers”\nTeaching Tolerance - Southern Poverty Law Center 2003\nFirst Edition\nWords and Music by Nancy Schimmel\n\n(Malvina Reynold's daughter). http://www.sisterschoice.com/. \nThe recording is by Sally Rogers. It is on her \"What Can One Little Person Do?\" CD: http://sallyrogers.com/site/store/what-can-one-little-person-do/.\n\nSally is an amazing award-winning children's musician. Check out her website http://sallyrogers.com."
+                }
+            }
+        ],
+        "updated": "2018-03-01T18:25:48.049890-08:00",
+        "likes": 0,
+        "timestamp": "2018-03-01T18:25:48.049890-08:00",
+        "user": 1,
+        "comments": [],
+        "attachments": [],
+        "tags": [
+            "history",
+            "columbus"
+        ]
+    },
+    {
+        "pk": 61,
+        "title": "Garage Band",
+        "content": [
+            {
+                "type": "text",
+                "content": "<p><span class=\"ql-size-large\">Garage Band </span>is software you can use to make songs!</p>"
+            },
+            {
+                "type": "audio",
+                "content": [
+                    {
+                        "id": 1380,
+                        "url": "/media/uploads/2018/03/02/cd1ff7c8-c3b9-4fa8-a7c5-50d4da0defde/SoundHelix-Song-1.mp3",
+                        "name": "SoundHelix-Song-1.mp3",
+                        "post": 2,
+                        "type": "audio_file",
+                        "title": "",
+                        "filetype": "audio/mp3",
+                        "description": "Like this one!"
+                    }
+                ]
+            },
+            {
+                "type": "audio",
+                "content": [
+                    {
+                        "id": 1382,
+                        "url": "/media/uploads/2018/03/02/015fe95a-0ac9-42db-8ae5-22228ddf2d01/SoundHelix-Song-2.mp3",
+                        "name": "SoundHelix-Song-2.mp3",
+                        "post": 2,
+                        "type": "audio_file",
+                        "title": "",
+                        "filetype": "audio/mp3",
+                        "description": "...or this one."
+                    }
+                ]
+            },
+            {
+                "type": "text",
+                "content": "<p>I don't actually know if those songs were made in garage band but this is an example</p>"
+            }
+        ],
+        "updated": "2018-03-01T19:07:39.579550-08:00",
+        "likes": 0,
+        "timestamp": "2018-03-01T19:07:39.579550-08:00",
+        "user": 1,
+        "comments": [],
+        "attachments": [],
+        "tags": []
+    },
+    {
+        "pk": 62,
+        "title": "Programming in Python!",
+        "content": [
+            {
+                "type": "text",
+                "content": "<p>some content and richard wuld not like this</p>"
+            }
+        ],
+        "updated": "2018-03-02T15:18:48.731065-08:00",
+        "likes": 0,
+        "timestamp": "2018-03-02T15:18:48.731065-08:00",
+        "user": 1,
+        "comments": [],
+        "attachments": [],
+        "tags": [
+            "programming",
+            "foo"
+        ]
+    },
+    {
+        "pk": 68,
+        "title": "Origins of the Maya",
+        "content": [
+            {
+                "type": "text",
+                "content": "<p>The history of Mesoamerica is usually divided into specific periods which, taken together, reveal the development of culture in the region and, for the purposes of this definition, the emergence and cultivation of the <a href=\"https://www.ancient.eu/Maya_Civilization/\" target=\"_blank\">Maya Civilization</a>.</p><p>The <a href=\"https://www.ancient.eu/Archaic_Period/\" target=\"_blank\">Archaic Period</a>: 7000-2000 BCE – During this time a hunter-gatherer culture began to cultivate crops such as maize, beans and other vegetables and the domestication of animals (most notably dogs and turkeys) and plants became widely practiced. The first villages of the region were established during this period which included sacred spots and temples dedicated to various gods. The villages excavated thus far are dated from 2000-1500 BCE.</p><p>The <a href=\"https://www.ancient.eu/Olmec/\" target=\"_blank\">Olmec</a> Period: 1500-200 BCE – This era is also known as the Pre-Classic or Formative Period when the Olmecs, the oldest culture in Mesoamerica, thrived. The Olmecs settled along the Gulf of Mexico and began building great cities of stone and brick. The famous Olmec heads strongly suggest highly sophisticated skill in sculpture and the first indications of Shamanic religious practices date from this period. The enormous size and scope of Olmec ruins gave birth to the idea that the land was once populated by giants. Though no one knows where the Olmecs came from, nor what happened to them, they lay the foundation for all the future civilizations in Mesoamerica.</p><p><br></p><p><br></p><p>The <a href=\"https://www.ancient.eu/Zapotec/\" target=\"_blank\">Zapotec</a> Period: 600 BCE-800 CE – In the region surrounding modern-day Oaxaca, the cultural center now known as Monte Alban was founded which became the capital of the Zapotec kingdom. The Zapotecs were clearly influenced by (or, perhaps, related to) the Olmecs and, through them, some of the most important cultural elements of the region were disseminated such as <a href=\"https://www.ancient.eu/writing/\" target=\"_blank\">writing</a>, mathematics, astronomy and the development of the calendar; all of which the Maya would refine.</p><p>The <a href=\"https://www.ancient.eu/Teotihuacan/\" target=\"_blank\">Teotihuacan</a> Period: 200-900 CE – During this era the great city of Teotihuacan grew from a small village to a metropolis of enormous size and influence. Early on, Teotihuacan was a rival of another city called <a href=\"https://www.ancient.eu/Cuicuilco/\" target=\"_blank\">Cuicuilco</a> but, when that community was destroyed by a volcano c. 100 CE, Teotihuacan became dominant in the region. Archaeological evidence suggests that Teotihuacan was an important religious center which was devoted to the worship of a Great Mother Goddess and her consort the Plumed Serpent. The Plumed Serpent god&nbsp;Kukulkan (also known as Gucamatz) was the most popular deity among the Maya. Like many of the cities which now lie in ruin throughout the southern Americas, Teotihuacan was abandoned sometime around 900 CE.</p><p><br></p><p>The El Tajin Period: 250-900 CE – This period is also known as the Classic Period in Mesoamerican and Mayan history. The name `El Tajin’ refers to the great city complex on the Gulf of Mexico which has been recognized as one of the most important sites in Mesoamerica. During this time the great urban centers rose across the land and the Maya numbered in the millions. The very important ball game which came to be known as Poc-a-Toc was developed and more ball courts have been found in and around the city of El Tajin than anywhere else in the region. Who, precisely, the people were who inhabited El Tajin remains unknown as there were over fifty different ethnic groups represented in the city and dominance has been ascribed to both the Maya and the Totonac.</p><p><br></p><p>The Classic Maya Period: 250-950 CE – This is the era which saw the consolidation of power in the great cities of the Yucatec Maya such as Chichen Itza and Uxmal. Direct cultural influences may be seen, in some sites, from the Olmecs and the Zapotecs and the cultural values of Teotihuacan and El Tajin but, in others, a wholly new culture seems to have emerged (such as at Chichen Itza where, though there is ample evidence of cultural borrowing, there is a significantly different style to the art and architecture). This period was the height of the Maya <a href=\"https://www.ancient.eu/civilization/\" target=\"_blank\">civilization</a> in which they perfected mathematics, astronomy, architecture and the visual arts and also refined and perfected the calendar. The oldest date recorded in this era is on Stele 29 in the city of <a href=\"https://www.ancient.eu/Tikal/\" target=\"_blank\">Tikal</a> (292 CE) and the latest is from an inscription on the Stele at the site of Tonina (909 CE). The city-states of the <a href=\"https://www.ancient.eu/Mayan_Civilization/\" target=\"_blank\">Mayan civilization</a> stretched from Piste in the north all the way down to modern-day Honduras.</p><p>The Post-Classic Period: 950-1524 CE – At this time the great cities of the Maya were abandoned. Thus far, no explanation for the mass exodus from the cities to outlying rural areas has been determined but climate change and over population have been strongly suggested among other possibilities. The Toltecs, a new tribe in the region, took over the vacant urban centers and re-populated them. At this time, Tula and Chichen-Itza became dominant cities in the region. The widely popular conception that the Maya were driven from their cities by the Spanish <a href=\"https://www.ancient.eu/conquest/\" target=\"_blank\">Conquest</a> is erroneous as the cities were already vacant by the time of the Spanish invasion (in fact, the Spanish conquerors had no idea the natives they found in the region were responsible for the enormous complexes of the cities). The Quiche Maya were defeated at the <a href=\"https://www.ancient.eu/battle/\" target=\"_blank\">Battle</a> of Utatlan in 1524 CE and this date traditionally marks the end of the Maya Civilization.</p><h3>MAYA Culture</h3><p>The height of the Maya Civilization in the Classic Period produced the incredible cultural advances for which they are well known. The Maya believed deeply in the cyclical nature of life – nothing was ever `born’ and nothing ever `died’ – and this belief inspired their view of the gods and the cosmos. Their cosmological views, in turn, encouraged their imaginative efforts in architecture, mathematics, and astronomy. Beneath the earth was the dark realm of <a href=\"https://www.ancient.eu/Xibalba/\" target=\"_blank\">Xibalba</a> (pronounced `shee-Bal-ba’ and translated as `place of fear’) from whence grew the great Tree of Life which came up through the earth and towered into the heavens, through thirteen levels, to reach the paradise of Tamoanchan (`place of the misty sky’) where beautiful flowers bloomed. In Mayan belief, however, one did not die and go to a `heaven’ or a `hell’ but, rather, embarked on a journey toward Tamoanchan. This journey began in the dark and treacherous underworld of Xibalba where the Xibalbans who lived there were more apt to trick and destroy a soul than help one.</p><p>If one could navigate through Xibalba, however, one could then find the way to ascend through the nine levels of the underworld, and the thirteen levels of the higher world, to paradise. The only ways in which a soul could by-pass Xibalba and travel instantly to Tamoanchan were through death in childbirth, as a sacrificial victim, in <a href=\"https://www.ancient.eu/warfare/\" target=\"_blank\">warfare</a>, on the ball court, or by suicide (the Maya had a special goddess of suicide named Ixtab who was depicted as the rotting corpse of a woman hanging by a noose in the heavens). Once one reached Tamoanchan there was eternal happiness but, it must be noted, this paradise was not thought to actually exist in the sky but on the earth. After ascending through the thirteen levels, one did not live in the air but, rather, on a mystical mountain back on the planet. It was because of this cyclical view that the Maya did not believe there was anything wrong with human sacrifice. Those people who were offered to the gods did not `die' but simply moved on. This cosmological belief influenced every aspect of the Mayan civilization and rituals were performed regularly in caves, evoking the darkness of Xibalba, and on hills or high temples which symbolized the heights of Tamoanchan.</p><p><br></p><p>The great <a href=\"https://www.ancient.eu/pyramids/\" target=\"_blank\">pyramids</a> which characterize so many Mayan sites are replicas of the great mountain of the gods known as the Witzob. The cyclical nature of human existence is mirrored in the famous Maya calendar. The depictions of the many gods and goddesses all go toward their function in helping one through the cycles of life or hindering. The great religious book of the Quiche Maya, the Popol-Vuh, tells precisely this story of the cyclical nature of life through the tale of the Hero Twins Hunahpu and Xbalanque and their victory over the forces of chaos and darkness symbolized by the Lords of Xibalba. The game the twins are famous for playing, Poc-a-Toc, serves the same purpose.</p><p>Poc-a-Toc was the most popular game among the Maya and was far more than `just a game’ as it symbolized the human struggle and reflected the way the Maya viewed existence. Two opposing teams of seven men each would face each other on a ball court and try to score a small rubber ball through a vertical hoop affixed to a <a href=\"https://www.ancient.eu/wall/\" target=\"_blank\">wall</a> (sometimes as high as twenty feet in the air, sometimes higher) while defending their own goal. What makes the game even more impressive is that a player could not use the hands or the feet, only the hips, shoulders, head and knees. The Spanish bishop Diego de Landa wrote that watching the Maya play Poc-a-Toc was like watching lightning strikes, they moved so quickly. It has long been believed that the losing team (or the captain of the losing team) would be killed at the end of the match but recent advances in deciphering the Mayan glyphs, together with archaeological evidence,&nbsp;suggests it&nbsp;may have been&nbsp;the winning team or the winning captain who was given the honor of a quick death and instant passage to paradise. The game is thought to have been symbolic, not only of the victory of the hero twins over darkness, but of the cyclical nature of life. The Mayanists Schele and Matthews claim, \"Many modern myths have grown up about the ballgame. The most popular says that the Maya sacrificed the winners so as to give a perfect gift to the gods. There is no evidence for this interpretation in any of the ancient or historical sources\" (210). This is not quite correct, however, as glyphs at many ball courts, Chichen Itza to name only one, could be interpreted as showing the winning team or captain being sacrificed and modern Mayan daykeepers at both Altun Ha in Belize and Chichen Itza in the Yucatan point to the hope of escape from the darkness of Xibalba as the reason for the winners being executed. Whichever team was chosen to die, and under what circumstances (since teams could not have been continually sacrificed as there is evidence of `star' teams) the ball game was deeply meaningful to the Maya as more than just a spectator sport. More information on the particulars of the game, and the life of the ancient Maya in general, comes to light as more heiroglyphics are discovered and interpreted.</p><p><br></p><h3>MAYAN Hieroglyphics</h3><p>The modern day difficulty in deciphering the Mayan hieroglyphics stems from the actions of the same man who, inadvertently, preserved so much of what we know of the Maya Civilization: Bishop Diego de Landa. Appointed to the Yucatan following the Spanish conquest of the north,&nbsp;Landa arrived in 1549 CE and instantly set himself to the task of routing out heathenism from among the Mayan converts to <a href=\"https://www.ancient.eu/christianity/\" target=\"_blank\">Christianity</a>. The concept of a god who dies and comes back to life was very familiar to the Maya from their own deity The Maize God and they seem to have accepted the story of <a href=\"https://www.ancient.eu/Jesus_Christ/\" target=\"_blank\">Jesus Christ</a> and his resurrection easily. Even so, Landa believed that there was a subversive faction growing among the Maya which was seducing them `back to idolatry’ and, having failed to crush this perceived rebellion through the avenues of prayer and admonition, chose another more direct method.</p><p>On 12 July 1562 CE, at the church at Mani, Landa burned over forty Mayan Codices (books) and over 20,000 images and stele. In his own words, “We found many books with these letters, and because they contained nothing that was free from superstition and the devil’s trickery, we burnt them, which the Indians greatly lamented.” Landa went further, however, and resorted to torture to extricate the secrets of the subversives among the natives and bring them back to what he saw as the true path of the church. His methods were condemned by the other priests and he was called back to Spain to explain his actions. Part of his defense was his 1566 CE work <em>Relacion de las Cosas de Yucatan</em> which has preserved much of the culture Landa tried to destroy and has proved to be a valuable asset in understanding ancient Maya culture, <a href=\"https://www.ancient.eu/religion/\" target=\"_blank\">religion</a>, and language.</p><p>Only three books of the Maya escaped the conflagration at Mani: <em>The Madrid Codex</em>, <em>The Dresden Codex</em>, and <em>The </em><a href=\"https://www.ancient.eu/paris/\" target=\"_blank\"><em>Paris</em></a><em> Codex</em> (so named for the cities where they were found many years after they were brought back from the Yucatan) which have provided scholars with a great deal of information on the beliefs of the Maya and, especially, on their calendar. The codices were created by scribes who made careful observations in astronomy (the <em>Dresden Codex</em> alone devotes six pages to accurately calculating the rising and positions of <a href=\"https://www.ancient.eu/venus/\" target=\"_blank\">Venus</a>) and their interpretations of the planets and the seasons exhibit a precision unmatched by other ancient civilizations. So important were their stories and books to the Maya that the <em>Legend of Zamna</em> and the <em>Hennequen Plant</em> describes the great goddess telling the prophet Zamna:</p><p><br></p><p>The city of Izamal was founded, according to this legend, by Zamna (associated with the deity Itzamna) of the Itzas who placed the sacred writings under the central temple.&nbsp;Izamal became known as the most important pilgrimage site in the Classical Period besides Chichen Itza. Shamans (known as Daykeepers) would interpret the particular energy of the day or month for the people by consulting with the gods presiding over the various months of the Maya calendar.</p><p><br></p><h3>MAYA Calendar</h3><p>There are two calendars at work simultaneously in the Maya system: the Haab, or civil calendar of 365 days in an 18 month period of 20 days each, and the Tzolkin, or sacred calendar, of 260 days divided into three groups of months of 20 days. The Haab and the Tzolkin work together, like gears interlocking in a machine, to create what is known as the Calendar Round but cannot account for dates farther in the future than 52 days. For longer calculations, the Maya devised what is known as the Long Count Calendar and is this which has attracted so much international attention in recent years regarding the end of the world on 21 December 2012 CE. As the long count calendar begins 11 August 3114 BCE, it goes into its next cycle (known as a Baktun) on 21 December 2012 CE.</p><p>There is nothing in the extant writings of the Maya to suggest any kind of cataclysm accompanies this transition. On 10 May 2012 CE it was reported that Boston University archaeologist William Saturno and Boston University student Maxwell Chamberlain, excavating at the Maya site of Xultun in Guatemala, discovered a 6x6 foot room dating to 800 CE which seems conclusively to have been a calendar workshop for Mayan scribes. The paintings and inscriptions on the walls of the room show the Maya calendar extending well beyond the year 2012 CE and that future Baktuns were understood to already be underway in the great cyclic dance of time. According to David Stuart, an expert on Maya hieroglyphs at the University of Texas at Austin, \"Baktun 14 was going to be coming, and Baktun 15 and Baktun 16. ... The Maya calendar is going to keep going, and keep going for billions, trillions, octillions of years into the future.\"</p><p>The months of the years of the Mayan calendars were governed over each by a specific god and, as these gods were eternal, they assured the continuance of the energy of their particular month. As all of life was considered one eternal cycle, the western concept of an `end of the world’, so popular in Christian ideology, would have been a completely foreign concept to a Maya scribe.</p><h3>MAYA Today</h3><p>In the modern age the Maya still farm the same lands and travel the same rivers as their ancestors did from the north in the Yucatan down to Honduras. The claim that the Maya somehow vanished, simply because their cities were found abandoned, is not only inaccurate but insulting to the over six million Maya who carry on the traditions of their ancestors. Though the region was Christianized in the 16th century CE conquest and inquisition, the old ways are still observed in a hybrid between European Catholicism and Mayan mysticism. The Daykeeper of a village still interprets the energy of a day and rituals are still performed in caves and on hills. On the island of Cozumel shrines to the Virgin Mary and the goddess Ixchel are interchangeable and, often, one and the same. A great deal has been learned about the Maya since the days when Stephens and Catherwood explored and documented the ancient ruins but, for the Maya living today, nothing of importance has ever been forgotten and the cycle of life continues on.</p><p><br></p><p><br></p><p><br></p>"
+            }
+        ],
+        "updated": "2018-03-06T09:54:59.943995-08:00",
+        "likes": 0,
+        "timestamp": "2018-03-06T09:54:59.943995-08:00",
+        "user": 1,
+        "comments": [],
+        "attachments": [],
+        "tags": [
+            "Maya",
+            "Mayans",
+            "Mesoamerica",
+            "American History",
+            ""
+        ]
+    },
+    {
+        "pk": 70,
+        "title": "Required Tuesday videos",
+        "content": [
+            {
+                "type": "video_link",
+                "content": {
+                    "id": "gOZFrwTTgok",
+                    "url": "https://www.youtube.com/watch?v=gOZFrwTTgok",
+                    "post": 2,
+                    "type": "video_link",
+                    "title": "500 Spanish Nouns - Part 1 | Learn Spanish | Spanish Vocabulary | Speaksli",
+                    "width": 640,
+                    "height": 480,
+                    "thumbnail": {
+                        "url": "https://i.ytimg.com/vi/gOZFrwTTgok/default.jpg",
+                        "width": 120,
+                        "height": 90
+                    },
+                    "description": "This Spanish language video is part 1 in a 10-part series called 500 Nouns. For more videos, please subscribe to the Speaksli channel on YouTube."
+                }
+            },
+            {
+                "type": "video_link",
+                "content": {
+                    "id": "6lGEo-KXIuA",
+                    "url": "https://www.youtube.com/watch?v=6lGEo-KXIuA",
+                    "post": 2,
+                    "type": "video_link",
+                    "title": "500 Spanish Nouns - Part 2 | Learn Spanish | Spanish Vocabulary | Speaksli",
+                    "width": 640,
+                    "height": 480,
+                    "thumbnail": {
+                        "url": "https://i.ytimg.com/vi/6lGEo-KXIuA/default.jpg",
+                        "width": 120,
+                        "height": 90
+                    },
+                    "description": "This Spanish language video is Part 2 in the 500 Nouns series from Speaksli."
+                }
+            }
+        ],
+        "updated": "2018-03-06T09:55:27.414364-08:00",
+        "likes": 0,
+        "timestamp": "2018-03-06T09:55:27.414364-08:00",
+        "user": 1,
+        "comments": [],
+        "attachments": [],
+        "tags": [
+            "High School Spanish",
+            "Tuesday",
+            "videos",
+            "Vocabulary"
+        ]
+    },
+    {
+        "pk": 72,
+        "title": "Python.exe!",
+        "content": [
+            {
+                "type": "file",
+                "files": [
+                    {
+                        "id": 1411,
+                        "url": "/media/uploads/2018/03/06/d8960378-b5b5-4bff-9f84-eb8c500ad095/python.exe",
+                        "file": {},
+                        "name": "python.exe",
+                        "post": 2,
+                        "type": "file"
+                    }
+                ]
+            },
+            {
+                "type": "text",
+                "content": "<p class=\"ql-align-right\"><s>kjlaerwu;ikf;</s></p>"
+            }
+        ],
+        "updated": "2018-03-06T10:11:49.874464-08:00",
+        "likes": 0,
+        "timestamp": "2018-03-06T10:11:49.874464-08:00",
+        "user": 1,
+        "comments": [],
+        "attachments": [],
+        "tags": []
+    },
+    {
+        "pk": 67,
+        "title": "Quadratic Formula Lecture",
+        "content": [
+            {
+                "type": "image_file",
+                "title": "",
+                "width": 640,
+                "height": 480,
+                "content": [
+                    {
+                        "id": 29,
+                        "url": "/media/uploads/2018/03/05/e7fc4ad1-b7ad-42c3-a878-627e93ea37cc/9a5c58dfd8b9befbf3e8b80_8no9ZcX.svg",
+                        "file": {},
+                        "name": "9a5c58dfd8b9befbf3e8b809f3b81676439ee221.svg",
+                        "post": 2,
+                        "type": "image_file",
+                        "title": "",
+                        "description": ""
+                    }
+                ],
+                "description": ""
+            }
+        ],
+        "updated": "2018-03-06T09:54:32.945266-08:00",
+        "likes": 0,
+        "timestamp": "2018-03-06T09:54:32.945266-08:00",
+        "user": 1,
+        "comments": [],
+        "attachments": [],
+        "tags": [
+            "quadratic formula",
+            "math",
+            "6th grade",
+            "formula"
+        ]
+    },
+    {
+        "pk": 69,
+        "title": "Writing Intro Videos",
+        "content": [
+            {
+                "type": "video_link",
+                "content": {
+                    "id": "F-0zC7fzlmQ",
+                    "url": "https://www.youtube.com/watch?v=F-0zC7fzlmQ",
+                    "post": 2,
+                    "type": "video_link",
+                    "title": "Writing tutorial: What is a story? | lynda.com",
+                    "width": 640,
+                    "height": 480,
+                    "thumbnail": {
+                        "url": "https://i.ytimg.com/vi/F-0zC7fzlmQ/default.jpg",
+                        "width": 120,
+                        "height": 90
+                    },
+                    "description": "This writing tutorial offers a definition for the term \"story\" and explains what makes a story captivating. Watch more at http://www.lynda.com/Business-Business-Skills-tutorials/Writing-Fundamentals-Craft-Story/89962-2.html?utm_medium=viral&utm_source=youtube&utm_campaign=videoupload-bus-F-0zC7fzlmQ.\n\n\n\nThis tutorial is a single movie from the Writing Fundamentals: The Craft of Story course presented by lynda.com author Lisa Cron. The complete course duration is 1 hour and 57 minutes long and digs into the craft of writing a compelling story, with practical how-to advice and before-and-after writing samples.\n\nIntroduction\n1. What Is a Story?\n2. Hooking Your Reader\n3. All Stories Make a Point\n4. Feeling What the Protagonist Feels\n5. All Protagonists Have a Goal\n6. Uncovering Your Protagonist's Inner Issue\n7. Being Specific Rather than Vague\n8. Suspense and Conflict\n9. Cause and Effect\n10. What Can Go Wrong, Must\n11. Setups, Payoffs, and the Clues in Between\n12. Flashbacks, Subplots, and Foreshadowing\nConclusion"
+                }
+            },
+            {
+                "type": "video_link",
+                "content": {
+                    "id": "Dzpmb0xBDzc",
+                    "url": "https://www.youtube.com/watch?v=Dzpmb0xBDzc",
+                    "post": 2,
+                    "type": "video_link",
+                    "title": "How To Improve Your Handwriting",
+                    "width": 640,
+                    "height": 480,
+                    "thumbnail": {
+                        "url": "https://i.ytimg.com/vi/Dzpmb0xBDzc/default.jpg",
+                        "width": 120,
+                        "height": 90
+                    },
+                    "description": "Subscribe to MonkeySee for more great videos: http://goo.gl/Py1pN0 Handwriting instructor Nan Jay Barchowsky demonstrates how to improve your handwriting skills."
+                }
+            }
+        ],
+        "updated": "2018-03-06T09:55:13.518517-08:00",
+        "likes": 0,
+        "timestamp": "2018-03-06T09:55:13.518517-08:00",
+        "user": 1,
+        "comments": [],
+        "attachments": [],
+        "tags": [
+            "english",
+            "creative writing",
+            "8th grade",
+            "tutorials",
+            "course intro videos",
+            "Introduction"
+        ]
+    },
+    {
+        "pk": 71,
+        "title": "Battle of Little Big Horn",
+        "content": [
+            {
+                "type": "image_file",
+                "title": "",
+                "width": 640,
+                "height": 480,
+                "content": [
+                    {
+                        "id": 30,
+                        "url": "/media/uploads/2018/03/05/5250c6b1-b368-4403-b8c1-627efcba13b3/1200px-Charles_Marion_R_xR8XcEG.jpg",
+                        "file": {},
+                        "name": "1200px-Charles_Marion_Russell_-_The_Custer_Fight_(1903).jpg",
+                        "post": 2,
+                        "type": "image_file",
+                        "title": "",
+                        "description": "Little Big Horn: Indian vs. American art perspective."
+                    },
+                    {
+                        "id": 31,
+                        "url": "/media/uploads/2018/03/05/3fad0136-0aa2-4ef2-928e-7cfbe6590b60/cu02.gif",
+                        "file": {},
+                        "name": "cu02.gif",
+                        "post": 2,
+                        "type": "image_file",
+                        "title": "",
+                        "description": "Little Big Horn: Indian vs. American art perspective."
+                    },
+                    {
+                        "id": 32,
+                        "url": "/media/uploads/2018/03/05/6eda0077-61e1-452f-ad88-a89f95a033c5/Little-Bighorn-pictogra_MnxEGVU.jpg",
+                        "file": {},
+                        "name": "Little-Bighorn-pictograph-Amos-Bad-Heart-Bull-2.jpg",
+                        "post": 2,
+                        "type": "image_file",
+                        "title": "",
+                        "description": "Little Big Horn: Indian vs. American art perspective."
+                    }
+                ],
+                "description": "Little Big Horn: Indian vs. American art perspective."
+            },
+            {
+                "type": "text",
+                "content": "<h2><strong>SIOUX WARS</strong></h2><p>During the last half of the nineteenth century, Lakota Sioux and their Cheyenne and Arapaho allies defended their homelands and natural resources against incursions by the federal government and European American settlers. Collectively known as the Sioux Wars, major engagements included the Grattan Massacre (1854), Fetterman Fight (1866), Battle of the Rosebud (1876), Battle of the Little Bighorn (1876), and the Wounded Knee Massacre (1890).</p><p>The first violent conflict in the Plains involving the Lakota Sioux and the federal government grew out of increased travel along the Oregon Trail. To protect overland travelers, the federal government built Fort Kearny in present-day Nebraska and purchased Fort Laramie in present-day Wyoming. Government agents also negotiated the Fort Laramie Treaty of 1851, which guaranteed the safe passage of emigrants in exchange for annuities and the recognition of tribal territories. Peace held until 1854 when a trivial event–the theft of an emigrant's cow by young Lakotas–led to the Grattan Massacre and subsequent army retaliations. On August 19, 1854, Lt. John Grattan led a detachment of twenty-nine men to recover the stolen cow from the village of Conquering Bear along the North Platte River. Misunderstandings and a belligerent Grattan sparked violence. When the shooting stopped, Grattan and all of his men lay dead; Conquering Bear was the lone Lakota casualty. Army retaliation was certain. The following summer, Col. William S. Harney destroyed a Sioux village at Ash Hollow (present-day Nebraska), killing more than 100 men, women, and children. Harney then pushed into Lakota territory, briefly occupying Fort Pierre (South Dakota) and finally establishing Fort Randall on the Missouri River. Harney's invasion of the Sioux homeland caused the Sioux to move away from the roads, soldiers, and forts and, in combination with the federal government's preoccupation with the Civil War (1861–65), led to almost ten years of relative peace.</p><p>Trouble flared again in 1865–67 when emigrants, in violation of the 1851 Treaty of Fort Laramie, moved along the Bozeman Trail to the Montana goldfields. This pathway cut through the heart of Plains Indian hunting grounds in the Powder River area. Persistent Lakota raids against settlers and soldiers along this route prompted the federal government to build Forts Reno, C. F. Smith, and Phil Kearny to protect emigrant travel. Despite the heavy military presence, Indian attacks continued, and in the second half of 1866 Lakotas led by Red Cloud and Crazy Horse battled federal troops. The most notorious engagement was the Fetterman Fight (December 21, 1866) near Fort Phil Kearny, Wyoming Territory, where eighty men under Capt. William Fetterman were killed. Public cries for decisive action against the Sioux reached a fever pitch, but Congress voted to broker peace with the warring tribes. Red Cloud signed the Fort Laramie Treaty (1868), which guaranteed, among other things, abandonment of the Bozeman Trail forts and creation of a large reservation that included the Black Hills. After agreeing to this treaty, Red Cloud and many Lakota bands moved onto this Great Sioux Reservation, while Sitting Bull, Crazy Horse, and Gall continued to resist encroachment on their lands. They openly rejected the treaty and continued to pursue their traditional life.</p><p>Hostilities erupted once again after an 1874 military expedition into the Black Hills confirmed rumors of gold. Gold seekers flooded into Paha Sapa (the Black Hills)–a clear violation of the 1868 Fort Laramie Treaty–forcing leaders such as Crazy Horse and Sitting Bull to defend Sioux territory. To avoid conflict, the federal government in 1875 offered to purchase the land from the Sioux. Overwhelmingly, the Sioux rejected this, and the government provoked a military showdown by issuing an ultimatum requiring all Sioux to report to an agency by January 31, 1876, or be considered hostile. The off-reservation people, now loosely allied under Sitting Bull, were scattered in the Powder River area (southeastern Montana and northwestern Wyoming) in small winter camps, and they largely ignored this arbitrary, impossible demand.</p><p>In May 1876 the army launched a threepronged campaign to force the Lakotas back onto the Great Sioux Reservation: Col. John Gibbon advanced eastward from Fort Ellis (Montana), Gen. George Crook moved north from Fort Laramie, and Gen. Alfred Terry (with George Custer) moved westward from Fort Abraham Lincoln (North Dakota). The military's campaign began to crumble when on June 17, 1876, the Sioux, led by Crazy Horse, routed and turned back Crook's command at the Battle of the Rosebud. On June 25.26, 1876, in the most famous fight of the offensive, Lt. Col. George Custer's Seventh Cavalry attacked an enormous Indian encampment on the Little Bighorn (Greasy Grass) River. Custer divided his command and attempted to strike the village from both ends but was quickly overwhelmed by superior numbers. Custer and 210 men in his immediate command (263 total) were killed.</p><p>After this victory, the Sioux and their allies fragmented into small bands and dispersed. The army initiated a winter campaign and relentlessly hunted down those bands that had not returned to their agencies. In May 1877, Crazy Horse surrendered at Fort Robinson, Nebraska; he was killed four months later, reportedly while trying to escape. Sitting Bull fled to Canada with as many as 2,000 followers. In retaliation for defeat at the Little Bighorn, Congress annexed the Black Hills from the Great Sioux Reservation on February 28, 1877.</p><p>Essentially, these events marked the end of the Sioux Wars and the start of the reservation era. After Sitting Bull returned to the United States in 1881, all Lakota Sioux bands lived on reservations and any hope of effective resistance was gone. The final conflict between the Sioux and the federal government–the Wounded Knee Massacre–was hardly a military confrontation. Militarily defeated, the Sioux readily adopted the Ghost Dance religion but with a more militaristic twist–some believed they would be impervious to bullets and most believed that if they danced and prayed with enough fervor the European Americans would be driven from the country. Their newfound focus caused great fear in the Plains, leading to a confrontation with federal troops. On December 29, 1890, while attempting to disarm a fleeing band of Lakotas, the Seventh Cavalry killed more than 250 Lakotas (mostly women and children) on the Pine Ridge Reservation in South Dakota. This massacre marked the end of Sioux resistance and the last chapter in the Plains Indian Wars.</p><p><br></p>"
+            },
+            {
+                "type": "text",
+                "content": "<p>On this day in 1876, Native American forces led by Chiefs Crazy Horse and Sitting Bull defeat the U.S. Army troops of Lieutenant Colonel George Armstrong Custer in a bloody battle near southern Montana’s Little Bighorn River.</p><p>Crazy Horse and Sitting Bull, leaders of the Sioux tribe on the Great Plains, strongly resisted the mid-19th-century efforts of the U.S. government to confine their people to reservations. In 1875, after gold was discovered in South Dakota’s Black Hills, the U.S. Army ignored previous treaty agreements and invaded the region. This betrayal led many Sioux and Cheyenne tribesmen to leave their reservations and join Sitting Bull and Crazy Horse in Montana. By the late spring of 1876, more than 10,000 Native Americans had gathered in a camp along the Little Bighorn River–which they called the Greasy Grass–in defiance of a U.S. War Department order to return to their reservations or risk being attacked.</p><p>In mid-June, three columns of U.S. soldiers lined up against the camp and prepared to march. A force of 1,200 Native Americans turned back the first column on June 17. Five days later, General Alfred Terry ordered Custer’s 7th Cavalry to scout ahead for enemy troops. On the morning of June 25, Custer drew near the camp and decided to press on ahead rather than wait for reinforcements.</p><p>At mid-day, Custer’s 600 men entered the Little Bighorn Valley. Among the Native Americans, word quickly spread of the impending attack. The older Sitting Bull rallied the warriors and saw to the safety of the women and children, while Crazy Horse set off with a large force to meet the attackers head on. Despite Custer’s desperate attempts to regroup his men, they were quickly overwhelmed. Custer and some 200 men in his battalion were attacked by as many as 3,000 Native Americans; within an hour, Custer and every last one of his soldier were dead.</p><p>The Battle of Little Bighorn–also called Custer’s Last Stand–marked the most decisive Native American victory and the worst U.S. Army defeat in the long Plains Indian War. The gruesome fate of Custer and his men outraged many white Americans and confirmed their image of the Indians as wild and bloodthirsty. Meanwhile, the U.S. government increased its efforts to subdue the tribes. Within five years, almost all of the Sioux and Cheyenne would be confined to reservations.</p><p><br></p><p><br></p>"
+            }
+        ],
+        "updated": "2018-03-06T09:55:44.433913-08:00",
+        "likes": 0,
+        "timestamp": "2018-03-06T09:55:44.433913-08:00",
+        "user": 1,
+        "comments": [],
+        "attachments": [],
+        "tags": [
+            "",
+            "Little Big Horn",
+            "Greasy Grass",
+            "General Custer",
+            "American History",
+            "Great Sioux War"
+        ]
+    },
+    {
+        "pk": 59,
+        "title": "Scratch programming",
+        "content": [
+            {
+                "type": "text",
+                "content": "<p>Scratch is an introductory web-based programming language!</p><p><br></p><p>Find it at http://scratch.mit.edu</p>"
+            }
+        ],
+        "updated": "2018-03-01T19:02:08.792997-08:00",
+        "likes": 0,
+        "timestamp": "2018-03-01T19:02:08.792997-08:00",
+        "user": 1,
+        "comments": [
+            3,
+            4
+        ],
+        "attachments": [],
+        "tags": [
+            "CS",
+            "programming"
+        ]
+    }
+]

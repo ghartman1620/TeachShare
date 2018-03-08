@@ -47,4 +47,7 @@ export default Vue.component("base-page", {
 body {
     zoom: 90%;
 }
+
+
+
 </style>
