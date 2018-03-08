@@ -55,11 +55,22 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'django_filters',
+    'channels',
     # 'django_elasticsearch_dsl',
 
     'accounts',
     'posts',
 ]
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        }
+    },
+}
+
 
 # ELASTICSEARCH_DSL = {
 #     'default': {
@@ -143,6 +154,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'TeachShare_WebApp.wsgi.application'
+ASGI_APPLICATION = 'TeachShare_WebApp.routing.application'
 
 
 # Database
@@ -195,11 +207,11 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-STATIC_URL = "/static/"
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, '', 'static')
 
 # Media files
-MEDIA_URL = "/media/"
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, '', 'media')
 
 LOGIN_REDIRECT_URL = '/account/'

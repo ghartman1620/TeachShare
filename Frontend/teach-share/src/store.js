@@ -23,13 +23,11 @@ export default new Vuex.Store({
     },
     state: {
         user: null,
-        comment: null,
-        comments: [],
-
         token: null,
+
         // file upload
-        files: [],
-        filesPercents: [],
+        // files: [],
+        // filesPercents: [],
 
         // Post feed
         posts: [],
