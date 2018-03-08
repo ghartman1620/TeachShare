@@ -2,6 +2,7 @@ import Vue from "vue";
 import Router from "vue-router";
 import Base from "@/components/Base";
 import Login from "@/components/Login";
+import api from "../api";
 
 // route-splitting to minimize necessary download size and will download javascript as-needed.
 //
@@ -19,7 +20,7 @@ const CommentEntry = () => import(/* webpackChunkName: "comments" */ "../compone
 
 Vue.use(Router);
 
-export default new Router({
+const router =  new Router({
     mode: "history",
     routes: [{
         path: "/",
@@ -104,3 +105,27 @@ export default new Router({
     }
     ]
 });
+
+const loginProtectedRoutes = ['create'];
+router.beforeEach((to, from, next) => {
+    if(loginProtectedRoutes.includes(to.name)){
+        var cookies = document.cookie.split(';');
+        const TOKEN = "token";
+        for(var i = 0; i < cookies.length; i++){
+            cookies[i] = cookies[i].trim();
+            if(cookies[i].length >= TOKEN.length){
+
+                if (cookies[i].substring(0, TOKEN.length).localeCompare(TOKEN) == 0){
+                    var access_token = cookies[i].substring(TOKEN.length+1);
+                    Object.assign(api.defaults, {headers: {authorization: 'Bearer ' + access_token}});
+                    api.get('/verify_token')
+                        .then(response => console.log(response.data))
+                        .catch(err => next({path: "/login"}));
+                }
+            }
+        }
+    }  
+    next();
+});
+
+export default router;

@@ -29,6 +29,7 @@
                             <a class="dropdown-item" href="#">Your posts</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#">Account details</a>
+                            <a @click="logout" class="dropdown-item">Logout</a>
                         </div>
                     </li>
                 </ul>
@@ -52,6 +53,12 @@ export default Vue.component("nav-bar", {
     props: ["query"],
     data() {
         return {};
+    },
+    methods: {
+        logout() {
+            this.$store.dispatch("logout");
+            this.$router.push({name: "Login"});
+        }
     }
 });
 </script>

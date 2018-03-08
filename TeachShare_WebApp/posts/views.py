@@ -6,6 +6,7 @@ from rest_framework.parsers import FileUploadParser, JSONParser
 from django_filters import rest_framework as filters
 import django_filters
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 
 from .models import Post, Comment, Attachment
 from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer
@@ -19,7 +20,6 @@ from urllib.parse import unquote
 from enum import Enum
 from elasticsearch_dsl.query import MultiMatch
 from rest_framework import status
-
 #Post search parameters
 #?term=string - searching for this string
 #?in=string - a list containing some of "title" "filenames" "content" "tags"
@@ -54,6 +54,7 @@ class SearchPostsView(views.APIView):
     searchIn = ['title', 'content', 'tags'] #default
     termType = Term.OR
     excludeType = Term.OR
+    permission_classes = (AllowAny,)
     '''
     Each of these parameter dicts defines a function to 
     deal with a particular query parameter. The params among

@@ -5,11 +5,9 @@
     <!-- logo -->
     <img class="img-responsive" src="/static/img/whitelogo.png">
     <div class="form">
-        <form action="http://127.0.0.1:8080/?#/test">
-            <input type="text" placeholder="username" v-model="username"/>
-            <input type="password" placeholder="password" v-model="pw"/>
-            <input v-on:click="login" type="submit" value="Login" />
-        </form>
+        <input type="text" placeholder="username" v-model="username"/>
+        <input type="password" placeholder="password" v-model="pw"/>
+        <button v-on:click="login" value="Login" />
     </div>
     </div>
 </body>
@@ -26,10 +24,18 @@ export default {
             pw: "",
         }
     },
+    computed: {
+        token() {
+            return this.$store.state.user.token;
+        },
+        cookietoken() {
+
+        }
+    },
     methods: {
         login: function(event) {
-
             this.$store.dispatch("login", { username: this.username, pw: this.pw});
+
         }        
     }
 }
