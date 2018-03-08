@@ -58,10 +58,8 @@ Vue.use(Notifications);
 Validator.extend("YoutubeEmbedURL", {
     getMessage: field => "The " + field + " value is not a valid YouTube link.",
     validate: value => {
-        console.log(value);
         var videoURL = new URL(value);
         var videoID = videoURL.searchParams.get("v");
-        console.log(videoID);
         if (videoID) {
             return true;
         }
