@@ -16,14 +16,35 @@ def assembleContent(content, element):
         else:
             content = content + " " + str(v)
     return content
+    
+def fileNamesFromFileElement(element):
+    fileNames = []
+    for file in element['files']:
+        fileNames.append(file['name'])
+
+    return fileNames
+
+def fileNamesFromImageAudioElement(element):
+    fileNames = []
+    for file in element['content']:
+        fileNames.append(file['name'])
+    return fileNames
+
+def fileNamesFromVideoElement(element):
+    return [element['content']['name']]
+
+def fileNamesFromVideoLinkElement(element):
+    return [element['content']['title']]
+
 
 @post.doc_type
 class PostDocument(DocType):
     title = fields.TextField()
     content = fields.TextField()
+    filenames = fields.TextField()
     tags = fields.TextField()
-    updated = fields.DateField()
-    likes = fields.IntegerField()
+    # updated = fields.DateField()
+    # likes = fields.IntegerField()
     timestamp = fields.DateField()
     id = fields.IntegerField()
     '''
@@ -33,6 +54,26 @@ class PostDocument(DocType):
             tags += tag + " "
         return tags
     '''
+    def prepare_filenames(self, instance):
+        files = []
+        for element in instance.content:
+            if element['type'] != 'text':
+                #This is code golf speak for call a certain function and append it to our files list
+                files.extend({
+                    'image_file' : fileNamesFromImageAudioElement,
+                    'audio'      : fileNamesFromImageAudioElement,
+                    'video_file' : fileNamesFromVideoElement,
+                    'file'       : fileNamesFromFileElement,
+                    'video_link' : fileNamesFromVideoLinkElement,
+                }[element['type']](element))
+
+        # from pprint import pprint
+        # print("in prepare files")
+        # pprint(vars(instance))
+        # print("files")  
+        # print(files)
+        return files
+    
     def prepare_content(self, instance):
         content = ""
         if not type(instance.content) is dict:

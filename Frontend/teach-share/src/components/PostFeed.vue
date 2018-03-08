@@ -2,26 +2,51 @@
 <div>
 <router-view/>
 <side-bar>
-    <b-form style="padding: 8px;" v-on:submit.prevent="advancedSearch()">
+    <b-form :class="{'control' : true}" style="padding: 8px;" v-on:submit.prevent="advancedSearch()">
+
         <b-form-group label="Search for posts with:">
-            <b-form-input type="text" v-model="keywords" placeholder="Keyword(s)"/>
-            
+            <b-form-input 
+                type="text" 
+                name="keywords"
+                v-validate="keywordRules" 
+                :class="{'input': true, 'is-danger': errors.has('keywords') }" 
+                v-model="keywords" 
+                placeholder="Keyword(s)"
+            />
+            <b-form-radio-group v-model="termtype" :options="termTypeOptions"/>
         </b-form-group>
         <b-form-group label="In:">
             <b-form-checkbox-group stacked v-model="searchIn" :options="searchInOptions"/>
         </b-form-group>
         <b-form-group label="Excluding posts with:">
-            <b-form-input type="text" v-model="exclude" placeholder="Keyword(s)"/>
+            <b-form-input 
+                type="text" 
+                name="excluding"
+                v-validate="keywordRules" 
+                :class="{'input': true, 'is-danger': errors.has('excluding') }" 
+                v-model="excluding" 
+                placeholder="Keyword(s)"
+            />
+            <b-form-radio-group v-model="excludetype" :options="termTypeOptions"/>
         </b-form-group>
+
         
         <b-form-group label="Sort by:">
             <b-form-radio-group stacked v-model="sortBy" :options="sortByOptions"/>
             
         </b-form-group>
         
-        
+        <span v-show="errors.has('keywords') && errors.has('excluding')" class="help is-danger">
+            You must filter by some keyword(s).
+        </span>
 
-        <b-button type="submit" class="sidebar-btn">Submit</b-button>
+        <b-button 
+            :disabled="errors.has('keywords') && errors.has('excluding')"
+            type="submit" 
+            variant="primary" 
+            class="sidebar-btn">
+            Submit
+        </b-button>
     </b-form>
 </side-bar>
 
@@ -59,9 +84,16 @@ export default {
     data: function() {
         return {
             keywords: "",
-            searchIn: [],
+            searchIn: ["title", "content", "tags"],
             excluding: "",
-            sortBy: "",
+            sortBy: "date",
+            termtype: "or",
+            excludetype: "or",
+            termTypeOptions: [
+                {text: "Search for any", value: "or"},
+                {text: "Search for all", value: "and"},
+            ],
+            
             searchInOptions: [
                 {text: "Title", value: "title"},
                 {text: "Content", value: "content"},
@@ -71,7 +103,8 @@ export default {
             sortByOptions: [
                 {text: "Date", value: "date"},
                 {text: "Relevance", value: "score"},
-                
+                //TODO
+                //{text: "Likes", value: "likes"},
             ]
         
         }
@@ -79,7 +112,14 @@ export default {
     computed: {
         posts: function() {
             return this.$store.getters.getPosts();
+        },
+        keywordRules() {
+            return this.excluding.length ? "" : "required";
+        },
+        excludingRules() {
+            return this.keywords.length ? "required" : ""
         }
+        
     },
     methods: {
         getPosts: function() {
@@ -97,7 +137,8 @@ export default {
         },
         reloadPosts(){
             if(this.$route.query.term != undefined){
-                this.$store.dispatch("simplePostSearch", this.$route.query.term);
+                console.log("here");
+                this.$store.dispatch("postSearch", this.$route.query);
             }
             else{
                 this.$store.dispatch("fetchAllPosts");
@@ -105,6 +146,23 @@ export default {
         },
         advancedSearch() {
             
+            var query = {};
+            if(this.keywords != ""){
+                query.term = this.keywords;
+            }
+            if(this.excluding != ""){
+                query.exclude = this.excluding;
+            }
+            query.sort = this.sortBy;
+            var searchParam = "";
+            this.searchIn.forEach(function(element){
+                searchParam += element + " ";
+            })
+            console.log(searchParam);
+            query.in = searchParam;
+            query.termtype = this.termtype;
+            query.excludetype = this.excludetype;
+            this.$router.push({name: "dashboard", query: query});
         }
     },
     beforeMount(){

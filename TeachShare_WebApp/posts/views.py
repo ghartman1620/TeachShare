@@ -14,32 +14,124 @@ from .documents import PostDocument
 # test
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.db.models import Q
 from urllib.parse import unquote
-
+from enum import Enum
+from elasticsearch_dsl.query import MultiMatch
 
 #Post search parameters
-#Contains a keyword
-#Contains all/any of multiple keywords
+#?term=string - searching for this string
+#?in=string - a list containing some of "title" "filenames" "content" "tags"
+#?sort=string - one of "date" "score" TODO - likes
+#?exclude=string - some keywords to discard some search results
+#?termtype=string - either 'and' or 'or' - says whether multiple words
+    #should try to match every one of the words or any of the words
+#?excludetype=string - either 'and' or 'or' - says whether to exclude 
+    #posts with all of the words listed or any of the words listed
 
+class Term(Enum):
+    AND = 0
+    OR = 1
+    @staticmethod
+    def fromString(str):
+        if(str=='and'):
+            print('retuning and term')
+            return Term.AND
+        else:
+            print('returning or term')
+            return Term.OR
+    def joinQueries(self, query1, query2):
+        print(self)
+        
+        if(self.value == Term.AND.value):
+            print('retruning and')
+            return query1 & query2
+        else: #or
+            print('returning or')
+            return query1 | query2
 class SearchPostsView(views.APIView):
+    searchIn = ['title', 'content', 'tags'] #default
+    termType = Term.OR
+    excludeType = Term.OR
+    '''
+    Each of these parameter dicts defines a function to 
+    deal with a particular query parameter. The params among
+    each list will be dealt with in any order, if they exist.
+    Each of these functions takes two arguments - the query param
+    value and the queryset.
+    '''
+    #optionParams will be dealt with first. They affect filtering. 
+    def setSearchIn(self, value, queryset):
+        self.searchIn = value.split(" ")
+        return queryset
+    def setTermType(self, value, queryset):
+        print(value)
+        self.termType = Term.fromString(value)
+        return queryset
+    def setExcludeType(self, value, queryset):
+        print('in exclude type')
+        print(value)
+        self.excludeType = Term.fromString(value)
+        return queryset
 
-    #queryset = Post.objects.all() #this isn't used but it makes rest framework happy
-    #s = PostDocument.search()
+    optionParams = {
+        'in'      : setSearchIn,
+        'termtype': setTermType,
+        'excludetype' : setExcludeType,
+    }
+    
+    #filterParams come next. they perform filters.
+    def filterByTerm(self, value, queryset):
+        terms = value.split(' ')
+        myQuery = MultiMatch(query=terms[0], fields=self.searchIn)
+
+        for term in terms[1:]:
+            myQuery = self.termType.joinQueries(myQuery, MultiMatch(query=term, fields=self.searchIn))
+        return queryset.query(myQuery)
+
+    def filterByExcludedTerm(self, value, queryset):
+        terms = value.split(' ')
+        myQuery = MultiMatch(query=terms[0], fields=self.searchIn)
+        print('in exclude filter')
+        print(value)
+        for term in terms[1:]:
+            myQuery = self.excludeType.joinQueries(myQuery, MultiMatch(query=term, fields=self.searchIn))
+        return queryset.exclude(myQuery)
+
+    filterParams = {
+        'term'    : filterByTerm,
+        'exclude' : filterByExcludedTerm,
+    }
+
+    
+    #sort parameters are last. They sort results.  
+    def sortBy(self, value, queryset):
+        return queryset.sort(
+            'title'
+        )
+    sortParams = {
+        'sort'    : sortBy,
+    }
+
+    def parseParams(self, paramSet, queryset):
+        for param, func in paramSet.items():
+            arg = self.request.query_params.get(param, None)
+            if arg != None:
+                queryset = func(self, unquote(arg), queryset)
+        return queryset
+
     def get_queryset(self):
         queryset = PostDocument.search()
-
-        termParam = self.request.query_params.get('term', None)
-        if termParam is not None:
-            terms = unquote(termParam)
-            termlist = terms.split(' ')
-            for term in termlist:
-                print('querying' + term)
-                queryset = queryset.query('multi_match', query=term, fields=['title', 'content', 'tags'])
+        queryset = self.parseParams(self.optionParams, queryset)
+        queryset = self.parseParams(self.filterParams, queryset)
+        queryset = self.parseParams(self.sortParams,   queryset)
         return queryset
+
+
     def get(self, request, format=None):
         response = []
         queryset = self.get_queryset()
-        for hit in queryset:
+        for hit in queryset.scan():
             try:
                 response.append(Post.objects.get(id=hit._d_['id']))
             except Post.DoesNotExist as e:

@@ -6,7 +6,7 @@ const PostCreateService = {
         postElements: [],
         doneMutations: [],
         unDoneMutations: [],
-        editorOpen: false 
+        editorOpen: false
     },
     mutations: {
         UNDO: state => {
@@ -17,7 +17,7 @@ const PostCreateService = {
         },
         UNDO_ADD_ELEMENT: (state, index) => {
             state.unDoneMutations.push({
-        mutation:       "ADD_ELEMENT",
+                mutation: "ADD_ELEMENT",
                 arg: state.postElements[index]
             });
             state.postElements.splice(index, 1);

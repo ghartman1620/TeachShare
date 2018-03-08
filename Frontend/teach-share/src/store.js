@@ -118,9 +118,25 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        simplePostSearch: (state, term) => {
-            console.log("doing search for" + term);
-            api.get("search/?term="+term)
+        postSearch: (state, query) => {
+            //this code to generate a querystring is very bad but it is 
+            //12:30AM and I do not care right now
+
+            //also eslint needs to stop bitching
+            //you're a code linter not a style guide you asshole
+            console.log("in postSearch");
+            var querystring = "";
+            var firstProperty = true;
+            Object.keys(query).forEach(function(key,index){
+                if(firstProperty){
+                    querystring += "?" + key + "=" + query[key];
+                    firstProperty = false;
+                }else{
+                    querystring += "&" + key + "=" + query[key];
+                }
+            });
+            console.log(querystring);
+            api.get("search/"+querystring)
                 .then(response => state.commit("LOAD_ALL_POSTS", response.data))
                 .catch(err => console.log(err))
         },
