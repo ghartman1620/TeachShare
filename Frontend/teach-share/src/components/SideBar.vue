@@ -52,10 +52,11 @@ export default Vue.component("side-bar", {
     height: auto; //enable me for having the white background conform to the height of the contents of the sidebar
     top: 60px; /* height of top navbar */
     left: 0;
-    width: 400px;
+    width: 410px;
     -webkit-transition: all 0.1s ease-in-out;
     -moz-transition: all 0.1s ease-in-out;
     transition: all 0.1s ease-in-out;
+    overflow: scroll;
 }
 .sidebar.collapsed {
     width: 40px;

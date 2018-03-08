@@ -219,7 +219,8 @@ def fileExt(filename):
     print(ext)
     return ext
 #these are allowed binary filetypes
-whitelist = ['pdf','doc', 'ppt','docx', 'odt']
+whitelist = ['pdf','doc', 'ppt','docx', 'odt', 'xlsx', 'xls', 'xlt', 'csv', 'ods', 'ots', 'fods', 'tex']
+
 
 class FileUploadView(views.APIView):
     parser_classes = (FileUploadParser, JSONParser)

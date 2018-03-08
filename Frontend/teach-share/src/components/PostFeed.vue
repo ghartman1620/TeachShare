@@ -5,6 +5,7 @@
     <b-form :class="{'control' : true}" style="padding: 8px;" v-on:submit.prevent="advancedSearch()">
 
         <b-form-group label="Search for posts with:">
+            <b-form-radio-group v-model="termtype" :options="termTypeOptions"/>
             <b-form-input 
                 type="text" 
                 name="keywords"
@@ -13,12 +14,14 @@
                 v-model="keywords" 
                 placeholder="Keyword(s)"
             />
-            <b-form-radio-group v-model="termtype" :options="termTypeOptions"/>
+            
         </b-form-group>
         <b-form-group label="In:">
             <b-form-checkbox-group stacked v-model="searchIn" :options="searchInOptions"/>
         </b-form-group>
         <b-form-group label="Excluding posts with:">
+            <b-form-radio-group v-model="excludetype" :options="termTypeOptions"/>
+
             <b-form-input 
                 type="text" 
                 name="excluding"
@@ -27,14 +30,24 @@
                 v-model="excluding" 
                 placeholder="Keyword(s)"
             />
-            <b-form-radio-group v-model="excludetype" :options="termTypeOptions"/>
         </b-form-group>
 
         
         <b-form-group label="Sort by:">
             <b-form-radio-group stacked v-model="sortBy" :options="sortByOptions"/>
-            
         </b-form-group>
+    
+        <!--<b-btn v-b-toggle.gradeCollapse variant="primary">Toggle Grades</b-btn>
+
+        <b-collapse id="gradeCollapse" class="mt-2">
+            <b-form-group label="Grades">
+
+                <b-form-checkbox-group stacked v-model="grades" :options="gradeOptions"/>
+                
+            </b-form-group>
+        </b-collapse>-->
+
+
         
         <span v-show="errors.has('keywords') && errors.has('excluding')" class="help is-danger">
             You must filter by some keyword(s).
@@ -47,6 +60,8 @@
             class="sidebar-btn">
             Submit
         </b-button>
+
+
     </b-form>
 </side-bar>
 
@@ -83,15 +98,33 @@ export default {
     components: { Post, SideBar },
     data: function() {
         return {
+            
             keywords: "",
             searchIn: ["title", "content", "tags"],
             excluding: "",
             sortBy: "date",
             termtype: "or",
             excludetype: "or",
+            grades: [],
+            gradeOptions: [
+                {text: "K", value: 0},
+                {text: "1", value: 1},
+                {text: "2", value: 2},
+                {text: "3", value: 3},
+                {text: "4", value: 4},
+                {text: "5", value: 5},
+                {text: "6", value: 6},
+                {text: "7", value: 7},
+                {text: "8", value: 8},
+                {text: "9", value: 9},
+                {text: "10", value: 10},
+                {text: "11", value: 11},
+                {text: "12", value: 12},
+                   
+            ],
             termTypeOptions: [
-                {text: "Search for any", value: "or"},
-                {text: "Search for all", value: "and"},
+                {text: "Any terms", value: "or"},
+                {text: "All terms", value: "and"},
             ],
             
             searchInOptions: [
