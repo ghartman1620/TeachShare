@@ -199,6 +199,14 @@ def SimpleMethod(request):
 #Attachment objects that are deleted do not delete the corresponding file
 
 # @TODO: figure out how to deal with bad url characters
+
+def isBinary(f):
+    chunk = f.read(1024)
+    if '\0' in chunk:
+        return True
+    else:
+        return False
+
 class FileUploadView(views.APIView):
     parser_classes = (FileUploadParser, JSONParser)
 
@@ -212,7 +220,9 @@ class FileUploadView(views.APIView):
         print(file_obj.name)
         p = Post.objects.first()
         a = Attachment.objects.create(post=p, file=file_obj)
+        
         print(a.file.url)
+        print(isBinary(open(a.file.url[1:], encoding='utf8')))
         print(a.file.name)
         file_obj.close()
         
