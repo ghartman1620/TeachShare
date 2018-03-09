@@ -120,8 +120,7 @@ class FileUploadView(views.APIView):
     parser_classes = (FileUploadParser, JSONParser)
 
     def put(self, request, filename, format=None):
-        add.delay(10, 10)
-        import pdb; pdb.set_trace()
+        # add.delay(10, 10)
         file_obj = request.data['file']
         p = Post.objects.first() # this is where we need to actually know the post.
         a = Attachment.objects.create(post=p, file=file_obj)

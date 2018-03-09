@@ -172,6 +172,11 @@ const PostCreateService = {
         closeEditor: context => {
             context.commit("CLOSE_EDITOR");
         }
+    },
+    getters: {
+        getTags: state => state.tags,
+        getTitle: state => state.title,
+        getContent: state => state.postElements
     }
 };
 

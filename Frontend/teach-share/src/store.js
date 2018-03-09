@@ -39,7 +39,7 @@ export default new Vuex.Store({
             state.posts = Object.assign([], data);
         },
         LOAD_POST: (state, data) => {
-            let index = state.posts.findIndex(function(val, ind, obj) {
+            let index = state.posts.findIndex(function (val, ind, obj) {
                 console.log(ind, val, obj);
                 if (val === data) {
                     return true;
@@ -192,7 +192,7 @@ export default new Vuex.Store({
                 api
                     .post("posts/", postObj)
                     .then(response => resolve(response))
-                    .catch(function(error) {
+                    .catch(function (error) {
                         console.log("error: ", error);
                         console.log(error.config);
                         if (error.response) {
@@ -216,18 +216,27 @@ export default new Vuex.Store({
                     });
             });
         },
-        saveDraft: (state, postObj) => {
-            // var obj = {
-            //     user: 1,
-            //     title: this.title,
-            //     content: this.$store.state.create.postElements,
-            //     likes: 0,
-            //     comments: [],
-            //     tags: this.tags,
-            //     attachments: []
-            // };
-            console.log(state);
-            state.dispatch("createPost", "hey");
+        saveDraft: (ctx, postObj) => {
+            console.log(ctx);
+            var obj = {
+                user: 1,
+                title: ctx.rootGetters.getTitle,
+                content: ctx.rootGetters.getContent,
+                likes: 0,
+                comments: [],
+                tags: ctx.rootGetters.getTags,
+                attachments: [],
+                content_type: 0,
+                grade: 0,
+                length: 0
+            };
+            console.log(ctx);
+            console.log("TAGS: ", ctx.getters);
+            console.log("TITLE", ctx.rootGetters);
+            ctx.dispatch("createPost", obj).then((result) => {
+                console.log(result.data);
+                console.log("POST PRIMARY KEY: ", result.data.pk);
+            });
         },
         login: (state, credentials) => {
             var body = {

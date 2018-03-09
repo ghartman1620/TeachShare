@@ -65,6 +65,7 @@ const FileService = {
     actions: {
         fileUpload: (context, formData) => {
             console.log(context);
+            context.dispatch("saveDraft");
             console.log();
             var files = formData.getAll("files");
             var i = 0;
