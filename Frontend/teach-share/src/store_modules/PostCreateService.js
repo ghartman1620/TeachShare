@@ -4,11 +4,19 @@ import Vue from "vue";
 const PostCreateService = {
     state: {
         postElements: [],
+        title: "",
+        tags: [],
         doneMutations: [],
         unDoneMutations: [],
-        editorOpen: false 
+        editorOpen: false
     },
     mutations: {
+        SET_TAGS: (state, tags) => {
+            state.tags = tags;
+        },
+        SET_TITLE: (state, newTitle) => {
+            state.title = newTitle;
+        },
         UNDO: state => {
             state.doneMutations.pop();
         },
@@ -34,13 +42,19 @@ const PostCreateService = {
         UNDO_EDIT_ELEMENT: (state, arg) => {
             state.unDoneMutations.push({
                 mutation: "EDIT_ELEMENT",
-                arg: { index: arg.index, element: state.postElements[arg.index] }
+                arg: {
+                    index: arg.index,
+                    element: state.postElements[arg.index]
+                }
             });
             state.postElements.splice(arg.index, 1, arg.element);
             console.log(state.unDoneMutations);
         },
         UNDO_SWAP_ELEMENTS: (state, iAndJ) => {
-            state.unDoneMutations.push({ mutation: "SWAP_ELEMENTS", arg: iAndJ });
+            state.unDoneMutations.push({
+                mutation: "SWAP_ELEMENTS",
+                arg: iAndJ
+            });
             var i = iAndJ[0];
             var j = iAndJ[1];
             var tmp = state.postElements[i];
@@ -105,11 +119,19 @@ const PostCreateService = {
     actions: {
         // Actions for in progress posts
 
+        setTags: (context, tags) => {
+            context.commit("SET_TAGS", tags);
+        },
+        setTitle: (context, title) => {
+            context.commit("SET_TITLE", title);
+        },
         undo: context => {
             console.log(context.state.doneMutations);
             if (context.state.doneMutations.length > 0) {
                 var mut =
-                    context.state.doneMutations[context.state.doneMutations.length - 1];
+                    context.state.doneMutations[
+                        context.state.doneMutations.length - 1
+                    ];
                 context.commit("UNDO");
                 context.commit(mut.mutation, mut.arg);
                 console.log(context.state.doneMutations);
@@ -118,7 +140,9 @@ const PostCreateService = {
         redo: context => {
             if (context.state.unDoneMutations.length > 0) {
                 var mut =
-                    context.state.unDoneMutations[context.state.unDoneMutations.length - 1];
+                    context.state.unDoneMutations[
+                        context.state.unDoneMutations.length - 1
+                    ];
                 console.log(mut);
                 context.commit("REDO");
                 context.commit(mut.mutation, mut.arg);
@@ -146,11 +170,11 @@ const PostCreateService = {
             state.commit("EDIT_ELEMENT", editedElement);
             state.commit("CLEAR_REDO");
         },
-        openEditor: (context) => {
+        openEditor: context => {
             console.log("in openeditor");
             context.commit("OPEN_EDITOR");
         },
-        closeEditor: (context) => {
+        closeEditor: context => {
             context.commit("CLOSE_EDITOR");
         }
     }

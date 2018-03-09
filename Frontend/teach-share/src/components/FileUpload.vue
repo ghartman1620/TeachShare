@@ -62,7 +62,6 @@
 
 <!-- Javascript -->
 <script>
-
 import Vue from "vue";
 import { mapGetters } from "vuex";
 
@@ -73,12 +72,10 @@ var fileTypes = Object.freeze({
     AUD: "audio/*"
 });
 
-const 
-    UPLOAD_INITIAL = 0,
+const UPLOAD_INITIAL = 0,
     UPLOAD_SAVING = 1,
     UPLOAD_SUCCESS = 2,
-    UPLOAD_ERROR = 3
-
+    UPLOAD_ERROR = 3;
 
 export default Vue.component("file-upload", {
     components: {},
@@ -114,7 +111,11 @@ export default Vue.component("file-upload", {
         currentUploadedFiles() {
             return this.$store.state.fs.uploadedFiles;
         },
-        ...mapGetters(["filesUploadStatus", "allFilesUploadComplete", "pastLimit"])
+        ...mapGetters([
+            "filesUploadStatus",
+            "allFilesUploadComplete",
+            "pastLimit"
+        ])
     },
     methods: {
         save(formData) {
@@ -149,9 +150,10 @@ export default Vue.component("file-upload", {
     mounted() {
         this.$store.dispatch("changeFileLimit", this.fileLimit);
         if (
-            this.$store.state.create.postElements.length > this.$route.query.index
+            this.$store.state.create.postElements.length >
+            this.$route.query.index
         ) {
-        console.log("im editing!");
+            console.log("im editing!");
         }
         this.resetState();
     },
