@@ -36,7 +36,7 @@ export default {
         login: function(event) {
             this.$store.dispatch("login", { username: this.username, pw: this.pw});
 
-        }        
+        },
     }
 }
 </script>

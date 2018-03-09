@@ -108,21 +108,31 @@ const router =  new Router({
 
 const loginProtectedRoutes = ['create'];
 router.beforeEach((to, from, next) => {
+    // 
+
+
+    //Checking if the user is logged in for pages that require login access.
+
     if(loginProtectedRoutes.includes(to.name)){
         var cookies = document.cookie.split(';');
+        
+        var tokenCookieExists = false;
         const TOKEN = "token";
         for(var i = 0; i < cookies.length; i++){
             cookies[i] = cookies[i].trim();
             if(cookies[i].length >= TOKEN.length){
-
                 if (cookies[i].substring(0, TOKEN.length).localeCompare(TOKEN) == 0){
+                    tokenCookieExists = true;
                     var access_token = cookies[i].substring(TOKEN.length+1);
-                    Object.assign(api.defaults, {headers: {authorization: 'Bearer ' + access_token}});
                     api.get('/verify_token')
                         .then(response => console.log(response.data))
+                        .then(next())
                         .catch(err => next({path: "/login"}));
                 }
             }
+        }
+        if(!tokenCookieExists){
+            next({path: '/login'});
         }
     }  
     next();

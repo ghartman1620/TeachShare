@@ -33,6 +33,8 @@ from oauth2_provider.views.mixins import OAuthLibMixin
 from oauth2_provider.oauth2_backends import OAuthLibCore
 from oauth2_provider.settings import oauth2_settings
 
+import json
+
 class TokenVerification(APIView):
     def get(self, request, format=None):
         return Response({"token" : "is valid"})
@@ -56,7 +58,17 @@ class TokenView(OAuthLibMixin, APIView):
             request._request.POST[key] = value
 
         url, headers, body, status = self.create_token_response(request._request)
-        return Response(body)
+        print('requestpost items')
+        for k,v in request._request.POST.items():
+            print(k)
+            print(v)
+        #returns the body (contains access & refresh tokens) and also userID
+        #it will be saved on the frontend for the purpose of knowing
+        #info about the logged in user
+        return Response({
+            'body': json.loads(body), 
+            'userId': User.objects.get(username=request._request.POST['username']).pk
+        })
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     """

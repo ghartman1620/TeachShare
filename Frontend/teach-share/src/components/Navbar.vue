@@ -14,7 +14,7 @@
 
                     <!-- create a post link -->
                     <li class="nav-item">
-                        <router-link class="nav-link" :to="{name:'create', query: { index: 0 } }">
+                        <router-link class="nav-link" :to="{name:'create'}">
                             <font-awesome-icon icon="edit" fixed-width></font-awesome-icon> Create Post
                         </router-link>
                     </li>
