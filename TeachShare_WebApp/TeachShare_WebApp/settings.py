@@ -63,12 +63,9 @@ INSTALLED_APPS = [
 
 ELASTICSEARCH_DSL={
     'default': {
-        'ENGINE': 'elasticsearch2_backend.Elasticsearch2SearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
-        'INDEX_NAME': 'teach',
+        'hosts': 'search:9200'
     },
 }
-
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -156,7 +153,7 @@ DATABASES = {
         'NAME': 'teachshare',
         'USER': 'postgres',
         'PASSWORD': 'password123',
-        'HOST': '127.0.0.1',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }

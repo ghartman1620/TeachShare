@@ -3,8 +3,10 @@ version: '2.2'
 services:
   db:
     image: postgres
+    networks:
+      - teachnet
     ports: 
-      - "5432:5432"
+      - 5432:5432
     restart: always
     environment:
       POSTGRES_DB: teachshare
@@ -12,27 +14,36 @@ services:
       POSTGRES_USER: postgres
   web:
     build: ./TeachShare_WebApp/.
+    networks:
+      - teachnet
     command: bash -c "./TeachShare_WebApp/wait-for-it.sh -h db -p 5432 -- python3 TeachShare_WebApp/manage.py makemigrations && python3 TeachShare_WebApp/manage.py migrate && python3 TeachShare_WebApp/manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
     ports:
-      - "8000:8000"
+      - 8000:8000
     depends_on:
       - db
       - search
   vue:
     build: Frontend/.
+    networks:
+      - teachnet
     command: npm run dev 
     volumes:
       - ./Frontend/teach-share/.:/code/.
     ports:
-      - "8080:8080"
+      - 8080:8080
     depends_on:
       - db
 
   search:
-    image: elasticsearch:5.6.8
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.2
+    networks:
+      - teachnet
+    container_name: search
+    hostname: search
     environment:
+      - ELASTIC_PASSWORD=
       - discovery.type=single-node
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -41,9 +52,16 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - esdata1:/usr/share/elasticsearch/data
+      - esdata2:/usr/share/elasticsearch/data
     ports:
-      - "9200:9200"
+      - 9200:9200
+  redis:
+    image: "redis:alpine"
+    ports:
+      - 6379:6379
 volumes:
-  esdata1:
+  esdata2:
     driver: local
+
+networks:
+  teachnet:
