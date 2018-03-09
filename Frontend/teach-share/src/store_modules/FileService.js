@@ -64,6 +64,8 @@ const FileService = {
     },
     actions: {
         fileUpload: (context, formData) => {
+            console.log(context);
+            console.log();
             var files = formData.getAll("files");
             var i = 0;
             forEach(files, function (file) {

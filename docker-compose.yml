@@ -24,6 +24,17 @@ services:
     depends_on:
       - db
       - search
+  celery:
+    build: ./TeachShare_WebApp/.
+    command: bash -c "cd TeachShare_WebApp && celery -A TeachShare_WebApp worker -l info -B"
+    volumes:
+      - .:/code
+    networks:
+      - teachnet
+    volumes:
+      - .:/code
+    depends_on:
+      - web
   vue:
     build: Frontend/.
     command: npm run dev 
@@ -53,6 +64,12 @@ services:
       - esdata2:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    networks:
+      - teachnet
 volumes:
   esdata2:
     driver: local

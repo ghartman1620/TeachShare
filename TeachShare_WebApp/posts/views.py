@@ -16,6 +16,8 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from urllib.parse import unquote
 
+from .tasks import add
+
 
 # Post search parameters
 # Contains a keyword
@@ -114,21 +116,14 @@ def SimpleMethod(request):
 # Files removed from the post are not deleted
 # Attachment objects that are deleted do not delete the corresponding file
 
-# @TODO: figure out how to deal with bad url characters
-
-
 class FileUploadView(views.APIView):
     parser_classes = (FileUploadParser, JSONParser)
 
     def put(self, request, filename, format=None):
+        add.delay(10, 10)
+        import pdb; pdb.set_trace()
         file_obj = request.data['file']
-        print(request.content_type)
-        print(dir(request))
-        print(request.parsers)
-        print(request.query_params)
-        print(filename)
-        print(file_obj.name)
-        p = Post.objects.first()
+        p = Post.objects.first() # this is where we need to actually know the post.
         a = Attachment.objects.create(post=p, file=file_obj)
         print(a.file.url)
         print(a.file.name)

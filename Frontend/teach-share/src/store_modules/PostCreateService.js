@@ -118,7 +118,6 @@ const PostCreateService = {
     },
     actions: {
         // Actions for in progress posts
-
         setTags: (context, tags) => {
             context.commit("SET_TAGS", tags);
         },
@@ -129,9 +128,7 @@ const PostCreateService = {
             console.log(context.state.doneMutations);
             if (context.state.doneMutations.length > 0) {
                 var mut =
-                    context.state.doneMutations[
-                        context.state.doneMutations.length - 1
-                    ];
+                context.state.doneMutations[context.state.doneMutations.length - 1];
                 context.commit("UNDO");
                 context.commit(mut.mutation, mut.arg);
                 console.log(context.state.doneMutations);
@@ -140,9 +137,7 @@ const PostCreateService = {
         redo: context => {
             if (context.state.unDoneMutations.length > 0) {
                 var mut =
-                    context.state.unDoneMutations[
-                        context.state.unDoneMutations.length - 1
-                    ];
+                context.state.unDoneMutations[context.state.unDoneMutations.length - 1];
                 console.log(mut);
                 context.commit("REDO");
                 context.commit(mut.mutation, mut.arg);

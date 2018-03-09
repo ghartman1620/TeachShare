@@ -64,7 +64,7 @@
 
                             <div class="col-10">
                                 <input class="form-control" type="text" v-model.lazy="title"
-                                    placeholder="Title required" id="titleTextbox">
+                                    @change="titleChanged"  placeholder="Title required" id="titleTextbox">
                             </div>
                         </div>
                     </div>
@@ -230,7 +230,12 @@ export default {
         createTag: function(e) {
             if (e.keyCode === 13 && this.inProgressTag !== "") {
                 this.createTagBtn();
+                this.$store.dispatch("setTags", this.tags);
             }
+        },
+        titleChanged: function(e) {
+            console.log(e)
+            this.$store.dispatch("setTitle", this.title);
         },
         createTagBtn: function() {
             this.tags.push(this.inProgressTag);

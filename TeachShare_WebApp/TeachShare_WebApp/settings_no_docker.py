@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 # -*- coding: utf-8 -*-
 
 import os
+import socket
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -55,20 +56,26 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'django_filters',
-    # 'django_elasticsearch_dsl',
+    'django_elasticsearch_dsl',
 
     'accounts',
     'posts',
 ]
 
-# ELASTICSEARCH_DSL = {
-#     'default': {
-#         'ENGINE': 'elasticsearch2_backend.Elasticsearch2SearchEngine',
-#         'URL': 'search:9200',
-#         'INDEX_NAME': 'teach',
-#     },
-# }
 
+
+ELASTICSEARCH_DSL={
+    'default': {
+        'hosts': 'localhost:9200'
+    },
+}
+
+# CELERY:
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_TASK_SERIALIZER = 'msgpack'
+CELERY_ACCEPT_CONTENT = ['msgpack', 'json']
+CELERY_RESULT_SERIALIZER = 'msgpack'
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -156,7 +163,7 @@ DATABASES = {
         'NAME': 'teachshare',
         'USER': 'postgres',
         'PASSWORD': 'password123',
-        'HOST': '127.0.0.1',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }

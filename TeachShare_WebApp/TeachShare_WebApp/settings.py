@@ -56,23 +56,26 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'django_filters',
-    # 'django_elasticsearch_dsl',
+    'django_elasticsearch_dsl',
 
     'accounts',
     'posts',
 ]
 
-searchip = socket.gethostbyname('search') + ':9200'
-print('SEARCH_IP: ' + searchip)
 
-# ELASTICSEARCH_DSL = {
-#     'default': {
-#         'ENGINE': 'elasticsearch2_backend.Elasticsearch2SearchEngine',
-#         'URL': 'http://search:9200',  # 172.18.0.3:9200
-#         'INDEX_NAME': 'teach',
-#     },
-# }
 
+ELASTICSEARCH_DSL={
+    'default': {
+        'hosts': 'search:9200'
+    },
+}
+
+# CELERY:
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_TASK_SERIALIZER = 'msgpack'
+CELERY_ACCEPT_CONTENT = ['msgpack']
+CELERY_RESULT_SERIALIZER = 'msgpack'
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
