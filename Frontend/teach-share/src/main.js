@@ -61,6 +61,9 @@ fontawesome.library.add(
 // moment.js for date formatting
 Vue.use(require("vue-moment"));
 
+// vue-cookie because js cookies are awful
+Vue.use(require("vue-cookie"));
+
 Vue.use(Carousel);
 Vue.use(Alert);
 Vue.use(Collapse);

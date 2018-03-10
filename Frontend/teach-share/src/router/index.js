@@ -3,6 +3,7 @@ import Router from "vue-router";
 import Base from "@/components/Base";
 import Login from "@/components/Login";
 import api from "../api";
+import store from "../store";
 
 // route-splitting to minimize necessary download size and will download javascript as-needed.
 //
@@ -106,33 +107,53 @@ const router =  new Router({
     ]
 });
 
-const loginProtectedRoutes = ['create'];
+var Cookie = require("tiny-cookie");
+const loginProtectedRoutes = ["create"];
 router.beforeEach((to, from, next) => {
-    // 
+    
+    console.log(window.localStorage.getItem("access_token"));
+
+    console.log(window.localStorage.getItem("refresh_token"));
+    console.log(window.localStorage.getItem("userId"));
+    // drop token into cookie from browser storage after validated
 
 
     //Checking if the user is logged in for pages that require login access.
 
+    //Are we accessing a login-protected page? If no, we don't need to be logged in.
     if(loginProtectedRoutes.includes(to.name)){
-        var cookies = document.cookie.split(';');
-        
+        //Is there a token in the cookie?
         var tokenCookieExists = false;
-        const TOKEN = "token";
-        for(var i = 0; i < cookies.length; i++){
-            cookies[i] = cookies[i].trim();
-            if(cookies[i].length >= TOKEN.length){
-                if (cookies[i].substring(0, TOKEN.length).localeCompare(TOKEN) == 0){
-                    tokenCookieExists = true;
-                    var access_token = cookies[i].substring(TOKEN.length+1);
-                    api.get('/verify_token')
-                        .then(response => console.log(response.data))
-                        .then(next())
-                        .catch(err => next({path: "/login"}));
-                }
-            }
+        var token = Cookie.get("token");
+        if(token != undefined){    
+  
+            tokenCookieExists = true;
+            Object.assign(api.defaults, {headers: {authorization : "Bearer " + token}});
+
+            api.get('/verify_token')
+                .then(response => console.log(response.data))
+                .then(next()) //If cookie token is valid, access page
+                .catch(err => next({path: "/login"})); //otherwise force login
         }
         if(!tokenCookieExists){
-            next({path: '/login'});
+            //If not, access browser storage to look for the refresh token.
+            var refresh_token = window.localStorage.getItem("refresh_token");
+            if(refresh_token == undefined){
+                next({path: "/login"});
+            }
+            else{
+                var body = {
+                    
+                    grant_type: "refresh_token",
+                    refresh_token: refresh_token,
+                    username: window.localStorage.getItem("username")
+                };
+                var head = { headers: { "content-type": "application/json" } };
+                api.post('/get_token', body,  head)
+                    .then(response => store.commit("SET_TOKEN", {data: response.data, persist: true}))
+                    .then(next())
+                    .catch(err => next({path: "/login"}));
+            }
         }
     }  
     next();

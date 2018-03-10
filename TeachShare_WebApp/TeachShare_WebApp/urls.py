@@ -23,7 +23,7 @@ router.register(r'attachments', AttachmentViewSet)
 urlpatterns = [
 
     url(r'^test/', SimpleMethod),
-    url(r'auth/get_token', TokenView.as_view()),
+    url(r'^api/get_token', TokenView.as_view()),
     url(r'^auth/', include('rest_framework_social_oauth2.urls')),
     url(r'^api/verify_token', TokenVerification.as_view()),
     url(r'^api/upload/(?P<filename>[^/]+)$', FileUploadView.as_view()),

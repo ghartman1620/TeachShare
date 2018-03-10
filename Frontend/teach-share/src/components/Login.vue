@@ -7,6 +7,7 @@
     <div class="form">
         <input type="text" placeholder="username" v-model="username"/>
         <input type="password" placeholder="password" v-model="pw"/>
+        <input type="checkbox" v-model="persist">Remember me</input>
         <button v-on:click="login" value="Login" />
     </div>
     </div>
@@ -22,6 +23,7 @@ export default {
         return {
             username: "",
             pw: "",
+            persist: false,
         }
     },
     computed: {
@@ -34,7 +36,7 @@ export default {
     },
     methods: {
         login: function(event) {
-            this.$store.dispatch("login", { username: this.username, pw: this.pw});
+            this.$store.dispatch("login", { username: this.username, pw: this.pw, persist: this.persist});
 
         },
     }

@@ -46,7 +46,7 @@ class TokenView(OAuthLibMixin, APIView):
     server_class = oauth2_settings.OAUTH2_SERVER_CLASS
     validator_class = oauth2_settings.OAUTH2_VALIDATOR_CLASS
     oauthlib_backend_class = OAuthLibCore
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny,)    
     def get(self, request, format=None):
         return Response({"foo" : "bar"})
     def post(self, request, format=None):
@@ -56,7 +56,7 @@ class TokenView(OAuthLibMixin, APIView):
         request._request.POST['client_secret'] = client_secret
         for key, value in request.data.items():
             request._request.POST[key] = value
-
+        
         url, headers, body, status = self.create_token_response(request._request)
         print('requestpost items')
         for k,v in request._request.POST.items():
@@ -65,9 +65,11 @@ class TokenView(OAuthLibMixin, APIView):
         #returns the body (contains access & refresh tokens) and also userID
         #it will be saved on the frontend for the purpose of knowing
         #info about the logged in user
+        user = User.objects.get(username=request._request.POST['username'])
         return Response({
             'body': json.loads(body), 
-            'userId': User.objects.get(username=request._request.POST['username']).pk
+            'userId': user.pk,
+            'username' : user.username,
         })
 
 class UserProfileViewSet(viewsets.ModelViewSet):
