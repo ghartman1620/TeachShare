@@ -6,6 +6,7 @@ const PostCreateService = {
         postElements: [],
         title: "",
         tags: [],
+        currentPost: null,
         doneMutations: [],
         unDoneMutations: [],
         editorOpen: false
@@ -16,6 +17,13 @@ const PostCreateService = {
         },
         SET_TITLE: (state, newTitle) => {
             state.title = newTitle;
+        },
+        SET_POST: (state, post) => {
+            state.currentPost = post;
+        },
+        ADD_ATTACHMENT: (state, attachment) => {
+            console.log("attachment being added: ", attachment);
+            state.currentPost.attachments.push(attachment.id);
         },
         UNDO: state => {
             state.doneMutations.pop();
@@ -124,6 +132,9 @@ const PostCreateService = {
         setTitle: (context, title) => {
             context.commit("SET_TITLE", title);
         },
+        setCurrentPost: (context, post) => {
+            context.commit("SET_POST", post);
+        },
         undo: context => {
             console.log(context.state.doneMutations);
             if (context.state.doneMutations.length > 0) {
@@ -144,9 +155,10 @@ const PostCreateService = {
             }
         },
         addElement: (state, element) => {
-            console.log("add_element action");
+            // clear order of actions from ADD_ELEMENT --> CLEAR_REDO --> saveDraft.
             state.commit("ADD_ELEMENT", element);
             state.commit("CLEAR_REDO");
+            state.dispatch("saveDraft").then(res => console.log(res));
         },
         // Actions are only allowed to have one argument so iAndJ is
         // a list with index 0 as the first index to be swapped
@@ -176,7 +188,14 @@ const PostCreateService = {
     getters: {
         getTags: state => state.tags,
         getTitle: state => state.title,
-        getContent: state => state.postElements
+        getContent: state => state.postElements,
+        getCurrentPost: state => state.currentPost,
+        getCurrentPostId: (state, getters) => {
+            if (getters.getCurrentPost !== null) {
+                return getters.getCurrentPost.pk;
+            }
+            return null;
+        }
     }
 };
 

@@ -1,4 +1,5 @@
 from django_elasticsearch_dsl import DocType, Index, fields
+
 from .models import Post
 
 # Name of the Elasticsearch index
@@ -43,8 +44,12 @@ class PostDocument(DocType):
                 content = content + " " + v
         return content
 
+    
+    def get_queryset(self):
+        return super(PostDocument, self).get_queryset().filter(draft=False)
+
     class Meta:
-        model = Post # The model associated with this DocType
+        model = Post  # The model associated with this DocType
         
         # The fields of the model you want to be indexed in Elasticsearch
         fields = [

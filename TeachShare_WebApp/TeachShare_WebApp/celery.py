@@ -1,5 +1,7 @@
 from __future__ import absolute_import, unicode_literals
+
 import os
+
 from celery import Celery
 from celery.schedules import crontab
 
@@ -16,16 +18,11 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # celery beat schedule
 app.conf.beat_schedule = {
-    # 'add-every-10-seconds': {
-    #     'task': 'posts.tasks.add',
-    #     'schedule': 10.0,
-    #     'args': (16, 16)
-    # },
-    'search-index-full-rebuild': {
-        'task': 'posts.tasks.rebuild_index',
-        'schedule': 30.0,
-        'args': ()
-    }, 
+    # 'search-index-full-rebuild': {
+    #     'task': 'posts.tasks.rebuild_index',
+    #     'schedule': crontab(minute='*/1'),
+    #     'args': ()
+    # }, 
 }
 
 # Load task modules from all registered Django app configs.

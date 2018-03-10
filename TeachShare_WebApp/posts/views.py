@@ -1,23 +1,20 @@
 # test
-from django.shortcuts import render
-from rest_framework import viewsets, views
-from rest_framework.parsers import FileUploadParser, JSONParser
+from urllib.parse import unquote
 
-from django_filters import rest_framework as filters
 import django_filters
-from rest_framework.response import Response
-
-from .models import Post, Comment, Attachment
-from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer
-from .documents import PostDocument
-
 # test
 from django.http import HttpResponse
 from django.shortcuts import render
-from urllib.parse import unquote
+from django_filters import rest_framework as filters
+from rest_framework import views, viewsets
+from rest_framework.parsers import FileUploadParser, JSONParser
+from rest_framework.response import Response
 
+from .documents import PostDocument
+from .models import Attachment, Comment, Post
+from .serializers import (AttachmentSerializer, CommentSerializer,
+                          PostSerializer)
 from .tasks import add
-
 
 # Post search parameters
 # Contains a keyword
@@ -92,16 +89,15 @@ class AttachmentViewSet(viewsets.ModelViewSet):
     filter_fields = ('post',)
 
     def create(self, request):
-        print(request)
-        print(dir(request))
-        print(request.data)
-        print(request.query_params)
+        # grab upload identifier and post primary key
         id = request.query_params.get('uid', '')
-        print(id)
+        post_id = request.data['post']
 
-        p = Post.objects.get(id=request.data['post'])
+        # grab the post instance and create the attachment instance
+        p = Post.objects.get(id=post_id)
         a = Attachment.objects.create(post=p)
-        print(p)
+
+        # return the post id, status and unique identifier
         return Response(data={
             'status': 'OK',
             'uid': id,
@@ -120,12 +116,10 @@ class FileUploadView(views.APIView):
     parser_classes = (FileUploadParser, JSONParser)
 
     def put(self, request, filename, format=None):
-        # add.delay(10, 10)
+        post_id = request.query_params['post']
         file_obj = request.data['file']
-        p = Post.objects.first() # this is where we need to actually know the post.
+        p = Post.objects.get(pk=post_id) # this is where we need to actually know the post.
         a = Attachment.objects.create(post=p, file=file_obj)
-        print(a.file.url)
-        print(a.file.name)
         file_obj.close()
 
         return Response(data={

@@ -90,27 +90,6 @@ export default new Vuex.Store({
                 }
             }
         },
-        // UPDATE_COMMENT: (state, comment) => {
-        //     console.log("UPDATE_COMMENT: ", comment);
-        //     let index = state.comments.findIndex(val => val.id === comment.id);
-        //     console.log("update index: ", index);
-        //     if (index === -1) {
-        //         state.comments.push(comment);
-        //         let postindex = state.posts.findIndex(val => val.pk === comment.post.pk);
-        //         if (index === -1) {
-        //             // what happened to the post
-        //         } else {
-        //             let commentindex = state.posts[postindex].comments.findIndex(val => val.pk === comment.pk);
-        //             if (commentindex === -1) {
-        //                 state.posts[postindex].comments.push(comment);
-        //             } else {
-        //                 state.posts[postindex].comments.splice(commentindex, comment);
-        //             }
-        //         }
-        //     } else {
-        //         state.comments.splice(index, 1);
-        //     }
-        // },
         LOAD_FILTERED_POSTS: (state, data) => {
             state.posts = Object.assign([], data);
         },
@@ -193,50 +172,62 @@ export default new Vuex.Store({
                     .post("posts/", postObj)
                     .then(response => resolve(response))
                     .catch(function (error) {
-                        console.log("error: ", error);
-                        console.log(error.config);
                         if (error.response) {
-                            // The request was made and the server responded with a status code
-                            // that falls out of the range of 2xx
-                            console.log(error.response.data);
-                            console.log(error.response.status);
-                            console.log(error.response.headers);
                             return resolve(error.response.data);
                         } else if (error.request) {
-                            // The request was made but no response was received
-                            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                            // http.ClientRequest in node.js
-                            console.log(error.request);
                             return resolve(error.request);
                         } else {
-                            // Something happened in setting up the request that triggered an Error
-                            console.log("Error", error.message);
                             return resolve(error.message);
                         }
                     });
             });
         },
-        saveDraft: (ctx, postObj) => {
-            console.log(ctx);
-            var obj = {
-                user: 1,
-                title: ctx.rootGetters.getTitle,
-                content: ctx.rootGetters.getContent,
-                likes: 0,
-                comments: [],
-                tags: ctx.rootGetters.getTags,
-                attachments: [],
-                content_type: 0,
-                grade: 0,
-                length: 0
-            };
-            console.log(ctx);
-            console.log("TAGS: ", ctx.getters);
-            console.log("TITLE", ctx.rootGetters);
-            ctx.dispatch("createPost", obj).then((result) => {
-                console.log(result.data);
-                console.log("POST PRIMARY KEY: ", result.data.pk);
+        updateExistingPost: (state, postObj) => {
+            console.log(postObj);
+            return new Promise((resolve, reject) => {
+                api
+                    .put(`posts/${postObj.pk}/`, postObj)
+                    .then(response => resolve(response))
+                    .catch(function (error) {
+                        if (error.response) {
+                            return resolve(error.response.data);
+                        } else if (error.request) {
+                            return resolve(error.request);
+                        } else {
+                            return resolve(error.message);
+                        }
+                    });
             });
+        },
+        saveDraft: (ctx) => {
+            if (ctx.rootGetters.getCurrentPostId === null) { // hasn't yet been saved...
+                var obj = {
+                    user: 1,
+                    title: ctx.rootGetters.getTitle,
+                    content: ctx.rootGetters.getContent,
+                    likes: 0,
+                    comments: [],
+                    tags: ctx.rootGetters.getTags,
+                    attachments: [],
+                    content_type: 0,
+                    grade: 0,
+                    length: 0
+                };
+                return ctx.dispatch("createPost", obj).then((result) => {
+                    ctx.dispatch("setCurrentPost", result.data);
+                    return result.data.pk;
+                });
+            } else {
+                // might be redundant! Check.
+                var currentPost = ctx.rootGetters.getCurrentPost;
+                currentPost.content = ctx.state.create.postElements;
+                currentPost.tags = ctx.rootGetters.getTags;
+                currentPost.title = ctx.rootGetters.getTitle;
+                console.log(currentPost);
+                return ctx.dispatch("updateExistingPost", currentPost).then(res => {
+                    return ctx.dispatch("setCurrentPost", res.data);
+                });
+            }
         },
         login: (state, credentials) => {
             var body = {

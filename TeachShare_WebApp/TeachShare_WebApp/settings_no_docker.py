@@ -70,6 +70,21 @@ ELASTICSEARCH_DSL={
     },
 }
 
+"""
+Django Cache Backend Settings (Redis):
+"""
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/0",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+DJANGO_REDIS_IGNORE_EXCEPTIONS = True
+
 # CELERY:
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
