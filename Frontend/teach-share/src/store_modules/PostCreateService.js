@@ -21,6 +21,14 @@ const PostCreateService = {
         SET_POST: (state, post) => {
             state.currentPost = post;
         },
+        REMOVE_ATTACHMENT: (state, attachment) => {
+            let ind = state.currentPost.attachments.findIndex(function(val) {
+                return val === attachment.id;
+            });
+            if (ind !== -1) {
+                state.currentPost.attachments.splice(ind, 1);
+            }
+        },
         ADD_ATTACHMENT: (state, attachment) => {
             console.log("attachment being added: ", attachment);
             state.currentPost.attachments.push(attachment.id);
@@ -139,19 +147,42 @@ const PostCreateService = {
             console.log(context.state.doneMutations);
             if (context.state.doneMutations.length > 0) {
                 var mut =
-                context.state.doneMutations[context.state.doneMutations.length - 1];
+                    context.state.doneMutations[
+                        context.state.doneMutations.length - 1
+                    ];
+                console.log("UNDO MUT: ", mut);
+                console.log(mut.mutation, mut.arg);
+                if (mut.mutation === "UNDO_ADD_ELEMENT") {
+                    context.dispatch(
+                        "removeAttachments",
+                        context.state.postElements[mut.arg].content
+                    );
+                }
                 context.commit("UNDO");
                 context.commit(mut.mutation, mut.arg);
                 console.log(context.state.doneMutations);
+                context.dispatch("saveDraft").then(res => console.log(res));
             }
         },
         redo: context => {
             if (context.state.unDoneMutations.length > 0) {
                 var mut =
-                context.state.unDoneMutations[context.state.unDoneMutations.length - 1];
+                    context.state.unDoneMutations[
+                        context.state.unDoneMutations.length - 1
+                    ];
+                console.log("REDO MUT: ", mut);
+                if (mut.mutation === "ADD_ELEMENT") {
+                    console.log(
+                        "REDO ADD ELEMENT: ",
+                        context.state.unDoneMutations,
+                        mut
+                    );
+                    context.dispatch("addAttachments", mut.arg.content);
+                }
                 console.log(mut);
                 context.commit("REDO");
                 context.commit(mut.mutation, mut.arg);
+                context.dispatch("saveDraft").then(res => console.log(res));
             }
         },
         addElement: (state, element) => {
@@ -167,15 +198,43 @@ const PostCreateService = {
             console.log(iAndJ[0] + " " + iAndJ[1]);
             state.commit("SWAP_ELEMENTS", iAndJ);
             state.commit("CLEAR_REDO");
+            state.dispatch("saveDraft").then(res => console.log(res));
         },
         removeElement: (state, index) => {
+            console.log(
+                "REMOVE ELEMENT LIST:",
+                state.state.postElements[index],
+                state.state.postElements,
+                state
+            );
+            state.dispatch(
+                "removeAttachments",
+                state.state.postElements[index].content
+            );
             state.commit("REMOVE_ELEMENT", index);
             state.commit("CLEAR_REDO");
+
+            state.dispatch("saveDraft").then(res => console.log(res));
+        },
+        removeAttachments: (state, attachments) => {
+            for (var i in attachments) {
+                let attachment = attachments[i];
+                console.log("REMOVE: ", attachment);
+                state.commit("REMOVE_ATTACHMENT", attachment);
+            }
+        },
+        addAttachments: (state, attachments) => {
+            for (var i in attachments) {
+                let attachment = attachments[i];
+                console.log("ADD: ", attachment);
+                state.commit("ADD_ATTACHMENT", attachment);
+            }
         },
         editElement: (state, editedElement) => {
             console.log("in editElement action");
             state.commit("EDIT_ELEMENT", editedElement);
             state.commit("CLEAR_REDO");
+            state.dispatch("saveDraft").then(res => console.log(res));
         },
         openEditor: context => {
             console.log("in openeditor");

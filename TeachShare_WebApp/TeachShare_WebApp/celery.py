@@ -18,12 +18,19 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # celery beat schedule
 app.conf.beat_schedule = {
-    # 'search-index-full-rebuild': {
-    #     'task': 'posts.tasks.rebuild_index',
-    #     'schedule': crontab(minute='*/1'),
-    #     'args': ()
-    # }, 
+    'search-index-full-rebuild': {
+        'task': 'posts.tasks.rebuild_index',
+        'schedule': crontab(minute='*/1'),
+        'args': ()
+    },
+    'garbage-truck': {
+        'task': 'posts.tasks.delete_stranded_attachments',
+        'schedule': crontab(minute='*/1'),
+        'args': ()
+    },
 }
+
+# delete_stranded_attachments
 
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()

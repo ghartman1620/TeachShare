@@ -62,9 +62,24 @@ INSTALLED_APPS = [
     'posts',
 ]
 
+"""
+Django Cache Backend Settings (Redis):
+    - Can be used for any cacheing whatsoever
+    - Example implementation for delayed/batched processing is in posts/tasks.py
+"""
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://localhost:6379/0',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'SERIALIZER': 'django_redis.serializers.msgpack.MSGPackSerializer',
+        }
+    }
+}
+DJANGO_REDIS_IGNORE_EXCEPTIONS = True
 
-
-ELASTICSEARCH_DSL={
+ELASTICSEARCH_DSL = {
     'default': {
         'hosts': 'localhost:9200'
     },

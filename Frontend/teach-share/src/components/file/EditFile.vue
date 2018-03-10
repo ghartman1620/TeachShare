@@ -61,7 +61,7 @@ export default Vue.component("edit-file", {
                 });
 			});
 			console.log(files);
-			return {type: "file", files: files}
+			return {type: "file", content: files}
 		},
 		cancel() {
             this.$router.push({ name: "create" });
