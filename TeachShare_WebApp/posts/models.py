@@ -68,4 +68,5 @@ class Attachment(models.Model):
     post = models.ForeignKey(
         Post, related_name='attachments', on_delete=models.SET_NULL, null=True)
     file = models.FileField(null=True, blank=True, upload_to=upload_to)
+    last_updated = models.DateTimeField(auto_now=True, auto_now_add=False)
 # Creates list of tags for every post

@@ -20,7 +20,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class AttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attachment
-        fields = ('pk', 'post', 'file')
+        fields = ('pk', 'post', 'file', 'last_updated')
 
 
 class PostSerializer(serializers.ModelSerializer):
