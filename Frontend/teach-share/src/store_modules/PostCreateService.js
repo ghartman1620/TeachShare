@@ -6,7 +6,6 @@ const PostCreateService = {
         postElements: [],
         doneMutations: [],
         unDoneMutations: [],
-        editorOpen: false
     },
     mutations: {
         UNDO: state => {
@@ -95,12 +94,7 @@ const PostCreateService = {
         CLEAR_REDO: state => {
             state.unDoneMutations = [];
         },
-        OPEN_EDITOR: state => {
-            state.editorOpen = true;
-        },
-        CLOSE_EDITOR: state => {
-            state.editorOpen = false;
-        }
+
     },
     actions: {
         // Actions for in progress posts
@@ -146,13 +140,7 @@ const PostCreateService = {
             state.commit("EDIT_ELEMENT", editedElement);
             state.commit("CLEAR_REDO");
         },
-        openEditor: (context) => {
-            console.log("in openeditor");
-            context.commit("OPEN_EDITOR");
-        },
-        closeEditor: (context) => {
-            context.commit("CLOSE_EDITOR");
-        }
+        
     }
 };
 

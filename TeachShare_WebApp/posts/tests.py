@@ -11,6 +11,7 @@ class PostSearchTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super(PostSearchTestCase, cls).setUpClass()
+        call_command('search_index', '--delete')
         cls.u = User.objects.create(username='User1')
         cls.u2 = User.objects.create(username='User2')
         cls.client = APIClient()
@@ -23,7 +24,7 @@ class PostSearchTestCase(TestCase):
                     content=obj['content'],
                     tags=obj['tags'],
                 )
-        call_command('search_index', '--rebuild')
+        #call_command('search_index', '--rebuild')
     
 
     @classmethod
@@ -52,7 +53,7 @@ class PostSearchTestCase(TestCase):
         self.assertIn("Battle of Little Big Horn",titles)
         self.assertIn("Christopher Columbus", titles)
 
-    def test_search_with_search_location_param_returns_appropriate_posts(self):
+    #def test_search_with_search_location_param_returns_appropriate_posts(self):
         
 
     # def test_search_with_term_parameter_returns_post_with_tag(self):
@@ -69,7 +70,6 @@ class PostSearchTestCase(TestCase):
 
 class PostCreateTestCase(TestCase):
     def setUp(self):
-       
         User.objects.create_user('bryan', 'bmccoid@ucsc.edu')
         self.u = User.objects.first()
         self.client = APIClient()

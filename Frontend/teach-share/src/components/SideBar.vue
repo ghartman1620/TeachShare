@@ -61,6 +61,7 @@ export default Vue.component("side-bar", {
 .sidebar.collapsed {
     width: 40px;
     background-color: transparent;
+    overflow: hidden;
 }
 .sidebar-btn {
     width: 100%;

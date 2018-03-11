@@ -57,7 +57,7 @@ export default Vue.component("nav-bar", {
     methods: {
         logout() {
             this.$store.dispatch("logout");
-            this.$router.push({name: "Login"});
+            this.$router.push({name: "login"});
         }
     }
 });

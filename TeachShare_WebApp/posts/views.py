@@ -20,6 +20,7 @@ from urllib.parse import unquote
 from enum import Enum
 from elasticsearch_dsl.query import MultiMatch
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 #Post search parameters
 #?term=string - searching for this string
 #?in=string - a list containing some of "title" "filenames" "content" "tags"
@@ -154,6 +155,7 @@ class PostViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Post model
     """
+    permission_classes = (IsAuthenticated,)
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     filter_class = PostFilter
@@ -161,6 +163,7 @@ class PostViewSet(viewsets.ModelViewSet):
         return self.queryset
 
 class CommentViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     filter_fields = ('post', 'text', 'user', 'timestamp')
@@ -170,6 +173,7 @@ class AttachmentViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Attachment model
     """
+    permission_classes = (IsAuthenticated,)
     parser_classes = (JSONParser, )
     queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer
@@ -224,6 +228,7 @@ whitelist = ['pdf','doc', 'ppt','docx', 'odt', 'xlsx', 'xls', 'xlt', 'csv', 'ods
 
 
 class FileUploadView(views.APIView):
+    permission_classes = (IsAuthenticated,)
     parser_classes = (FileUploadParser, JSONParser)
 
     def put(self, request, filename, format=None):
