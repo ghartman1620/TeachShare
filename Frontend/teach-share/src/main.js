@@ -15,11 +15,23 @@ import {
     Carousel,
     Alert,
     Card,
-    FormTextarea,
+    Collapse,
+    Navbar,
     Button,
     Layout,
-    Badge
+
+    Form,
+    FormGroup,
+    FormInput,
+    FormRadio,
+    FormSelect,
+    FormTextarea,
+    FormCheckbox,
+
+    Badge,
+    
 } from "bootstrap-vue/es/components";
+
 
 // font-awesome icons
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
@@ -32,6 +44,8 @@ import faCheck from "@fortawesome/fontawesome-free-solid/faCheck";
 import faTimes from "@fortawesome/fontawesome-free-solid/faTimes";
 import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
 import faUserCircle from "@fortawesome/fontawesome-free-solid/faUserCircle";
+import faArrowLeft from "@fortawesome/fontawesome-free-solid/faArrowLeft"
+import faArrowRight from "@fortawesome/fontawesome-free-solid/faArrowRight"
 
 fontawesome.library.add(
     faPlus,
@@ -40,18 +54,34 @@ fontawesome.library.add(
     faCheck,
     faTimes,
     faEdit,
-    faUserCircle
+    faUserCircle,
+    faArrowLeft,
+    faArrowRight,
 );
 
 // moment.js for date formatting
 Vue.use(require("vue-moment"));
 
+// vue-cookie because js cookies are awful
+Vue.use(require("vue-cookie"));
+
 Vue.use(Carousel);
 Vue.use(Alert);
+Vue.use(Collapse);
 Vue.use(Card);
-Vue.use(FormTextarea);
+Vue.use(Navbar);
+
 Vue.use(Button);
 Vue.use(Layout);
+
+Vue.use(Form);
+Vue.use(FormGroup);
+Vue.use(FormInput);
+Vue.use(FormRadio);
+Vue.use(FormSelect);
+Vue.use(FormTextarea);
+Vue.use(FormCheckbox);
+
 Vue.use(Badge);
 
 Vue.use(Notifications);

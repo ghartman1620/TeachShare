@@ -211,6 +211,7 @@ export default {
     },
 
     methods: {
+        
         getEditorStyle() {
             if (this.$store.state.create.editorOpen) {
                 return editorVisible;

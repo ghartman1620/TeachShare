@@ -13,6 +13,7 @@
 import Vue from "vue";
 import Navbar from "./Navbar";
 import Notify from "./Notify";
+import api from "../api";
 
 export default Vue.component("base-page", {
     components: { Notify, Navbar },
@@ -23,7 +24,7 @@ export default Vue.component("base-page", {
         };
     },
     mounted() {
-        // this.$notifyLight("Hey this is some stuff! <strong>BOLD</strong>.")
+        
     }
 });
 </script>
@@ -47,4 +48,7 @@ export default Vue.component("base-page", {
 body {
     zoom: 90%;
 }
+
+
+
 </style>

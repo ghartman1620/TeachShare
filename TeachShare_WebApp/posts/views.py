@@ -2,11 +2,23 @@
 from urllib.parse import unquote
 
 import django_filters
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+
+from .models import Post, Comment, Attachment
+from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer
+from .documents import PostDocument
+
 # test
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.db.models import Q
+from urllib.parse import unquote
+from enum import Enum
+from elasticsearch_dsl.query import MultiMatch
 from django_filters import rest_framework as filters
-from rest_framework import views, viewsets
+from rest_framework import status, views, viewsets
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import FileUploadParser, JSONParser
 from rest_framework.response import Response
 
@@ -16,12 +28,124 @@ from .serializers import (AttachmentSerializer, CommentSerializer,
                           PostSerializer)
 from .tasks import add
 
+#Post search parameters
+#?term=string - searching for this string
+#?in=string - a list containing some of "title" "filenames" "content" "tags"
+#?sort=string - one of "date" "score" TODO - likes
+#?exclude=string - some keywords to discard some search results
+#?termtype=string - either 'and' or 'or' - says whether multiple words
+    #should try to match every one of the words or any of the words
+#?excludetype=string - either 'and' or 'or' - says whether to exclude 
+    #posts with all of the words listed or any of the words listed
+# test
+
+
 # Post search parameters
 # Contains a keyword
 # Contains all/any of multiple keywords
 
+class Term(Enum):
+    AND = 0
+    OR = 1
+    @staticmethod
+    def fromString(str):
+        if(str=='and'):
+            print('retuning and term')
+            return Term.AND
+        else:
+            print('returning or term')
+            return Term.OR
+    def joinQueries(self, query1, query2):
+        print(self)
+        
+        if(self.value == Term.AND.value):
+            print('retruning and')
+            return query1 & query2
+        else: #or
+            print('returning or')
+            return query1 | query2
 class SearchPostsView(views.APIView):
+    searchIn = ['title', 'content', 'tags'] #default
+    termType = Term.OR
+    excludeType = Term.OR
+    permission_classes = (AllowAny,)
+    '''
+    Each of these parameter dicts defines a function to 
+    deal with a particular query parameter. The params among
+    each list will be dealt with in any order, if they exist.
+    Each of these functions takes two arguments - the query param
+    value and the queryset.
+    '''
+    #optionParams will be dealt with first. They affect filtering. 
+    def setSearchIn(self, value, queryset):
+        self.searchIn = value.split(" ")
+        return queryset
+    def setTermType(self, value, queryset):
+        print(value)
+        self.termType = Term.fromString(value)
+        return queryset
+    def setExcludeType(self, value, queryset):
+        print('in exclude type')
+        print(value)
+        self.excludeType = Term.fromString(value)
+        return queryset
 
+    optionParams = {
+        'in'      : setSearchIn,
+        'termtype': setTermType,
+        'excludetype' : setExcludeType,
+    }
+    
+    #filterParams come next. they perform filters.
+    def filterByTerm(self, value, queryset):
+        terms = value.split(' ')
+        myQuery = MultiMatch(query=terms[0], fields=self.searchIn)
+
+        for term in terms[1:]:
+            myQuery = self.termType.joinQueries(myQuery, MultiMatch(query=term, fields=self.searchIn))
+        return queryset.query(myQuery)
+
+    def filterByExcludedTerm(self, value, queryset):
+        terms = value.split(' ')
+        myQuery = MultiMatch(query=terms[0], fields=self.searchIn)
+        print('in exclude filter')
+        print(value)
+        for term in terms[1:]:
+            myQuery = self.excludeType.joinQueries(myQuery, MultiMatch(query=term, fields=self.searchIn))
+        return queryset.exclude(myQuery)
+
+    filterParams = {
+        'term'    : filterByTerm,
+        'exclude' : filterByExcludedTerm,
+    }
+
+    
+    #sort parameters are last. They sort results.  
+    def sortBy(self, value, queryset):
+        return queryset.sort(
+            'title'
+        )
+    sortParams = {
+        'sort'    : sortBy,
+    }
+
+    def parseParams(self, paramSet, queryset):
+        for param, func in paramSet.items():
+            arg = self.request.query_params.get(param, None)
+            if arg != None:
+                queryset = func(self, unquote(arg), queryset)
+        return queryset
+
+<<<<<<< HEAD
+    def get_queryset(self):
+        queryset = PostDocument.search()
+        queryset = self.parseParams(self.optionParams, queryset)
+        queryset = self.parseParams(self.filterParams, queryset)
+        queryset = self.parseParams(self.sortParams,   queryset)
+        return queryset
+
+
+=======
     # queryset = Post.objects.all() #this isn't used but it makes rest framework happy
     #s = PostDocument.search()
     def get_queryset(self):
@@ -37,10 +161,11 @@ class SearchPostsView(views.APIView):
                                           'title', 'content', 'tags'])
         return queryset
 
+>>>>>>> 9739abe44525a703829d212bed8d1888a65be3f7
     def get(self, request, format=None):
         response = []
         queryset = self.get_queryset()
-        for hit in queryset:
+        for hit in queryset.scan():
             try:
                 response.append(Post.objects.get(id=hit._d_['id']))
             except Post.DoesNotExist as e:
@@ -65,7 +190,12 @@ class PostViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Post model
     """
+<<<<<<< HEAD
+    permission_classes = (IsAuthenticated,)
+    queryset = Post.objects.all()
+=======
     queryset = Post.objects.filter()
+>>>>>>> 9739abe44525a703829d212bed8d1888a65be3f7
     serializer_class = PostSerializer
     filter_class = PostFilter
 
@@ -74,6 +204,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     filter_fields = ('post', 'text', 'user', 'timestamp')
@@ -83,6 +214,7 @@ class AttachmentViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Attachment model
     """
+    permission_classes = (IsAuthenticated,)
     parser_classes = (JSONParser, )
     queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer
@@ -112,7 +244,34 @@ def SimpleMethod(request):
 # Files removed from the post are not deleted
 # Attachment objects that are deleted do not delete the corresponding file
 
+<<<<<<< HEAD
+# @TODO: figure out how to deal with bad url characters
+
+# @TODO: write tests for uploading restricted files
+def isBinary(f):
+    chunk = f.read(1024)
+    if '\0' in chunk:
+        return True
+    else:
+        return False
+ 
+def fileExt(filename):
+    ext = ""
+    for i in reversed(range(0, len(filename))):
+        if filename[i] == '.':
+            break
+        ext = filename[i] + ext
+
+    print(ext)
+    return ext
+#these are allowed binary filetypes
+whitelist = ['pdf','doc', 'ppt','docx', 'odt', 'xlsx', 'xls', 'xlt', 'csv', 'ods', 'ots', 'fods', 'tex']
+
+
+=======
+>>>>>>> 9739abe44525a703829d212bed8d1888a65be3f7
 class FileUploadView(views.APIView):
+    permission_classes = (IsAuthenticated,)
     parser_classes = (FileUploadParser, JSONParser)
 
     def put(self, request, filename, format=None):
@@ -120,6 +279,18 @@ class FileUploadView(views.APIView):
         file_obj = request.data['file']
         p = Post.objects.get(pk=post_id) # this is where we need to actually know the post.
         a = Attachment.objects.create(post=p, file=file_obj)
+<<<<<<< HEAD
+        
+        print(a.file.url)
+        with open(a.file.url[1:], encoding='latin1') as f:
+            if isBinary(f) and not fileExt(a.file.url) in whitelist:
+                print('bad filetype!') 
+                return Response(data={
+                    'error' : fileExt(a.file.url) + ' files are allowed. Allowed filetypes are: ' + str(whitelist)
+                }, status=status.HTTP_400_BAD_REQUEST)
+        print(a.file.name)
+=======
+>>>>>>> 9739abe44525a703829d212bed8d1888a65be3f7
         file_obj.close()
 
         return Response(data={

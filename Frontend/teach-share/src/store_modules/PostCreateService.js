@@ -10,7 +10,6 @@ const PostCreateService = {
         currentPost: null,
         doneMutations: [],
         unDoneMutations: [],
-        editorOpen: false
     },
     mutations: {
         SET_TAGS: (state, tags) => {
@@ -119,12 +118,7 @@ const PostCreateService = {
         CLEAR_REDO: state => {
             state.unDoneMutations = [];
         },
-        OPEN_EDITOR: state => {
-            state.editorOpen = true;
-        },
-        CLOSE_EDITOR: state => {
-            state.editorOpen = false;
-        }
+
     },
     actions: {
         // Actions for in progress posts
@@ -217,12 +211,7 @@ const PostCreateService = {
             state.commit("CLEAR_REDO");
             state.dispatch("saveDraft").then(res => $log(res));
         },
-        openEditor: context => {
-            context.commit("OPEN_EDITOR");
-        },
-        closeEditor: context => {
-            context.commit("CLOSE_EDITOR");
-        }
+
     },
     getters: {
         getTags: state => state.tags,

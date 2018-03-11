@@ -1,6 +1,6 @@
 <template>
     <nav class="navbar fixed-top navbar-inverse navbar-expand-lg navbar-dark dark-green">
-            <div class="container">
+        <div class="container">
             <!-- brand section -->
             <router-link class="navbar-brand" to="/"><img class="img-responsive ts-logo" src="/static/ts-logo.png"></router-link>
 
@@ -14,7 +14,7 @@
 
                     <!-- create a post link -->
                     <li class="nav-item">
-                        <router-link class="nav-link" :to="{name:'create', query: { index: 0 } }">
+                        <router-link class="nav-link" :to="{name:'create'}">
                             <font-awesome-icon icon="edit" fixed-width></font-awesome-icon> Create Post
                         </router-link>
                     </li>
@@ -29,6 +29,7 @@
                             <a class="dropdown-item" href="#">Your posts</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#">Account details</a>
+                            <a @click="logout" class="dropdown-item">Logout</a>
                         </div>
                     </li>
                 </ul>
@@ -52,6 +53,12 @@ export default Vue.component("nav-bar", {
     props: ["query"],
     data() {
         return {};
+    },
+    methods: {
+        logout() {
+            this.$store.dispatch("logout");
+            this.$router.push({name: "login"});
+        }
     }
 });
 </script>

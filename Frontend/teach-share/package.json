@@ -27,6 +27,7 @@
         "uuid": "^3.2.1",
         "vee-validate": "^2.0.3",
         "vue": "^2.5.2",
+        "vue-cookie": "^1.1.4",
         "vue-moment": "^3.2.0",
         "vue-quill-editor": "^3.0.5",
         "vue-router": "^3.0.1",

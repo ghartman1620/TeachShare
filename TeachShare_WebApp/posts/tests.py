@@ -11,73 +11,65 @@ class PostSearchTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super(PostSearchTestCase, cls).setUpClass()
-        u = User.objects.create(username='User1')
-        u2 = User.objects.create(username='User2')
-        with open('posts/testPostContent/columbus', encoding='utf8') as f:
-            cls.p0 = Post.objects.create(
-                user=u, 
-                title='Christopher Columbus',
-                content=json.loads(f.read()),
-                tags=['history','columbus'],
-                likes=0,
-            )
-        with open('posts/testPostContent/scratch', encoding='utf8') as f:
-            cls.p1 = Post.objects.create(
-                user=u, 
-                title='Programming in Scratch',
-                content=json.loads(f.read()),
-                tags=['cs','programming', 'scratch'],
-                likes=0,
-            )
-        with open('posts/testPostContent/garageband', encoding='utf8') as f:
-            cls.p2 = Post.objects.create(
-                user=u2, 
-                title='Garage Band',
-                content=json.loads(f.read()),
-                tags=[],
-                likes=0,
-            )
-        with open('posts/testPostContent/python', encoding='utf8') as f:
-            cls.p3 = Post.objects.create(
-                user=u2, 
-                title='python programming!',
-                content=json.loads(f.read()),
-                tags=[],
-                likes=0,
-            )
-        call_command('search_index', '--rebuild')
+        call_command('search_index', '--delete')
+        cls.u = User.objects.create(username='User1')
+        cls.u2 = User.objects.create(username='User2')
         cls.client = APIClient()
+        with open('posts/testPostContent.json', encoding='utf8') as f:
+            posts = json.loads(f.read())
+            for obj in posts:
+                Post.objects.create(
+                    title=obj['title'],
+                    user=cls.u,
+                    content=obj['content'],
+                    tags=obj['tags'],
+                )
+        #call_command('search_index', '--rebuild')
+    
 
     @classmethod
     def tearDownClass(cls):
         assert(True)
-
     def test_search_with_no_query_params_returns_all_posts(self):
         resp = self.client.get('/api/search/')
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(len(resp.data), 4)
+        self.assertEqual(resp.status_code, 200, 'api call returned non-success status')
+        self.assertEqual(len(resp.data), 10)
 
+
+    
     def test_search_with_term_parameter_returns_appropriate_post(self):
         resp = self.client.get('/api/search/?term=programming')
         self.assertEqual(resp.status_code, 200)
-        self.assertIn(PostSerializer(self.p1).data, resp.data)
         self.assertEqual(len(resp.data), 2)
-    
-    def test_search_with_term_parameter_returns_post_with_tag(self):
+        self.assertEqual(resp.data[1]['title'], "Programming in Python!")
+        self.assertEqual(resp.data[0]['title'], "Scratch programming")
+        
         resp = self.client.get('/api/search/?term=history')
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.data[0], PostSerializer(self.p0).data)
-        self.assertEqual(len(resp.data), 1)
+        self.assertEqual(len(resp.data),3)
+        titles = []
+        for post in resp.data:
+            titles.append(post['title'])
+        self.assertIn("Origins of the Maya", titles)
+        self.assertIn("Battle of Little Big Horn",titles)
+        self.assertIn("Christopher Columbus", titles)
 
-    def test_search_with_multiple_parameters(self):
-        resp = self.client.get('/api/search/?term=programming python')
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.data[0], PostSerializer(self.p3).data)
-        self.assertEqual(len(resp.data), 1)
+    #def test_search_with_search_location_param_returns_appropriate_posts(self):
+        
+
+    # def test_search_with_term_parameter_returns_post_with_tag(self):
+    #     resp = self.client.get('/api/search/?term=history')
+    #     self.assertEqual(resp.status_code, 200)
+    #     self.assertEqual(resp.data[0], PostSerializer(self.p0).data)
+    #     self.assertEqual(len(resp.data), 1)
+
+    # def test_search_with_multiple_parameters(self):
+    #     resp = self.client.get('/api/search/?term=programming python')
+    #     self.assertEqual(resp.status_code, 200)
+    #     self.assertEqual(resp.data[0], PostSerializer(self.p3).data)
+    #     self.assertEqual(len(resp.data), 1)
 
 class PostCreateTestCase(TestCase):
     def setUp(self):
-       
         User.objects.create_user('bryan', 'bmccoid@ucsc.edu')
         self.u = User.objects.first()
         self.client = APIClient()
