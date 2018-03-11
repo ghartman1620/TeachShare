@@ -136,7 +136,6 @@ class SearchPostsView(views.APIView):
                 queryset = func(self, unquote(arg), queryset)
         return queryset
 
-<<<<<<< HEAD
     def get_queryset(self):
         queryset = PostDocument.search()
         queryset = self.parseParams(self.optionParams, queryset)
@@ -145,23 +144,6 @@ class SearchPostsView(views.APIView):
         return queryset
 
 
-=======
-    # queryset = Post.objects.all() #this isn't used but it makes rest framework happy
-    #s = PostDocument.search()
-    def get_queryset(self):
-        queryset = PostDocument.search()
-
-        termParam = self.request.query_params.get('term', None)
-        if termParam is not None:
-            terms = unquote(termParam)
-            termlist = terms.split(' ')
-            for term in termlist:
-                print('querying' + term)
-                queryset = queryset.query('multi_match', query=term, fields=[
-                                          'title', 'content', 'tags'])
-        return queryset
-
->>>>>>> 9739abe44525a703829d212bed8d1888a65be3f7
     def get(self, request, format=None):
         response = []
         queryset = self.get_queryset()
@@ -190,12 +172,8 @@ class PostViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Post model
     """
-<<<<<<< HEAD
     permission_classes = (IsAuthenticated,)
     queryset = Post.objects.all()
-=======
-    queryset = Post.objects.filter()
->>>>>>> 9739abe44525a703829d212bed8d1888a65be3f7
     serializer_class = PostSerializer
     filter_class = PostFilter
 
@@ -204,7 +182,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     filter_fields = ('post', 'text', 'user', 'timestamp')
@@ -244,7 +222,6 @@ def SimpleMethod(request):
 # Files removed from the post are not deleted
 # Attachment objects that are deleted do not delete the corresponding file
 
-<<<<<<< HEAD
 # @TODO: figure out how to deal with bad url characters
 
 # @TODO: write tests for uploading restricted files
@@ -268,8 +245,6 @@ def fileExt(filename):
 whitelist = ['pdf','doc', 'ppt','docx', 'odt', 'xlsx', 'xls', 'xlt', 'csv', 'ods', 'ots', 'fods', 'tex']
 
 
-=======
->>>>>>> 9739abe44525a703829d212bed8d1888a65be3f7
 class FileUploadView(views.APIView):
     permission_classes = (IsAuthenticated,)
     parser_classes = (FileUploadParser, JSONParser)
@@ -279,7 +254,6 @@ class FileUploadView(views.APIView):
         file_obj = request.data['file']
         p = Post.objects.get(pk=post_id) # this is where we need to actually know the post.
         a = Attachment.objects.create(post=p, file=file_obj)
-<<<<<<< HEAD
         
         print(a.file.url)
         with open(a.file.url[1:], encoding='latin1') as f:
@@ -289,8 +263,6 @@ class FileUploadView(views.APIView):
                     'error' : fileExt(a.file.url) + ' files are allowed. Allowed filetypes are: ' + str(whitelist)
                 }, status=status.HTTP_400_BAD_REQUEST)
         print(a.file.name)
-=======
->>>>>>> 9739abe44525a703829d212bed8d1888a65be3f7
         file_obj.close()
 
         return Response(data={
