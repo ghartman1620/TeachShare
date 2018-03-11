@@ -15,12 +15,12 @@
                             User: <b-badge variant="primary">{{user}}</b-badge>
                         </b-col>
                         <b-col offset="3" cols="2" offset-sm="4" sm="2" offset-md="6" md="1">
-                            <b-btn
+                            <!-- <b-btn
                                 size="sm"
                                 variant="warning"
                                 @click="editing = !editing">
                                 <font-awesome-icon icon="edit" fixed-width></font-awesome-icon>
-                            </b-btn>
+                            </b-btn> -->
                         </b-col>
                     </b-row>
                 </b-card>
@@ -82,7 +82,6 @@ export default {
     },
     methods: {
         submit() {
-            console.log("Text: ", this.text);
             this.editing = false;
             this.prevText = this.text;
             this.$emit("changedComment", this.text);
@@ -94,7 +93,6 @@ export default {
             });
         },
         cancel() {
-            console.log("Cancelling comment.");
             this.editing = false;
             this.text = this.prevText;
         }

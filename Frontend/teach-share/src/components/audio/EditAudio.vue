@@ -60,79 +60,72 @@ import AudioElement from "./AudioElement";
 var _ = require("lodash");
 
 export default Vue.component("edit-audio", {
-  components: { FileUpload, AudioElement },
-  props: [],
-  data() {
-    return {
-      title: "",
-      description: ""
+    components: { FileUpload, AudioElement },
+    props: [],
+    data() {
+        return {
+            title: "",
+            description: ""
     };
-  },
-  computed: {
-    changedTextRecv() {},
-    ...mapGetters(["hasFiles", "allFilesUploadComplete"])
-  },
-  methods: {
-    submitAudio() {
-      console.log(this.title);
-      console.log(this.description);
-      this.$store.dispatch("submitAudioFiles", this.generateJSON());
     },
-    generateJSON() {
-      let output = new Array();
-      var vm = this;
-      _.map(this.$store.state.fs.uploadedFiles, function(val, ind, arr) {
-        console.log(val, ind, arr);
-        output.push({
-          post: 2,
-          type: "audio_file",
-          id: val.db_id,
-          title: vm.title,
-          filetype: val.file.type,
-          name: val.file.name,
-          url: val.url,
-          description: vm.description
+    computed: {
+        changedTextRecv() {},
+        ...mapGetters(["hasFiles", "allFilesUploadComplete"])
+    },
+    methods: {
+        submitAudio() {
+            this.$store.dispatch("submitAudioFiles", this.generateJSON());
+        },
+        generateJSON() {
+            let output = new Array();
+            var vm = this;
+            _.map(this.$store.state.fs.uploadedFiles, function(val, ind, arr) {
+            output.push({
+                post: 2,
+                type: "audio_file",
+                id: val.db_id,
+                title: vm.title,
+                filetype: val.file.type,
+                name: val.file.name,
+                url: val.url,
+                description: vm.description});
+            });
+            return output;
+        },
+        submit() {
+            var vm = this;
+            if (this.$route.query.index === this.$store.state.create.postElements.length) {
+                this.$store.dispatch("addElement", {
+                    type: "audio",
+                    content: this.generateJSON()
+                }).then(function(){
+                    vm.$router.push({name: "create"});
+                });
+            } else {
+                this.$store.dispatch("editElement", {
+                    index: this.$route.query.index,
+                    element: { type: "audio", content: this.generateJSON() }
+                }).then(function(){
+                    vm.$router.push({name: "create"});
+                });
+            }
+        },
+        close: function(event) {
+            this.$router.push({ name: "create" });
+        }
+    },
+    created() {
+        this.$on("changedTitle", function(res) {
+            this.title = res;
         });
-      });
-      console.log(output);
-      return output;
+        this.$on("changedBody", function(res) {
+            this.description = res;
+        });
+        this.$store.dispatch("openEditor");
     },
-    submit() {
-        var vm = this;
-        if (this.$route.query.index === this.$store.state.create.postElements.length) {
-            this.$store.dispatch("addElement", {
-                type: "audio",
-                content: this.generateJSON()
-            }).then(function(){
-                vm.$router.push({name: "create"});
-            });
-        } else {
-            this.$store.dispatch("editElement", {
-                index: this.$route.query.index,
-                element: { type: "audio", content: this.generateJSON() }
-            }).then(function(){
-                vm.$router.push({name: "create"});
-            });
-      }
-    },
-    close: function(event) {
-      this.$router.push({ name: "create" });
+    destroyed() {
+        this.$store.dispatch("closeEditor");
     }
-  },
-  created() {
-    this.$on("changedTitle", function(res) {
-      console.log("CHANGED!!!", res);
-      this.title = res;
-    });
-    this.$on("changedBody", function(res) {
-      console.log("CHANGED!!!", res);
-      this.description = res;
-    });
-    this.$store.dispatch("openEditor");
-  },
-  destroyed() {
-    this.$store.dispatch("closeEditor");
-  }
 });
 </script>
 

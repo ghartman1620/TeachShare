@@ -4,6 +4,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import VeeValidate, { Validator } from "vee-validate";
 import Notifications from "./notifications";
+import Logger from "./logger";
 
 // our stuff
 import App from "./App.vue";
@@ -84,14 +85,13 @@ Vue.use(FormCheckbox);
 Vue.use(Badge);
 
 Vue.use(Notifications);
+Vue.use(Logger, true);
 
 Validator.extend("YoutubeEmbedURL", {
     getMessage: field => "The " + field + " value is not a valid YouTube link.",
     validate: value => {
-        console.log(value);
         var videoURL = new URL(value);
         var videoID = videoURL.searchParams.get("v");
-        console.log(videoID);
         if (videoID) {
             return true;
         }

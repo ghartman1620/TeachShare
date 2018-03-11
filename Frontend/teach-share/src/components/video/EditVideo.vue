@@ -91,18 +91,9 @@ export default Vue.component("edit-video", {
         removedFile() {
             var vm = this;
             this.$on("RemoveItem", function(item) {
-                console.log("Removed: ", item);
                 vm.$dispatch("removeVideo", item);
             });
         }
-    },
-    methods: {},
-    mounted() {
-        this.$nextTick(() => {
-            // let h = this.$children[4].$el.clientHeight;
-            // this.styleObject["max-height"] = 500;
-            // console.log("CLIENT HEIGHT: ", h);
-        });
     },
     created() {
 		this.$store.dispatch("openEditor");

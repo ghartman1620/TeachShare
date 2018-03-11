@@ -30,12 +30,10 @@ export default {
     methods: {
         test() {
             var val = 
-            console.log("TEST: ", val);
             this.postLocal = val;
         }
     },
     mounted() {
-        console.log("ROUTE: ", this.$route.params)
         this.$store.dispatch("fetchPost", this.$route.params.post_id);
     }
 }

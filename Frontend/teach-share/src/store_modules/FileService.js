@@ -5,6 +5,7 @@ import map from "lodash/map";
 import forEach from "lodash/forEach";
 import every from "lodash/every";
 import reduce from "lodash/reduce";
+import $log from "../log";
 
 // Load some necessary libraries
 const uuidv4 = require("uuid/v4");
@@ -45,7 +46,6 @@ const FileService = {
             }
         },
         REMOVE_FILE: (state, file) => {
-            console.log(file);
             if (file.cancelSource != null) {
                 file.cancelSource.cancel("Operation cancelled by the user");
             }
@@ -64,46 +64,50 @@ const FileService = {
     },
     actions: {
         fileUpload: (context, formData) => {
-            var files = formData.getAll("files");
-            var i = 0;
-            forEach(files, function (file) {
-                var fileAlreadyUploaded = false;
-                context.state.uploadedFiles.forEach(function (element) {
-                    if (element.file.name == file.name) {
-                        fileAlreadyUploaded = true;
-                    }
-                });
-                if (!fileAlreadyUploaded && i + context.state.uploadedFiles.length < context.state.limit) {
-                    var identifier = uuidv4();
-                    var cancelToken = axios.CancelToken;
-                    var source = cancelToken.source();
-                    let config = {
-                        onUploadProgress: progressEvent => {
-                            let percentCompleted = Math.floor(
-                                progressEvent.loaded * 100 / progressEvent.total
-                            );
-                            context.commit("CHANGE_UPLOADED_FILES", {
-                                percent: percentCompleted,
-                                file: file,
-                                request_id: identifier,
-                                cancelSource: source
+            context.dispatch("saveDraft").then(function (postid) {
+                var files = formData.getAll("files");
+                var i = 0;
+                forEach(files, function (file) {
+                    var fileAlreadyUploaded = false;
+                    context.state.uploadedFiles.forEach(function (element) {
+                        if (element.file.name == file.name) {
+                            fileAlreadyUploaded = true;
+                        }
+                    });
+                    if (!fileAlreadyUploaded && i + context.state.uploadedFiles.length < context.state.limit) {
+                        var identifier = uuidv4();
+                        var cancelToken = axios.CancelToken;
+                        var source = cancelToken.source();
+                        let config = {
+                            onUploadProgress: progressEvent => {
+                                let percentCompleted = Math.floor(
+                                    progressEvent.loaded * 100 / progressEvent.total
+                                );
+                                context.commit("CHANGE_UPLOADED_FILES", {
+                                    percent: percentCompleted,
+                                    file: file,
+                                    request_id: identifier,
+                                    cancelSource: source
+                                });
+                            },
+                            cancelToken: source.token
+                        };
+                        api
+                            .put(`upload/${file.name}?id=${identifier}&post=${context.rootGetters.getCurrentPostId}`, file, config)
+                            .then(response => {
+                                context.commit("UPDATE_UPLOAD_FILES", response);
+                                context.commit("ADD_ATTACHMENT", response.data);
+                            })
+                            .catch(function (err) {
+                                if (axios.isCancel(err)) {
+                                    context.commit("REMOVE_FILE", file);
+                                } else {
+                                    $log(err, "danger", true);
+                                }
                             });
-                        },
-                        cancelToken: source.token
-                    };
-                    api
-                        .put(`upload/${file.name}?id=${identifier}`, file, config)
-                        .then(response => context.commit("UPDATE_UPLOAD_FILES", response))
-                        .catch(function (err) {
-                            if (axios.isCancel(err)) {
-                                console.log("Upload cancelled", err.message);
-                                context.commit("REMOVE_FILE", file);
-                            } else {
-                                console.log(err);
-                            }
-                        });
-                }
-                i++;
+                    }
+                    i++;
+                });
             });
         },
         removeFile: (state, file) => {
@@ -111,7 +115,6 @@ const FileService = {
             state.commit("REMOVE_FILE", file);
         },
         changeFileLimit: (state, data) => {
-            console.log(data);
             state.commit("CHANGE_FILE_LIMIT", data);
         },
         clearFiles: (state) => {

@@ -16,7 +16,6 @@ export default Vue.component("search-box", {
     },
     methods: {
         search() {
-            console.log("in search");
             this.$router.push({name: "dashboard", query: {term: this.query}});
         },
     }

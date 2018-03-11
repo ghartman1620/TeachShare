@@ -54,23 +54,18 @@ export default Vue.component("audio-element", {
     methods: {
         // basic play functionality (not needed)
         Play() {
-            console.log("play");
             this.audio.play();
         },
         Pause() {
-            console.log("pause");
             this.audio.pause();
         },
         ToggleEditText() {
-            console.log("editing text!")
             this.editing = !this.editing;
         },
         changedTitle() {
-            console.log("emit!");
             this.$parent.$emit("changedTitle", this.localTitle);
         },
         changedBody() {
-            console.log("emit!");
             this.$parent.$emit("changedBody", this.localBody);
         }
     }

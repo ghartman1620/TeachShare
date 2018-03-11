@@ -31,8 +31,6 @@ export default Vue.component("image-element", {
     },
     computed: {},
     mounted: function() {
-        console.log("in image element");
-        console.log(this.images);
         this.audio = document.getElementById(this.id);
     },
     methods: {
@@ -53,29 +51,22 @@ export default Vue.component("image-element", {
         },
         toggleEditText() {
             //@deprecated: no longer in use
-            console.log("editing text!");
             this.editing = !this.editing;
         },
         changedTitle() {
-            console.log("emit!");
             this.$parent.$emit("changedTitle", this.localTitle);
         },
         changedBody() {
-            console.log("emit!");
             this.$parent.$emit("changedBody", this.localBody);
         },
         changeSizeStyle() {
             var maxImageHeight = 0;
-            console.log(maxImageHeight);
             var self = this;
             this.images.forEach(function(img){
                 var imageObj = new Image();
                 imageObj.src = self.URL(img.url);
-                console.log(imageObj.src);
                 maxImageHeight = imageObj.height > maxImageHeight 
-                    ? imageObj.height : maxImageHeight;
-                console.log(imageObj.height);
-                console.log(maxImageHeight);    
+                    ? imageObj.height : maxImageHeight;   
             });
             this.sizeStyle =  {
                 width: "100%",

@@ -2,29 +2,26 @@ import findIndex from "lodash/findIndex";
 import filter from "lodash/filter";
 import v4 from "uuid/v4";
 
-// NotificationService definition
+// NotificationService definition -- this is where you send and remove
+// notifications from. Generally speaking, all you have to do is that.
+//
+// @TODO: make them 'time-out', so that it disappears eventually on it's own.
 const NotificationService = {
     state: {
         pendingNotifications: []
     },
     mutations: {
         SEND_NOTIFICATION: (state, notification) => {
-            console.log("SEND_NOTIFICATION: ", notification);
             let current = findIndex(state.pendingNotifications, (v) => v == notification);
-            console.log("CURRENT: ", current);
             if (current === -1) {
                 notification.id = v4();
-                let val = state.pendingNotifications.push(notification);
-                console.log("VAL: ", val);
-                console.log(state.pendingNotifications);
+                state.pendingNotifications.push(notification);
             } else {
                 state.pendingNotifications[current] = notification;
             }
         },
         REMOVE_NOTIFICATION: (state, notificationID) => {
-            console.log(notificationID);
             let current = findIndex(state.pendingNotifications, (n) => n.id === notificationID);
-            console.log(current);
             if (current !== -1) {
                 state.pendingNotifications.splice(current, 1);
             }

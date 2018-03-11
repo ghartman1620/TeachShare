@@ -111,7 +111,6 @@ export default Vue.component("edit-video-file", {
                 description: this.fileDescription
             };
             this.$store.dispatch("submitVideoFile", obj);
-            console.log(obj);
             return { type: "video_file", content: obj };
         },
         cancelEdit() {

@@ -1,9 +1,6 @@
 # test
-from django.shortcuts import render
-from rest_framework import viewsets, views
-from rest_framework.parsers import FileUploadParser, JSONParser
+from urllib.parse import unquote
 
-from django_filters import rest_framework as filters
 import django_filters
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -19,8 +16,18 @@ from django.db.models import Q
 from urllib.parse import unquote
 from enum import Enum
 from elasticsearch_dsl.query import MultiMatch
-from rest_framework import status
+from django_filters import rest_framework as filters
+from rest_framework import status, views, viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import FileUploadParser, JSONParser
+from rest_framework.response import Response
+
+from .documents import PostDocument
+from .models import Attachment, Comment, Post
+from .serializers import (AttachmentSerializer, CommentSerializer,
+                          PostSerializer)
+from .tasks import add
+
 #Post search parameters
 #?term=string - searching for this string
 #?in=string - a list containing some of "title" "filenames" "content" "tags"
@@ -30,6 +37,12 @@ from rest_framework.permissions import IsAuthenticated
     #should try to match every one of the words or any of the words
 #?excludetype=string - either 'and' or 'or' - says whether to exclude 
     #posts with all of the words listed or any of the words listed
+# test
+
+
+# Post search parameters
+# Contains a keyword
+# Contains all/any of multiple keywords
 
 class Term(Enum):
     AND = 0
@@ -123,6 +136,7 @@ class SearchPostsView(views.APIView):
                 queryset = func(self, unquote(arg), queryset)
         return queryset
 
+<<<<<<< HEAD
     def get_queryset(self):
         queryset = PostDocument.search()
         queryset = self.parseParams(self.optionParams, queryset)
@@ -131,6 +145,23 @@ class SearchPostsView(views.APIView):
         return queryset
 
 
+=======
+    # queryset = Post.objects.all() #this isn't used but it makes rest framework happy
+    #s = PostDocument.search()
+    def get_queryset(self):
+        queryset = PostDocument.search()
+
+        termParam = self.request.query_params.get('term', None)
+        if termParam is not None:
+            terms = unquote(termParam)
+            termlist = terms.split(' ')
+            for term in termlist:
+                print('querying' + term)
+                queryset = queryset.query('multi_match', query=term, fields=[
+                                          'title', 'content', 'tags'])
+        return queryset
+
+>>>>>>> 9739abe44525a703829d212bed8d1888a65be3f7
     def get(self, request, format=None):
         response = []
         queryset = self.get_queryset()
@@ -139,28 +170,38 @@ class SearchPostsView(views.APIView):
                 response.append(Post.objects.get(id=hit._d_['id']))
             except Post.DoesNotExist as e:
                 pass
-            
+
         return Response(PostSerializer(response, many=True).data)
-    
+
 
 class PostFilter(filters.FilterSet):
-    beginIndex = django_filters.NumberFilter(name='beginIndex', label="beginIndex", method='filterNumberPosts')
+    beginIndex = django_filters.NumberFilter(
+        name='beginIndex', label="beginIndex", method='filterNumberPosts')
+
     class Meta:
         model = Post
         fields = ('user', 'title', 'updated', 'likes', 'timestamp', 'comments')
+
     def filterNumberPosts(self, queryset, name, value):
         return queryset[value:value+10]
+
 
 class PostViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Post model
     """
+<<<<<<< HEAD
     permission_classes = (IsAuthenticated,)
     queryset = Post.objects.all()
+=======
+    queryset = Post.objects.filter()
+>>>>>>> 9739abe44525a703829d212bed8d1888a65be3f7
     serializer_class = PostSerializer
     filter_class = PostFilter
+
     def get_queryset(self):
         return self.queryset
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
@@ -180,30 +221,30 @@ class AttachmentViewSet(viewsets.ModelViewSet):
     filter_fields = ('post',)
 
     def create(self, request):
-        print(request)
-        print(dir(request))
-        print(request.data)
-        print(request.query_params)
+        # grab upload identifier and post primary key
         id = request.query_params.get('uid', '')
-        print(id)
-    
-        p = Post.objects.get(id=request.data['post'])
+        post_id = request.data['post']
+
+        # grab the post instance and create the attachment instance
+        p = Post.objects.get(id=post_id)
         a = Attachment.objects.create(post=p)
-        print(p)
+
+        # return the post id, status and unique identifier
         return Response(data={
             'status': 'OK',
             'uid': id,
             'post': p.pk,
-        }, status=201 )
+        }, status=201)
 
 
-def SimpleMethod(request): 
+def SimpleMethod(request):
     return render(request, 'test.html')
 
-#Known issues with backend upload:
-#Files removed from the post are not deleted
-#Attachment objects that are deleted do not delete the corresponding file
+# Known issues with backend upload:
+# Files removed from the post are not deleted
+# Attachment objects that are deleted do not delete the corresponding file
 
+<<<<<<< HEAD
 # @TODO: figure out how to deal with bad url characters
 
 # @TODO: write tests for uploading restricted files
@@ -227,20 +268,18 @@ def fileExt(filename):
 whitelist = ['pdf','doc', 'ppt','docx', 'odt', 'xlsx', 'xls', 'xlt', 'csv', 'ods', 'ots', 'fods', 'tex']
 
 
+=======
+>>>>>>> 9739abe44525a703829d212bed8d1888a65be3f7
 class FileUploadView(views.APIView):
     permission_classes = (IsAuthenticated,)
     parser_classes = (FileUploadParser, JSONParser)
 
     def put(self, request, filename, format=None):
+        post_id = request.query_params['post']
         file_obj = request.data['file']
-        print(request.content_type)
-        print(dir(request))
-        print(request.parsers)
-        print(request.query_params)
-        print(filename)
-        print(file_obj.name)
-        p = Post.objects.first()
+        p = Post.objects.get(pk=post_id) # this is where we need to actually know the post.
         a = Attachment.objects.create(post=p, file=file_obj)
+<<<<<<< HEAD
         
         print(a.file.url)
         with open(a.file.url[1:], encoding='latin1') as f:
@@ -250,14 +289,15 @@ class FileUploadView(views.APIView):
                     'error' : fileExt(a.file.url) + ' files are allowed. Allowed filetypes are: ' + str(whitelist)
                 }, status=status.HTTP_400_BAD_REQUEST)
         print(a.file.name)
+=======
+>>>>>>> 9739abe44525a703829d212bed8d1888a65be3f7
         file_obj.close()
-        
-        return Response(data={
-                'status': 'OK', 
-                'id': a.pk,
-                'request_id': request.query_params['id'],
-                'url': a.file.url,
-                'filename': a.file.name
-            }, 
-            status=201)
 
+        return Response(data={
+            'status': 'OK',
+            'id': a.pk,
+            'request_id': request.query_params['id'],
+            'url': a.file.url,
+            'filename': a.file.name
+        },
+            status=201)

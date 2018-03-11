@@ -63,20 +63,6 @@ INSTALLED_APPS = [
 ]
 
 """
-ElasticSearch-DSL Django settings
-    - Signal Processor is temporary, will likely increase server load
-"""
-ELASTICSEARCH_DSL = {
-    'default': {
-        'hosts': 'search:9200'
-    },
-}
-# TEMPORARY: will cause unneccesary load on the server but simplifies things for now.
-# ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = 'django_elasticsearch_dsl.signals.RealTimeSignalProcessor'
-ELASTICSEARCH_DSL_AUTOSYNC = False
-ELASTICSEARCH_DSL_AUTO_REFRESH = False
-
-"""
 Django Cache Backend Settings (Redis):
     - Can be used for any cacheing whatsoever
     - Example implementation for delayed/batched processing is in posts/tasks.py
@@ -84,7 +70,7 @@ Django Cache Backend Settings (Redis):
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://redis:6379/0',
+        'LOCATION': 'redis://localhost:6379/0',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'SERIALIZER': 'django_redis.serializers.msgpack.MSGPackSerializer',
@@ -93,12 +79,32 @@ CACHES = {
 }
 DJANGO_REDIS_IGNORE_EXCEPTIONS = True
 
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'localhost:9200'
+    },
+}
+
+"""
+Django Cache Backend Settings (Redis):
+"""
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/0",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+DJANGO_REDIS_IGNORE_EXCEPTIONS = True
 
 # CELERY:
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_TASK_SERIALIZER = 'msgpack'
-CELERY_ACCEPT_CONTENT = ['msgpack']
+CELERY_ACCEPT_CONTENT = ['msgpack', 'json']
 CELERY_RESULT_SERIALIZER = 'msgpack'
 
 REST_FRAMEWORK = {
@@ -187,7 +193,7 @@ DATABASES = {
         'NAME': 'teachshare',
         'USER': 'postgres',
         'PASSWORD': 'password123',
-        'HOST': 'db',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
@@ -228,11 +234,11 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, '', 'static')
 
 # Media files
-MEDIA_URL = '/media/'
+MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, '', 'media')
 
 LOGIN_REDIRECT_URL = '/account/'
