@@ -7,7 +7,8 @@ from django.db.models import Q
 
 from .models import Attachment, Post
 from .serializers import PostSerializer
-from datetime import datetime, timedelta
+from datetime import timedelta
+from django.utils import timezone
 
 
 @shared_task
@@ -33,8 +34,8 @@ def garbage_man():
 
 @shared_task
 def delete_stranded_attachments():
-    date_threshold = datetime.now() - timedelta(hours=2)
-    stranded = Attachment.objects.filter(post=None)
+    date_threshold = timezone.now() - timedelta(hours=2)
+    stranded = Attachment.objects.filter(post=None, last_updated__lte=date_threshold)
     files = [f.file for f in stranded]
     print('Deleting files: ')
     print(files)
