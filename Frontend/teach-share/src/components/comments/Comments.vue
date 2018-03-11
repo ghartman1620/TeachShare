@@ -23,9 +23,9 @@ export default {
         }
     },
     mounted() {
-        this.$store.dispatch("fetchCommentsForPost", this.post.pk);
+        // this.$store.dispatch("fetchCommentsForPost", this.post.pk);
     }
-}
+};
 </script>
 
 <style lang="scss" scoped>

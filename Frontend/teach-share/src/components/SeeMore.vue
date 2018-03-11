@@ -46,11 +46,11 @@ export default Vue.component("see-more", {
         showOrHideContent() {
             if (!this.expanded) {
                 this.contentClasses.pop();
+                this.expand();
             } else {
                 this.contentClasses.push("gradient");
             }
             this.expanded = !this.expanded;
-            this.expand();
         },
         expand() {
             this.$emit("expanded", this.expanded);

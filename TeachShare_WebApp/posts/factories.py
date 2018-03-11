@@ -5,6 +5,7 @@ import random
 from faker import Faker
 from datetime import timedelta
 
+
 def generate_video_link_dict():
     t = 'video_link'
     f = Faker()
@@ -27,6 +28,7 @@ def generate_video_link_dict():
         }
     }
 
+
 def generate_video_file_dict():
     t = 'video_file'
     f = Faker()
@@ -44,12 +46,14 @@ def generate_video_file_dict():
         }
     }
 
+
 def generate_text_dict():
     f = Faker()
     return {
         'type': 'text',
         'content': f.text(max_nb_chars=1000)
     }
+
 
 def generate_audio_file_dict():
     f = Faker()
@@ -63,8 +67,9 @@ def generate_audio_file_dict():
             'type': 'audio_file',
             'filetype': f.mime_type(category='audio'),
             'url': f.url()
-        },]
+        }, ]
     }
+
 
 def generate_image_file_dict():
     t = 'image_file'
@@ -82,8 +87,9 @@ def generate_image_file_dict():
             'name': f.file_name(category='image'),
             'type': t,
             'filetype': f.mime_type(category='image')
-        } for a in range(1, random.randint(2, 10))] # create between 1 and 10 of these
+        } for a in range(1, random.randint(2, 10))]  # create between 1 and 10 of these
     }
+
 
 def generate_file_dict():
     f = Faker()
@@ -94,8 +100,9 @@ def generate_file_dict():
             'name': f.file_name(),
             'type': 'file',
             'url': f.url()
-        } for a in range(1, random.randint(2, 20)) ]
+        } for a in range(1, random.randint(2, 20))]
     }
+
 
 YOUTUBE_LIST = [
     'https://www.youtube.com/watch?v=DsuTwV0jwaY',
@@ -118,13 +125,14 @@ YOUTUBE_LIST = [
 ]
 
 FUNCTION_LIST = [
-    generate_video_link_dict, 
+    generate_video_link_dict,
     generate_text_dict,
     generate_audio_file_dict,
     generate_file_dict,
     generate_image_file_dict,
-    generate_video_file_dict 
+    generate_video_file_dict
 ]
+
 
 class PostFactory(factory.DjangoModelFactory):
     class Meta:
@@ -132,10 +140,16 @@ class PostFactory(factory.DjangoModelFactory):
 
     title = factory.Faker('sentence')
     likes = factory.lazy_attribute(lambda x: random.randint(0, 1000))
-    user = factory.lazy_attribute(lambda x: User.objects.all()[random.randint(0, User.objects.count()-1)])
-    timestamp = factory.Faker('date_time_this_century', before_now=True, after_now=False)
-    tags = factory.Faker('words', nb=random.randint(0,30))
-    content = factory.lazy_attribute(lambda x: [ FUNCTION_LIST[ random.randint(0,len(FUNCTION_LIST)-1) ]() for a in range(random.randint(1, 10)) ] )
-    content_type = factory.lazy_attribute(lambda x: Post.CONTENT_TYPE[random.randint(0, len(Post.CONTENT_TYPE)-1)][0])
-    grade = factory.lazy_attribute(lambda x: Post.GRADES[random.randint(0, len(Post.GRADES)-1)][0])
+    user = factory.lazy_attribute(lambda x: User.objects.all()[
+                                  random.randint(0, User.objects.count()-1)])
+    timestamp = factory.Faker('date_time_this_century',
+                              before_now=True, after_now=False)
+    tags = factory.Faker('words', nb=random.randint(0, 30))
+    content = factory.lazy_attribute(lambda x: [FUNCTION_LIST[random.randint(
+        0, len(FUNCTION_LIST)-1)]() for a in range(random.randint(1, 10))])
+    content_type = factory.lazy_attribute(
+        lambda x: Post.CONTENT_TYPE[random.randint(0, len(Post.CONTENT_TYPE)-1)][0])
+    grade = factory.lazy_attribute(
+        lambda x: Post.GRADES[random.randint(0, len(Post.GRADES)-1)][0])
     length = factory.Faker('time_delta')
+    draft = False
