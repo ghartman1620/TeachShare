@@ -8,6 +8,7 @@ import AudioService from "./store_modules/AudioService";
 import ImageService from "./store_modules/ImageService";
 import PostCreateService from "./store_modules/PostCreateService";
 import NotificationService from "./store_modules/NotificationService";
+import $log from "./log";
 
 Vue.use(Vuex);
 
@@ -40,7 +41,6 @@ export default new Vuex.Store({
         },
         LOAD_POST: (state, data) => {
             let index = state.posts.findIndex(function (val, ind, obj) {
-                console.log(ind, val, obj);
                 if (val === data) {
                     return true;
                 }
@@ -58,8 +58,6 @@ export default new Vuex.Store({
             state.comment = Object.assign({}, data);
         },
         LOAD_COMMENTS_FOR_POST: (state, data) => {
-            console.log("PostID: ", data.post);
-            console.log("Comments: ", data.comments);
             let index = state.posts.findIndex(val => val.pk === data.post);
             if (index !== -1) {
                 state.posts[index].comments = Object.assign([], data.comments);
@@ -67,17 +65,14 @@ export default new Vuex.Store({
             state.comments = Object.assign([], data);
         },
         CREATE_UPDATE_COMMENT: (state, comment) => {
-            console.log("CREATE_COMMENT: ", comment);
             let postindex = state.posts.findIndex(
                 val => val.pk === comment.post
             );
             if (postindex === -1) {
-                console.log("it couldn't find it!");
+                $log("Couldn't find it!", "danger");
             } else {
                 let post = state.posts[postindex];
                 let comments = post.comments;
-                // comments.push(comment);
-                console.log("Comments now... ", comments);
                 let commentindex = post.comments.findIndex(
                     val => val.pk === comment.pk
                 );
@@ -95,57 +90,48 @@ export default new Vuex.Store({
         },
         SET_TOKEN: (state, tok) => {
             state.token = tok;
-            console.log(state.token);
             api.defaults.headers.Authorization = "Token " + state.token;
-            console.log(api.defaults.headers.Authorization);
         }
     },
     actions: {
         simplePostSearch: (state, term) => {
-            console.log("doing search for" + term);
             api
                 .get("search/?term=" + term)
                 .then(response => state.commit("LOAD_ALL_POSTS", response.data))
-                .catch(err => console.log(err));
+                .catch(err => $log(err));
         },
         fetchAllPosts: state => {
-            console.log(api.defaults.headers.Authorization);
             api
                 .get(`search/`)
                 .then(response => state.commit("LOAD_ALL_POSTS", response.data))
-                .catch(err => console.log(err));
+                .catch(err => $log(err));
         },
         fetchPost: (state, postID) => {
-            console.log("FETCH_POST");
-            console.log(api.defaults.headers.Authorization);
             api
                 .get(`posts/${postID}/`)
                 .then(response => state.commit("LOAD_POST", response.data))
-                .catch(err => console.log(err));
+                .catch(err => $log(err));
         },
         fetchUser: (state, userID) => {
-            console.log("FETCH_USER");
             api
                 .get(`users/${userID}/`)
                 .then(response => state.commit("LOAD_USER", response.data))
-                .catch(err => console.log(err));
+                .catch(err => $log(err));
         },
         fetchComment: (state, commentID) => {
-            console.log("FETCH_COMMENT");
             api
                 .get(`comments/${commentID}/`)
                 .then(response => state.commit("LOAD_COMMENT", response.data))
-                .catch(err => console.log(err));
+                .catch(err => $log(err));
         },
         fetchComments: (state, commentID) => {
-            console.log("FETCH_COMMENTS");
+            $log("FETCH_COMMENTS");
             api
                 .get(`comments/${commentID}/`)
                 .then(response => state.commit("LOAD_COMMENTS", response.data))
-                .catch(err => console.log(err));
+                .catch(err => $log(err));
         },
         fetchCommentsForPost: (state, postID) => {
-            console.log("FETCH_COMMENT");
             api
                 .get(`comments/?post=${postID}`)
                 .then(response =>
@@ -154,19 +140,17 @@ export default new Vuex.Store({
                         post: postID
                     })
                 )
-                .catch(err => console.log(err));
+                .catch(err => $log(err));
         },
         fetchFilteredPosts: (state, filterParams) => {
-            console.log("FETCH_FILTERED_POSTS", filterParams);
             api
                 .get(`posts/?user=${filterParams}`)
                 .then(response =>
                     state.commit("LOAD_FILTERED_POSTS", response.data)
                 )
-                .catch(err => console.log(err));
+                .catch(err => $log(err));
         },
         createPost: (state, postObj) => {
-            console.log(postObj);
             return new Promise((resolve, reject) => {
                 api
                     .post("posts/", postObj)
@@ -183,7 +167,6 @@ export default new Vuex.Store({
             });
         },
         updateExistingPost: (state, postObj) => {
-            console.log(postObj);
             return new Promise((resolve, reject) => {
                 api
                     .put(`posts/${postObj.pk}/`, postObj)
@@ -223,7 +206,7 @@ export default new Vuex.Store({
                 currentPost.content = ctx.state.create.postElements;
                 currentPost.tags = ctx.rootGetters.getTags;
                 currentPost.title = ctx.rootGetters.getTitle;
-                console.log(currentPost);
+
                 return ctx.dispatch("updateExistingPost", currentPost).then(res => {
                     return ctx.dispatch("setCurrentPost", res.data);
                 });
@@ -240,7 +223,7 @@ export default new Vuex.Store({
                 .then(response =>
                     state.commit("SET_TOKEN", response.data.token)
                 )
-                .catch(err => console.log(err));
+                .catch(err => $log(err));
         },
         createOrUpdateComment: (state, comment) => {
             if (comment.pk !== undefined) {

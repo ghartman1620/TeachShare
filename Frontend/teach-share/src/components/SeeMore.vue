@@ -61,7 +61,6 @@ export default Vue.component("see-more", {
         Vue.nextTick().then(function() {
             var ele = vm.$refs.content;
             vm.elementHeight = ele.offsetHeight;
-            console.log("nextTick: ", vm.elementHeight);
             if (vm.elementHeight > vm.maxHeight) {
                 vm.contentClasses.push("gradient");
                 vm.needShowMore = true;

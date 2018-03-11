@@ -65,13 +65,11 @@ export default Vue.component("file-video", {
         this.video = this.$refs.videoTag;
     },
     methods: {
-        // basic play functionality (not needed)
+        // basic play functionality (not needed currently)
         play() {
-            console.log("play");
             this.video.play();
         },
         pause() {
-            console.log("pause");
             this.video.pause();
         }
     }

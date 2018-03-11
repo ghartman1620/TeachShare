@@ -154,7 +154,6 @@ export default Vue.component("edit-video-embed", {
                 description: this.ActualDescription
             };
             this.$store.dispatch("submitVideoEmbed", obj);
-            console.log(obj);
             this.$router.push({ name: "create" });
             return { type: "video_link", content: obj };
         },
@@ -164,12 +163,10 @@ export default Vue.component("edit-video-embed", {
     },
     mounted() {
         this.$on("changeHeight", function(h) {
-            console.log(h);
             this.height = h.value;
             this.dimensionErrors = h.errors;
         });
         this.$on("changeWidth", function(w) {
-            console.log(w);
             this.width = w.value;
             this.dimensionErrors = w.errors;
         });

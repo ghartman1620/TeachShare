@@ -24,20 +24,19 @@ const AudioService = {
     },
     actions: {
         submitAudioFiles: (state, data) => {
-            console.log(data);
             if (data.length) {
-                _.forEach(data, function(val) {
-                    state.commit('LOAD_AUDIO_INSTANCE', val);
+                _.forEach(data, function (val) {
+                    state.commit("LOAD_AUDIO_INSTANCE", val);
                 });
                 return;
             }
-            state.commit('LOAD_VIDEO_INSTANCE', data);
+            state.commit("LOAD_VIDEO_INSTANCE", data);
         },
         removeAllAudioInstances: (state, data) => {
-            state.commit('CLEAR_AUDIO_INSTANCES');
+            state.commit("CLEAR_AUDIO_INSTANCES");
         },
         removeAudioInstance: (state, data) => {
-            state.commit('REMOVE_AUDIO_INSTANCE', data);
+            state.commit("REMOVE_AUDIO_INSTANCE", data);
         }
     },
     getters: {}

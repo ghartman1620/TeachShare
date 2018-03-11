@@ -55,35 +55,30 @@ export default Vue.component("dimension-picker", {
   components: {},
   props: [],
   data() {
-    return {
-      width: Number(640),
-      height: Number(480)
-    };
+      return {
+          width: Number(640),
+          height: Number(480)
+      };
   },
-  computed: {
-    //   ...mapFields(["width", "height"]),
-  },
+  computed: {},
   methods: {
-    changeWidth() {
-      console.log(this.width);
-      var vm = this;
-      Vue.nextTick(function() {
-        console.log(vm.errors.collect("width"));
-        vm.$parent.$emit("changeWidth", {
-          value: Number(vm.width),
-          errors: vm.errors
-        });
+      changeWidth() {
+          var vm = this;
+          Vue.nextTick(function() {
+              vm.$parent.$emit("changeWidth", {
+                  value: Number(vm.width),
+                  errors: vm.errors
+          });
       });
     },
     changeHeight() {
-      console.log(this.height);
-      var vm = this;
-      Vue.nextTick().then(function() {
-        vm.$parent.$emit("changeHeight", {
-          value: Number(vm.height),
-          errors: vm.errors
+        var vm = this;
+        Vue.nextTick().then(function() {
+            vm.$parent.$emit("changeHeight", {
+                value: Number(vm.height),
+                errors: vm.errors
+            });
         });
-      });
     }
   }
 });

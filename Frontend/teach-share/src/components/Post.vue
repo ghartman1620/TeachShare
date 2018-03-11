@@ -90,13 +90,7 @@ export default {
             var vm = this;
             this.$store
                 .dispatch("fetchCommentsForPost", this.post.pk)
-                .then(function(res) {
-                    console.log(
-                        "Comments for post: ",
-                        vm.post.pk,
-                        " are fetched."
-                    );
-                });
+                .then(function(res) {});
         },
         submitComment() {
             var vm = this;
@@ -108,7 +102,6 @@ export default {
                     user: 1 // get current user...
                 })
                 .then(function(ret) {
-                    console.log(ret);
                     if (ret.status < 300) {
                         vm.$notifySuccess(
                             "Your comment was successfully posted!"
@@ -116,7 +109,6 @@ export default {
                     } else {
                         let total = "";
                         forEach(ret, function(val, key) {
-                            console.log("forEach", key, val);
                             let currentValue = val.join(" ");
                             total = `${total} "${key}: ${currentValue}" `;
                         });
@@ -133,9 +125,7 @@ export default {
             this.newCommentText = "";
         }
     },
-    mounted() {
-        console.log(this.post);
-    }
+    mounted() {}
 };
 </script>
 

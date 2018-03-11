@@ -98,7 +98,6 @@ export default Vue.component("edit-image", {
             let output = new Array();
             var vm = this;
             _.map(this.$store.state.fs.uploadedFiles, function(val, ind, arr) {
-                console.log(val, ind, arr);
                 output.push({
                     post: 2,
                     type: "image_file",
@@ -110,7 +109,6 @@ export default Vue.component("edit-image", {
                     description: vm.description
                 });
             });
-            console.log(output);
             return { 
                 type: "image_file", 
                 description: this.description, 

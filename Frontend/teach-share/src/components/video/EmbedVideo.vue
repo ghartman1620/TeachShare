@@ -53,7 +53,6 @@ export default Vue.component("embed-video", {
     },
     aspectRatioClass: function() {
       var ratio = this.width / this.height;
-      console.log(ratio);
       // all the ratios are fudged down slightly to make the ratios match up more closely to
       // values that are 'in-between'.
       if (ratio >= 19 / 9) {
@@ -69,11 +68,9 @@ export default Vue.component("embed-video", {
     actualSource() {
       var temp = this.source;
       var url = new URL(this.source);
-      console.log(url);
       var params = url.searchParams;
 
       let videoID = params.get("v");
-      console.log(url.toString());
 
       if (this.playlist) {
         params.append("playlist", this.playlist);
@@ -94,16 +91,6 @@ export default Vue.component("embed-video", {
       return `https://youtube.com/embed/${videoID}`;
     }
   },
-  methods: {
-    // showOrHideAllText() {
-    //   if (!this.textShown) {
-    //     this.textClasses.pop();
-    //   } else {
-    //     this.textClasses.push("sizing-and-gradient");
-    //   }
-    //   this.textShown = !this.textShown;
-    // }
-  }
 });
 </script>
 

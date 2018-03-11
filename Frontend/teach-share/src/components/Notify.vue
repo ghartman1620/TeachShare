@@ -31,7 +31,6 @@ export default {
     },
     methods: {
         close(note) {
-            console.log(note);
             this.$store.dispatch("removeNotification", note.id);
         }
         

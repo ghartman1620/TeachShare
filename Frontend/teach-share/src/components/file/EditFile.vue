@@ -48,9 +48,7 @@ export default Vue.component("edit-file", {
 		},
 		generateJSON() {
 			var files = [];
-			console.log(this.$store.state.fs.uploadedFiles);
 			this.$store.state.fs.uploadedFiles.forEach(function(val){
-				console.log(val.file);
 				files.push({
                     post: 2,
                     type: "file",
@@ -60,7 +58,6 @@ export default Vue.component("edit-file", {
                     url: val.url,
                 });
 			});
-			console.log(files);
 			return {type: "file", content: files}
 		},
 		cancel() {

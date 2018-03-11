@@ -227,7 +227,6 @@ export default {
         },
         nop: function() {},
         removeTag: function(index) {
-            console.log("remove tag" + index);
             this.tags.splice(index, 1);
         },
         createTag: function(e) {
@@ -237,7 +236,6 @@ export default {
             }
         },
         titleChanged: function(e) {
-            console.log(e)
             this.$store.dispatch("setTitle", this.title);
         },
         createTagBtn: function() {
@@ -257,7 +255,6 @@ export default {
             currentPost.tags = this.$store.getters.getTags;
             currentPost.title = this.$store.getters.getTitle;
             currentPost.draft = false;
-            console.log(currentPost);
 
             // dispatch createPost method in the store. This will send a
             // post request to the backend server.
@@ -267,8 +264,7 @@ export default {
                     vm.$notifyDanger(
                         "There was a problem submitting your post."
                     );
-                } else if (ret.status < 300) {
-                    // post was successful
+                } else if (ret.status < 300) { // post was successful
                     vm.$notifySuccess("Post submitted successfully!");
                 } else {
                     let total = "";
@@ -296,7 +292,6 @@ export default {
             } else {
                 routeName += "file";
             }
-            console.log(routeName);
             this.$router.push({ name: routeName, query: { index: index } });
         },
 
@@ -428,20 +423,6 @@ $theme-colors: ("primary": red);
     border: none;
     box-shadow: $card-shadow;
 }
-
-#create-tag-button {
-    // padding: 10px;
-    // margin-right: 10px;
-    // margin-left: 10px;
-    // width: 40px;
-    // height: auto;
-}
-
-// #create-plus {
-//     font-size: 1.5rem;
-//     text-align: center;
-//     vertical-align: middle;
-// }
 
 #tag-submit-box {
     margin-bottom: 10px;

@@ -82,7 +82,6 @@ export default {
     },
     methods: {
         submit() {
-            console.log("Text: ", this.text);
             this.editing = false;
             this.prevText = this.text;
             this.$emit("changedComment", this.text);
@@ -94,7 +93,6 @@ export default {
             });
         },
         cancel() {
-            console.log("Cancelling comment.");
             this.editing = false;
             this.text = this.prevText;
         }

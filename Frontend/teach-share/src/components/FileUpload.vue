@@ -126,10 +126,8 @@ export default Vue.component("file-upload", {
             this.uploadError = null;
         },
         filesChange(fieldName, fileList) {
-            console.log(fieldName, fileList);
             const formData = new FormData();
             if (!fileList.length) {
-                console.log("fileList is empty");
                 return;
             }
             Array.from(Array(fileList.length).keys()).map(x => {
@@ -137,10 +135,8 @@ export default Vue.component("file-upload", {
             });
             this.save(formData);
             this.$refs.fileUpload.value = null;
-            console.log("in filesChange2");
         },
         removeItem(file) {
-            console.log(file);
             var vm = this;
             this.$store.dispatch("removeFile", file).then(function() {
                 vm.$parent.$emit("RemoveItem", file);
@@ -149,12 +145,7 @@ export default Vue.component("file-upload", {
     },
     mounted() {
         this.$store.dispatch("changeFileLimit", this.fileLimit);
-        if (
-            this.$store.state.create.postElements.length >
-            this.$route.query.index
-        ) {
-            console.log("im editing!");
-        }
+        if (this.$store.state.create.postElements.length > this.$route.query.index) {}
         this.resetState();
     },
     destroyed() {

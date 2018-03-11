@@ -1,6 +1,7 @@
 import Vue from "vue";
 import api from "../api";
 import axios from "axios";
+import $log from "../log";
 
 // Load some necessary libraries
 var _ = require("lodash");
@@ -15,7 +16,6 @@ const YouTubeService = {
     },
     mutations: {
         LOAD_YOUTUBE_VIDEO_DATA: (state, data) => {
-            console.log(state, data);
             state.ytVideoDetails = Object.assign({}, data);
         },
         CLEAR_YT_DATA: (state, data) => {
@@ -24,7 +24,6 @@ const YouTubeService = {
     },
     actions: {
         getYoutubeVideoInfo: (state, data) => {
-            console.log(data);
             var videoURL = new URL(data);
             var videoID = videoURL.searchParams.get("v");
             let videoSection = "snippet,statistics";
@@ -35,7 +34,7 @@ const YouTubeService = {
                 axios
                     .get(ApiURL.toString())
                     .then(resp => state.commit("LOAD_YOUTUBE_VIDEO_DATA", resp.data))
-                    .catch(err => console.log(err));
+                    .catch(err => $log(err));
             }
         },
         clearYoutubeData: state => {

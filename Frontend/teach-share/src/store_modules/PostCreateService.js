@@ -1,5 +1,6 @@
 import api from "../api";
 import Vue from "vue";
+import $log from "../log";
 
 const PostCreateService = {
     state: {
@@ -22,7 +23,7 @@ const PostCreateService = {
             state.currentPost = post;
         },
         REMOVE_ATTACHMENT: (state, attachment) => {
-            let ind = state.currentPost.attachments.findIndex(function(val) {
+            let ind = state.currentPost.attachments.findIndex(function (val) {
                 return val === attachment.id;
             });
             if (ind !== -1) {
@@ -30,7 +31,6 @@ const PostCreateService = {
             }
         },
         ADD_ATTACHMENT: (state, attachment) => {
-            console.log("attachment being added: ", attachment);
             state.currentPost.attachments.push(attachment.id);
         },
         UNDO: state => {
@@ -45,7 +45,6 @@ const PostCreateService = {
                 arg: state.postElements[index]
             });
             state.postElements.splice(index, 1);
-            console.log(state.unDoneMutations);
         },
         UNDO_REMOVE_ELEMENT: (state, arg) => {
             state.unDoneMutations.push({
@@ -53,7 +52,6 @@ const PostCreateService = {
                 arg: arg.index
             });
             state.postElements.splice(arg.index, 0, arg.element);
-            console.log(state.unDoneMutations);
         },
         UNDO_EDIT_ELEMENT: (state, arg) => {
             state.unDoneMutations.push({
@@ -64,7 +62,6 @@ const PostCreateService = {
                 }
             });
             state.postElements.splice(arg.index, 1, arg.element);
-            console.log(state.unDoneMutations);
         },
         UNDO_SWAP_ELEMENTS: (state, iAndJ) => {
             state.unDoneMutations.push({
@@ -76,7 +73,6 @@ const PostCreateService = {
             var tmp = state.postElements[i];
             Vue.set(state.postElements, i, state.postElements[j]);
             Vue.set(state.postElements, j, tmp);
-            console.log(state.unDoneMutations);
         },
         // Mutations for the currently edited post data:  and postElements
         ADD_ELEMENT: (state, element) => {
@@ -85,7 +81,6 @@ const PostCreateService = {
                 arg: state.postElements.length
             });
             state.postElements.push(element);
-            console.log("add element mutation");
         },
         SWAP_ELEMENTS: (state, iAndJ) => {
             // I wrote this code because i'm triggered by being limited
@@ -99,7 +94,6 @@ const PostCreateService = {
             var tmp = state.postElements[i];
             Vue.set(state.postElements, i, state.postElements[j]);
             Vue.set(state.postElements, j, tmp);
-            console.log(state.postElements);
         },
         REMOVE_ELEMENT: (state, index) => {
             state.doneMutations.push({
@@ -144,14 +138,11 @@ const PostCreateService = {
             context.commit("SET_POST", post);
         },
         undo: context => {
-            console.log(context.state.doneMutations);
             if (context.state.doneMutations.length > 0) {
                 var mut =
                     context.state.doneMutations[
                         context.state.doneMutations.length - 1
                     ];
-                console.log("UNDO MUT: ", mut);
-                console.log(mut.mutation, mut.arg);
                 if (mut.mutation === "UNDO_ADD_ELEMENT") {
                     context.dispatch(
                         "removeAttachments",
@@ -160,8 +151,7 @@ const PostCreateService = {
                 }
                 context.commit("UNDO");
                 context.commit(mut.mutation, mut.arg);
-                console.log(context.state.doneMutations);
-                context.dispatch("saveDraft").then(res => console.log(res));
+                context.dispatch("saveDraft").then(res => $log(res));
             }
         },
         redo: context => {
@@ -170,43 +160,36 @@ const PostCreateService = {
                     context.state.unDoneMutations[
                         context.state.unDoneMutations.length - 1
                     ];
-                console.log("REDO MUT: ", mut);
                 if (mut.mutation === "ADD_ELEMENT") {
-                    console.log(
+                    $log(
                         "REDO ADD ELEMENT: ",
                         context.state.unDoneMutations,
                         mut
                     );
+
+                    $log("Add attachments", "success");
                     context.dispatch("addAttachments", mut.arg.content);
                 }
-                console.log(mut);
                 context.commit("REDO");
                 context.commit(mut.mutation, mut.arg);
-                context.dispatch("saveDraft").then(res => console.log(res));
+                context.dispatch("saveDraft").then(res => $log(res));
             }
         },
         addElement: (state, element) => {
             // clear order of actions from ADD_ELEMENT --> CLEAR_REDO --> saveDraft.
             state.commit("ADD_ELEMENT", element);
             state.commit("CLEAR_REDO");
-            state.dispatch("saveDraft").then(res => console.log(res));
+            state.dispatch("saveDraft").then(res => $log(res));
         },
         // Actions are only allowed to have one argument so iAndJ is
         // a list with index 0 as the first index to be swapped
         // and index 1 the second
         swapElements: (state, iAndJ) => {
-            console.log(iAndJ[0] + " " + iAndJ[1]);
             state.commit("SWAP_ELEMENTS", iAndJ);
             state.commit("CLEAR_REDO");
-            state.dispatch("saveDraft").then(res => console.log(res));
+            state.dispatch("saveDraft").then(res => $log(res));
         },
         removeElement: (state, index) => {
-            console.log(
-                "REMOVE ELEMENT LIST:",
-                state.state.postElements[index],
-                state.state.postElements,
-                state
-            );
             state.dispatch(
                 "removeAttachments",
                 state.state.postElements[index].content
@@ -214,30 +197,27 @@ const PostCreateService = {
             state.commit("REMOVE_ELEMENT", index);
             state.commit("CLEAR_REDO");
 
-            state.dispatch("saveDraft").then(res => console.log(res));
+            state.dispatch("saveDraft").then(res => $log(res));
         },
         removeAttachments: (state, attachments) => {
             for (var i in attachments) {
                 let attachment = attachments[i];
-                console.log("REMOVE: ", attachment);
                 state.commit("REMOVE_ATTACHMENT", attachment);
             }
         },
         addAttachments: (state, attachments) => {
             for (var i in attachments) {
+                $log(attachments[i]);
                 let attachment = attachments[i];
-                console.log("ADD: ", attachment);
                 state.commit("ADD_ATTACHMENT", attachment);
             }
         },
         editElement: (state, editedElement) => {
-            console.log("in editElement action");
             state.commit("EDIT_ELEMENT", editedElement);
             state.commit("CLEAR_REDO");
-            state.dispatch("saveDraft").then(res => console.log(res));
+            state.dispatch("saveDraft").then(res => $log(res));
         },
         openEditor: context => {
-            console.log("in openeditor");
             context.commit("OPEN_EDITOR");
         },
         closeEditor: context => {

@@ -10,7 +10,6 @@ const VideoService = {
         LOAD_VIDEO_INSTANCE: (state, data) => {
             let current = _.findIndex(state.videos, v => v.id === data.id);
             if (current > -1) {
-                console.log(data);
                 Vue.set(state.videos, current, data);
                 return;
             }
@@ -31,9 +30,8 @@ const VideoService = {
             state.commit("LOAD_VIDEO_INSTANCE", data);
         },
         submitVideoFiles: (state, data) => {
-            console.log("submitVIDEOFiles: ", data);
             if (data.length) {
-                _.forEach(data, function(val) {
+                _.forEach(data, function (val) {
                     state.commit("LOAD_VIDEO_INSTANCE", val);
                 });
                 return;

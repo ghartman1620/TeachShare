@@ -46,7 +46,6 @@ export default {
             var height = document.documentElement.offsetHeight;
 
             if (offset >= height) {
-                console.log("scroll to bototm");
                 //this.getPosts();
             }        
         },
@@ -70,11 +69,8 @@ export default {
             },
             false
         );
-        console.log(this.$router.params);
     },
-    mounted() {
-        console.log(this.$router);
-    },
+    mounted() {},
     destroyed() {
         window.removeEventListener("scroll", function() {t.scroll()}, false);
     },

@@ -5,6 +5,7 @@ import map from "lodash/map";
 import forEach from "lodash/forEach";
 import every from "lodash/every";
 import reduce from "lodash/reduce";
+import $log from "../log";
 
 // Load some necessary libraries
 const uuidv4 = require("uuid/v4");
@@ -45,7 +46,6 @@ const FileService = {
             }
         },
         REMOVE_FILE: (state, file) => {
-            console.log(file);
             if (file.cancelSource != null) {
                 file.cancelSource.cancel("Operation cancelled by the user");
             }
@@ -64,12 +64,7 @@ const FileService = {
     },
     actions: {
         fileUpload: (context, formData) => {
-            console.log(context);
             context.dispatch("saveDraft").then(function (postid) {
-                console.log("The primary key was... ", postid);
-                console.log("The primary key of the 'postID' is...", context.rootGetters.getCurrentPostId);
-
-                console.log();
                 var files = formData.getAll("files");
                 var i = 0;
                 forEach(files, function (file) {
@@ -105,10 +100,9 @@ const FileService = {
                             })
                             .catch(function (err) {
                                 if (axios.isCancel(err)) {
-                                    console.log("Upload cancelled", err.message);
                                     context.commit("REMOVE_FILE", file);
                                 } else {
-                                    console.log(err);
+                                    $log(err, "danger", true);
                                 }
                             });
                     }
@@ -121,7 +115,6 @@ const FileService = {
             state.commit("REMOVE_FILE", file);
         },
         changeFileLimit: (state, data) => {
-            console.log(data);
             state.commit("CHANGE_FILE_LIMIT", data);
         },
         clearFiles: (state) => {

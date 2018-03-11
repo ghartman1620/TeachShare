@@ -114,11 +114,6 @@ export default Vue.component("edit-text", {
     },
     mounted() {
         this.$store.dispatch("openEditor");
-        // this.$router.replace({
-        //     name: "edit-text",
-        //     query: { index: this.$route.query.index }
-        // });
-        console.log("mounted edit text");
         if (
             this.$route.query.index >=
             this.$store.state.create.postElements.length
@@ -135,7 +130,6 @@ export default Vue.component("edit-text", {
         }
     },
     beforeDestroy() {
-        console.log("destroy");
         this.$store.dispatch("closeEditor");
     }
 });
