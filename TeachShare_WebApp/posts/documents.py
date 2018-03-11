@@ -1,4 +1,5 @@
 from django_elasticsearch_dsl import DocType, Index, fields
+
 from .models import Post
 
 # Name of the Elasticsearch index
@@ -9,13 +10,15 @@ post.settings(
     number_of_replicas=0
 )
 
+
 def assembleContent(content, element):
-    for k,v in element.items():
+    for k, v in element.items():
         if type(v) is dict:
             content = assembleContent(content, v)
         else:
             content = content + " " + str(v)
     return content
+
 
 @post.doc_type
 class PostDocument(DocType):
@@ -33,22 +36,26 @@ class PostDocument(DocType):
             tags += tag + " "
         return tags
     '''
+
     def prepare_content(self, instance):
         content = ""
         if not type(instance.content) is dict:
             for element in instance.content:
                 content = content + assembleContent(content, element)
         else:
-            for k,v in instance.content.items():
+            for k, v in instance.content.items():
                 content = content + " " + v
         return content
 
+    def get_queryset(self):
+        return super(PostDocument, self).get_queryset().filter(draft=False)
+
     class Meta:
-        model = Post # The model associated with this DocType
-        
+        model = Post  # The model associated with this DocType
+
         # The fields of the model you want to be indexed in Elasticsearch
         fields = [
-           
+
         ]
 
         # Ignore auto updating of Elasticsearch when a model is saved

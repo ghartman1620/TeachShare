@@ -3,7 +3,7 @@
 	<ul style="list-style-type: none;">
 		<li>
 			<div class="row">
-				<div v-for="file in element.files" class="col-xl-4 col-sm-6">
+				<div v-for="file in element.content" class="col-xl-4 col-sm-6">
 					<div class="card">
 						<div class="card-body">
 							<div>

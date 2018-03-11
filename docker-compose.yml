@@ -7,6 +7,8 @@ services:
       - teachnet
     ports: 
       - 5432:5432
+    networks:
+      - teachnet
     restart: always
     environment:
       POSTGRES_DB: teachshare
@@ -19,11 +21,24 @@ services:
     command: bash -c "./TeachShare_WebApp/wait-for-it.sh -h db -p 5432 -- python3 TeachShare_WebApp/manage.py makemigrations && python3 TeachShare_WebApp/manage.py migrate && python3 TeachShare_WebApp/manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
+    networks:
+      - teachnet
     ports:
       - 8000:8000
     depends_on:
       - db
       - search
+  celery:
+    build: ./TeachShare_WebApp/.
+    command: bash -c "cd TeachShare_WebApp && celery -A TeachShare_WebApp worker -l info -B"
+    volumes:
+      - .:/code
+    networks:
+      - teachnet
+    volumes:
+      - .:/code
+    depends_on:
+      - web
   vue:
     build: Frontend/.
     networks:
@@ -31,16 +46,15 @@ services:
     command: npm run dev 
     volumes:
       - ./Frontend/teach-share/.:/code/.
+    networks:
+      - teachnet
     ports:
       - 8080:8080
     depends_on:
       - db
 
   search:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.2
-    networks:
-      - teachnet
-    container_name: search
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.2
     hostname: search
     environment:
       - ELASTIC_PASSWORD=
@@ -51,17 +65,20 @@ services:
       memlock:
         soft: -1
         hard: -1
+    networks:
+      - teachnet
     volumes:
       - esdata2:/usr/share/elasticsearch/data
     ports:
-      - 9200:9200
+      - "9200:9200"
   redis:
     image: "redis:alpine"
     ports:
       - 6379:6379
+    networks:
+      - teachnet
 volumes:
   esdata2:
     driver: local
-
 networks:
   teachnet:

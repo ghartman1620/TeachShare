@@ -63,8 +63,8 @@
                             </div>
 
                             <div class="col-10">
-                                <input class="form-control" type="text" v-model.lazy="title"
-                                    placeholder="Title required" id="titleTextbox">
+                                <input class="form-control" type="text" v-model="title"
+                                    @input="titleChanged"  placeholder="Title required" id="titleTextbox">
                             </div>
                         </div>
                     </div>
@@ -134,7 +134,7 @@
         <button type="button" class="redo-button align-right btn btn-sm btn-outline-success btn-primary-spacing" @click="redo">
             <font-awesome-icon icon="redo" fixed-width></font-awesome-icon> redo 
         </button>
-        <button type="button" class="submit-button btn btn-primary" v-on:click="submitPost">
+        <button type="button" :disabled="!hasTitle" class="submit-button btn btn-primary" @click="submitPost">
             <font-awesome-icon icon="check" fixed-width></font-awesome-icon> Publish post
         </button>
     </nav>
@@ -204,6 +204,9 @@ export default {
         },
         nextStateId() {
             return this.$store.state.create.nextStateId;
+        },
+        hasTitle() {
+            return this.title.length > 0;
         }
     },
 
@@ -230,7 +233,12 @@ export default {
         createTag: function(e) {
             if (e.keyCode === 13 && this.inProgressTag !== "") {
                 this.createTagBtn();
+                this.$store.dispatch("setTags", this.tags);
             }
+        },
+        titleChanged: function(e) {
+            console.log(e)
+            this.$store.dispatch("setTitle", this.title);
         },
         createTagBtn: function() {
             this.tags.push(this.inProgressTag);
@@ -240,25 +248,27 @@ export default {
             this.$store.dispatch("fetchUser", 1);
         },
         submitPost: function(event) {
-            console.log(this.$store.state.create.postElements);
-            var obj = {
-                user: 1,
-                title: this.title,
-                content: this.$store.state.create.postElements,
-                likes: 0,
-                comments: [],
-                tags: this.tags,
-                attachments: []
-            };
-            console.log(obj);
             var vm = this;
-            this.$store.dispatch("createPost", obj).then(function(ret) {
-                console.log("RETURNED: ", ret);
+
+            // Generate current post before posting..
+            //
+            var currentPost = this.$store.getters.getCurrentPost;
+            currentPost.content = this.$store.state.create.postElements;
+            currentPost.tags = this.$store.getters.getTags;
+            currentPost.title = this.$store.getters.getTitle;
+            currentPost.draft = false;
+            console.log(currentPost);
+
+            // dispatch createPost method in the store. This will send a
+            // post request to the backend server.
+            this.$store.dispatch("createPost", currentPost).then(function(ret) {
+                // handle the response from the server
                 if (ret === undefined) {
                     vm.$notifyDanger(
                         "There was a problem submitting your post."
                     );
                 } else if (ret.status < 300) {
+                    // post was successful
                     vm.$notifySuccess("Post submitted successfully!");
                 } else {
                     let total = "";

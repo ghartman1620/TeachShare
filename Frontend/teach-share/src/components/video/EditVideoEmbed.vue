@@ -49,7 +49,7 @@
                     </div>
                 </div>
             </transition>
-            <br>
+            <br> 
             <h4>
                 Video Description (optional) :
             </h4>
@@ -58,7 +58,7 @@
             <div class="row">
                 <div class="offset-3 col-6">
                     <button type="submit" :disabled="errors.any() || EmbedURL == '' || dimensionErrors.any()" class="btn btn-primary btn-block">
-                        <span v-if="!errors.any()">Submit Video Link</span>
+                        <span v-if="!errors.any() && title !== ''">Submit Video Link</span>
                         <span v-else>Please enter a valid link</span>
                     </button>
                 </div>
@@ -95,7 +95,7 @@ export default Vue.component("edit-video-embed", {
             EmbedHeight: 480,
             includeYtData: true,
             dimensionErrors: {
-                any: function(){
+                any: function() {
                     return false;
                 }
             }

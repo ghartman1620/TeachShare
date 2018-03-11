@@ -1,5 +1,5 @@
 <template>
-    <see-more :maxHeight="actualMaxHeight">
+    <see-more @expanded="getComments" :maxHeight="actualMaxHeight">
         <div :id="index" class="container-fluid card">
             <div class="row">
                 <div class="col-12">
@@ -63,57 +63,80 @@ import forEach from "lodash/forEach";
 
 export default {
     name: "Post",
-    components: {SeeMore, PostElement, Comments, CommentEntry, FontAwesomeIcon},
+    components: {
+        SeeMore,
+        PostElement,
+        Comments,
+        CommentEntry,
+        FontAwesomeIcon
+    },
     props: ["post", "index", "maxHeight"],
     data: function() {
         return {
             newCommentText: ""
-        }
+        };
     },
     computed: {
         actualMaxHeight() {
             // @TODO: make this actually show the WHOLE content, not just an arbitrarily huge maxHeight
-            return this.maxHeight !== undefined ? this.maxHeight : 1000000
+            return this.maxHeight !== undefined ? this.maxHeight : 1000000;
         },
         textLength() {
             return this.newCommentText.length > 10;
         }
     },
     methods: {
+        getComments() {
+            var vm = this;
+            this.$store
+                .dispatch("fetchCommentsForPost", this.post.pk)
+                .then(function(res) {
+                    console.log(
+                        "Comments for post: ",
+                        vm.post.pk,
+                        " are fetched."
+                    );
+                });
+        },
         submitComment() {
             var vm = this;
-            this.$store.dispatch("createOrUpdateComment", {
-                pk: undefined,
-                post: this.post.pk,
-                text: this.newCommentText,
-                user: 1 // get current user...
-            }).then(function(ret) {
-                console.log(ret);
-                if (ret.status < 300) {
-                    vm.$notifySuccess("Your comment was successfully posted!");
-                } else {
-                    let total = "";
-                    forEach(ret, function(val, key) {
-                        console.log("forEach", key, val);
-                        let currentValue = val.join(" ");
-                        total = `${total} "${key}: ${currentValue}" `;
-                    });
+            this.$store
+                .dispatch("createOrUpdateComment", {
+                    pk: undefined,
+                    post: this.post.pk,
+                    text: this.newCommentText,
+                    user: 1 // get current user...
+                })
+                .then(function(ret) {
+                    console.log(ret);
+                    if (ret.status < 300) {
+                        vm.$notifySuccess(
+                            "Your comment was successfully posted!"
+                        );
+                    } else {
+                        let total = "";
+                        forEach(ret, function(val, key) {
+                            console.log("forEach", key, val);
+                            let currentValue = val.join(" ");
+                            total = `${total} "${key}: ${currentValue}" `;
+                        });
+                        vm.$notifyDanger(
+                            `There was a problem submitting your comment. ${total}`
+                        );
+                    }
+                })
+                .catch(function(ret) {
                     vm.$notifyDanger(
-                        `There was a problem submitting your comment. ${total}`
+                        "There was an unknown error with your request."
                     );
-                }   
-            }).catch(function(ret) {
-                vm.$notifyDanger("There was an unknown error with your request.");
-            });
+                });
             this.newCommentText = "";
-
         }
     },
     mounted() {
         console.log(this.post);
     }
-  
-}
+};
 </script>
 
 <style lang="scss" scoped>

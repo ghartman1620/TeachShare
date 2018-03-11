@@ -50,6 +50,10 @@ export default Vue.component("see-more", {
                 this.contentClasses.push("gradient");
             }
             this.expanded = !this.expanded;
+            this.expand();
+        },
+        expand() {
+            this.$emit("expanded", this.expanded);
         }
     },
     mounted() {

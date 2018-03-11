@@ -3,6 +3,7 @@ from posts.models import Post
 from accounts.models import User
 import random
 from faker import Faker
+from datetime import timedelta
 
 def generate_video_link_dict():
     t = 'video_link'
@@ -135,4 +136,6 @@ class PostFactory(factory.DjangoModelFactory):
     timestamp = factory.Faker('date_time_this_century', before_now=True, after_now=False)
     tags = factory.Faker('words', nb=random.randint(0,30))
     content = factory.lazy_attribute(lambda x: [ FUNCTION_LIST[ random.randint(0,len(FUNCTION_LIST)-1) ]() for a in range(random.randint(1, 10)) ] )
-
+    content_type = factory.lazy_attribute(lambda x: Post.CONTENT_TYPE[random.randint(0, len(Post.CONTENT_TYPE)-1)][0])
+    grade = factory.lazy_attribute(lambda x: Post.GRADES[random.randint(0, len(Post.GRADES)-1)][0])
+    length = factory.Faker('time_delta')

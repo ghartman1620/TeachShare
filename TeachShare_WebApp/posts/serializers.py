@@ -23,7 +23,6 @@ class AttachmentSerializer(serializers.ModelSerializer):
         fields = ('pk', 'post', 'file')
 
 
-
 class PostSerializer(serializers.ModelSerializer):
     # user = serializers.HyperlinkedRelatedField(many=False, read_only=True, view_name='users')
     # comments = CommentSerializer(many=True)
@@ -31,8 +30,9 @@ class PostSerializer(serializers.ModelSerializer):
     # attachments = AttachmentSerializer(many=True)
     # tags = TagSerializer(many=True, required=False, read_only=True)
     # pk = serializers.ReadOnlyField()
-        
+
     class Meta:
         model = Post
         fields = ('pk', 'title', 'content', 'updated',
-                  'likes', 'timestamp', 'user', 'comments', 'attachments', 'tags')
+                  'likes', 'timestamp', 'user', 'comments', 'attachments',
+                  'tags', 'draft', 'length', 'content_type', 'subject', 'grade')

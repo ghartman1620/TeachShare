@@ -35,7 +35,7 @@ router.register(r'comments', CommentViewSet)
 router.register(r'attachments', AttachmentViewSet)
 
 urlpatterns = [
-    
+
     url(r'^test/', SimpleMethod),
     url(r'^auth/', include('rest_framework_social_oauth2.urls')),
     url(r'^api/upload/(?P<filename>[^/]+)$', FileUploadView.as_view()),
