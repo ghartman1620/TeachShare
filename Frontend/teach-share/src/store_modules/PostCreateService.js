@@ -211,6 +211,8 @@ const PostCreateService = {
             state.commit("CLEAR_REDO");
             state.dispatch("saveDraft").then(res => $log(res));
         },
+        openEditor: (context) => {},
+        closeEditor: (context) => {}
 
     },
     getters: {

@@ -136,20 +136,13 @@ class SearchPostsView(views.APIView):
                 queryset = func(self, unquote(arg), queryset)
         return queryset
 
-    # queryset = Post.objects.all() #this isn't used but it makes rest framework happy
-    #s = PostDocument.search()
     def get_queryset(self):
         queryset = PostDocument.search()
-
-        termParam = self.request.query_params.get('term', None)
-        if termParam is not None:
-            terms = unquote(termParam)
-            termlist = terms.split(' ')
-            for term in termlist:
-                print('querying' + term)
-                queryset = queryset.query('multi_match', query=term, fields=[
-                                          'title', 'content', 'tags'])
+        queryset = self.parseParams(self.optionParams, queryset)
+        queryset = self.parseParams(self.filterParams, queryset)
+        queryset = self.parseParams(self.sortParams,   queryset)
         return queryset
+
 
     def get(self, request, format=None):
         response = []
@@ -179,7 +172,8 @@ class PostViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Post model
     """
-    queryset = Post.objects.filter()
+    permission_classes = (IsAuthenticated,)
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
     filter_class = PostFilter
 
