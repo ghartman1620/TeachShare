@@ -23,9 +23,7 @@ export default Vue.component("base-page", {
             queryParam: ""
         };
     },
-    mounted() {
-        
-    }
+    mounted() {}
 });
 </script>
 

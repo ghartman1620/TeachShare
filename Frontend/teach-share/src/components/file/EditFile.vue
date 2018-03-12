@@ -63,12 +63,6 @@ export default Vue.component("edit-file", {
 		cancel() {
             this.$router.push({ name: "create" });
         }
-	},
-	created() {
-		this.$store.dispatch("openEditor");
-	},
-	destroyed() {
-		this.$store.dispatch("closeEditor");
 	}
 });
 </script>

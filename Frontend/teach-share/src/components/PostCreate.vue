@@ -255,6 +255,7 @@ export default {
             currentPost.content = this.$store.state.create.postElements;
             currentPost.tags = this.$store.getters.getTags;
             currentPost.title = this.$store.getters.getTitle;
+            currentPost.user = this.$store.getters.getCurrentUser.profile.pk;
             currentPost.draft = false;
 
             // dispatch createPost method in the store. This will send a
@@ -331,13 +332,6 @@ $title-tag-card-background: darken(#bececa, 5%);
 $dark-green: #3b896a;
 $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
 $card-color: #96e6b3;
-
-// @import "../../node_modules/bootstrap/scss/_variables.scss";
-@import "../../node_modules/bootstrap/scss/_functions.scss";
-@import "../../node_modules/bootstrap/scss/_variables.scss";
-@import "../../node_modules/bootstrap/scss/_mixins.scss";
-
-$theme-colors: ("primary": red);
 
 .post-element-container {
     padding-top: 30px;
@@ -500,6 +494,8 @@ $theme-colors: ("primary": red);
 
 .card {
     background-color: #e5ffee;
+    position: relative;
+    
 }
 
 .title {

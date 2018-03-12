@@ -22,12 +22,13 @@ export default new Vuex.Store({
         image: ImageService,
         create: PostCreateService,
         notifications: NotificationService,
-        user: UserService,
+        user: UserService
     },
     state: {
         user: null,
         comment: null,
         comments: [],
+        users: [],
 
         // file upload
         files: [],
@@ -54,6 +55,16 @@ export default new Vuex.Store({
         },
         LOAD_USER: (state, data) => {
             state.user = Object.assign({}, data);
+        },
+        ADD_USER: (state, user) => {
+            console.log("ADDUSER: ", user);
+            let index = state.users.findIndex(val => val.pk === user.pk);
+            console.log(index);
+            if (index !== -1) {
+                state.users.splice(index, user);
+            }
+            state.users.push(user);
+            console.log(state.users);
         },
         LOAD_COMMENT: (state, data) => {
             state.comment = Object.assign({}, data);
@@ -88,29 +99,29 @@ export default new Vuex.Store({
         },
         LOAD_FILTERED_POSTS: (state, data) => {
             state.posts = Object.assign([], data);
-        },
+        }
 
     },
     actions: {
         postSearch: (state, query) => {
-            //this code to generate a querystring is very bad but it is 
-            //12:30AM and I do not care right now
+            // this code to generate a querystring is very bad but it is
+            // 12:30AM and I do not care right now
 
-            //also eslint needs to stop bitching
-            //you're a code linter not a style guide you asshole
+            // also eslint needs to stop bitching
+            // you're a code linter not a style guide you asshole
             console.log("in postSearch");
             var querystring = "";
             var firstProperty = true;
-            Object.keys(query).forEach(function(key,index){
-                if(firstProperty){
+            Object.keys(query).forEach(function (key, index) {
+                if (firstProperty) {
                     querystring += "?" + key + "=" + query[key];
                     firstProperty = false;
-                }else{
+                } else {
                     querystring += "&" + key + "=" + query[key];
                 }
             });
             console.log(querystring);
-            api.get("search/"+querystring)
+            api.get("search/" + querystring)
                 .then(response => state.commit("LOAD_ALL_POSTS", response.data))
                 .catch(err => $log(err));
         },
@@ -129,7 +140,7 @@ export default new Vuex.Store({
         fetchUser: (state, userID) => {
             api
                 .get(`users/${userID}/`)
-                .then(response => state.commit("LOAD_USER", response.data))
+                .then(response => state.commit("ADD_USER", response.data))
                 .catch(err => $log(err));
         },
         fetchComment: (state, commentID) => {
@@ -199,7 +210,7 @@ export default new Vuex.Store({
         saveDraft: (ctx) => {
             if (ctx.rootGetters.getCurrentPostId === null) { // hasn't yet been saved...
                 var obj = {
-                    user: 1,
+                    user: ctx.rootGetters.getCurrentUser.profile.pk,
                     title: ctx.rootGetters.getTitle,
                     content: ctx.rootGetters.getContent,
                     likes: 0,
@@ -218,6 +229,7 @@ export default new Vuex.Store({
                 // might be redundant! Check.
                 var currentPost = ctx.rootGetters.getCurrentPost;
                 currentPost.content = ctx.state.create.postElements;
+                currentPost.user = ctx.rootGetters.getCurrentUser.profile.pk;
                 currentPost.tags = ctx.rootGetters.getTags;
                 currentPost.title = ctx.rootGetters.getTitle;
 
@@ -225,19 +237,6 @@ export default new Vuex.Store({
                     return ctx.dispatch("setCurrentPost", res.data);
                 });
             }
-        },
-        login: (state, credentials) => {
-            var body = {
-                username: credentials.username,
-                password: credentials.pw
-            };
-            var head = { headers: { "content-type": "application/json" } };
-            api
-                .post("get_token/", body, head)
-                .then(response =>
-                    state.commit("SET_TOKEN", response.data.token)
-                )
-                .catch(err => $log(err));
         },
         createOrUpdateComment: (state, comment) => {
             if (comment.pk !== undefined) {
@@ -276,6 +275,10 @@ export default new Vuex.Store({
         },
         getCommentsByPost: (state, getters) => postid => {
             return getters.getPostById(postid).comments;
-        }
+        },
+        getCurrentUser: (state, getters) => {
+            return state.user;
+        },
+        getUserByID: state => id => state.users.find((val, ind, obj) => val.pk === id)
     }
 });

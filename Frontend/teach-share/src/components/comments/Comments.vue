@@ -3,7 +3,7 @@
         <div :key="comment.pk" v-for="comment in watchComments">
             <comment-entry
                 :post="post"
-                :user="1"
+                :user="comment.user"
                 :comment="comment">
             </comment-entry>
         </div>
@@ -20,10 +20,11 @@ export default {
     computed: {
         watchComments() {
             return this.$store.getters.getCommentsByPost(this.post.pk);
-        }
+        },
+        
     },
     mounted() {
-        // this.$store.dispatch("fetchCommentsForPost", this.post.pk);
+        
     }
 };
 </script>

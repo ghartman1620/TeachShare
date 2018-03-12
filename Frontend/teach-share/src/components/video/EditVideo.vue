@@ -94,13 +94,7 @@ export default Vue.component("edit-video", {
                 vm.$dispatch("removeVideo", item);
             });
         }
-    },
-    created() {
-		this.$store.dispatch("openEditor");
-	},
-	destroyed() {
-		this.$store.dispatch("closeEditor");
-	}
+    }
 });
 </script>
 

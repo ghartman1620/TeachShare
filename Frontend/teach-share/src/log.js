@@ -1,43 +1,59 @@
-var moment = require("moment");
-
 var LevelEnum = Object.freeze({
     "warning": {bg: "#ffdd00", fg: "#000000"},
     "danger": {bg: "#ff0a0a", fg: "#ffffff"},
     "success": {bg: "#03dd00", fg: "#000000"}
 });
 
-function $log (obj, level, fullObj) {
-    var formatting = LevelEnum[level];
-    var formattingStr;
+function ln (depth) {
+    var e = new Error();
+    if (!e.stack) {
+        try {
+            // IE requires the Error to actually be throw or else the Error's 'stack'
+            // property is undefined.
+            throw e;
+        } catch (e) {
+            if (!e.stack) {
+                return 0; // IE < 10, likely
+            }
+        }
+    }
+    var stack = e.stack.toString().split(/\r\n|\n/);
+    return stack[depth];
+}
 
-    if (level === undefined || formatting === undefined) {
-        formattingStr = "";
-        level = "log";
-    } else {
-        formattingStr = `background: ${formatting.bg}; color: ${formatting.fg};`;
-    }
+function logFull (level, depth, ...items) {
+    for (let obj of items) {
+        var formatting = LevelEnum[level];
+        var formattingStr;
+        var line = ln(depth);
+        // console.log(line);
 
-    var str;
-    var hasError = false;
-    try {
-        str = JSON.stringify(obj, null, 2);
-    } catch (err) {
-        console.log(`%c[error]: ${err}`, formattingStr);
-        str = err;
-        hasError = true;
-    }
-    var date = moment().format("dddd, MMMM Do YYYY, h:mm:ss a");
+        if (level === undefined || formatting === undefined) {
+            formattingStr = "";
+            level = "log";
+        } else {
+            formattingStr = `background: ${formatting.bg}; color: ${formatting.fg};`;
+        }
 
-    if (hasError) {
-        console.log("%c[object**]: ", formattingStr, obj);
-    } else {
-        console.log(`%c[${level}] --> ${date}:`, formattingStr);
-        console.log(`${str}`);
+        var str;
+        var hasError = false;
+        try {
+            str = JSON.stringify(obj, null, 4);
+        } catch (err) {
+            console.log(`%c[error]: ${err}`, formattingStr);
+            str = err;
+            hasError = true;
+        }
+
+        if (hasError) {
+            console.log("%c[object**]: ", formattingStr, obj);
+            console.log(line);
+        } else {
+            console.log(`%c[${level}]:`, formattingStr);
+            console.log(line);
+            console.log(`Object: ${str}`);
+        }
     }
-    if (fullObj === true) {
-        console.log(Object.getOwnPropertyNames(obj));
-    }
-    console.log("");
 };
 
-export default $log;
+export default logFull;

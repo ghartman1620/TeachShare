@@ -78,7 +78,12 @@ export default {
         };
     },
     computed: {
-        
+        fullUser() {
+            if (this.comment.user !== undefined) {
+                return this.$store.getters.getUserByID(this.comment.user);
+            } 
+            return undefined;
+        }
     },
     methods: {
         submit() {
@@ -98,9 +103,11 @@ export default {
         }
     },
     mounted() {
+        
         this.text = this.comment.text;
         this.prevText = this.text;
         this.editing = this.edit;
+        
     }
 };
 </script>

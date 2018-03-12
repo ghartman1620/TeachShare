@@ -90,7 +90,13 @@ export default {
             var vm = this;
             this.$store
                 .dispatch("fetchCommentsForPost", this.post.pk)
-                .then(function(res) {});
+                .then(function(res) {
+                    vm.$log(res);
+                    for (let c of vm.post.comments) {
+                        vm.$log(c);
+                        vm.$store.dispatch("fetchUser", c.user);
+                    }
+                });
         },
         submitComment() {
             var vm = this;
@@ -99,7 +105,7 @@ export default {
                     pk: undefined,
                     post: this.post.pk,
                     text: this.newCommentText,
-                    user: 1 // get current user...
+                    user: this.$store.getters.getCurrentUser.profile.pk
                 })
                 .then(function(ret) {
                     if (ret.status < 300) {

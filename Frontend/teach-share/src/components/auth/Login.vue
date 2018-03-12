@@ -45,23 +45,18 @@ export default {
     computed: {
         token() {
             return this.$store.state.user.token;
-        },
+        }
 
     },
     methods: {
         login: function(event) {
-            console.log("IN LOGIN");
             var obj =  { username: this.username, pw: this.pw, persist: this.persist};
-            console.log(obj);
             var vm = this;
             this.$store.dispatch("login", obj)
             .then(function(token) {
-                console.log(token);
-                console.log(vm.$cookie.get("token"))
                 vm.$router.push({name: "create"});
             })
             .catch(function(err){
-                console.log(err.response);
                 vm.$notifyDanger("You could not login!<br>" + err.response.data.error_description);
             }); 
         },

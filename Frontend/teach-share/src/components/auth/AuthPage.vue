@@ -33,7 +33,7 @@ export default Vue.component('auth-page', {
     components: {Notify,},
     methods: {
         submit() {
-            console.log("IN SUBMIT");
+            this.$log("IN SUBMIT");
             this.$emit("submitAuth");
         }
     }

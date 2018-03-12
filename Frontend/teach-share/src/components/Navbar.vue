@@ -21,15 +21,19 @@
 
                     <!-- just an example dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="Account Profile" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <a v-if="!isLoggedIn" class="nav-link dropdown-toggle" href="#" id="Account Profile" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                             <font-awesome-icon icon="user-circle" fixed-width></font-awesome-icon> Profile
+                        </a>
+                        <a v-else class="nav-link dropdown-toggle" href="#" id="Account Profile" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            <font-awesome-icon icon="user-circle" fixed-width></font-awesome-icon> {{ user.profile.username }}
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <router-link class="dropdown-item" :to="{name: 'dashboard'}">Your post feed</router-link>
-                            <a class="dropdown-item" href="#">Your posts</a>
+                            <a class="dropdown-item" href="">Your posts</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Account details</a>
-                            <a @click="logout" class="dropdown-item">Logout</a>
+                            <a class="dropdown-item" href="">Account details</a>
+                            <a @click="logout" class="dropdown-item" href="">Logout</a>
+                            <!-- <router-link v-else class="dropdown-item" to="login">Login</router-link> -->
                         </div>
                     </li>
                 </ul>
@@ -53,6 +57,14 @@ export default Vue.component("nav-bar", {
     props: ["query"],
     data() {
         return {};
+    },
+    computed: {
+        isLoggedIn() {
+            return this.$store.getters.getUser !== undefined;
+        },
+        user() {
+            return this.$store.getters.getCurrentUser;
+        }
     },
     methods: {
         logout() {

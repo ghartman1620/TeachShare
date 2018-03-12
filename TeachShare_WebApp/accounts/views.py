@@ -55,6 +55,7 @@ class TokenView(OAuthLibMixin, APIView):
     def post(self, request, format=None):
         
         request._request.POST = request._request.POST.copy()
+        print(vars(request))
         request._request.POST['client_id'] = client_id
         request._request.POST['client_secret'] = client_secret
         for key, value in request.data.items():
@@ -65,6 +66,7 @@ class TokenView(OAuthLibMixin, APIView):
         print("statuscode")
         print(statuscode)
         if(statuscode != 200):
+            print(body)
             return Response(json.loads(body), status=statuscode)
         print("body")
         print(body)
@@ -81,6 +83,9 @@ class TokenView(OAuthLibMixin, APIView):
         #info about the logged in user
         try:
             user = User.objects.get(username=request._request.POST['username'])
+            u = UserSerializer(user, context={'request': request})
+            print(u.data)
+            print(vars(u))
         except User.DoesNotExist:
             print(request._request.POST['username'])
             return Response({
@@ -88,6 +93,7 @@ class TokenView(OAuthLibMixin, APIView):
             }, status=status.HTTP_401_UNAUTHORIZED)
         return Response({
             'body': json.loads(body), 
+            'user': u.data,
             'userId': user.pk,
             'username' : user.username,
         })

@@ -121,10 +121,6 @@ export default Vue.component("edit-audio", {
         this.$on("changedBody", function(res) {
             this.description = res;
         });
-        this.$store.dispatch("openEditor");
-    },
-    destroyed() {
-        this.$store.dispatch("closeEditor");
     }
 });
 </script>

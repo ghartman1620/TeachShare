@@ -129,13 +129,7 @@ export default Vue.component("edit-image", {
         this.$on("changeWidth", function(w) {
             this.width = w;
         });
-    },
-    created() {
-		this.$store.dispatch("openEditor");
-	},
-	destroyed() {
-		this.$store.dispatch("closeEditor");
-	}
+    }
 });
 </script>
 

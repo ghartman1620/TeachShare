@@ -113,7 +113,6 @@ export default Vue.component("edit-text", {
         }
     },
     mounted() {
-        this.$store.dispatch("openEditor");
         if (
             this.$route.query.index >=
             this.$store.state.create.postElements.length
@@ -128,9 +127,6 @@ export default Vue.component("edit-text", {
                 this.$store.state.create.postElements[this.$route.query.index]
             );
         }
-    },
-    beforeDestroy() {
-        this.$store.dispatch("closeEditor");
     }
 });
 </script>
