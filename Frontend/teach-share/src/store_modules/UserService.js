@@ -45,7 +45,17 @@ const UserService = {
         }
     },
     actions: {
-
+        fetchCurrentUser: (state, userID) => {
+            return new Promise((resolve, reject) => {
+                api
+                    .get(`users/${userID}/`)
+                    .then(response => {
+                        state.commit("LOGIN_USER", response.data);
+                        resolve(response.data);
+                    })
+                    .catch(err => console.log(err));
+            });
+        },
         login: (context, credentials) => {
             console.log(credentials);
             var body = {

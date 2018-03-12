@@ -29,9 +29,9 @@ import {
     FormCheckbox,
 
     Badge,
-    
-} from "bootstrap-vue/es/components";
+    Jumbotron
 
+} from "bootstrap-vue/es/components";
 
 // font-awesome icons
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
@@ -44,8 +44,8 @@ import faCheck from "@fortawesome/fontawesome-free-solid/faCheck";
 import faTimes from "@fortawesome/fontawesome-free-solid/faTimes";
 import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
 import faUserCircle from "@fortawesome/fontawesome-free-solid/faUserCircle";
-import faArrowLeft from "@fortawesome/fontawesome-free-solid/faArrowLeft"
-import faArrowRight from "@fortawesome/fontawesome-free-solid/faArrowRight"
+import faArrowLeft from "@fortawesome/fontawesome-free-solid/faArrowLeft";
+import faArrowRight from "@fortawesome/fontawesome-free-solid/faArrowRight";
 
 fontawesome.library.add(
     faPlus,
@@ -56,7 +56,7 @@ fontawesome.library.add(
     faEdit,
     faUserCircle,
     faArrowLeft,
-    faArrowRight,
+    faArrowRight
 );
 
 // moment.js for date formatting
@@ -66,6 +66,7 @@ Vue.use(require("vue-moment"));
 Vue.use(require("vue-cookie"));
 
 Vue.use(Carousel);
+Vue.use(Jumbotron);
 Vue.use(Alert);
 Vue.use(Collapse);
 Vue.use(Card);

@@ -16,7 +16,7 @@ import Post from "./Post";
 export default {
     name: "PostDetail",
     components: {Post},
-    data: function() {
+    data: function() { 
         return { }
     },
     computed: {
@@ -28,13 +28,32 @@ export default {
         }
     },
     methods: {
+        getComments() {
+            var vm = this;
+            this.$store
+                .dispatch("fetchCommentsForPost", this.postLocal.pk)
+                .then(function(res) {
+                    vm.$log(res);
+                    for (let c of vm.post.comments) {
+                        vm.$log(c);
+                        let hasUser = vm.$store.state.users.find((val) => val.pk === c.pk);
+                        vm.$logWarning("Post.vue", hasUser);
+                        if (hasUser === null) {
+                            
+                        }
+                        vm.$store.dispatch("fetchUser", c.user);
+                    }
+                });
+        },
         test() {
             var val = 
             this.postLocal = val;
         }
     },
-    mounted() {
-        this.$store.dispatch("fetchPost", this.$route.params.post_id);
+    created() {
+        this.$store.dispatch("fetchPost", this.$route.params.post_id).then((res) => {
+            this.getComments();
+        });
     }
 }
 </script>

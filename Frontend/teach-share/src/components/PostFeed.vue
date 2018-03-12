@@ -78,7 +78,7 @@
         </div>
     </div>
     <br><br> 
-</div>
+</div> 
 
 <!-- Scroll to bottom functionality -->
 

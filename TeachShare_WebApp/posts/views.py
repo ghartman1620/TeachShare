@@ -21,12 +21,14 @@ from rest_framework import status, views, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import FileUploadParser, JSONParser
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 
 from .documents import PostDocument
 from .models import Attachment, Comment, Post
 from .serializers import (AttachmentSerializer, CommentSerializer,
                           PostSerializer)
 from .tasks import add
+import os 
 
 #Post search parameters
 #?term=string - searching for this string
@@ -162,20 +164,26 @@ class PostFilter(filters.FilterSet):
 
     class Meta:
         model = Post
-        fields = ('user', 'title', 'updated', 'likes', 'timestamp', 'comments')
+        fields = ('draft', 'user', 'title', 'updated', 'likes', 'timestamp', 'comments')
 
     def filterNumberPosts(self, queryset, name, value):
         return queryset[value:value+10]
 
 
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 5
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 class PostViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Post model
     """
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     filter_class = PostFilter
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         return self.queryset
@@ -255,14 +263,14 @@ class FileUploadView(views.APIView):
         p = Post.objects.get(pk=post_id) # this is where we need to actually know the post.
         a = Attachment.objects.create(post=p, file=file_obj)
         
-        print(a.file.url)
-        with open(a.file.url[1:], encoding='latin1') as f:
-            if isBinary(f) and not fileExt(a.file.url) in whitelist:
-                print('bad filetype!') 
-                return Response(data={
-                    'error' : fileExt(a.file.url) + ' files are allowed. Allowed filetypes are: ' + str(whitelist)
-                }, status=status.HTTP_400_BAD_REQUEST)
-        print(a.file.name)
+        # print(os.path.dirname(os.path.realpath(__file__)) + a.file.url[1:])
+        # with open(os.path.dirname(os.path.realpath(__file__)) + a.file.url, encoding='latin1') as f:
+        #     if isBinary(f) and not fileExt(a.file.url) in whitelist:
+        #         print('bad filetype!') 
+        #         return Response(data={
+        #             'error' : fileExt(a.file.url) + ' files are allowed. Allowed filetypes are: ' + str(whitelist)
+        #         }, status=status.HTTP_400_BAD_REQUEST)
+        # print(a.file.name)
         file_obj.close()
 
         return Response(data={

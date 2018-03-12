@@ -6,6 +6,7 @@
                     <br>
                     <h2 class="text-center"><strong>{{post.title}}</strong></h2>
                     <h5 class="text-center">posted: {{ post.updated | moment("from") }}</h5>
+                    <h6 class="text-center">by <b-badge variant="dark">{{fullUsername}}</b-badge></h6>
                     <hr>
                     <div>
                         <div :key="element.pk" v-for="element in post.content">
@@ -83,7 +84,16 @@ export default {
         },
         textLength() {
             return this.newCommentText.length > 10;
-        }
+        },
+        fullUser() {
+           return this.$store.getters.getUserByID(this.post.user);
+        },
+        fullUsername() {
+            if (this.fullUser !== undefined) {
+                return this.fullUser.username;
+            }
+            return "";
+        },
     },
     methods: {
         getComments() {
@@ -94,15 +104,33 @@ export default {
                     vm.$log(res);
                     for (let c of vm.post.comments) {
                         vm.$log(c);
+                        let hasUser = vm.$store.state.users.find((val) => val.pk === c.pk);
+                        vm.$logWarning(hasUser);
+                        if (hasUser === null) {
+                            
+                        }
                         vm.$store.dispatch("fetchUser", c.user);
                     }
                 });
         },
         submitComment() {
             var vm = this;
+            let currentUser = this.$store.getters.getCurrentUser.profile;
+            if (currentUser === undefined) {
+                this.$log("cookie: ", this.$cookie.get("userId"));
+                this.$store.dispatch("fetchCurrentUser", this.$cookie.get("userId"));
+                this.actualSubmit();
+            } else {
+                this.actualSubmit();
+            }
+
+            this.newCommentText = "";
+        },
+        actualSubmit() {
+            var vm = this;
+            this.$logDanger(this.$store.state.user.profile);
             this.$store
                 .dispatch("createOrUpdateComment", {
-                    pk: undefined,
                     post: this.post.pk,
                     text: this.newCommentText,
                     user: this.$store.getters.getCurrentUser.profile.pk
@@ -128,10 +156,11 @@ export default {
                         "There was an unknown error with your request."
                     );
                 });
-            this.newCommentText = "";
         }
     },
-    mounted() {}
+    created() {
+        // this.$store.dispatch("fetchUser", this.post.user);
+    }
 };
 </script>
 

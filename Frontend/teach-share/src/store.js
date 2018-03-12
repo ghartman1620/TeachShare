@@ -62,6 +62,8 @@ export default new Vuex.Store({
             console.log(index);
             if (index !== -1) {
                 state.users.splice(index, user);
+                console.log(state.users);
+                return;
             }
             state.users.push(user);
             console.log(state.users);
@@ -131,17 +133,35 @@ export default new Vuex.Store({
                 .then(response => state.commit("LOAD_ALL_POSTS", response.data))
                 .catch(err => $log(err));
         },
-        fetchPost: (state, postID) => {
+        fetchAllPostsRaw: state => {
+            console.log("fetchAllPostsRaw");
             api
-                .get(`posts/${postID}/`)
-                .then(response => state.commit("LOAD_POST", response.data))
+                .get(`posts/?draft=False&page_size=5`)
+                .then(response => {
+                    state.commit("LOAD_ALL_POSTS", response.data.results);
+                    console.log(response);
+                })
                 .catch(err => $log(err));
+        },
+        fetchPost: (state, postID) => {
+            return new Promise((resolve, reject) => {
+                api
+                    .get(`posts/${postID}/`)
+                    .then(response => {
+                        state.commit("LOAD_POST", response.data);
+                        resolve(response.data);
+                    })
+                    .catch(err => $log(err));
+            });
         },
         fetchUser: (state, userID) => {
             api
                 .get(`users/${userID}/`)
                 .then(response => state.commit("ADD_USER", response.data))
                 .catch(err => $log(err));
+        },
+        addUser: (state, user) => {
+            state.commit("ADD_USER", user);
         },
         fetchComment: (state, commentID) => {
             api
@@ -157,15 +177,18 @@ export default new Vuex.Store({
                 .catch(err => $log(err));
         },
         fetchCommentsForPost: (state, postID) => {
-            api
-                .get(`comments/?post=${postID}`)
-                .then(response =>
-                    state.commit("LOAD_COMMENTS_FOR_POST", {
-                        comments: response.data,
-                        post: postID
+            return new Promise((resolve, reject) => {
+                api
+                    .get(`comments/?post=${postID}`)
+                    .then(response => {
+                        state.commit("LOAD_COMMENTS_FOR_POST", {
+                            comments: response.data,
+                            post: postID
+                        });
+                        resolve(response);
                     })
-                )
-                .catch(err => $log(err));
+                    .catch(err => reject(err));
+            });
         },
         fetchFilteredPosts: (state, filterParams) => {
             api
@@ -279,6 +302,8 @@ export default new Vuex.Store({
         getCurrentUser: (state, getters) => {
             return state.user;
         },
-        getUserByID: state => id => state.users.find((val, ind, obj) => val.pk === id)
+        getUserByID: state => id => {
+            return state.users.find((val, ind, obj) => val.pk === id);
+        }
     }
 });

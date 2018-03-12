@@ -119,6 +119,9 @@ const router = new Router({
 // Refreshes token if necessary.
 function verifyAndRefreshLogin () {
     var token = Cookie.get("token");
+
+    // @TODO: using != causes a type cast before comparison, leading to inconsistent results
+    // consider using !== and finding the correct comparison, to avoid unknown behavior.
     if (token != undefined) {
         // verify token
         Object.assign(api.defaults, {headers: {authorization: "Bearer " + token}});
@@ -130,20 +133,16 @@ function verifyAndRefreshLogin () {
         });
     } else {
         var refresh_token = window.localStorage.getItem("refresh_token");
-        console.log(refresh_token);
         if (refresh_token != undefined) {
-            console.log("refresh token call");
             var body = {
                 grant_type: "refresh_token",
                 refresh_token: refresh_token,
                 username: window.localStorage.getItem("username")
             };
             var head = { headers: { "content-type": "application/json" } };
-            console.log(body);
             return new Promise((resolve, reject) => {
                 api.post("/get_token", body, head)
                     .then(function (response) {
-                        console.log("setting token");
                         var date = new Date();
                         date.setTime(date.getTime() + (response.data.body.expires_in * 1000 - 120000));
                         Cookie.set("token", response.data.body.access_token, date.toGMTString());
@@ -152,7 +151,6 @@ function verifyAndRefreshLogin () {
                         Cookie.set("username", response.data.username, date.toGMTString());
                         window.localStorage.setItem("refresh_token", response.data.body.refresh_token);
                         window.localStorage.setItem("access_token", response.data.body.access_token);
-
                         resolve(true);
                     })
                     .catch(err => resolve(false));
@@ -166,20 +164,6 @@ var Cookie = require("tiny-cookie");
 const loginProtectedRoutes = ["create"];
 const loggedOutRoutes = ["login", "register"];
 router.beforeEach((to, from, next) => {
-    console.log("window storage");
-
-    console.log(window.localStorage.getItem("refresh_token"));
-    console.log(window.localStorage.getItem("userId"));
-    console.log(window.localStorage.getItem("username"));
-    console.log(window.localStorage.getItem("access_token"));
-
-    console.log("cookies");
-
-    console.log(Cookie.get("loggedIn"));
-    console.log(Cookie.get("token"));
-    console.log(Cookie.get("userId"));
-    console.log(Cookie.get("username"));
-
     if (loggedOutRoutes.includes(to.name)) {
         verifyAndRefreshLogin()
             .then(function (loggedIn) {

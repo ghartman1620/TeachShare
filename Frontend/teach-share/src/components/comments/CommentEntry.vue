@@ -12,7 +12,7 @@
                     
                     <b-row>
                         <b-col cols="7" sm="6" md="5">
-                            User: <b-badge variant="primary">{{user}}</b-badge>
+                            User: <b-badge variant="primary">{{fullUsername}}</b-badge>
                         </b-col>
                         <b-col offset="3" cols="2" offset-sm="4" sm="2" offset-md="6" md="1">
                             <!-- <b-btn
@@ -24,8 +24,6 @@
                         </b-col>
                     </b-row>
                 </b-card>
-
-
         </div>
         <div v-if="editing">
             <b-container>
@@ -79,11 +77,15 @@ export default {
     },
     computed: {
         fullUser() {
-            if (this.comment.user !== undefined) {
-                return this.$store.getters.getUserByID(this.comment.user);
-            } 
-            return undefined;
-        }
+           return this.$store.getters.getUserByID(this.user);
+        },
+        fullUsername() {
+            if (this.fullUser !== undefined) {
+                return this.fullUser.username;
+            }
+            return "";
+        },
+
     },
     methods: {
         submit() {

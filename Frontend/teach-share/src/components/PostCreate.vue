@@ -193,7 +193,7 @@ export default {
         return {
             title: "",
             editedElement: {},
-            editedElementIndex: -1,
+            editedElementIndex: -1, 
             inProgressTag: "",
             tags: []
         };
@@ -213,7 +213,8 @@ export default {
     methods: {
         
         getEditorStyle() {
-            if (this.$store.state.create.editorOpen) {
+            this.$log(this.$route.name !== "create");
+            if (this.$route.name !== "create") {
                 return editorVisible;
             } else {
                 return editorHidden;
@@ -244,7 +245,7 @@ export default {
             this.inProgressTag = "";
         },
         getUser: function() {
-            this.$store.dispatch("fetchUser", 1);
+            // this.$store.dispatch("fetchUser", 1);
         },
         submitPost: function(event) {
             var vm = this;

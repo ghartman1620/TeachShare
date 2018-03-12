@@ -97,7 +97,7 @@ export default Vue.component("edit-video-embed", {
             dimensionErrors: {
                 any: function() {
                     return false;
-                }
+                } 
             }
         };
     },
