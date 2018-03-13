@@ -19,6 +19,7 @@ import {
     Navbar,
     Button,
     Layout,
+    Image,
 
     Form,
     FormGroup,
@@ -82,6 +83,7 @@ Vue.use(FormRadio);
 Vue.use(FormSelect);
 Vue.use(FormTextarea);
 Vue.use(FormCheckbox);
+Vue.use(Image);
 
 Vue.use(Badge);
 

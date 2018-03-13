@@ -211,7 +211,7 @@
         "content": [
             {
                 "type": "file",
-                "files": [
+                "content": [
                     {
                         "id": 1411,
                         "url": "/media/uploads/2018/03/06/d8960378-b5b5-4bff-9f84-eb8c500ad095/python.exe",

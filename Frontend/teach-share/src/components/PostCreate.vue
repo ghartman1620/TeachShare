@@ -1,6 +1,8 @@
 
 <template>
 <div>
+
+
 <div :style="getBodyStyle()">
     <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container">
         <div class="col-8 mx-auto card-deck" id="button-bar">
@@ -63,8 +65,8 @@
                             </div>
 
                             <div class="col-10">
-                                <input class="form-control" type="text" v-model="title"
-                                    @input="titleChanged"  placeholder="Title required" id="titleTextbox">
+                                <input class="form-control" type="text" v-model.lazy="title"
+                                    placeholder="Title required" id="titleTextbox">
                             </div>
                         </div>
                     </div>
@@ -99,13 +101,13 @@
         <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
             <div class="post-element-container">
                 <div class="card-column column">
-                  <div class="col-12 container">
-                    <div class="post-element card">
-                      <post-element :element="element" :index="index"></post-element>
+                    <div class="col-12 container">
+                        <div class="post-element card">
+                            <post-element :element="element" :index="index"></post-element>
+                        </div>
                     </div>
-                  </div>
 
-                  <div class="justify-content-start">
+                    <div class="justify-content-start">
                         <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
 
                             <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
@@ -134,7 +136,7 @@
         <button type="button" class="redo-button align-right btn btn-sm btn-outline-success btn-primary-spacing" @click="redo">
             <font-awesome-icon icon="redo" fixed-width></font-awesome-icon> redo 
         </button>
-        <button type="button" :disabled="!hasTitle" class="submit-button btn btn-primary" @click="submitPost">
+        <button type="button" class="submit-button btn btn-primary" v-on:click="submitPost">
             <font-awesome-icon icon="check" fixed-width></font-awesome-icon> Publish post
         </button>
     </nav>
@@ -204,9 +206,6 @@ export default {
         },
         nextStateId() {
             return this.$store.state.create.nextStateId;
-        },
-        hasTitle() {
-            return this.title.length > 0;
         }
     },
 
@@ -234,7 +233,6 @@ export default {
         createTag: function(e) {
             if (e.keyCode === 13 && this.inProgressTag !== "") {
                 this.createTagBtn();
-                this.$store.dispatch("setTags", this.tags);
             }
         },
         titleChanged: function(e) {
@@ -248,6 +246,17 @@ export default {
             // this.$store.dispatch("fetchUser", 1);
         },
         submitPost: function(event) {
+            console.log(this.$store.state.create.postElements);
+            var obj = {
+                user: 1,
+                title: this.title,
+                content: this.$store.state.create.postElements,
+                likes: 0,
+                comments: [],
+                tags: this.tags,
+                attachments: []
+            };
+            console.log(obj);
             var vm = this;
 
             // Generate current post before posting..
