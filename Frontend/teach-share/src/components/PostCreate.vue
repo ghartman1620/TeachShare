@@ -221,7 +221,7 @@ export default {
             }
         },
         getBodyStyle() {
-            if (this.$store.state.create.editorOpen) {
+            if (this.$route.name != "create") {
                 return bodyHidden;
             } else {
                 return bodyVisible;

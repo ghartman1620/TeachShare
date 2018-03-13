@@ -23,7 +23,7 @@ class PostSearchTestCase(TestCase):
                     user=cls.u,
                     content=obj['content'],
                     tags=obj['tags'],
-                )
+                )   
         #call_command('search_index', '--rebuild')
     
 
