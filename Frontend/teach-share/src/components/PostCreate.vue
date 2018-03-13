@@ -193,7 +193,7 @@ export default {
         return {
             title: "",
             editedElement: {},
-            editedElementIndex: -1, 
+            editedElementIndex: -1,
             inProgressTag: "",
             tags: []
         };
@@ -211,7 +211,6 @@ export default {
     },
 
     methods: {
-        
         getEditorStyle() {
             this.$log(this.$route.name !== "create");
             if (this.$route.name !== "create") {
@@ -221,7 +220,7 @@ export default {
             }
         },
         getBodyStyle() {
-            if (this.$store.state.create.editorOpen) {
+            if (this.$route.name !== "create") {
                 return bodyHidden;
             } else {
                 return bodyVisible;
@@ -267,8 +266,14 @@ export default {
                     vm.$notifyDanger(
                         "There was a problem submitting your post."
                     );
-                } else if (ret.status < 300) { // post was successful
+                } else if (ret.status < 300) {
+                    // post was successful
                     vm.$notifySuccess("Post submitted successfully!");
+                    
+                    vm.$router.push({
+                        name: "posts",
+                        params: { post_id: ret.data.pk }
+                    });
                 } else {
                     let total = "";
                     forEach(ret, function(val, key) {
@@ -496,7 +501,6 @@ $card-color: #96e6b3;
 .card {
     background-color: #e5ffee;
     position: relative;
-    
 }
 
 .title {

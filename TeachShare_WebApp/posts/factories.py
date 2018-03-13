@@ -95,7 +95,7 @@ def generate_file_dict():
     f = Faker()
     return {
         'type': 'file',
-        'files': [{
+        'content': [{
             'post': random.randint(1, Post.objects.count()) if Post.objects.count() >= 1 else 1,
             'name': f.file_name(),
             'type': 'file',
