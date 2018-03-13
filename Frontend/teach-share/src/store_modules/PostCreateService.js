@@ -16,6 +16,7 @@ const PostCreateService = {
             state.tags = tags;
         },
         SET_TITLE: (state, newTitle) => {
+            console.log(newTitle);
             state.title = newTitle;
         },
         SET_POST: (state, post) => {
@@ -126,6 +127,7 @@ const PostCreateService = {
             context.commit("SET_TAGS", tags);
         },
         setTitle: (context, title) => {
+            console.log(this.title);
             context.commit("SET_TITLE", title);
         },
         setCurrentPost: (context, post) => {

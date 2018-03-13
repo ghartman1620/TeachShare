@@ -21,8 +21,12 @@ def assembleContent(content, element):
     
 def fileNamesFromFileElement(element):
     fileNames = []
-    for file in element['content']:
-        fileNames.append(file['name'])
+    
+    try:
+        for file in element['content']:
+            fileNames.append(file['name'])
+    except KeyError:
+        print(element)
     return fileNames
 
 def fileNamesFromImageAudioElement(element):

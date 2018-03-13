@@ -45,10 +45,7 @@ export default {
                     }
                 });
         },
-        test() {
-            var val = 
-            this.postLocal = val;
-        }
+
     },
     created() {
         this.$store.dispatch("fetchPost", this.$route.params.post_id).then((res) => {

@@ -65,7 +65,7 @@
                             </div>
 
                             <div class="col-10">
-                                <input class="form-control" type="text" v-model.lazy="title"
+                                <input class="form-control" @input="titleChanged" type="text" v-model="title"
                                     placeholder="Title required" id="titleTextbox">
                             </div>
                         </div>
@@ -235,6 +235,7 @@ export default {
             }
         },
         titleChanged: function(e) {
+            console.log(this.title);
             this.$store.dispatch("setTitle", this.title);
         },
         createTagBtn: function() {
@@ -264,6 +265,7 @@ export default {
             currentPost.content = this.$store.state.create.postElements;
             currentPost.tags = this.$store.getters.getTags;
             currentPost.title = this.$store.getters.getTitle;
+            console.log(currentPost.title);
             currentPost.user = this.$store.getters.getCurrentUser.profile.pk;
             currentPost.draft = false;
 

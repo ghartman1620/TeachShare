@@ -172,6 +172,7 @@ export default {
     },
     created() {
         // this.$store.dispatch("fetchUser", this.post.user);
+        this.$log(this.post);
     }
 };
 </script>
