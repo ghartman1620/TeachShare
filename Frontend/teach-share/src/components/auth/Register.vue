@@ -111,18 +111,18 @@ export default Vue.component("register",{
                     email: this.email,
                     
                 }).then(function(ret) {
-                    this.$log("RETURNED: ", ret);
+                    vm.$log("RETURNED: ", ret);
                     
                     vm.$router.push({name: "login"});
                 })
                 .catch(function(err) {
-                    this.$log("caught error!");
+                    vm.$log("caught error!");
                     Object.keys(err).forEach(function(key){
-                        this.$log(key);
-                        this.$log(err[key]);
+                        vm.$log(key);
+                        vm.$log(err[key]);
                     })
-                    this.$log(err);
-                    this.$log(err.response.data);
+                    vm.$log(err);
+                    vm.$log(err.response.data);
                     vm.$notifyDanger("There was a problem creating your account!<br>" + err.response.data.error.toString());
                 });
     

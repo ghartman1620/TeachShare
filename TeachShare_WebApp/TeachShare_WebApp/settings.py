@@ -84,7 +84,7 @@ Django Cache Backend Settings (Redis):
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://redis:6379/0',
+        'LOCATION': 'redis://localhost:6379/0',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'SERIALIZER': 'django_redis.serializers.msgpack.MSGPackSerializer',
@@ -95,8 +95,8 @@ DJANGO_REDIS_IGNORE_EXCEPTIONS = True
 
 
 # CELERY:
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_TASK_SERIALIZER = 'msgpack'
 CELERY_ACCEPT_CONTENT = ['msgpack']
 CELERY_RESULT_SERIALIZER = 'msgpack'

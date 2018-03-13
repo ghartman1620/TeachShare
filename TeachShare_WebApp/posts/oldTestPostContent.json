@@ -57,12 +57,63 @@
         ]
     },
     {
+        "pk": 61,
+        "title": "Garage Band",
+        "content": [
+            {
+                "type": "text",
+                "content": "<p><span class=\"ql-size-large\">Garage Band </span>is software you can use to make songs!</p>"
+            },
+            {
+                "type": "audio",
+                "content": [
+                    {
+                        "id": 1380,
+                        "url": "/media/uploads/2018/03/02/cd1ff7c8-c3b9-4fa8-a7c5-50d4da0defde/SoundHelix-Song-1.mp3",
+                        "name": "SoundHelix-Song-1.mp3",
+                        "post": 2,
+                        "type": "audio_file",
+                        "title": "",
+                        "filetype": "audio/mp3",
+                        "description": "Like this one!"
+                    }
+                ]
+            },
+            {
+                "type": "audio",
+                "content": [
+                    {
+                        "id": 1382,
+                        "url": "/media/uploads/2018/03/02/015fe95a-0ac9-42db-8ae5-22228ddf2d01/SoundHelix-Song-2.mp3",
+                        "name": "SoundHelix-Song-2.mp3",
+                        "post": 2,
+                        "type": "audio_file",
+                        "title": "",
+                        "filetype": "audio/mp3",
+                        "description": "...or this one."
+                    }
+                ]
+            },
+            {
+                "type": "text",
+                "content": "<p>I don't actually know if those songs were made in garage band but this is an example</p>"
+            }
+        ],
+        "updated": "2018-03-01T19:07:39.579550-08:00",
+        "likes": 0,
+        "timestamp": "2018-03-01T19:07:39.579550-08:00",
+        "user": 1,
+        "comments": [],
+        "attachments": [],
+        "tags": []
+    },
+    {
         "pk": 62,
         "title": "Programming in Python!",
         "content": [
             {
                 "type": "text",
-                "content": "<p>Python is a programming language appropriate for beginners to text-based programming. It attempts to make its syntax as simple as possible and mandates proper coding style, such as good indentation.</p>"
+                "content": "<p>some content and richard wuld not like this</p>"
             }
         ],
         "updated": "2018-03-02T15:18:48.731065-08:00",
@@ -153,7 +204,74 @@
             "Vocabulary"
         ]
     },
-
+    {
+        "pk": 72,
+        
+        "title": "Python.exe!",
+        "content": [
+            {
+                "type": "file",
+                "content": [
+                    {
+                        "id": 1411,
+                        "url": "/media/uploads/2018/03/06/d8960378-b5b5-4bff-9f84-eb8c500ad095/python.exe",
+                        "file": {},
+                        "name": "python.exe",
+                        "post": 2,
+                        "type": "file"
+                    }
+                ]
+            },
+            {
+                "type": "text",
+                "content": "<p class=\"ql-align-right\"><s>kjlaerwu;ikf;</s></p>"
+            }
+        ],
+        "updated": "2018-03-06T10:11:49.874464-08:00",
+        "likes": 0,
+        "timestamp": "2018-03-06T10:11:49.874464-08:00",
+        "user": 1,
+        "comments": [],
+        "attachments": [],
+        "tags": []
+    },
+    {
+        "pk": 67,
+        "title": "Quadratic Formula Lecture",
+        "content": [
+            {
+                "type": "image_file",
+                "title": "",
+                "width": 640,
+                "height": 480,
+                "content": [
+                    {
+                        "id": 29,
+                        "url": "/media/uploads/2018/03/05/e7fc4ad1-b7ad-42c3-a878-627e93ea37cc/9a5c58dfd8b9befbf3e8b80_8no9ZcX.svg",
+                        "file": {},
+                        "name": "9a5c58dfd8b9befbf3e8b809f3b81676439ee221.svg",
+                        "post": 2,
+                        "type": "image_file",
+                        "title": "",
+                        "description": ""
+                    }
+                ],
+                "description": ""
+            }
+        ],
+        "updated": "2018-03-06T09:54:32.945266-08:00",
+        "likes": 0,
+        "timestamp": "2018-03-06T09:54:32.945266-08:00",
+        "user": 1,
+        "comments": [],
+        "attachments": [],
+        "tags": [
+            "quadratic formula",
+            "math",
+            "6th grade",
+            "formula"
+        ]
+    },
     {
         "pk": 69,
         "title": "Writing Intro Videos",
@@ -210,7 +328,73 @@
             "Introduction"
         ]
     },
-
+    {
+        "pk": 71,
+        "title": "Battle of Little Big Horn",
+        "content": [
+            {
+                "type": "image_file",
+                "title": "",
+                "width": 640,
+                "height": 480,
+                "content": [
+                    {
+                        "id": 30,
+                        "url": "/media/uploads/2018/03/05/5250c6b1-b368-4403-b8c1-627efcba13b3/1200px-Charles_Marion_R_xR8XcEG.jpg",
+                        "file": {},
+                        "name": "1200px-Charles_Marion_Russell_-_The_Custer_Fight_(1903).jpg",
+                        "post": 2,
+                        "type": "image_file",
+                        "title": "",
+                        "description": "Little Big Horn: Indian vs. American art perspective."
+                    },
+                    {
+                        "id": 31,
+                        "url": "/media/uploads/2018/03/05/3fad0136-0aa2-4ef2-928e-7cfbe6590b60/cu02.gif",
+                        "file": {},
+                        "name": "cu02.gif",
+                        "post": 2,
+                        "type": "image_file",
+                        "title": "",
+                        "description": "Little Big Horn: Indian vs. American art perspective."
+                    },
+                    {
+                        "id": 32,
+                        "url": "/media/uploads/2018/03/05/6eda0077-61e1-452f-ad88-a89f95a033c5/Little-Bighorn-pictogra_MnxEGVU.jpg",
+                        "file": {},
+                        "name": "Little-Bighorn-pictograph-Amos-Bad-Heart-Bull-2.jpg",
+                        "post": 2,
+                        "type": "image_file",
+                        "title": "",
+                        "description": "Little Big Horn: Indian vs. American art perspective."
+                    }
+                ],
+                "description": "Little Big Horn: Indian vs. American art perspective."
+            },
+            {
+                "type": "text",
+                "content": "<h2><strong>SIOUX WARS</strong></h2><p>During the last half of the nineteenth century, Lakota Sioux and their Cheyenne and Arapaho allies defended their homelands and natural resources against incursions by the federal government and European American settlers. Collectively known as the Sioux Wars, major engagements included the Grattan Massacre (1854), Fetterman Fight (1866), Battle of the Rosebud (1876), Battle of the Little Bighorn (1876), and the Wounded Knee Massacre (1890).</p><p>The first violent conflict in the Plains involving the Lakota Sioux and the federal government grew out of increased travel along the Oregon Trail. To protect overland travelers, the federal government built Fort Kearny in present-day Nebraska and purchased Fort Laramie in present-day Wyoming. Government agents also negotiated the Fort Laramie Treaty of 1851, which guaranteed the safe passage of emigrants in exchange for annuities and the recognition of tribal territories. Peace held until 1854 when a trivial event–the theft of an emigrant's cow by young Lakotas–led to the Grattan Massacre and subsequent army retaliations. On August 19, 1854, Lt. John Grattan led a detachment of twenty-nine men to recover the stolen cow from the village of Conquering Bear along the North Platte River. Misunderstandings and a belligerent Grattan sparked violence. When the shooting stopped, Grattan and all of his men lay dead; Conquering Bear was the lone Lakota casualty. Army retaliation was certain. The following summer, Col. William S. Harney destroyed a Sioux village at Ash Hollow (present-day Nebraska), killing more than 100 men, women, and children. Harney then pushed into Lakota territory, briefly occupying Fort Pierre (South Dakota) and finally establishing Fort Randall on the Missouri River. Harney's invasion of the Sioux homeland caused the Sioux to move away from the roads, soldiers, and forts and, in combination with the federal government's preoccupation with the Civil War (1861–65), led to almost ten years of relative peace.</p><p>Trouble flared again in 1865–67 when emigrants, in violation of the 1851 Treaty of Fort Laramie, moved along the Bozeman Trail to the Montana goldfields. This pathway cut through the heart of Plains Indian hunting grounds in the Powder River area. Persistent Lakota raids against settlers and soldiers along this route prompted the federal government to build Forts Reno, C. F. Smith, and Phil Kearny to protect emigrant travel. Despite the heavy military presence, Indian attacks continued, and in the second half of 1866 Lakotas led by Red Cloud and Crazy Horse battled federal troops. The most notorious engagement was the Fetterman Fight (December 21, 1866) near Fort Phil Kearny, Wyoming Territory, where eighty men under Capt. William Fetterman were killed. Public cries for decisive action against the Sioux reached a fever pitch, but Congress voted to broker peace with the warring tribes. Red Cloud signed the Fort Laramie Treaty (1868), which guaranteed, among other things, abandonment of the Bozeman Trail forts and creation of a large reservation that included the Black Hills. After agreeing to this treaty, Red Cloud and many Lakota bands moved onto this Great Sioux Reservation, while Sitting Bull, Crazy Horse, and Gall continued to resist encroachment on their lands. They openly rejected the treaty and continued to pursue their traditional life.</p><p>Hostilities erupted once again after an 1874 military expedition into the Black Hills confirmed rumors of gold. Gold seekers flooded into Paha Sapa (the Black Hills)–a clear violation of the 1868 Fort Laramie Treaty–forcing leaders such as Crazy Horse and Sitting Bull to defend Sioux territory. To avoid conflict, the federal government in 1875 offered to purchase the land from the Sioux. Overwhelmingly, the Sioux rejected this, and the government provoked a military showdown by issuing an ultimatum requiring all Sioux to report to an agency by January 31, 1876, or be considered hostile. The off-reservation people, now loosely allied under Sitting Bull, were scattered in the Powder River area (southeastern Montana and northwestern Wyoming) in small winter camps, and they largely ignored this arbitrary, impossible demand.</p><p>In May 1876 the army launched a threepronged campaign to force the Lakotas back onto the Great Sioux Reservation: Col. John Gibbon advanced eastward from Fort Ellis (Montana), Gen. George Crook moved north from Fort Laramie, and Gen. Alfred Terry (with George Custer) moved westward from Fort Abraham Lincoln (North Dakota). The military's campaign began to crumble when on June 17, 1876, the Sioux, led by Crazy Horse, routed and turned back Crook's command at the Battle of the Rosebud. On June 25.26, 1876, in the most famous fight of the offensive, Lt. Col. George Custer's Seventh Cavalry attacked an enormous Indian encampment on the Little Bighorn (Greasy Grass) River. Custer divided his command and attempted to strike the village from both ends but was quickly overwhelmed by superior numbers. Custer and 210 men in his immediate command (263 total) were killed.</p><p>After this victory, the Sioux and their allies fragmented into small bands and dispersed. The army initiated a winter campaign and relentlessly hunted down those bands that had not returned to their agencies. In May 1877, Crazy Horse surrendered at Fort Robinson, Nebraska; he was killed four months later, reportedly while trying to escape. Sitting Bull fled to Canada with as many as 2,000 followers. In retaliation for defeat at the Little Bighorn, Congress annexed the Black Hills from the Great Sioux Reservation on February 28, 1877.</p><p>Essentially, these events marked the end of the Sioux Wars and the start of the reservation era. After Sitting Bull returned to the United States in 1881, all Lakota Sioux bands lived on reservations and any hope of effective resistance was gone. The final conflict between the Sioux and the federal government–the Wounded Knee Massacre–was hardly a military confrontation. Militarily defeated, the Sioux readily adopted the Ghost Dance religion but with a more militaristic twist–some believed they would be impervious to bullets and most believed that if they danced and prayed with enough fervor the European Americans would be driven from the country. Their newfound focus caused great fear in the Plains, leading to a confrontation with federal troops. On December 29, 1890, while attempting to disarm a fleeing band of Lakotas, the Seventh Cavalry killed more than 250 Lakotas (mostly women and children) on the Pine Ridge Reservation in South Dakota. This massacre marked the end of Sioux resistance and the last chapter in the Plains Indian Wars.</p><p><br></p>"
+            },
+            {
+                "type": "text",
+                "content": "<p>On this day in 1876, Native American forces led by Chiefs Crazy Horse and Sitting Bull defeat the U.S. Army troops of Lieutenant Colonel George Armstrong Custer in a bloody battle near southern Montana’s Little Bighorn River.</p><p>Crazy Horse and Sitting Bull, leaders of the Sioux tribe on the Great Plains, strongly resisted the mid-19th-century efforts of the U.S. government to confine their people to reservations. In 1875, after gold was discovered in South Dakota’s Black Hills, the U.S. Army ignored previous treaty agreements and invaded the region. This betrayal led many Sioux and Cheyenne tribesmen to leave their reservations and join Sitting Bull and Crazy Horse in Montana. By the late spring of 1876, more than 10,000 Native Americans had gathered in a camp along the Little Bighorn River–which they called the Greasy Grass–in defiance of a U.S. War Department order to return to their reservations or risk being attacked.</p><p>In mid-June, three columns of U.S. soldiers lined up against the camp and prepared to march. A force of 1,200 Native Americans turned back the first column on June 17. Five days later, General Alfred Terry ordered Custer’s 7th Cavalry to scout ahead for enemy troops. On the morning of June 25, Custer drew near the camp and decided to press on ahead rather than wait for reinforcements.</p><p>At mid-day, Custer’s 600 men entered the Little Bighorn Valley. Among the Native Americans, word quickly spread of the impending attack. The older Sitting Bull rallied the warriors and saw to the safety of the women and children, while Crazy Horse set off with a large force to meet the attackers head on. Despite Custer’s desperate attempts to regroup his men, they were quickly overwhelmed. Custer and some 200 men in his battalion were attacked by as many as 3,000 Native Americans; within an hour, Custer and every last one of his soldier were dead.</p><p>The Battle of Little Bighorn–also called Custer’s Last Stand–marked the most decisive Native American victory and the worst U.S. Army defeat in the long Plains Indian War. The gruesome fate of Custer and his men outraged many white Americans and confirmed their image of the Indians as wild and bloodthirsty. Meanwhile, the U.S. government increased its efforts to subdue the tribes. Within five years, almost all of the Sioux and Cheyenne would be confined to reservations.</p><p><br></p><p><br></p>"
+            }
+        ],
+        "updated": "2018-03-06T09:55:44.433913-08:00",
+        "likes": 0,
+        "timestamp": "2018-03-06T09:55:44.433913-08:00",
+        "user": 1,
+        "comments": [],
+        "attachments": [],
+        "tags": [
+            "",
+            "Little Big Horn",
+            "Greasy Grass",
+            "General Custer",
+            "American History",
+            "Great Sioux War"
+        ]
+    },
     {
         "pk": 59,
         "title": "Scratch programming",

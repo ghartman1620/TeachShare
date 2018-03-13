@@ -28,6 +28,7 @@ class PostSearchTestCase(TestCase):
                     grade=0,
                     content_type=0,
                     length=timedelta(seconds=0),
+                    draft=False
                 )   
         #call_command('search_index', '--rebuild')
     

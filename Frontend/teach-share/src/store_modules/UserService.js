@@ -98,8 +98,9 @@ const UserService = {
         createUser: (context, user) => {
             return new Promise((resolve, reject) => {
                 api.post("users/", user)
-                    .then(response => resolve(response))
+                    .then(function(response){resolve(response)})
                     .catch(function (error) {
+                        console.log(error);
                         reject(error);
                     });
             });
