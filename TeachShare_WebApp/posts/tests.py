@@ -1,6 +1,7 @@
 from django.test import TestCase
-from rest_framework.test import APIRequestFactory
-from rest_framework.test import APIClient
+
+from rest_framework.test import APIRequestFactory, APIClient, force_authenticate, view
+
 from posts.models import Post
 from accounts.models import User
 from posts.serializers import PostSerializer
@@ -11,7 +12,7 @@ class PostSearchTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super(PostSearchTestCase, cls).setUpClass()
-        call_command('search_index', '--delete')
+        call_command('search_index', '--delete', '-f')
         cls.u = User.objects.create(username='User1')
         cls.u2 = User.objects.create(username='User2')
         cls.client = APIClient()
@@ -24,7 +25,7 @@ class PostSearchTestCase(TestCase):
                     content=obj['content'],
                     tags=obj['tags'],
                 )
-        #call_command('search_index', '--rebuild')
+        call_command('search_index', '--rebuild', '-f')
     
 
     @classmethod
@@ -68,11 +69,11 @@ class PostSearchTestCase(TestCase):
     #     self.assertEqual(resp.data[0], PostSerializer(self.p3).data)
     #     self.assertEqual(len(resp.data), 1)
 
-class PostCreateTestCase(TestCase):
+class PostCreateAndLoginTestCase(TestCase):
     def setUp(self):
-        User.objects.create_user('bryan', 'bmccoid@ucsc.edu')
+        User.objects.create_user(username='bryan', email='bmccoid@ucsc.edu', password="abc123")
         self.u = User.objects.first()
-        self.client = APIClient()
+        self.factory = APIRequestFactory()
         # nothing yet
 
     def test_can_lookup(self):
@@ -82,13 +83,14 @@ class PostCreateTestCase(TestCase):
         p = Post.objects.first()
 
         # test get request
-        resp = self.client.get('/api/posts/{}/'.format(p.pk))
-
+        request = self.factory.get('/api/posts/{}/'.format(p.pk))
+        force_authenticate(request, user=self.u)
+        resp = view(request)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, PostSerializer(p).data)
 
     def test_can_create(self):
-        resp = self.client.post('/api/posts/', {
+        request = self.factory.post('/api/posts/', {
             'title': 'test post',
             'content': {},
             'likes': 0,
@@ -97,7 +99,9 @@ class PostCreateTestCase(TestCase):
             'attachments': [],
             'tags': [],
         }, format='json')
-        self.assertEqual(resp.status_code, 201)
+        force_authenticate(request, user=self.u)
+
+        self.assertEqual(view(request).status_code, 201)
     
 
     '''
@@ -111,13 +115,17 @@ class PostCreateTestCase(TestCase):
         for i in range(0,55):
             Post.objects.create(title='lots of this post', content={}, user=self.u, tags=[])
         for i in range(0, 4):
-            resp = self.client.get('/api/posts/?beginIndex=' + str(i*10))
+            request = self.factory.get('/api/posts/?beginIndex=' + str(i*10))
+            force_authenticate(request, user=self.u)
+            resp = view(request)
             self.assertEqual(resp.status_code, 200)
             size=0
             for thing in resp.data:
                 size+=1
             self.assertEqual(size, 10)
-        resp = self.client.get('/api/posts/?beginIndex=50')
+        request = self.factory.get('/api/posts/?beginIndex=50')
+        force_authenticate(request, user=self.u)
+        resp = view(request)
         size=0
         self.assertEqual(resp.status_code, 200)
         for thing in resp.data:
