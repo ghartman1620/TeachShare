@@ -1,0 +1,16 @@
+PUT http://127.0.0.1:9200/posts http/1.1
+Content-Type: application/json
+
+{
+  "mappings": {
+    "_doc": {
+      "dynamic": false, 
+      "properties": {
+        "content": { 
+          "dynamic": true,
+          "properties": {}
+        }
+      }
+    }
+  }
+}
