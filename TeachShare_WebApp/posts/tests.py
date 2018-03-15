@@ -1,11 +1,13 @@
 from django.test import TestCase
 
-from rest_framework.test import APIRequestFactory, APIClient, force_authenticate, view
+from rest_framework.test import APIRequestFactory, APIClient, force_authenticate
 
 from posts.models import Post
 from accounts.models import User
 from posts.serializers import PostSerializer
 from django.core.management import call_command
+from oauth2_provider.models import Application 
+
 import json
 
 class PostSearchTestCase(TestCase):
@@ -69,12 +71,43 @@ class PostSearchTestCase(TestCase):
     #     self.assertEqual(resp.data[0], PostSerializer(self.p3).data)
     #     self.assertEqual(len(resp.data), 1)
 
+def registerApplication(user):
+    from accounts.views import client_id
+    from accounts.views import client_secret
+    Application.objects.create(
+        client_id=client_id,
+        user=user,
+        client_type="Confidential",
+        authorization_grant_type="Resource owner password-based",
+        name="teachshare",
+        client_secret=client_secret
+    )
+
 class PostCreateAndLoginTestCase(TestCase):
     def setUp(self):
         User.objects.create_user(username='bryan', email='bmccoid@ucsc.edu', password="abc123")
         self.u = User.objects.first()
+        self.client = APIClient()
         self.factory = APIRequestFactory()
-        # nothing yet
+        '''from accounts.views import client_id
+        from accounts.views import client_secret
+        Application.objects.create(
+            client_id=client_id,
+            user=self.u,
+            client_type="Confidential",
+            authorization_grant_type="Resource owner password-based",
+            name="teachshare",
+            client_secret=client_secret
+        )
+        #registerApplication(self.u)
+        resp = self.client.post('/auth/token', {
+            'grant_type' : 'password', 
+            'username': 'bryan', 
+            'password' : 'password123',
+        })
+        print(resp.data)
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + resp.data['access_token'])
+        '''
 
     def test_can_lookup(self):
         # create a post to lookup
@@ -82,15 +115,20 @@ class PostCreateAndLoginTestCase(TestCase):
                             likes=0, user=self.u, tags =[])
         p = Post.objects.first()
 
+        request = self.factory.get('/api/posts/{}'.format(p.pk))
+        force_authenticate(request)
+        from posts.views import PostViewSet
+        
+        resp = PostViewSet.as_view({'get' : 'list'})(request)
         # test get request
-        request = self.factory.get('/api/posts/{}/'.format(p.pk))
-        force_authenticate(request, user=self.u)
-        resp = view(request)
+        
+        #resp = self.client.get('/api/posts/{}/'.format(p.pk))
+       
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, PostSerializer(p).data)
 
     def test_can_create(self):
-        request = self.factory.post('/api/posts/', {
+        resp = self.client.post('/api/posts/', {
             'title': 'test post',
             'content': {},
             'likes': 0,
@@ -99,9 +137,8 @@ class PostCreateAndLoginTestCase(TestCase):
             'attachments': [],
             'tags': [],
         }, format='json')
-        force_authenticate(request, user=self.u)
 
-        self.assertEqual(view(request).status_code, 201)
+        self.assertEqual(resp.status_code, 201)
     
 
     '''
@@ -115,17 +152,15 @@ class PostCreateAndLoginTestCase(TestCase):
         for i in range(0,55):
             Post.objects.create(title='lots of this post', content={}, user=self.u, tags=[])
         for i in range(0, 4):
-            request = self.factory.get('/api/posts/?beginIndex=' + str(i*10))
-            force_authenticate(request, user=self.u)
-            resp = view(request)
+            resp = self.client.get('/api/posts/?beginIndex=' + str(i*10))
+
             self.assertEqual(resp.status_code, 200)
             size=0
             for thing in resp.data:
                 size+=1
             self.assertEqual(size, 10)
-        request = self.factory.get('/api/posts/?beginIndex=50')
-        force_authenticate(request, user=self.u)
-        resp = view(request)
+        resp = self.client.get('/api/posts/?beginIndex=50')
+
         size=0
         self.assertEqual(resp.status_code, 200)
         for thing in resp.data:

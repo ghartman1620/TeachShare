@@ -10,6 +10,7 @@ from accounts.views import UserProfileViewSet, UserViewSet, GroupViewSet, TokenV
 from posts.views import PostViewSet, CommentViewSet, AttachmentViewSet, SearchPostsView
 from posts.views import *
 from posts.views import FileUploadView
+from rest_framework_social_oauth2 import urls
 
 
 router = routers.DefaultRouter()
