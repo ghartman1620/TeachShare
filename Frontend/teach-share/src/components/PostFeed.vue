@@ -71,7 +71,7 @@
     <div class="card post-container-card card-shadow">
         <div class="card-body">
             <post
-                :maxHeight="500"
+                :maxHeight="1000"
                 :post="post"
                 :index="index">
             </post>
@@ -190,10 +190,10 @@ export default {
             this.searchIn.forEach(function(element){
                 searchParam += element + " ";
             })
-            console.log(searchParam);
             query.in = searchParam;
             query.termtype = this.termtype;
             query.excludetype = this.excludetype;
+            console.log(query);
             this.$router.push({name: "dashboard", query: query});
         }
     },

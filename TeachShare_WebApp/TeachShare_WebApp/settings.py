@@ -73,8 +73,8 @@ ELASTICSEARCH_DSL = {
 }
 # TEMPORARY: will cause unneccesary load on the server but simplifies things for now.
 # ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = 'django_elasticsearch_dsl.signals.RealTimeSignalProcessor'
-ELASTICSEARCH_DSL_AUTOSYNC = False
-ELASTICSEARCH_DSL_AUTO_REFRESH = False
+ELASTICSEARCH_DSL_AUTOSYNC = True
+ELASTICSEARCH_DSL_AUTO_REFRESH = True
 
 """
 Django Cache Backend Settings (Redis):
@@ -103,6 +103,8 @@ CELERY_RESULT_SERIALIZER = 'msgpack'
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
+
+
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',

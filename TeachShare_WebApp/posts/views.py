@@ -150,10 +150,7 @@ class SearchPostsView(views.APIView):
         response = []
         queryset = self.get_queryset()
         for hit in queryset.scan():
-            try:
-                response.append(Post.objects.get(id=hit._d_['id']))
-            except Post.DoesNotExist as e:
-                pass
+            response.append(Post.objects.get(id=hit._d_['id']))
 
         return Response(PostSerializer(response, many=True).data)
 

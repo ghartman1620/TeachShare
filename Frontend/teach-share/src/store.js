@@ -106,11 +106,6 @@ export default new Vuex.Store({
     },
     actions: {
         postSearch: (state, query) => {
-            // this code to generate a querystring is very bad but it is
-            // 12:30AM and I do not care right now
-
-            // also eslint needs to stop bitching
-            // you're a code linter not a style guide you asshole
             console.log("in postSearch");
             var querystring = "";
             var firstProperty = true;
