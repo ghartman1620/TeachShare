@@ -31,7 +31,7 @@ export default Vue.component("image-element", {
             editing: false,
             localTitle: this.title,
             localBody: this.body,
-            sizeStyle: {width: "100%", height: "600px", padding: "20px"}
+            sizeStyle: { width: "100%", height: "600px", padding: "20px" }
         };
     },
     computed: {},
@@ -40,17 +40,17 @@ export default Vue.component("image-element", {
     },
     methods: {
         getSizeStyle() {
-            if(this.isMounted){
-                
-            }return {
+            if (this.isMounted) {
+            }
+            return {
                 width: "100%",
                 height: "600px",
-                padding: "20px",
-            }
+                padding: "20px"
+            };
         },
         URL(val) {
-            if (val.indexOf('http') === -1) {
-                 return `http://localhost:8000${val}`;
+            if (val.indexOf("http") === -1) {
+                return `http://localhost:8000${val}`;
             }
             return `${val}`;
         },
@@ -67,16 +67,18 @@ export default Vue.component("image-element", {
         changeSizeStyle() {
             var maxImageHeight = 0;
             var self = this;
-            this.images.forEach(function(img){
+            this.images.forEach(function(img) {
                 var imageObj = new Image();
                 imageObj.src = self.URL(img.url);
-                maxImageHeight = imageObj.height > maxImageHeight 
-                    ? imageObj.height : maxImageHeight;   
+                maxImageHeight =
+                    imageObj.height > maxImageHeight
+                        ? imageObj.height
+                        : maxImageHeight;
             });
-            this.sizeStyle =  {
+            this.sizeStyle = {
                 width: "100%",
-                height: maxImageHeight+10,
-                padding: "20px",
+                height: maxImageHeight + 10 + "px",
+                padding: "20px"
             };
         }
     },

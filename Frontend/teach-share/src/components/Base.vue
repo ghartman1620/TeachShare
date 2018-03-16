@@ -28,7 +28,7 @@ export default Vue.component("base-page", {
     },
     mounted() {
         let uid = this.$cookie.get("userId");
-        if (uid !== undefined) {
+        if (uid !== undefined && uid !== null) {
             this.$store.dispatch("fetchCurrentUser", uid)
                 .then((resp) => {
                     this.$logSuccess(resp);
@@ -56,7 +56,7 @@ export default Vue.component("base-page", {
     }
 });
 </script>
-
+ 
 <style lang="scss">
 .fade-enter-active,
 .fade-leave-active {
