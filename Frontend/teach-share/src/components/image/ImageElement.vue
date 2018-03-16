@@ -1,13 +1,18 @@
 <template>
     <div>
         <div class="card-body">
-            <b-carousel controls img-width="600" img-height="480">
+            <b-carousel 
+                controls 
+                indicators
+                background="#000000"
+                img-width="600" 
+                img-height="480">
                 <div :key="i.id" v-for="i in this.images">
                     <b-carousel-slide 
                         :caption="i.title" 
                         :text="i.description"
                         :img-src="URL(i.url)"
-                        style="height: 600px"
+                        style="height: 480px; width: auto;"
                     />
                 </div>
             </b-carousel>

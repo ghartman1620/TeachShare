@@ -1,0 +1,11 @@
+@google_secret=UcvpIOjRuIOJ_6NT9CYUHraA
+@client_id=232250430081-c7aicgo6hrj04074sdhruurc8dm9un2b.apps.googleusercontent.com
+@backend=google-oauth2
+@token=ya29.Glt7Bft5NM9zEM2EGy3IGBgAOSNrZm0-66qjOUWzCLtidVso5ay83EWh-GSC7XKHzvpCqvu8Jjvedf7yqcMJgXz7BBUaY2f8dfZEMOkA7TEWYbZU5xaVatABey2H
+
+###
+ 
+POST http://localhost:8000/auth/convert-token HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=convert_token&client_id={{client_id}}&client_secret={{google_secret}}&token={{token}}&backend={{backend}}
