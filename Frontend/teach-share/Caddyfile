@@ -1,7 +1,7 @@
 localhost:8081
 gzip
 ext .html
-root /home/bryan/Development/school/cmps116/TeachShare/Frontend/teach-share/dist/
+root /home/bryan/dev/school/cmps116/TeachShare/Frontend/teach-share/dist
 
 rewrite / {
   to {path} /

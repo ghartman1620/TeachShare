@@ -20,7 +20,7 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.conf.beat_schedule = {
     'search-index-full-rebuild': {
         'task': 'posts.tasks.rebuild_index',
-        'schedule': crontab(minute='*/1'),
+        'schedule': 30.0, #crontab(minute='*/1'),
         'args': ()
     },
     'garbage-truck': {
