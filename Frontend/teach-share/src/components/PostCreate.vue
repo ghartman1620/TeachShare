@@ -3,119 +3,114 @@
 <div>
 
 
-<div :style="getBodyStyle()">
-    <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container">
-        <div class="col-8 mx-auto card-deck" id="button-bar">
+    <div :style="getBodyStyle()">
+        <b-container>
 
-            <h2></h2>
-            <div class="round-button" id="text-icon">
-                <router-link :to="{ name: 'edit-text', query: {index: this.maxElementIndex()}}">
-                    <img src="/static/text-button.png"
-                                onmouseover="this.src='/static/text-button-hover.png'"
-                                onmouseout="this.src='/static/text-button.png'">
-                </router-link>
-            </div>
-            <h2></h2>
+            <b-col sm="12" offset-lg="2" lg="8">    
+            <!-- <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container"> -->
+            <b-col cols="8">
+            <b-row id="button-bar">
 
-            <div class="round-button" id="video-icon">
-                <router-link :to="{name: 'edit-video', query: {index: this.maxElementIndex(), videotype: 'embed'}}">
-                    <img src="/static/video-button.png"
-                                onmouseover="this.src='/static/video-button-hover.png'"
-                                onmouseout="this.src='/static/video-button.png'">
-
-                </router-link>
-            </div>
-            <h2></h2>
-
-            <div class="round-button" id="audio-icon">
-                <router-link :to="{name: 'edit-audio', query: {index: this.maxElementIndex()}}">
-                    <img src="/static/audio-button.png"
-                                onmouseover="this.src='/static/audio-button-hover.png'"
-                                onmouseout="this.src='/static/audio-button.png'">
-                </router-link>
-            </div>
-            <h2></h2>
-
-            <div class="round-button" id="image-icon">
-                <router-link :to="{name: 'edit-image', query: {index: this.maxElementIndex()}}">
-                    <img src="/static/image-button.png" >
-                </router-link>
-            </div>
-
-            <div class="round-button" id="file-icon">
-                <router-link :to="{name: 'edit-file', query: {index: this.maxElementIndex()}}">
-                    <img src="/static/file-button.png"
-                                onmouseover="this.src='/static/file-button-hover.png'"
-                                onmouseout="this.src='/static/file-button.png'">
-                </router-link>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-2"></div>
-        <div class="col-8">
-            <div class="form-group">
-                <div id="title-tag-card" class="card">
-                    <br>
-                    <div class="title-container container">
-                        <div class="row">
-                            <div class="col-2">
-                                <label for="titleTextbox"><h4><strong>Title: </strong></h4></label>
-                            </div>
-
-                            <div class="col-10">
-                                <input class="form-control" @input="titleChanged" type="text" v-model="title"
-                                    placeholder="Title required" id="titleTextbox">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="container tag-card card">
-                        <div class="row">
-                            <div class="col-2">
-                                <label for="tagTextbox"><h4><strong>Tags: </strong></h4></label>
-                            </div>
-                            <div class="col-8">
-                                <input class="form-control" v-model="inProgressTag" v-on:keyup="createTag"
-                                    placeholder="add a topic tag" id="tagTextbox">
-                            </div>
-                            <div class="col-2">
-                                <button @click="createTagBtn" id="create-tag-button" class="btn btn-block btn-primary">
-                                    <span>
-                                        <font-awesome-icon icon="plus"></font-awesome-icon>
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                        <hr>
-                        <span id="tag-container" :key="index" v-for="(tag,index) in tags">
-                            <span @click="removeTag(index)" class="tag-entry badge badge-dark">{{tag}} <span aria-hidden="true">&times;</span>
-                                <!-- <button id="tag-delete-button" type="button" class="btn btn-sm btn-dark" >{{"x"}}</button> -->
-                            </span>
-                        </span>
-                    </div>
+                <h2></h2>
+                <div class="round-button" id="text-icon">
+                    <router-link :to="{ name: 'edit-text', query: {index: this.maxElementIndex()}}">
+                        <img src="/static/text-button.png"
+                                    onmouseover="this.src='/static/text-button-hover.png'"
+                                    onmouseout="this.src='/static/text-button.png'">
+                    </router-link>
                 </div>
-            </div>
-        </div>
-    </div>
-        <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
+                <h2></h2>
+
+                <div class="round-button" id="video-icon">
+                    <router-link :to="{name: 'edit-video', query: {index: this.maxElementIndex()}}">
+                        <img src="/static/video-button.png"
+                                    onmouseover="this.src='/static/video-button-hover.png'"
+                                    onmouseout="this.src='/static/video-button.png'">
+
+                    </router-link>
+                </div>
+                <h2></h2>
+
+                <div class="round-button" id="audio-icon">
+                    <router-link :to="{name: 'edit-audio', query: {index: this.maxElementIndex()}}">
+                        <img src="/static/audio-button.png"
+                                    onmouseover="this.src='/static/audio-button-hover.png'"
+                                    onmouseout="this.src='/static/audio-button.png'">
+                    </router-link>
+                </div>
+                <h2></h2>
+
+                <div class="round-button" id="image-icon">
+                    <router-link :to="{name: 'edit-image', query: {index: this.maxElementIndex()}}">
+                        <img src="/static/image-button.png" >
+                    </router-link>
+                </div>
+
+                <div class="round-button" id="file-icon">
+                    <router-link :to="{name: 'edit-file', query: {index: this.maxElementIndex()}}">
+                        <img src="/static/file-button.png"
+                                    onmouseover="this.src='/static/file-button-hover.png'"
+                                    onmouseout="this.src='/static/file-button.png'">
+                    </router-link>
+                </div>
+            </b-row>
+            </b-col>
+            </b-col>
+        
+        </b-container>
+        <b-row>
+            <!-- TODO: make this more centered -->
+            <b-col offset="2" cols="7">
+                <b-container>
+                    <b-form-group>
+                        <b-card id="title-tag-card">
+                            <b-row>
+                                <b-col cols="2">
+                                    <label for="titleTextbox"><h4><strong>Title: </strong></h4></label>
+                                </b-col>
+
+                                <b-col cols="10">
+                                    <input class="form-control" @input="titleChanged" type="text" v-model="title"
+                                        placeholder="Title required" id="titleTextbox">
+                                </b-col>
+                            </b-row>
+                            <b-row>
+                                <b-col cols="2" >
+                                    <label for="tagTextbox"><h4><strong>Tags: </strong></h4></label>
+                                </b-col>
+                                <b-col cols="8">
+                                    <input class="form-control" v-model="inProgressTag" v-on:keyup="createTag"
+                                        placeholder="add a topic tag" id="tagTextbox">
+                                </b-col>
+                                <b-col cols="2">
+                                    <b-button @click="createTagBtn" id="create-tag-button" variant="primary">
+                                        <span>
+                                            <font-awesome-icon icon="plus"></font-awesome-icon>
+                                        </span>
+                                    </b-button>
+                                </b-col>
+                                <hr>
+                                <span :key="index" v-for="(tag,index) in tags">
+                                    <span @click="removeTag(index)" class="tag-entry badge badge-dark">{{tag}} <span aria-hidden="true">&times;</span>
+                                    </span>
+                                </span>
+                            </b-row>
+                        </b-card>
+                    </b-form-group>
+                </b-container>
+            </b-col>
+        </b-row>
+        <div :key="index" v-for="(element,index) in storeElements">
             <div class="post-element-container">
-                <div class="card-column column">
-                    <div class="col-12 container">
-                        <div class="post-element card">
-                            <post-element :element="element" :index="index"></post-element>
-                        </div>
-                    </div>
-
-                    <div class="justify-content-start">
-                        <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
-
-                            <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
-                            <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="/static/caret-square-down.png"></button>
-                            <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button>
-                            <button class="btn btn-primary" id="edit-button" @click="editElement(index)"><img height=20 src="/static/edit-icon.png"></button>
-
-                        </div>
+                <div class="post-element card">
+                    <post-element :element="element" :index="index"></post-element>
+                </div>
+                <div class="justify-content-start">
+                    <div>
+                        <b-button variant="dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></b-button>
+                        <b-button variant="dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="/static/caret-square-down.png"></b-button>
+                        <b-button variant="danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></b-button>
+                        <b-button variant="primary" id="edit-button" @click="editElement(index)"><img height=20 src="/static/edit-icon.png"></b-button>
                     </div>
                 </div>
             </div>
@@ -123,31 +118,39 @@
         </div>
     </div>
     <br><br><br> <!-- this is so problems don't occur with bottom of page button presses -->
-    <nav class="navbar fixed-bottom navbar-light navbar-left bottom-navbar bg-light">
+
+    <b-navbar fixed="bottom" class="bottom-navbar ">
         <div id="bottomNavTitle" class="title" v-if="title != ''">{{title}}</div>
         <div class="title title-placeholder" v-else></div>
-    </nav>
+    </b-navbar>
 
 
-    <nav class="navbar fixed-bottom justify-content-end bg-transparent">
-        <button type="button" class="undo-button align-right btn btn-sm btn-outline-danger btn-primary-spacing" @click="undo">
-            <font-awesome-icon icon="undo" fixed-width></font-awesome-icon> undo 
-        </button>
-        <button type="button" class="redo-button align-right btn btn-sm btn-outline-success btn-primary-spacing" @click="redo">
-            <font-awesome-icon icon="redo" fixed-width></font-awesome-icon> redo 
-        </button>
-        <button type="button" class="submit-button btn btn-primary" v-on:click="submitPost">
-            <font-awesome-icon icon="check" fixed-width></font-awesome-icon> Publish post
-        </button>
-    </nav>
+    <b-navbar fixed="bottom">
+        <!-- TODO: make the buttons align right like they did previously. -->
+        <b-navbar-nav class="ml-auto">
+        
+            <b-button type="button" variant="outline-danger" class="undo-button" @click="undo">
+                <font-awesome-icon icon="undo" fixed-width></font-awesome-icon> undo 
+            </b-button>
+            
+            <b-button type="button" variant="outline-success" class="redo-button" @click="redo">
+                <font-awesome-icon icon="redo" fixed-width></font-awesome-icon> redo 
+            </b-button>
+            
+            <b-button type="button" variant="primary" class="submit-button" v-on:click="submitPost">
+                <font-awesome-icon icon="check" fixed-width></font-awesome-icon> Publish post
+            </b-button>
+            
+        </b-navbar-nav>
+        
+
+    </b-navbar>
 
 
 <div :style="getEditorStyle()">
-  <div class="row">
-    <div class="col-12">
+
       <router-view/>
-    </div>
-  </div>
+
 </div>
 
 </div>
@@ -522,13 +525,7 @@ $card-color: #96e6b3;
     opacity: 0.5;
 }
 
-.undo-button {
-    margin-right: 1rem;
-}
 
-.redo-button {
-    margin-right: 1rem;
-}
 
 .tag-card {
     background-color: $title-tag-card-background;
