@@ -8,7 +8,7 @@ const ImageService = {
     },
     mutations: {
         LOAD_IMAGE_INSTANCE: (state, data) => {
-            let current = _.findIndex(state.images, v => v.id === data.id);
+            let current = state.images.findIndex(v => v.id === data.id);
             if (current > -1) {
                 Vue.set(state.images, current, data);
                 return;
@@ -19,7 +19,7 @@ const ImageService = {
     actions: {
         LoadImages: (state, data) => {
             if (data.length) {
-                _.forEach(data, function (val) {
+                data.forEach( val => {
                     state.commit("LOAD_IMAGE_INSTANCE", val);
                 });
                 return;

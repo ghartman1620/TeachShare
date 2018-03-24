@@ -1,13 +1,19 @@
 import Vue from "vue";
 import api from "../api";
 import axios from "axios";
-import $log from "../log";
+
+// typescript 'require' workaround hack
+declare function require(name:string): any;
 
 // Load some necessary libraries
 var _ = require("lodash");
 const uuidv4 = require("uuid/v4");
 
 var API_KEY = "AIzaSyAOHmdMqDLrCvAxnbkdTabddnKRZkpqPJY";
+
+function isString(str: String | null): str is String {
+    return (<String>str) !== null;
+}
 
 // YouTubeService definition
 const YouTubeService = {
@@ -30,11 +36,11 @@ const YouTubeService = {
             var ApiURL = new URL(
                 `https://www.googleapis.com/youtube/v3/videos?id=${videoID}&key=${API_KEY}&part=${videoSection}`
             );
-            if (videoID.length > 10) {
+            if ( isString(videoID) && videoID.length > 10) {
                 axios
                     .get(ApiURL.toString())
                     .then(resp => state.commit("LOAD_YOUTUBE_VIDEO_DATA", resp.data))
-                    .catch(err => $log(err));
+                    .catch(err => console.error(err));
             }
         },
         clearYoutubeData: state => {

@@ -5,7 +5,9 @@ import map from "lodash/map";
 import forEach from "lodash/forEach";
 import every from "lodash/every";
 import reduce from "lodash/reduce";
-import $log from "../log";
+
+// typescript 'require' workaround hack
+declare function require(name:string);
 
 // Load some necessary libraries
 const uuidv4 = require("uuid/v4");
@@ -102,7 +104,7 @@ const FileService = {
                                 if (axios.isCancel(err)) {
                                     context.commit("REMOVE_FILE", file);
                                 } else {
-                                    $log(err, "danger", true);
+                                    console.error(err);
                                 }
                             });
                     }

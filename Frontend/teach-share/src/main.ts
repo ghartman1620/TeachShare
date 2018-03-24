@@ -9,10 +9,10 @@ import Logger from "./logger";
 // our stuff
 import App from "./App.vue";
 import router from "./router"; 
-// import store from "./store";
+import store from "./store";
 
 // typescript 'require' workaround hack
-declare function require(name:string);
+declare function require(name:string): any;
 
 import {
     Carousel,
@@ -37,7 +37,6 @@ import {
 } from "bootstrap-vue/es/components";
 
 // font-awesome icons
-import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import fontawesome from "@fortawesome/fontawesome";
 
 // import brands from "@fortawesome/fontawesome-free-brands";
@@ -113,7 +112,7 @@ Vue.use(VeeValidate);
 new Vue({
     el: "#app",
     router,
-    // store,
-    components: { },
+    store,
+    components: { App },
     template: "<App/>"
 });

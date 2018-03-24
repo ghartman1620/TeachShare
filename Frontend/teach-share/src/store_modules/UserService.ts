@@ -1,6 +1,9 @@
 import Vue from "vue";
 import api from "../api";
 
+// typescript 'require' workaround hack
+declare function require(name:string): any;
+
 var Cookie = require("tiny-cookie");
 const UserService = {
     state: {
@@ -14,12 +17,12 @@ const UserService = {
             state.token = response.data.body.access_token;
             console.log(response.data.body);
             var date = new Date();
-            console.log(this);
+            console.log();
             date.setTime(date.getTime() + (response.data.body.expires_in * 1000 - 120000));
-            Cookie.set("token", response.data.body.access_token, date.toGMTString());
-            Cookie.set("loggedIn", true, date.toGMTString());
-            Cookie.set("userId", response.data.userId, date.toGMTString());
-            Cookie.set("username", response.data.username, date.toGMTString());
+            Cookie.set("token", response.data.body.access_token, date.toISOString());
+            Cookie.set("loggedIn", true, date.toISOString());
+            Cookie.set("userId", response.data.userId, date.toISOString());
+            Cookie.set("username", response.data.username, date.toISOString());
 
             console.log(response.data.body.access_token);
 

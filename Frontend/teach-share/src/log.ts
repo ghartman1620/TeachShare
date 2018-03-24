@@ -4,6 +4,10 @@ var LevelEnum = Object.freeze({
     "success": {bg: "#03dd00", fg: "#000000"}
 });
 
+function isString(str: String | undefined): str is String {
+    return (<String>str) !== undefined;
+}
+
 function ln (depth) {
     var e = new Error();
     if (!e.stack) {
@@ -17,9 +21,11 @@ function ln (depth) {
             }
         }
     }
-    var stack = e.stack.toString().split(/\r\n|\n/);
+    var stack = isString(e.stack).toString().split(/\r\n|\n/);
     return stack[depth];
 }
+
+
 
 function logFull (level, depth, ...items) {
     for (let obj of items) {

@@ -34,6 +34,8 @@
         "vuex": "^3.0.1"
     },
     "devDependencies": {
+        "@types/es6-promise": "^3.3.0",
+        "@types/es6-shim": "^0.31.36",
         "@types/lodash": "^4.14.106",
         "autoprefixer": "^7.2.5",
         "babel-core": "^6.22.1",
@@ -97,9 +99,11 @@
         "sinon": "^4.0.0",
         "sinon-chai": "^2.8.0",
         "ts-loader": "^3.5.0",
+        "tslib": "^1.9.0",
         "typescript": "^2.7.2",
         "uglifyjs-webpack-plugin": "^1.1.1",
         "url-loader": "^0.5.8",
+        "vue-class-component": "^6.2.0",
         "vue-loader": "^13.3.0",
         "vue-property-decorator": "^6.0.0",
         "vue-style-loader": "^3.0.1",

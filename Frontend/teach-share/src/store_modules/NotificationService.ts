@@ -1,5 +1,3 @@
-import findIndex from "lodash/findIndex";
-import filter from "lodash/filter";
 import v4 from "uuid/v4";
 
 // NotificationService definition -- this is where you send and remove
@@ -12,7 +10,7 @@ const NotificationService = {
     },
     mutations: {
         SEND_NOTIFICATION: (state, notification) => {
-            let current = findIndex(state.pendingNotifications, (v) => v == notification);
+            let current = state.pendingNotifications.findIndex(v => v == notification);
             if (current === -1) {
                 notification.id = v4();
                 state.pendingNotifications.push(notification);
@@ -21,7 +19,7 @@ const NotificationService = {
             }
         },
         REMOVE_NOTIFICATION: (state, notificationID) => {
-            let current = findIndex(state.pendingNotifications, (n) => n.id === notificationID);
+            let current = state.pendingNotifications.findIndex(n => n.id === notificationID);
             if (current !== -1) {
                 state.pendingNotifications.splice(current, 1);
             }
@@ -37,7 +35,7 @@ const NotificationService = {
     },
     getters: {
         getAllNotifications: state => state.pendingNotifications,
-        getAllSuccess: state => filter(state.pendingNotifications, x => x.type === "SUCCESS")
+        getAllSuccess: state => state.pendingNotifications.filter(x => x.type === "SUCCESS")
     }
 };
 

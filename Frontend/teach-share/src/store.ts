@@ -9,7 +9,6 @@ import ImageService from "./store_modules/ImageService";
 import PostCreateService from "./store_modules/PostCreateService";
 import NotificationService from "./store_modules/NotificationService";
 import UserService from "./store_modules/UserService";
-import $log from "./log";
 
 Vue.use(Vuex);
 
@@ -73,7 +72,7 @@ export const mutations = {
     CREATE_UPDATE_COMMENT: (state, comment) => {
         let postindex = state.posts.findIndex(val => val.pk === comment.post);
         if (postindex === -1) {
-            $log("Couldn't find it!", "danger");
+            console.error("Couldn't find it!", "danger");
         } else {
             let post = state.posts[postindex];
             let comments = post.comments;
@@ -116,13 +115,13 @@ export const actions = {
         api
             .get("search/" + querystring)
             .then(response => state.commit("LOAD_ALL_POSTS", response.data))
-            .catch(err => $log(err));
+            .catch(err => console.error(err));
     },
     fetchAllPosts: state => {
         api
             .get(`search/`)
             .then(response => state.commit("LOAD_ALL_POSTS", response.data))
-            .catch(err => $log(err));
+            .catch(err => console.error(err));
     },
     fetchAllPostsRaw: state => {
         console.log("fetchAllPostsRaw");
@@ -132,7 +131,7 @@ export const actions = {
                 state.commit("LOAD_ALL_POSTS", response.data.results);
                 console.log(response);
             })
-            .catch(err => $log(err));
+            .catch(err => console.error(err));
     },
     fetchPost: (state, postID) => {
         return new Promise((resolve, reject) => {
@@ -142,14 +141,14 @@ export const actions = {
                     state.commit("LOAD_POST", response.data);
                     resolve(response.data);
                 })
-                .catch(err => $log(err));
+                .catch(err => console.error(err));
         });
     },
     fetchUser: (state, userID) => {
         api
             .get(`users/${userID}/`)
             .then(response => state.commit("ADD_USER", response.data))
-            .catch(err => $log(err));
+            .catch(err => console.error(err));
     },
     addUser: (state, user) => {
         state.commit("ADD_USER", user);
@@ -158,14 +157,13 @@ export const actions = {
         api
             .get(`comments/${commentID}/`)
             .then(response => state.commit("LOAD_COMMENT", response.data))
-            .catch(err => $log(err));
+            .catch(err => console.error(err));
     },
     fetchComments: (state, commentID) => {
-        $log("FETCH_COMMENTS");
         api
             .get(`comments/${commentID}/`)
             .then(response => state.commit("LOAD_COMMENTS", response.data))
-            .catch(err => $log(err));
+            .catch(err => console.error(err));
     },
     fetchCommentsForPost: (state, postID) => {
         return new Promise((resolve, reject) => {
@@ -187,7 +185,7 @@ export const actions = {
             .then(response =>
                 state.commit("LOAD_FILTERED_POSTS", response.data)
             )
-            .catch(err => $log(err));
+            .catch(err => console.error(err));
     },
     createPost: (state, postObj) => {
         return new Promise((resolve, reject) => {

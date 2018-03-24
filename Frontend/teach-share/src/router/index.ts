@@ -1,13 +1,16 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Base from "@/components/Base.vue";
+import Base from "@/components/Base.vue"; 
 
 import api from "../api";
-import store from "../store";
+import store from "../store"; 
+
+// typescript 'require' workaround hack
+declare function require(name:string): any;
 
 // route-splitting to minimize necessary download size and will download javascript as-needed.
-//
-const Home = () =>
+// @ts-ignore
+const Home = () => 
     import ( /* webpackChunkName: "home" */ "../components/HomePage.vue");
 const PostCreate = () =>
     import ( /* webpackChunkName: "post-create" */ "../components/PostCreate.vue");
@@ -133,14 +136,14 @@ function verifyAndRefreshLogin() {
     // consider using !== and finding the correct comparison, to avoid unknown behavior.
     if (token != undefined) {
         // verify token
-        Object.assign(api.defaults, {
+        (<any>Object).assign(api.defaults, {
             headers: { authorization: "Bearer " + token }
         });
 
-        return new Promise((resolve, reject) => {
+        return new Promise<any>((resolve, reject) => {
             api
                 .get("/verify_token")
-                .then(response => resolve(true))
+                .then(response => resolve(true)) 
                 .catch(err => resolve(false));
         });
     } else {
@@ -164,18 +167,18 @@ function verifyAndRefreshLogin() {
                         Cookie.set(
                             "token",
                             response.data.body.access_token,
-                            date.toGMTString()
+                            date.toISOString()
                         );
-                        Cookie.set("loggedIn", true, date.toGMTString());
+                        Cookie.set("loggedIn", true, date.toISOString());
                         Cookie.set(
                             "userId",
                             response.data.userId,
-                            date.toGMTString()
+                            date.toISOString()
                         );
                         Cookie.set(
                             "username",
                             response.data.username,
-                            date.toGMTString()
+                            date.toISOString()
                         );
                         window.localStorage.setItem(
                             "refresh_token",
@@ -200,7 +203,7 @@ var Cookie = require("tiny-cookie");
 const loginProtectedRoutes = ["create"];
 const loggedOutRoutes = ["login", "register"];
 router.beforeEach((to, from, next) => {
-    if (loggedOutRoutes.includes(to.name)) {
+    if (loggedOutRoutes.some(val => val === to.name)) {
         verifyAndRefreshLogin().then(function(loggedIn) {
             if (loggedIn) {
                 next({ name: "dashboard" });
@@ -211,7 +214,8 @@ router.beforeEach((to, from, next) => {
     }
 
     // Are we accessing a login-protected page? If no, we don't need to be logged in.
-    if (loginProtectedRoutes.includes(to.name)) {
+    // @TODO: make sure this works!!!
+    if (loginProtectedRoutes.some(val => val === to.name)) {
         verifyAndRefreshLogin().then(function(loggedIn) {
             if (loggedIn) {
                 next();
@@ -224,7 +228,9 @@ router.beforeEach((to, from, next) => {
             Cookie.get("token") == undefined &&
             window.localStorage.getItem("refresh_token") != undefined
         ) {
-            verifyAndRefreshLogin().then(next());
+            verifyAndRefreshLogin().then(function() {
+                next();
+            });
         } else {
             next();
         }
