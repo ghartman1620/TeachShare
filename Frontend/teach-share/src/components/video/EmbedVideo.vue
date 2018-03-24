@@ -1,29 +1,32 @@
 <template>
-    <div class="container row">
-    <div class="card" :style="{width: cardWidth + 'px', padding: '10px'}">
-        <div :class="aspectRatioClass">
-            <iframe
-                class="embed-responsive-item"
-                :id="id"
-                :width="width"
-                :height="height"
-                :src="actualSource">
-            </iframe>
-        </div>
-    <div class="card-body">
-        <h4 class="card-title">{{ title }}</h4>
-            <p :class="textClasses">
-                <slot>
-                    There was no content provided.
-                </slot>
-            </p>
-            <!-- <button type="button" @click.prevent="showOrHideAllText" class="btn btn-dark btn-block">
-                <span v-if="!textShown">read more...</span>
-                <span v-else>read less</span>
-            </button> -->
-        </div>
-    </div>
-    </div>
+    <b-container>
+        <b-row align-h="center">
+            <b-col cols="8">
+                <b-card :style="{width: cardWidth + 'px', padding: '10px'}">
+                    
+                        <div :class="aspectRatioClass">
+                            <iframe
+                                class="embed-responsive-item"
+                                :id="id"
+                                :width="width"
+                                :height="height"
+                                :src="actualSource">
+                            </iframe>
+                        </div>
+                    
+                <div>
+                    <h4>{{ title }}</h4>
+                    <p :class="textClasses">
+                        <slot>
+                            There was no content provided.
+                        </slot>
+                    </p>
+
+                </div>
+                </b-card>
+            </b-col>
+        </b-row>
+    </b-container>
 </template>
 
 <script>

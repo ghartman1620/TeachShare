@@ -2,19 +2,19 @@
 
 	<ul style="list-style-type: none;">
 		<li>
-			<div class="row">
-				<div v-for="file in element.content" class="col-xl-4 col-sm-6">
-					<div class="card">
-						<div class="card-body">
-							<div>
-								<h5 class="card-title text-center">
-									<a :href="'http://127.0.0.1:8000' + file.url" class="card-link">{{file.name}}</a>
-								</h5>
-							</div>
+			<b-container>
+				<b-row>
+				<b-col xl="4" sm="6" :key="file.name" v-for="file in element.content">
+					<b-card>
+						<div>
+							<h5>
+								<a :href="'http://127.0.0.1:8000' + file.url" class="card-link">{{file.name}}</a>
+							</h5>
 						</div>
-					</div>
-					</div>
-				</div>
+					</b-card>
+					</b-col>
+				</b-row>
+			</b-container>
 		</li>
 	</ul>
 </template>

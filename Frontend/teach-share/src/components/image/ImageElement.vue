@@ -1,21 +1,17 @@
 <template>
-    <div>
-        <div class="card-body" id="carousel-card">
-            <b-carousel controls id="carousel" class="container">
-                <div id="carousel-container" class="container " v-for="(i,index) in this.images" :key="i.id">
+    <b-card class="carousel-card">
+
+        <b-container>
+            <b-carousel controls id="carousel" >
+                <div id="carousel-container"v-for="(i,index) in this.images" :key="i.id">
                     <b-carousel-slide>
                         <img slot="img" class="d-block align-content-center slide" 
                         :src="URL(i.url)" :caption="(URL(i.url))" alt="image slot"/>
                     </b-carousel-slide> 
-
-                    
                 </div>
-            
             </b-carousel>
-        </div>
-
-
-    </div>
+        </b-container>
+    </b-card>
 </template>
 
 <script>

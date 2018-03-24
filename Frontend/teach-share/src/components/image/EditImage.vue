@@ -1,52 +1,45 @@
 <template>
 <div>
-    <div class="card">
+    <b-card>
         <form v-on:submit.prevent="submit">
             <!-- file upload -->
             <file-upload :fileLimit="20" title="Upload Image Files" fileAcceptType="IMG"></file-upload>
             <br><br>
 
             <!-- Title -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="basic-height">Title</span>
-                        </div>
-                        <input
+            <b-row>
+                <b-col>
+                    <b-input-group prepend="Title">
+                        <b-input
                             v-model="title"
                             type="text"
-                            class="form-control"
                             name="height"
-                            aria-describedby="basic-height">
-                    </div>
-                </div>
-                <div class="col-12">
+                            aria-describedby="basic-height"/>
+                    </b-input-group>
                     <br>
-                    <dimension-picker></dimension-picker>
-                </div>
-            </div>
+                </b-col>   
+            </b-row>
+            <b-row>
+                <b-col>
+                    <dimension-picker/>
+                </b-col>
+            </b-row>
             <br><br>
             <h4>Image Description(s) (optional):</h4>
 
             <!-- Description -->
             <textarea v-model="description" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
             <br>
-            <div class="row">
-                <div class="offset-3 col-6">
-                    <button @click.prevent="submit" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
-                        <span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
-                        <span v-else>Submit Image(s)</span>
-                    </button>
-                </div>
-                <div class="col-2">
-                    <button type="button" class="btn btn-danger btn-block" @click.prevent="cancelEdit">
-                    Cancel
-                    </button>
-                </div>
-            </div>
+            <submit-close-editor
+                @submit="submit"
+                @close="cancelEdit"
+                :disabled="!allFilesUploadComplete"
+                type="image"
+                disableMessage="Please Select Image(s) to upload"
+            />
+
         </form>
-    </div>
+    </b-card>
 
 
 </div>
@@ -58,11 +51,12 @@ import FileUpload from "../FileUpload";
 import { mapGetters } from "vuex";
 import ImageElement from "./ImageElement";
 import DimensionPicker from "../DimensionPicker";
+import SubmitCloseEditor from "../SubmitCloseEditor";
 
 var _ = require("lodash");
 
 export default Vue.component("edit-image", {
-    components: { FileUpload, ImageElement, DimensionPicker },
+    components: { FileUpload, ImageElement, DimensionPicker, SubmitCloseEditor },
     props: [],
     data() {
     return {

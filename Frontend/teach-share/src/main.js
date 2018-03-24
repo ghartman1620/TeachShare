@@ -20,6 +20,9 @@ import {
     Button,
     Layout,
     Image,
+    InputGroup,
+    Tabs,
+    Media,
 
     Form,
     FormGroup,
@@ -31,6 +34,8 @@ import {
 
     Badge,
     Jumbotron
+
+
 
 } from "bootstrap-vue/es/components";
 
@@ -72,6 +77,9 @@ Vue.use(Alert);
 Vue.use(Collapse);
 Vue.use(Card);
 Vue.use(Navbar);
+Vue.use(InputGroup);
+Vue.use(Tabs);
+Vue.use(Media);
 
 Vue.use(Button);
 Vue.use(Layout);

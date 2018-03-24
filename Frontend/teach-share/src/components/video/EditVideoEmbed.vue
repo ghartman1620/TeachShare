@@ -5,69 +5,59 @@
             Enter the embed url here
         </p>
         <form v-on:submit.prevent="submit">
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon3">Embed URL</span>
-                </div>
-                <input
+            <b-input-group prepend="Embed URL">
+                <b-input
                     v-on:input="DebounceSubmit"
                     v-validate="'required|url|YoutubeEmbedURL'"
                     :class="{'input': true, 'outline-danger': errors.has('embedurl') }"
                     v-model="EmbedURL"
                     type="text"
-                    class="form-control"
                     name="embedurl"
-                    aria-describedby="basic-addon3">
-            </div>
+                    aria-describedby="basic-addon3"/>
+            </b-input-group>
                 <span v-show="errors.has('embedurl')" class="help text-danger">{{ errors.first('embedurl') }}</span>
             <br>
             <transition name="fade">
-                <div v-if="ytVideoDescription || ytVideoThumbnail || ytVideoTitle" class="row">
+                <div v-if="ytVideoDescription || ytVideoThumbnail || ytVideoTitle">
                     <!-- <div class="col-1"></div> -->
-                    <div class="col">
-                        <div class="media">
-                            <img class="mr-3" :src="ytVideoThumbnail.url" alt="Generic placeholder image">
-                            <div class="media-body">
-                                <h5 class="mt-0">{{ ytVideoTitle }}</h5>
-                                    {{ytVideoDescriptionShort}}
-                            </div>
-                        </div>
-                    <div class="col-1"></div>
+                    <b-row>
+                        <b-col>
+                            <b-media>
+                                <b-img :src="ytVideoThumbnail.url" alt="Generic placeholder image"/>
+                                <div>
+                                    <h5>{{ ytVideoTitle }}</h5>
+                                        {{ytVideoDescriptionShort}}
+                                </div>
+                            </b-media>
+                        </b-col>
+                    </b-row>
                     <br>
-                    <div class="row">
+                    <b-row>
                         <!-- dimension picker -->
-                        <div class="col-8">
+                        <b-col cols="8">
                             <dimension-picker></dimension-picker>
-                        </div>
-                        <div class="col-4">
-                            <input v-model="includeYtData" class="form-check-input" type="checkbox" value="" id="ytcheck">
-                            <label class="form-check-label" for="ytcheck">
-                                <h5>Include YouTube Video Information</h5>
-                            </label>
-                        </div>
-                    </div>
-                    </div>
+                        </b-col>
+                        <b-col cols="4">
+                            <b-form-checkbox v-model="includeYtData" class="form-check-input" type="checkbox" value="" id="ytcheck">
+                                Include YouTube Video Information
+                            </b-form-checkbox>
+                        </b-col>
+                    </b-row>
                 </div>
             </transition>
             <br> 
             <h4>
                 Video Description (optional) :
             </h4>
-            <textarea v-model="EmbedDescription" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+            <b-form-textarea v-model="EmbedDescription" id="exampleFormControlTextarea1" rows="3"></b-form-textarea>
             <br>
-            <div class="row">
-                <div class="offset-3 col-6">
-                    <button type="submit" :disabled="errors.any() || EmbedURL == '' || dimensionErrors.any()" class="btn btn-primary btn-block">
-                        <span v-if="!errors.any() && title !== ''">Submit Video Link</span>
-                        <span v-else>Please enter a valid link</span>
-                    </button>
-                </div>
-                <div class="col-2">
-                        <button type="button" class="btn btn-danger btn-block" @click.prevent="cancelEdit">
-                                Cancel
-                        </button>
-                </div>
-            </div>
+            <submit-close-editor
+                @submit="submit"
+                @close="cancelEdit"
+                :disabled="errors.any() || EmbedURL == '' || dimensionErrors.any()"
+                type="video"
+                disableMessage="Please submit a valid YouTube link."
+            />
         </form>
     </div>
 </template>
@@ -78,11 +68,12 @@ import FileUpload from "../FileUpload";
 import EditVideoEmbed from "./EditVideoEmbed";
 import DimensionPicker from "../DimensionPicker";
 import { mapGetters } from "vuex";
+import SubmitCloseEditor from "../SubmitCloseEditor";
 
 var _ = require("lodash");
 
 export default Vue.component("edit-video-embed", {
-    components: { DimensionPicker },
+    components: { DimensionPicker, SubmitCloseEditor},
     props: [],
     data() {
         return {

@@ -1,29 +1,32 @@
 <template>
-<div>
-    <br>
-    <div class="card" :style="{width: cardWidth + 'px', padding: '10px'}">
-        <video
-            ref="videoTag"
-            class="align-items-center"
-            :id="id"
-            :src="url"
-            autostart="autoplay"
-            :width="width"
-            :height="height"
-            :controls="controls"
-        >
-        </video>
-        
-        <div class="card-body">
-            <h4 class="card-title">{{ title }}</h4>
-            <p :class="textClasses">
-                <slot>
-                    There was no content provided.
-                </slot>
-            </p>
-        </div>
-    </div>
-    </div>
+
+    <b-container>
+        <b-row align-h="center">
+            <b-col cols="8">
+                <b-card :title="title" :style="{width: cardWidth + 'px', padding: '10px'}">
+                    <video
+                        ref="videoTag"
+                        class="align-items-center"
+                        :id="id"
+                        :src="url"
+                        autostart="autoplay"
+                        :width="width"
+                        :height="height"
+                        :controls="controls"
+                    >
+                    </video>
+                    <!-- {{title}} -->
+
+                    <p :class="textClasses">
+                        <slot>
+                            There was no content provided.
+                        </slot>
+                    </p>
+
+                </b-card>
+            </b-col>
+        </b-row>
+    </b-container>
 </template>
 
 <script>

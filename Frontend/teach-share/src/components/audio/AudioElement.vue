@@ -1,20 +1,34 @@
 <template>
 <div>
     <div :style="{width: cardWidth + 'px', padding: '10px'}">
-        <div class="card-body">
-            <audio
-                class="col-12"
-                :id="id"
-                :src="url"
-                :type="filetype"
-                :controls="controls">
-            </audio>
-            <br><br>
-            <h4 class="card-title">{{ localTitle }}</h4>
-            <p class="card-text">
-                {{localBody}}
-            </p>
-        </div>
+        
+        <b-card>
+            <b-container>
+                <b-row>
+                    <!-- TODO: make this have 100% width -->
+                    <b-col> 
+                        <audio 
+                            :id="id"
+                            :src="url"
+                            :type="filetype"
+                            :controls="controls">
+                        </audio>
+                    </b-col>
+                   
+                </b-row>
+                <b-row>
+                    <b-col>
+                        <h4>
+                            {{ localTitle }}
+                        </h4>
+                        <p>
+                            {{localBody}}
+                        </p>
+                    </b-col>
+                </b-row>
+
+            </b-container>
+        </b-card>
     </div>
     </div>
 </template>

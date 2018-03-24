@@ -1,22 +1,16 @@
 <template>
 <body>
-	<div class="card">
+	<b-card>
 		<file-upload :fileLimit="20" title="Upload Files">
 		</file-upload>
-		<div class="row">
-			<div class="offset-3 col-6">
-				<button @click.prevent="submit" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
-					<span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
-					<span v-else>Submit File(s)</span>
-				</button>
-			</div>
-			<div class="col-2">
-				<button @click.prevent="cancel" type="button" class="btn btn-danger btn-block">
-						Cancel
-				</button>
-			</div>
-		</div>
-	</div>
+		<submit-close-editor
+			@submit="submit"
+			@close="cancel"
+			type="file"
+			:disabled="!allFilesUploadComplete"
+			disableMessage="Please Select File(s) to upload"
+		/>
+	</b-card>
 </body>
 </template>
 
@@ -24,8 +18,9 @@
 import Vue from "vue";
 import FileUpload from "../FileUpload";
 import { mapGetters } from "vuex";
+import SubmitCloseEditor from "../SubmitCloseEditor";
 export default Vue.component("edit-file", {
-	components: {FileUpload},
+	components: {FileUpload, SubmitCloseEditor},
 	computed: {
 		...mapGetters(["hasFiles", "allFilesUploadComplete"])
 	},

@@ -1,37 +1,39 @@
 <template>
     <div>
-        <div class="card">
-            <form v-on:submit.prevent="submitAudio">
-
+        <b-card>
+            <b-form v-on:submit.prevent="submitAudio">
                 <!-- file upload -->
                 <file-upload :fileLimit="1" title="Upload Audio Files" fileAcceptType="AUD"></file-upload>
                 <br><br>
-                
                 <!-- Title -->
-                <div class="row">
-                    <div class="col-12">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                        <span class="input-group-text" id="basic-height">Title</span>
-                        </div>
-                        <input
+                <b-row>
+                    <b-col>
+                    <b-input-group prepend="Title">
+
+                        <b-form-input
                         v-model="title"
                         type="text"
-                        class="form-control"
                         name="height"
-                        aria-describedby="basic-height">
-                    </div>
-                    </div>
+                        aria-describedby="basic-height"/>
+                    </b-input-group>
+                    </b-col>
                     <br><br><br>
-                </div>
+                </b-row>
                 <br>
                 <h4>Audio Description(s) (optional):</h4>
 
                 <!-- Description -->
-                <textarea v-model="description" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                <b-form-textarea v-model="description" id="exampleFormControlTextarea1" :rows="3"></b-form-textarea>
                 <br>
-            </form>
-        </div>
+                <submit-close-editor
+                    @submit="submit"
+                    @close="close"
+                    :disabled="!allFilesUploadComplete"
+                    disableMessage="Please upload an audio or wait for audio to finish uploading"
+                    type="audio"
+                />
+            </b-form>
+        </b-card>
     </div>                
 </template>
 
@@ -40,11 +42,12 @@ import Vue from "vue";
 import FileUpload from "../FileUpload";
 import { mapGetters } from "vuex";
 import AudioElement from "./AudioElement";
+import SubmitCloseEditor from "../SubmitCloseEditor";
 
 var _ = require("lodash");
 
 export default Vue.component("edit-audio", {
-    components: { FileUpload, AudioElement },
+    components: { FileUpload, AudioElement, SubmitCloseEditor },
     props: [],
     data() {
         return {
