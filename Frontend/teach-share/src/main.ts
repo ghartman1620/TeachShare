@@ -8,8 +8,11 @@ import Logger from "./logger";
 
 // our stuff
 import App from "./App.vue";
-import router from "./router";
-import store from "./store";
+import router from "./router"; 
+// import store from "./store";
+
+// typescript 'require' workaround hack
+declare function require(name:string);
 
 import {
     Carousel,
@@ -19,7 +22,6 @@ import {
     Navbar,
     Button,
     Layout,
-    Image,
 
     Form,
     FormGroup,
@@ -37,16 +39,17 @@ import {
 // font-awesome icons
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import fontawesome from "@fortawesome/fontawesome";
+
 // import brands from "@fortawesome/fontawesome-free-brands";
-import faPlus from "@fortawesome/fontawesome-free-solid/faPlus";
-import faUndo from "@fortawesome/fontawesome-free-solid/faUndo";
-import faRedo from "@fortawesome/fontawesome-free-solid/faRedo";
-import faCheck from "@fortawesome/fontawesome-free-solid/faCheck";
-import faTimes from "@fortawesome/fontawesome-free-solid/faTimes";
-import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
-import faUserCircle from "@fortawesome/fontawesome-free-solid/faUserCircle";
-import faArrowLeft from "@fortawesome/fontawesome-free-solid/faArrowLeft";
-import faArrowRight from "@fortawesome/fontawesome-free-solid/faArrowRight";
+import * as faPlus from "@fortawesome/fontawesome-free-solid/faPlus";
+import * as faUndo from "@fortawesome/fontawesome-free-solid/faUndo";
+import * as faRedo from "@fortawesome/fontawesome-free-solid/faRedo";
+import * as faCheck from "@fortawesome/fontawesome-free-solid/faCheck";
+import * as faTimes from "@fortawesome/fontawesome-free-solid/faTimes";
+import * as faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
+import * as faUserCircle from "@fortawesome/fontawesome-free-solid/faUserCircle";
+import * as faArrowLeft from "@fortawesome/fontawesome-free-solid/faArrowLeft";
+import * as faArrowRight from "@fortawesome/fontawesome-free-solid/faArrowRight";
 
 fontawesome.library.add(
     faPlus,
@@ -63,7 +66,7 @@ fontawesome.library.add(
 // moment.js for date formatting
 Vue.use(require("vue-moment"));
 
-// vue-cookie because js cookies are awful
+// // vue-cookie because js cookies are awful
 Vue.use(require("vue-cookie"));
 
 Vue.use(Carousel);
@@ -83,7 +86,6 @@ Vue.use(FormRadio);
 Vue.use(FormSelect);
 Vue.use(FormTextarea);
 Vue.use(FormCheckbox);
-Vue.use(Image);
 
 Vue.use(Badge);
 
@@ -91,8 +93,8 @@ Vue.use(Notifications);
 Vue.use(Logger, true);
 
 Validator.extend("YoutubeEmbedURL", {
-    getMessage: field => "The " + field + " value is not a valid YouTube link.",
-    validate: value => {
+    getMessage: (field: any) => "The " + field + " value is not a valid YouTube link.",
+    validate: (value: any) => {
         var videoURL = new URL(value);
         var videoID = videoURL.searchParams.get("v");
         if (videoID) {
@@ -111,7 +113,7 @@ Vue.use(VeeValidate);
 new Vue({
     el: "#app",
     router,
-    store,
-    components: { App },
+    // store,
+    components: { },
     template: "<App/>"
 });
