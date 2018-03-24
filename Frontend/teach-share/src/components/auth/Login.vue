@@ -51,8 +51,8 @@ export default {
     methods: {
         login: function(event) {
             var vm = this;
-            this.$login.withPassword(this.username, this.pw, this.persist)
-            .then(function(token) {
+            this.$login(this.username, this.pw, this.persist)
+            .then(function() {
                 vm.$router.push({name: "create"});
             })
             .catch(function(err){

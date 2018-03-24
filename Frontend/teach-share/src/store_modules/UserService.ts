@@ -117,13 +117,7 @@ const UserService = {
     },
     getters: {
         getToken: (state) => state.token,
-        getLoggedInUser: function(state): User | null{
-            if(state.user == null){
-                console.error("User is not logged in. Next time, check with this.$isLoggedIn() before accessing this.$user");
-                return null;
-            }
-            return state.user;
-        }
+        getLoggedInUser: (state) => state.user,
     }
 };
 export default UserService;

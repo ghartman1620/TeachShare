@@ -35,8 +35,14 @@ class User {
         this.token = token || Cookie.get("token");
         this.expires = expires || new Date(Cookie.get("expires"));
         this.saveDataInCookie();
+        console.log("in user ctor");
+        console.log(refreshToken);
+
         if(refreshToken){
-            window.localStorage.setItem("refresh_token", refreshToken);
+            console.log("setting localstorage");
+            window.localStorage.setItem("refreshToken", refreshToken);
+            window.localStorage.setItem("username", this.username);
+            
         }
         Object.assign(api.defaults, {headers: {authorization: "Bearer " + this.token}});
     }
@@ -68,6 +74,7 @@ class User {
 }
 
 
+
 //I'm moving these functions out of the store and into here
 //because I want to be able to pass more than one parameter to them
 //and not have to bundle them up as a dictionary to go to a vuex dispatch.
@@ -78,8 +85,6 @@ class User {
 //as necessary.
 const UserPlugin = {
     install: function (Vue: any, options: any) {
-        Vue.prototype.$user = store.getters.getLoggedInUser;
-
         Vue.prototype.$logout = function(): void {
             Cookie.remove("token");
             Cookie.remove("loggedIn");
@@ -87,47 +92,41 @@ const UserPlugin = {
             Cookie.remove("username");
             Object.assign(api.defaults, {headers: {}});
 
-            window.localStorage.removeItem("access_token");
-            window.localStorage.removeItem("refresh_token");
-            window.localStorage.removeItem("userId");
+            window.localStorage.removeItem("refreshToken");
             window.localStorage.removeItem("username");
             
         };
         Vue.prototype.$isLoggedIn = function(): boolean {
-            
+            console.log(store.getters.getLoggedInUser);
             return store.state.user.user !== null;
         };
-        Vue.prototype.$login = {
-            withPassword: function(username: string, password: string, persist: boolean): Promise<void>{
-                var body = {
-                    username: username,
-                    password: password,
-                    grant_type: "password"
-                };
-                console.log(body);
-                var head = { headers: { "content-type": "application/json" } };
-                return new Promise( (resolve, reject) => {
-                    api.post("get_token/", body, head).then(function(response: any){
-                        console.log(response);
-                        var user: User = new User(response.data.user.username, 
-                                response.data.user.pk, 
-                                response.data.user.email,
-                                response.data.user.first_name, 
-                                response.data.user.last_name, 
-                                response.data.body.access_token,
-                                new Date(Date.now() + response.data.body.expiresIn*1000),
-                                persist ? response.body.refreshToken : undefined);
-                        store.dispatch("setUser", user);
-                        resolve();
+        Vue.prototype.$login = function(username: string, password: string, persist: boolean): Promise<void>{
+            var body = {
+                username: username,
+                password: password,
+                grant_type: "password"
+            };
+            console.log(body);
+            var head = { headers: { "content-type": "application/json" } };
+            return new Promise( (resolve, reject) => {
+                api.post("get_token/", body, head).then(function(response: any){
+                    console.log(response);
+                    var user: User = new User(response.data.user.username, 
+                            response.data.user.pk, 
+                            response.data.user.email,
+                            response.data.user.first_name, 
+                            response.data.user.last_name, 
+                            response.data.body.access_token,
+                            new Date(Date.now() + response.data.body.expiresIn*1000),
+                            persist ? response.data.body.refresh_token : undefined);
+                    store.dispatch("setUser", user);
+                    resolve();
 
-                    }).catch(function(error){
-                        reject(error);
-                    })
-                });
-            },
-            withRefreshToken: function(refresh_token: string): void {
-                console.log(refresh_token);
-            }
+                }).catch(function(error){
+                    
+                    reject(error);
+                })
+            });
         }
     }
 }

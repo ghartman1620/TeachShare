@@ -204,25 +204,30 @@ const router = new Router({
 var Cookie = require("tiny-cookie");
 function verifyAndRefreshLogin(): Promise<any> {
     if(Vue.prototype.$isLoggedIn()){
-        console.log("returning true");
         return new Promise((resolve) => {resolve(true);});
     }
     else if(Cookie.get("token") != null){
-        console.log("get from cookie");
         var u: User = new User();
         store.dispatch("setUser", u);
         return new Promise((resolve) => {resolve(true);});
     }
-    else if(window.localStorage.getItem("refresh_token") !== null){
-        console.log("refresh token");
+    else if(window.localStorage.getItem("refreshToken") !== null){
+        console.log("logging back in...");
+        console.log(window.localStorage.getItem("refreshToken"));
+
+        console.log(window.localStorage.getItem("username"));
         return new Promise((resolve, reject) => {
             var body = {
                 grant_type: "refresh_token",
-                refresh_token: window.localStorage.getItem("refresh_token"),
+                refresh_token: window.localStorage.getItem("refreshToken"),
                 username: window.localStorage.getItem("username")
             };
+            console.log(body);
             var head = { headers: { "content-type": "application/json" } };
+            Object.assign(api.defaults, {});
             api.post("get_token/", body, head).then(function(response: any) {
+                console.log(response);
+                
                 var user: User = new User(response.user.username, 
                     response.user.pk, 
                     response.user.email,
@@ -235,13 +240,13 @@ function verifyAndRefreshLogin(): Promise<any> {
                 resolve(true);
 
             }).catch(function(error: any) {
-                Vue.prototype.$log(error);
+                console.log(error);
                 resolve(false);
             })
         });
     }   
     else{
-        console.log("returning false");
+        console.log("foobar");
         return new Promise((resolve) => {resolve(false);});
     }
 
@@ -251,7 +256,7 @@ function verifyAndRefreshLogin(): Promise<any> {
 const loginProtectedRoutes = ["create"];
 const loggedOutRoutes = ["login", "register"];
 router.beforeEach((to, from, next) => {
-    console.log(store.state.user.user);
+    console.log(window.localStorage.getItem("refreshToken"));
     if (loggedOutRoutes.some(val => val === to.name)) {
         verifyAndRefreshLogin().then(function(loggedIn) {
             if (loggedIn) {
@@ -264,10 +269,7 @@ router.beforeEach((to, from, next) => {
 
     // @TODO: make sure this works!!!
     if (loginProtectedRoutes.some(val => val === to.name)) {
-        console.log("in login protected route");
-        console.log(Vue.prototype.$user);
         verifyAndRefreshLogin().then(function(loggedIn) {
-            console.log(loggedIn);
             if (loggedIn) {
                 next();
             } else {
