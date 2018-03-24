@@ -25,7 +25,7 @@
                             <font-awesome-icon icon="user-circle" fixed-width></font-awesome-icon> Profile
                         </a>
                         <a v-else class="nav-link dropdown-toggle" href="#" id="Account Profile" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            <font-awesome-icon icon="user-circle" fixed-width></font-awesome-icon> <b-badge variant="primary">{{ user.profile.username }}</b-badge>
+                            <font-awesome-icon icon="user-circle" fixed-width></font-awesome-icon> <b-badge variant="primary">logged in </b-badge>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <router-link class="dropdown-item" :to="{name: 'dashboard'}">Your post feed</router-link>
@@ -60,15 +60,15 @@ export default Vue.component("nav-bar", {
     },
     computed: {
         isLoggedIn() {
-            return this.$store.getters.getUser !== undefined;
+            return this.$isLoggedIn();
         },
         user() {
-            return this.$store.getters.getCurrentUser;
+            return this.$user;
         }
     },
     methods: {
         logout() {
-            this.$store.dispatch("logout");
+            this.$logout();
             this.$router.push({name: "login"});
         }
     }

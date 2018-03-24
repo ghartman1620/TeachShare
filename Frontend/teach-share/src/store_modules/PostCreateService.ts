@@ -1,6 +1,5 @@
 import api from "../api";
 import Vue from "vue";
-import $log from "../log";
 
 const PostCreateService = {
     state: {
@@ -145,7 +144,7 @@ const PostCreateService = {
                 }
                 context.commit("UNDO");
                 context.commit(mut.mutation, mut.arg);
-                context.dispatch("saveDraft").then(res => $log(res));
+                context.dispatch("saveDraft").then(res => console.error(res));
             }
         },
         redo: context => {
@@ -155,25 +154,25 @@ const PostCreateService = {
                         context.state.unDoneMutations.length - 1
                     ];
                 if (mut.mutation === "ADD_ELEMENT") {
-                    $log(
+                    console.error(
                         "REDO ADD ELEMENT: ",
                         context.state.unDoneMutations,
                         mut
                     );
 
-                    $log("Add attachments", "success");
+                    console.error("Add attachments", "success");
                     context.dispatch("addAttachments", mut.arg.content);
                 }
                 context.commit("REDO");
                 context.commit(mut.mutation, mut.arg);
-                context.dispatch("saveDraft").then(res => $log(res));
+                context.dispatch("saveDraft").then(res => console.error(res));
             }
         },
         addElement: (state, element) => {
             // clear order of actions from ADD_ELEMENT --> CLEAR_REDO --> saveDraft.
             state.commit("ADD_ELEMENT", element);
             state.commit("CLEAR_REDO");
-            state.dispatch("saveDraft").then(res => $log(res));
+            state.dispatch("saveDraft").then(res => console.error(res));
         },
         // Actions are only allowed to have one argument so iAndJ is
         // a list with index 0 as the first index to be swapped
@@ -181,7 +180,7 @@ const PostCreateService = {
         swapElements: (state, iAndJ) => {
             state.commit("SWAP_ELEMENTS", iAndJ);
             state.commit("CLEAR_REDO");
-            state.dispatch("saveDraft").then(res => $log(res));
+            state.dispatch("saveDraft").then(res => console.error(res));
         },
         removeElement: (state, index) => {
             state.dispatch(
@@ -191,7 +190,7 @@ const PostCreateService = {
             state.commit("REMOVE_ELEMENT", index);
             state.commit("CLEAR_REDO");
 
-            state.dispatch("saveDraft").then(res => $log(res));
+            state.dispatch("saveDraft").then(res => console.error(res));
         },
         removeAttachments: (state, attachments) => {
             for (var i in attachments) {
@@ -201,7 +200,7 @@ const PostCreateService = {
         },
         addAttachments: (state, attachments) => {
             for (var i in attachments) {
-                $log(attachments[i]);
+                console.error(attachments[i]);
                 let attachment = attachments[i];
                 state.commit("ADD_ATTACHMENT", attachment);
             }
@@ -209,7 +208,7 @@ const PostCreateService = {
         editElement: (state, editedElement) => {
             state.commit("EDIT_ELEMENT", editedElement);
             state.commit("CLEAR_REDO");
-            state.dispatch("saveDraft").then(res => $log(res));
+            state.dispatch("saveDraft").then(res => console.error(res));
         },
         openEditor: (context) => {},
         closeEditor: (context) => {}

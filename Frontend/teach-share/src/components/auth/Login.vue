@@ -50,17 +50,21 @@ export default {
     },
     methods: {
         login: function(event) {
-            var obj =  { username: this.username, pw: this.pw, persist: this.persist};
             var vm = this;
-            this.$store.dispatch("login", obj)
+            this.$login.withPassword(this.username, this.pw, this.persist)
             .then(function(token) {
                 vm.$router.push({name: "create"});
             })
             .catch(function(err){
-                vm.$notifyDanger("You could not login!<br>" + err.response.data.error_description);
+                console.log(err);
+                vm.$notifyDanger("You could not login<br>" + err.response.data.error_description);
             }); 
         },
     },
+    mounted() {
+
+        
+    }
 }
 </script>
 

@@ -8,7 +8,7 @@ const VideoService = {
     },
     mutations: {
         LOAD_VIDEO_INSTANCE: (state, data) => {
-            let current = _.findIndex(state.videos, v => v.id === data.id);
+            let current = state.videos.findIndex(v => v.id === data.id);
             if (current > -1) {
                 Vue.set(state.videos, current, data);
                 return;
@@ -31,9 +31,7 @@ const VideoService = {
         },
         submitVideoFiles: (state, data) => {
             if (data.length) {
-                _.forEach(data, function (val) {
-                    state.commit("LOAD_VIDEO_INSTANCE", val);
-                });
+                data.forEach( val => state.commit("LOAD_VIDEO_INSTANCE", val));
                 return;
             }
             state.commit("LOAD_VIDEO_INSTANCE", data);

@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
-      "lib": ["dom", "es5", "es2015"],
+      "lib": ["dom", "es5", "es2015", "es2015.promise"],
       "target": "es5",
-      "strict": false,
+      "strict": true,
       "module": "esnext",
       "moduleResolution": "node",
       "emitDecoratorMetadata": true,
@@ -10,7 +10,8 @@
       "noImplicitReturns": false,
       "experimentalDecorators": true,
       "allowSyntheticDefaultImports": true,
-      "allowJs": true
+      "allowJs": true,
+      "importHelpers": true
     },
     "include": [
       "./src/**/*"

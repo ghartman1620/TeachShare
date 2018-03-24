@@ -1,12 +1,16 @@
 import Vue from "vue";
 import api from "../api";
+import { User } from "../user";
+
+// typescript 'require' workaround hack
+declare function require(name:string): any;
 
 var Cookie = require("tiny-cookie");
+
+
 const UserService = {
     state: {
-        token: "",
-        loggedIn: false,
-        profile: undefined
+        user: null,
     },
     mutations: {
         SET_TOKEN: (state, credentials) => {
@@ -14,12 +18,12 @@ const UserService = {
             state.token = response.data.body.access_token;
             console.log(response.data.body);
             var date = new Date();
-            console.log(this);
+            console.log();
             date.setTime(date.getTime() + (response.data.body.expires_in * 1000 - 120000));
-            Cookie.set("token", response.data.body.access_token, date.toGMTString());
-            Cookie.set("loggedIn", true, date.toGMTString());
-            Cookie.set("userId", response.data.userId, date.toGMTString());
-            Cookie.set("username", response.data.username, date.toGMTString());
+            Cookie.set("token", response.data.body.access_token, date.toISOString());
+            Cookie.set("loggedIn", true, date.toISOString());
+            Cookie.set("userId", response.data.userId, date.toISOString());
+            Cookie.set("username", response.data.username, date.toISOString());
 
             console.log(response.data.body.access_token);
 
@@ -42,7 +46,10 @@ const UserService = {
         LOGIN_USER: (state, user) => {
             state.profile = user;
             state.loggedIn = true;
-        }
+        },
+        SET_USER: (state, user: User): void => {
+            state.user = user;
+        },
     },
     actions: {
         fetchCurrentUser: (state, userID) => {
@@ -103,15 +110,19 @@ const UserService = {
                         reject(error);
                     });
             });
+        },
+        setUser: (context, user: User) => {
+            context.commit("SET_USER", user);
         }
     },
     getters: {
         getToken: (state) => state.token,
-        getUser: (state, getters) => {
-            if (state.loggedIn) {
-                return getters.getCurrentUser;
+        getLoggedInUser: function(state): User | null{
+            if(state.user == null){
+                console.error("User is not logged in. Next time, check with this.$isLoggedIn() before accessing this.$user");
+                return null;
             }
-            return undefined;
+            return state.user;
         }
     }
 };

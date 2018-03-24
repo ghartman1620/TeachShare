@@ -1,13 +1,18 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Base from "@/components/Base.vue";
+import Base from "@/components/Base.vue"; 
+
 
 import api from "../api";
-import store from "../store";
+import store from "../store"; 
+import { User } from "../user";
+
+// typescript 'require' workaround hack
+declare function require(name:string): any;
 
 // route-splitting to minimize necessary download size and will download javascript as-needed.
-//
-const Home = () =>
+// @ts-ignore
+const Home = () => 
     import ( /* webpackChunkName: "home" */ "../components/HomePage.vue");
 const PostCreate = () =>
     import ( /* webpackChunkName: "post-create" */ "../components/PostCreate.vue");
@@ -126,21 +131,21 @@ const router = new Router({
 
 // Returns true or false if user is logged in.
 // Refreshes token if necessary.
-function verifyAndRefreshLogin() {
+/**function verifyAndRefreshLogin() {
     var token = Cookie.get("token");
 
     // @TODO: using != causes a type cast before comparison, leading to inconsistent results
     // consider using !== and finding the correct comparison, to avoid unknown behavior.
     if (token != undefined) {
         // verify token
-        Object.assign(api.defaults, {
+        (<any>Object).assign(api.defaults, {
             headers: { authorization: "Bearer " + token }
         });
 
-        return new Promise((resolve, reject) => {
+        return new Promise<any>((resolve, reject) => {
             api
                 .get("/verify_token")
-                .then(response => resolve(true))
+                .then(response => resolve(true)) 
                 .catch(err => resolve(false));
         });
     } else {
@@ -164,18 +169,18 @@ function verifyAndRefreshLogin() {
                         Cookie.set(
                             "token",
                             response.data.body.access_token,
-                            date.toGMTString()
+                            date.toISOString()
                         );
-                        Cookie.set("loggedIn", true, date.toGMTString());
+                        Cookie.set("loggedIn", true, date.toISOString());
                         Cookie.set(
                             "userId",
                             response.data.userId,
-                            date.toGMTString()
+                            date.toISOString()
                         );
                         Cookie.set(
                             "username",
                             response.data.username,
-                            date.toGMTString()
+                            date.toISOString()
                         );
                         window.localStorage.setItem(
                             "refresh_token",
@@ -195,12 +200,59 @@ function verifyAndRefreshLogin() {
         });
     }
 }
-
+*/
 var Cookie = require("tiny-cookie");
+function verifyAndRefreshLogin(): Promise<any> {
+    if(Vue.prototype.$isLoggedIn()){
+        console.log("returning true");
+        return new Promise((resolve) => {resolve(true);});
+    }
+    else if(Cookie.get("token") != null){
+        console.log("get from cookie");
+        var u: User = new User();
+        store.dispatch("setUser", u);
+        return new Promise((resolve) => {resolve(true);});
+    }
+    else if(window.localStorage.getItem("refresh_token") !== null){
+        console.log("refresh token");
+        return new Promise((resolve, reject) => {
+            var body = {
+                grant_type: "refresh_token",
+                refresh_token: window.localStorage.getItem("refresh_token"),
+                username: window.localStorage.getItem("username")
+            };
+            var head = { headers: { "content-type": "application/json" } };
+            api.post("get_token/", body, head).then(function(response: any) {
+                var user: User = new User(response.user.username, 
+                    response.user.pk, 
+                    response.user.email,
+                    response.user.first_name, 
+                    response.user.last_name, 
+                    response.body.access_token,
+                    new Date(Date.now() + response.body.expiresIn*1000),
+                    response.body.refresh_token);
+                store.dispatch("setUser", user);
+                resolve(true);
+
+            }).catch(function(error: any) {
+                Vue.prototype.$log(error);
+                resolve(false);
+            })
+        });
+    }   
+    else{
+        console.log("returning false");
+        return new Promise((resolve) => {resolve(false);});
+    }
+
+}
+
+
 const loginProtectedRoutes = ["create"];
 const loggedOutRoutes = ["login", "register"];
 router.beforeEach((to, from, next) => {
-    if (loggedOutRoutes.includes(to.name)) {
+    console.log(store.state.user.user);
+    if (loggedOutRoutes.some(val => val === to.name)) {
         verifyAndRefreshLogin().then(function(loggedIn) {
             if (loggedIn) {
                 next({ name: "dashboard" });
@@ -210,25 +262,19 @@ router.beforeEach((to, from, next) => {
         });
     }
 
-    // Are we accessing a login-protected page? If no, we don't need to be logged in.
-    if (loginProtectedRoutes.includes(to.name)) {
+    // @TODO: make sure this works!!!
+    if (loginProtectedRoutes.some(val => val === to.name)) {
+        console.log("in login protected route");
+        console.log(Vue.prototype.$user);
         verifyAndRefreshLogin().then(function(loggedIn) {
+            console.log(loggedIn);
             if (loggedIn) {
                 next();
             } else {
                 next({ name: "login" });
             }
         });
-    } else {
-        if (
-            Cookie.get("token") == undefined &&
-            window.localStorage.getItem("refresh_token") != undefined
-        ) {
-            verifyAndRefreshLogin().then(next());
-        } else {
-            next();
-        }
-    }
+    } 
     next();
 });
 
