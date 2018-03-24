@@ -68,15 +68,15 @@
 
 
 <div :key="post.pk" v-for="(post, index) in posts">
-    <div class="card post-container-card card-shadow">
-        <div class="card-body">
+    <b-container>
+        <b-card>
             <post
                 :maxHeight="1000"
                 :post="post"
                 :index="index">
             </post>
-        </div>
-    </div>
+        </b-card>
+    </b-container>
     <br><br> 
 </div> 
 

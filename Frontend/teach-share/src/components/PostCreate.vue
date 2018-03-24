@@ -7,7 +7,6 @@
         <b-container>
 
             <b-col sm="12" offset-lg="2" lg="8">    
-            <!-- <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container"> -->
             <b-col cols="8">
             <b-row id="button-bar">
 
@@ -101,10 +100,11 @@
             </b-col>
         </b-row>
         <div :key="index" v-for="(element,index) in storeElements">
+            <!-- TODO: the post element background was some other color at some point and it got lost, need to put it back -->
             <div class="post-element-container">
-                <div class="post-element card">
+                <b-card class="post-element">
                     <post-element :element="element" :index="index"></post-element>
-                </div>
+                </b-card>
                 <div class="justify-content-start">
                     <div>
                         <b-button variant="dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></b-button>

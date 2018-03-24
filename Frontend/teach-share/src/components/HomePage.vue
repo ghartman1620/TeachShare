@@ -10,7 +10,8 @@
         <b-btn @click.prevent="seePosts" variant="primary">See posts</b-btn>
         <b-btn @click="createPost" variant="success">Create a post</b-btn>
     </b-jumbotron>
-    <!-- <raw-feed v-if="showPosts"></raw-feed> -->
+
+    <raw-feed v-if="showPosts"></raw-feed> 
     
 </div>
 </template>
@@ -24,7 +25,7 @@ export default Vue.component("base-page", {
     props: [],
     data() {
         return {
-            showPosts: false
+            showPosts: true
         };
     },
     methods: {

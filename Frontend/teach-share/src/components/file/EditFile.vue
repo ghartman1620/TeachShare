@@ -64,7 +64,5 @@ export default Vue.component("edit-file", {
 
 
 <style scoped>
-.card {
-	padding: 10px;
-}
+
 </style>

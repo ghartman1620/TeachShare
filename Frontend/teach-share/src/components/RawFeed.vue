@@ -2,15 +2,13 @@
 <div>
 <router-view/>
     <div :key="post.pk" v-for="(post, index) in posts">
-        <div class="card post-container-card card-shadow">
-            <div class="card-body">
-                <post
-                    :maxHeight="500"
-                    :post="post"
-                    :index="index">
-                </post>
-            </div>
-        </div>
+        <b-card >
+            <post
+                :maxHeight="500"
+                :post="post"
+                :index="index">
+            </post>
+        </b-card>
         <br><br> 
     </div> 
 </div>

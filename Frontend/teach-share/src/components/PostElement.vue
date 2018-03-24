@@ -5,11 +5,11 @@ Uses TextElement, VideoElement, etc.
 
 <template>
     <div>
-        <div class="post-element card" v-if="element.type === 'text'">
+        <b-card class="post-element" v-if="element.type === 'text'">
             <text-element :element="element"></text-element>
 
-        </div>
-        <div class="post-element card" v-else-if="element.type === 'image_file'">
+        </b-card>
+        <b-card class="post-element" v-else-if="element.type === 'image_file'">
             <image-element 
                 :title="element.title" 
                 :body="element.description" 
@@ -17,17 +17,17 @@ Uses TextElement, VideoElement, etc.
                 :width="element.width"
                 :height="element.height"
             />
-        </div>
-        <div class="post-element card" v-else-if="element.type === 'audio'">
+        </b-card>
+        <b-card class="post-element" v-else-if="element.type === 'audio'">
             <audio-element :id="element.content[0].id"
             :title="element.content[0].title"
             :body="element.content[0].description"
             :controls="true" :source="element.content[0].url"
             :filetype="element.content[0].filetype"
             autoplay="false"/>
-        </div>
+        </b-card>
 
-        <div class="post-element card" id="outer-video-container" v-else-if="element.type === 'video_link' || element.type === 'video_file'">
+        <b-card class="post-element" id="outer-video-container" v-else-if="element.type === 'video_link' || element.type === 'video_file'">
             <div class="post-element video-post" id="inner-video-container" v-if="element.type === 'video_link'">
                     <video-element
                         name="vid-comp1"
@@ -56,10 +56,10 @@ Uses TextElement, VideoElement, etc.
                     <div slot="description">{{element.content.description}}</div>
                     </video-element>
             </div>
-        </div>
-        <div class="post-element card" v-else-if="element.type === 'file'">
+        </b-card>
+        <b-card class="post-element" v-else-if="element.type === 'file'">
             <file-element :element="element"/>
-        </div>
+        </b-card>
     </div>
 </template>
 

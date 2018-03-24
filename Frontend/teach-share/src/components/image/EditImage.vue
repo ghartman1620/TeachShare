@@ -130,8 +130,6 @@ export default Vue.component("edit-image", {
 
 
 <style lang="scss" scoped>
-.card {
-    padding: 10px;
-}
+
 </style>
 

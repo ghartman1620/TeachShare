@@ -118,8 +118,6 @@ export default Vue.component("edit-audio", {
 
 
 <style lang="scss" scoped>
-.card {
-  padding: 10px;
-}
+
 </style>
 

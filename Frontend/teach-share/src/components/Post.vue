@@ -1,8 +1,10 @@
 <template>
     <see-more @expanded="getComments" :maxHeight="actualMaxHeight">
-        <div :id="index" class="container-fluid card">
-            <div class="row">
-                <div class="col-12">
+        <b-container fluid>
+            <b-card>
+
+            <b-row>
+                <b-col>
                     <br>
                     <h2 class="text-center"><strong>{{post.title}}</strong></h2>
                     <h5 class="text-center">posted: {{ post.updated | moment("from") }}</h5>
@@ -21,8 +23,8 @@
                             <post-element :element="element" :index="index"/>
                         </div>
                     </div>
-                </div> <!-- div class="col-12" -->
-            </div> <!-- div class="row" -->
+                </b-col> <!-- div class="col-12" -->
+            </b-row> <!-- div class="row" -->
             <hr>
             <h3>Comments: </h3>
             <br>
@@ -57,7 +59,8 @@
                     </b-container>
                 </b-col>
             </b-row>
-        </div> <!-- div :id="index"... -->
+        </b-card> <!-- div :id="index"... -->
+        </b-container>
     </see-more>
 </template>
 
