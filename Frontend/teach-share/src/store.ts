@@ -1,5 +1,5 @@
 import Vue from "vue";
-import Vuex from "vuex";
+import Vuex, { GetterTree } from "vuex";
 import api from "../src/api";
 import FileService from "./store_modules/FileService";
 import YouTubeService from "./store_modules/YouTubeService";

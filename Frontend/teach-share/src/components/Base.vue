@@ -9,70 +9,78 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
-import Navbar from "./Navbar";
-import Notify from "./Notify";
-import api from "../api";
-import router from "@/router";
-import store from "@/store";
-import Image from "./image/Image";
+import Navbar from "./Navbar.vue";
+import Notify from "./Notify.vue";
+// import Image from "./image/Image";
 
-export default Vue.component("base-page", {
-    components: { Notify, Navbar },
-    props: ["items"],
-    data() {
-        return {
-            queryParam: ""
-        };
+import Component from 'vue-class-component'
+
+
+@Component({
+    props: {
+        items: String
     },
-    methods: {
-        waitDelay(delayLength, vm) {
-            var that = this;
+    components: { Notify, Navbar}
+})
 
-            // is the value undefined/not provided? Just in case, not actually
-            // particularly possible considering it's the first of two
-            // required arguments
-            if (delayLength === undefined) {
-                delayLength = 0;
-            }
+export default class Base extends Vue {
 
-            // is it already mounted and ready?
-            if (vm._isMounted && vm.$el.children[0].height !== 0 && vm.$el.children[0].width !== 0) {
-                this.$log({height: vm.$el.children[0].height, width: vm.$el.children[0].width});
-            } else {
+    name: String = "base-page";
+    queryParam: String = "";
 
-                // wait 'delayLength' and then print or call recursively adding 10ms each time 
-                // until complete..
-                setTimeout(function() {
-                    if (vm._isMounted && vm.$el.children[0].height !== 0 && vm.$el.children[0].width !== 0) {
-                        that.$log({height: vm.$el.children[0].height, width: vm.$el.children[0].width});
-                    } else {
-                        that.waitDelay(delayLength+1, vm);
-                    }
-                }, delayLength);
-            }
-        }
-    },
+    get computedMsg() {
+        return `computed ${this.name}`;
+    }
+
+    // waitDelay(delayLength: Number|undefined, vm): void {
+    //     var that = this;
+
+    //     // is the value undefined/not provided? Just in case, not actually
+    //     // particularly possible considering it's the first of two
+    //     // required arguments
+    //     if (delayLength === undefined) {
+    //         delayLength = 0;
+    //     }
+
+    //     // is it already mounted and ready?
+    //     if (vm._isMounted && vm.$el.children[0].height !== 0 && vm.$el.children[0].width !== 0) {
+    //         console.error({height: vm.$el.children[0].height, width: vm.$el.children[0].width});
+    //     } else {
+
+    //         // wait 'delayLength' and then print or call recursively adding 10ms each time 
+    //         // until complete..
+    //         setTimeout(function() {
+    //             if (vm._isMounted && vm.$el.children[0].height !== 0 && vm.$el.children[0].width !== 0) {
+    //                 console.error({height: vm.$el.children[0].height, width: vm.$el.children[0].width});
+    //             } else {
+    //                 that.waitDelay(Number(delayLength)+1, vm);
+    //             }
+    //         }, delayLength);
+    //     }
+    // }
+
     mounted() {
-        let uid = this.$cookie.get("userId");
-        if (uid !== undefined && uid !== null) {
-            this.$store.dispatch("fetchCurrentUser", uid)
-                .then((resp) => {
-                    this.$logSuccess(resp);
-                    this.$store.dispatch("addUser", resp)
-                })
-        }
+        
+        // let uid = this.$cookie.get("userId");
+        // if (uid !== undefined && uid !== null) {
+        //     this.$store.dispatch("fetchCurrentUser", uid)
+        //         .then((resp) => {
+        //             this.$log(resp);
+        //             this.$store.dispatch("addUser", resp)
+        //         })
+        // }
 
         // this is an example of how to check an images height/width without actually mounting it on the page
-        const Constructor = Vue.extend(Image);
-        const vm = new Constructor( { propsData: 
-                {src: "http://localhost:8000/media/uploads/2018/03/15/2c3ef4c0-75e9-48ca-a00e-da83cb33de7b/wallhaven-616483.jpg"}
-            }).$mount()
-        console.log(vm);
+        // const Constructor = Vue.extend(Image);
+        // const vm = new Constructor( { propsData: 
+        //         {src: "http://localhost:8000/media/uploads/2018/03/15/2c3ef4c0-75e9-48ca-a00e-da83cb33de7b/wallhaven-616483.jpg"}
+        //     }).$mount()
+        // console.log(vm);
         // console.log("Height: ", vm.$el.children[0].height, "Width:", vm.$el.children[0].width);
         
-        this.waitDelay(0, vm);
+        // this.waitDelay(0, vm);
 
         // you can do this (has worked on my many tests) or a generic timeout just to ensure the data is propogated.
         // you can't attach the listener directly to the img tag because it's not actually in the dom.
@@ -84,7 +92,7 @@ export default Vue.component("base-page", {
         //     console.log("Height: ", vm.$el.children["0"].naturalHeight, "Width:", vm.$el.children["0"].naturalWidth);
         // });
     }
-});
+}
 </script>
  
 <style lang="scss">

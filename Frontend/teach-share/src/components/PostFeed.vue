@@ -87,138 +87,150 @@
 </div>
 </template>
 
-<script>
-import Vue from "vue";
-import Post from "./Post";
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+import { Watch, Prop } from 'vue-property-decorator'
+import Post from "./Post.vue";
 import SideBar from "./SideBar.vue";
 
+interface SearchQueryString {
+    term: string
+    exclude: string
+    sort: string
+    in: string
+    termtype: string
+    excludetype: string
+}
 
-export default {
-    name: "PostFeed",
+@Component({
+    name: "post-feed",
     components: { Post, SideBar },
-    data: function() {
-        return {
-            
-            keywords: "",
-            searchIn: ["title", "content", "tags"],
-            excluding: "",
-            sortBy: "date",
-            termtype: "or",
-            excludetype: "or",
-            grades: [],
-            gradeOptions: [
-                {text: "K", value: 0},
-                {text: "1", value: 1},
-                {text: "2", value: 2},
-                {text: "3", value: 3},
-                {text: "4", value: 4},
-                {text: "5", value: 5},
-                {text: "6", value: 6},
-                {text: "7", value: 7},
-                {text: "8", value: 8},
-                {text: "9", value: 9},
-                {text: "10", value: 10},
-                {text: "11", value: 11},
-                {text: "12", value: 12},
-                   
-            ],
-            termTypeOptions: [
-                {text: "Any terms", value: "or"},
-                {text: "All terms", value: "and"},
-            ],
-            
-            searchInOptions: [
-                {text: "Title", value: "title"},
-                {text: "Content", value: "content"},
-                {text: "File names", value: "filenames"},
-                {text: "Tags", value: "tags"}
-            ],
-            sortByOptions: [
-                {text: "Date", value: "date"},
-                {text: "Relevance", value: "score"},
-                //TODO
-                //{text: "Likes", value: "likes"},
-            ]
-        
-        }
-    },
-    computed: {
-        posts: function() {
-            return this.$store.getters.getPosts();
-        },
-        keywordRules() {
-            return this.excluding.length ? "" : "required";
-        },
-        excludingRules() {
-            return this.keywords.length ? "required" : ""
-        }
-        
-    },
-    methods: {
-        getPosts: function() {
-            this.$store.dispatch("fetchAllPosts");
-        },
-        scroll() {
-            var offset =
-                document.documentElement.scrollTop + window.innerHeight;
-            var height = document.documentElement.offsetHeight;
+})
 
-            if (offset >= height) {
-                //this.getPosts();
-            }        
-        },
-        reloadPosts(){
-            if(this.$route.query.term != undefined){
-                console.log("here");
-                this.$store.dispatch("postSearch", this.$route.query);
-            }
-            else{
-                this.$store.dispatch("fetchAllPosts");
-            }
-        },
-        advancedSearch() {
+export default class PostFeed extends Vue {
+
+    keywords: string = "";
+    searchIn: Array<string> = ["title", "content", "tags"];
+    excluding: string = "";
+    sortBy: string = "date";
+    termtype: string = "or";
+    excludetype: string = "or";
+    grades: string[] = [];
+    gradeOptions: object[] = [
+        {text: "K", value: 0},
+        {text: "1", value: 1},
+        {text: "2", value: 2},
+        {text: "3", value: 3},
+        {text: "4", value: 4},
+        {text: "5", value: 5},
+        {text: "6", value: 6},
+        {text: "7", value: 7},
+        {text: "8", value: 8},
+        {text: "9", value: 9},
+        {text: "10", value: 10},
+        {text: "11", value: 11},
+        {text: "12", value: 12}
             
-            var query = {};
-            if(this.keywords != ""){
-                query.term = this.keywords;
-            }
-            if(this.excluding != ""){
-                query.exclude = this.excluding;
-            }
-            query.sort = this.sortBy;
-            var searchParam = "";
-            this.searchIn.forEach(function(element){
-                searchParam += element + " ";
-            })
-            console.log(searchParam);
-            query.in = searchParam;
-            query.termtype = this.termtype;
-            query.excludetype = this.excludetype;
-            this.$router.push({name: "dashboard", query: query});
+    ];
+    termTypeOptions: object[] = [
+        {text: "Any terms", value: "or"},
+        {text: "All terms", value: "and"}
+    ];
+    
+    searchInOptions: object[] = [
+        {text: "Title", value: "title"},
+        {text: "Content", value: "content"},
+        {text: "File names", value: "filenames"},
+        {text: "Tags", value: "tags"}
+    ];
+    sortByOptions: object[] = [
+        {text: "Date", value: "date"},
+        {text: "Relevance", value: "score"}
+        //TODO
+        //{text: "Likes", value: "likes"},
+    ];
+
+    get posts() {
+        return this.$store.getters.getPosts();
+    }
+    get keywordRules() {
+        return this.excluding.length ? "" : "required";
+    }
+    get excludingRules() {
+        return this.keywords.length ? "required" : ""
+    }
+        
+    getPosts() {
+        this.$store.dispatch("fetchAllPosts");
+    }
+    scroll() {
+        var offset =
+            document.documentElement.scrollTop + window.innerHeight;
+        var height = document.documentElement.offsetHeight;
+
+        if (offset >= height) {
+            //this.getPosts();
+        }        
+    }
+    reloadPosts(){
+        if(this.$route.query.term != undefined){
+            console.log("here");
+            this.$store.dispatch("postSearch", this.$route.query);
         }
-    },
+        else{
+            this.$store.dispatch("fetchAllPosts");
+        }
+    }
+
+    advancedSearch() {    
+        var query = {
+            term: "",
+            exclude: "",
+            sort: "",
+            in: "",
+            termtype: "",
+            excludetype: ""
+        };
+
+        if(this.keywords != ""){
+            query.term = this.keywords;
+        }
+        if(this.excluding != ""){
+            query.exclude = this.excluding;
+        }
+        query.sort = this.sortBy;
+        var searchParam = "";
+        this.searchIn.forEach(function(element){
+            searchParam += element + " ";
+        })
+        console.log(searchParam);
+        query.in = searchParam;
+        query.termtype = this.termtype;
+        query.excludetype = this.excludetype;
+        this.$router.push({name: "dashboard", query: query});
+    }
+
     beforeMount(){
         this.reloadPosts();
         
-        var t = this;
-        window.addEventListener(
-            "scroll",
-            function() {
-                t.scroll();
-            },
-            false
-        );
-    },
-    mounted() {},
-    destroyed() {
-        window.removeEventListener("scroll", function() {t.scroll()}, false);
-    },
-    watch: {
-        $route (to, from){
-            this.reloadPosts();
-        }
+        // var t = this;
+        // window.addEventListener(
+        //     "scroll",
+        //     function() {
+        //         t.scroll();
+        //     },
+        //     false
+        // );
     }
-};
+    mounted() {}
+    destroyed() {
+        // window.removeEventListener("scroll", function() {t.scroll()}, false);
+    }
+    @Watch("$route")
+    onRouteChange(to: any, from: any) {
+        this.reloadPosts();
+    }
+}
 </script>
 
 <style lang="scss" scoped>

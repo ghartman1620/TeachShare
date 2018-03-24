@@ -13,6 +13,7 @@ class AudioEntry {
 // YouTubeService definition
 const AudioService = {
     state: {
+        test: String||null,
         audio: Array<AudioEntry>()
     },
     mutations: {
@@ -25,6 +26,7 @@ const AudioService = {
             state.audio.push(data);
         },
         REMOVE_AUDIO_INSTANCE: (state, data) => {
+            
             Vue.delete(state.audio, data);
         },
         CLEAR_AUDIO_INSTANCES: (state, data) => {

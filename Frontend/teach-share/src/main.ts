@@ -66,7 +66,8 @@ fontawesome.library.add(
 Vue.use(require("vue-moment"));
 
 // // vue-cookie because js cookies are awful
-Vue.use(require("vue-cookie"));
+var VueCookie = require("vue-cookie");
+Vue.use(VueCookie);
 
 Vue.use(Carousel);
 Vue.use(Jumbotron);
@@ -87,6 +88,27 @@ Vue.use(FormTextarea);
 Vue.use(FormCheckbox);
 
 Vue.use(Badge);
+
+
+
+import _Vue from "vue"; 
+
+declare module "vue/types/vue" {
+    export interface Vue {
+        $log(Vue: VueConstructor<_Vue>, options?: any): void;
+        $logSuccess(Vue: VueConstructor<_Vue>, options?: any): void;
+
+        $notify(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifySuccess(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifyDanger(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifyInfo(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifyWarning(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifyPrimary(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifySecondary(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifyDark(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifyLight(Vue: VueConstructor<_Vue>, options?: any): void;
+    }
+}
 
 Vue.use(Notifications);
 Vue.use(Logger, true);

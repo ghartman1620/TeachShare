@@ -47,32 +47,35 @@
     </nav>
 </template>
 
-<script>
-import Vue from "vue";
+<script lang="ts">
 import SearchBox from "./SearchBox.vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 
-export default Vue.component("nav-bar", {
-    components: { SearchBox, FontAwesomeIcon },
-    props: ["query"],
-    data() {
-        return {};
+import { Component, Vue } from "vue-property-decorator";
+
+@Component({
+    name:"nav-bar",
+    props: {
+        query: String
     },
-    computed: {
-        isLoggedIn() {
-            return this.$store.getters.getUser !== undefined;
-        },
-        user() {
-            return this.$store.getters.getCurrentUser;
-        }
-    },
-    methods: {
-        logout() {
-            this.$store.dispatch("logout");
-            this.$router.push({name: "login"});
-        }
+    components: { SearchBox, FontAwesomeIcon }
+})
+
+export default class NavBar extends Vue {
+
+    get isLoggedIn() {
+        return this.$store.getters.getUser !== undefined;
     }
-});
+    get user() {
+        return this.$store.getters.getCurrentUser;
+    }
+
+    logout() {
+        this.$store.dispatch("logout");
+        this.$router.push({name: "login"});
+    }
+    
+}
 </script>
 
 

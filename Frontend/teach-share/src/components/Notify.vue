@@ -17,25 +17,24 @@
       </div>
   </div>
 </template>
-<script>
-import { mapGetters } from "vuex";
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
 
-export default {
-    name: "notify",
-    props: [],
-    computed: {
-        ...mapGetters(["getAllNotifications"])
-    },
-    data: function() {
-        return {}
-    },
-    methods: {
-        close(note) {
-            this.$store.dispatch("removeNotification", note.id);
-        }
-        
+@Component({
+    props: {},
+})
+export default class Notify extends Vue {
+    name: string = "notify";
+
+    // mapGetters(["getAllNotifications"]);
+    get getAllNotifications() {
+        return this.$store.getters;
     }
-  
+
+    close(note: any) {
+        console.log("This gets called for some reason...?")
+        this.$store.dispatch("removeNotification", note.id)
+    }
 }
 </script>
 
