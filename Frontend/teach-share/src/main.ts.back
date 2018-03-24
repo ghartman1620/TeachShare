@@ -37,15 +37,15 @@ import {
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import fontawesome from "@fortawesome/fontawesome";
 // import brands from "@fortawesome/fontawesome-free-brands";
-import faPlus from "@fortawesome/fontawesome-free-solid/faPlus";
-import faUndo from "@fortawesome/fontawesome-free-solid/faUndo";
-import faRedo from "@fortawesome/fontawesome-free-solid/faRedo";
-import faCheck from "@fortawesome/fontawesome-free-solid/faCheck";
-import faTimes from "@fortawesome/fontawesome-free-solid/faTimes";
-import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
-import faUserCircle from "@fortawesome/fontawesome-free-solid/faUserCircle";
-import faArrowLeft from "@fortawesome/fontawesome-free-solid/faArrowLeft";
-import faArrowRight from "@fortawesome/fontawesome-free-solid/faArrowRight";
+import * as faPlus from "@fortawesome/fontawesome-free-solid/faPlus";
+import * as faUndo from "@fortawesome/fontawesome-free-solid/faUndo";
+import * as faRedo from "@fortawesome/fontawesome-free-solid/faRedo";
+import * as faCheck from "@fortawesome/fontawesome-free-solid/faCheck";
+import * as faTimes from "@fortawesome/fontawesome-free-solid/faTimes";
+import * as faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
+import * as faUserCircle from "@fortawesome/fontawesome-free-solid/faUserCircle";
+import * as faArrowLeft from "@fortawesome/fontawesome-free-solid/faArrowLeft";
+import * as faArrowRight from "@fortawesome/fontawesome-free-solid/faArrowRight";
 
 fontawesome.library.add(
     faPlus,
@@ -59,11 +59,15 @@ fontawesome.library.add(
     faArrowRight
 );
 
+import VueMoment from "vue-moment";
+
 // moment.js for date formatting
-Vue.use(require("vue-moment"));
+Vue.use(VueMoment);
+
+import VueCookie from "vue-cookie";
 
 // vue-cookie because js cookies are awful
-Vue.use(require("vue-cookie"));
+Vue.use(VueCookie);
 
 Vue.use(Carousel);
 Vue.use(Jumbotron);
@@ -100,7 +104,7 @@ Validator.extend("YoutubeEmbedURL", {
     }
 });
 
-require("bootstrap");
+import Bootstrap from "bootstrap";
 
 Vue.use(Vuex);
 Vue.use(VeeValidate);
