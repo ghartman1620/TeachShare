@@ -227,15 +227,16 @@ function verifyAndRefreshLogin(): Promise<any> {
             Object.assign(api.defaults, {});
             api.post("get_token/", body, head).then(function(response: any) {
                 console.log(response);
-                
-                var user: User = new User(response.user.username, 
-                    response.user.pk, 
-                    response.user.email,
-                    response.user.first_name, 
-                    response.user.last_name, 
-                    response.body.access_token,
-                    new Date(Date.now() + response.body.expiresIn*1000),
-                    response.body.refresh_token);
+                console.log(response.data.user);
+                console.log(response.data.user.username);
+                var user: User = new User(response.data.user.username, 
+                    response.data.user.pk, 
+                    response.data.user.email,
+                    response.data.user.first_name, 
+                    response.data.user.last_name, 
+                    response.data.body.access_token,
+                    new Date(Date.now() + response.data.body.expiresIn*1000),
+                    response.data.body.refresh_token);
                 store.dispatch("setUser", user);
                 resolve(true);
 
