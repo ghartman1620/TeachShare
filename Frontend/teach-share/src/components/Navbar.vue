@@ -1,6 +1,6 @@
 <template>
-    <nav class="navbar fixed-top navbar-inverse navbar-expand-lg navbar-dark dark-green">
-        <div class="container">
+    <b-navbar fixed="top" class="navbar-inverse navbar-expand-lg navbar-dark dark-green">
+        <b-container>
             <!-- brand section -->
             <router-link class="navbar-brand" to="/"><img class="img-responsive ts-logo" src="/static/ts-logo.png"></router-link>
 
@@ -43,8 +43,8 @@
                     <search-box></search-box>
                 </div>
             </div>
-        </div>
-    </nav>
+        </b-container>
+    </b-navbar>
 </template>
 
 <script>
