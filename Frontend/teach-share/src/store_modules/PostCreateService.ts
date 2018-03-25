@@ -1,5 +1,134 @@
 import api from "../api";
 import Vue from "vue";
+import {Post} from "../post";
+
+import { getStoreBuilder } from "vuex-typex"
+import Vuex, { Store, ActionContext } from "vuex"
+
+import { RootState } from "../models";
+
+// import { storeBuilder } from "../../store";
+
+interface PostState {
+    post: Post
+}
+
+type PostContext = ActionContext<PostState, RootState>;
+
+const state: PostState = {
+    post: new Post()
+}
+
+export const mutations = {
+    SET_TAGS: (state: PostState, tags: string[]) => {
+        state.post.setTags(tags);
+    },
+    SET_TITLE: (state: PostState, newTitle: string) => {
+        state.post.setTitle(newTitle);
+    },
+    SET_POST: (state, post) => {
+        state.currentPost = post;
+    },
+    REMOVE_ATTACHMENT: (state, attachment) => {
+        let ind = state.currentPost.attachments.findIndex(function (val) {
+            return val === attachment.id;
+        });
+        if (ind !== -1) {
+            state.currentPost.attachments.splice(ind, 1);
+        }
+    },
+    ADD_ATTACHMENT: (state, attachment) => {
+        state.currentPost.attachments.push(attachment.id);
+    },
+    UNDO: state => {
+        state.doneMutations.pop();
+    },
+    REDO: state => {
+        state.unDoneMutations.pop();
+    },
+    UNDO_ADD_ELEMENT: (state, index) => {
+        state.unDoneMutations.push({
+            mutation: "ADD_ELEMENT",
+            arg: state.postElements[index]
+        });
+        state.postElements.splice(index, 1);
+    },
+    UNDO_REMOVE_ELEMENT: (state, arg) => {
+        state.unDoneMutations.push({
+            mutation: "REMOVE_ELEMENT",
+            arg: arg.index
+        });
+        state.postElements.splice(arg.index, 0, arg.element);
+    },
+    UNDO_EDIT_ELEMENT: (state, arg) => {
+        state.unDoneMutations.push({
+            mutation: "EDIT_ELEMENT",
+            arg: {
+                index: arg.index,
+                element: state.postElements[arg.index]
+            }
+        });
+        state.postElements.splice(arg.index, 1, arg.element);
+    },
+    UNDO_SWAP_ELEMENTS: (state, iAndJ) => {
+        state.unDoneMutations.push({
+            mutation: "SWAP_ELEMENTS",
+            arg: iAndJ
+        });
+        var i = iAndJ[0];
+        var j = iAndJ[1];
+        var tmp = state.postElements[i];
+        Vue.set(state.postElements, i, state.postElements[j]);
+        Vue.set(state.postElements, j, tmp);
+    },
+    // Mutations for the currently edited post data:  and postElements
+    ADD_ELEMENT: (state, element) => {
+        state.doneMutations.push({
+            mutation: "UNDO_ADD_ELEMENT",
+            arg: state.postElements.length
+        });
+        state.postElements.push(element);
+    },
+    SWAP_ELEMENTS: (state, iAndJ) => {
+        // I wrote this code because i'm triggered by being limited
+        // to one function argument so I'm going to pretend I can pass two.
+        state.doneMutations.push({
+            mutation: "UNDO_SWAP_ELEMENTS",
+            arg: iAndJ
+        });
+        var i = iAndJ[0];
+        var j = iAndJ[1];
+        var tmp = state.postElements[i];
+        Vue.set(state.postElements, i, state.postElements[j]);
+        Vue.set(state.postElements, j, tmp);
+    },
+    REMOVE_ELEMENT: (state, index) => {
+        state.doneMutations.push({
+            mutation: "UNDO_REMOVE_ELEMENT",
+            arg: { element: state.postElements[index], index: index }
+        });
+        state.postElements.splice(index, 1);
+    },
+    EDIT_ELEMENT: (state, editedElement) => {
+        state.doneMutations.push({
+            mutation: "UNDO_EDIT_ELEMENT",
+            arg: {
+                element: state.postElements[editedElement.index],
+                index: editedElement.index
+            }
+        });
+        state.postElements.splice(
+            editedElement.index,
+            1,
+            editedElement.element
+        );
+    },
+    CLEAR_REDO: state => {
+        state.unDoneMutations = [];
+    },
+
+}
+
 
 const PostCreateService = {
     state: {
