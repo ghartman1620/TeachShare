@@ -15,24 +15,23 @@ import {
   Mutation,
   namespace
 } from "vuex-class";
-
-const ModuleGetter = namespace("audio", Getter)
+import { AudioElement } from "./models";
 
 @Component({
     props: {},
 })
 export default class App extends Vue {
-    @ModuleGetter("") imageModule
     @State("audio") stateAudio;
     @Action("audio/submitAudioFiles") submit;
     mounted() {
-        console.log(ModuleGetter);
-        console.log(this.submit());
-        this.submit().then((res)=> console.log(res));
+        let ae = new AudioElement({pk: 10, file: "file"});
+        console.log(this.submit(ae));
+        let ab = {...ae, pk: 3};
+        this.submit(ab).then((res)=> console.log(res));
         console.log(this.stateAudio);
     }
 
-};
+}
 </script>
 
 <style lang="scss">

@@ -1,6 +1,6 @@
 import { AudioElement } from "../../models";
 
 export interface AudioState {
-    audio?: AudioElement[];
+    audio?: { [id: number]: AudioElement };
     error: boolean;
 }

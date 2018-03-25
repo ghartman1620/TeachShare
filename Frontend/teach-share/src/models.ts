@@ -32,8 +32,16 @@ export class AudioElement extends Model {
     public title: string;
     public url: string;
 
-    constructor(pk: number, file: string, description: string,
-        filetype: string, name: string, title: string, type: FieldEnum, url: string) {
+    constructor({
+            pk = 0,
+            file = "",
+            description = "",
+            filetype = "",
+            name = "", 
+            title = "",
+            type=FieldEnum.audio_file,
+            url = ""}) {
+
         super(pk);
         this.file = file;
         this.description = description;
