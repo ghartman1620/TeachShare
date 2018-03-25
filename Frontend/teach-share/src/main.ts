@@ -4,15 +4,16 @@ import Vue from "vue";
 import Vuex from "vuex";
 import VeeValidate, { Validator } from "vee-validate";
 import Notifications from "./notifications";
-import Logger from "./logger";
+import Logger from "./logging/logger";
 
 // our stuff
 import App from "./App.vue";
-import router from "./router"; 
+import router from "./router";
+
 import store from "./store";
 
 // typescript 'require' workaround hack
-declare function require(name:string): any;
+declare function require(name: string): any;
 
 import {
     Carousel,
@@ -89,24 +90,22 @@ Vue.use(FormCheckbox);
 
 Vue.use(Badge);
 
-
-
-import _Vue from "vue"; 
-
+// This is frustrating. We are 'suppose' to be able to create *.d.ts files for types such as this
+// but it only seems to work when I put it here. This is mostly just for plugins I think, though.
+import _Vue from "vue";
 declare module "vue/types/vue" {
     export interface Vue {
-        $log(Vue: VueConstructor<_Vue>, options?: any): void;
-        $logSuccess(Vue: VueConstructor<_Vue>, options?: any): void;
-
-        $notify(Vue: VueConstructor<_Vue>, options?: any): void;
-        $notifySuccess(Vue: VueConstructor<_Vue>, options?: any): void;
-        $notifyDanger(Vue: VueConstructor<_Vue>, options?: any): void;
-        $notifyInfo(Vue: VueConstructor<_Vue>, options?: any): void;
-        $notifyWarning(Vue: VueConstructor<_Vue>, options?: any): void;
-        $notifyPrimary(Vue: VueConstructor<_Vue>, options?: any): void;
-        $notifySecondary(Vue: VueConstructor<_Vue>, options?: any): void;
-        $notifyDark(Vue: VueConstructor<_Vue>, options?: any): void;
-        $notifyLight(Vue: VueConstructor<_Vue>, options?: any): void;
+        $log(...args: any[]): void;
+        $logDanger(...args: any[]): void;
+        $notify(type: any, content: any): void;
+        $notifySuccess(content: string): void;
+        $notifyDanger(content: string): void;
+        $notifyInfo(content: string): void;
+        $notifyWarning(content: string): void;
+        $notifyPrimary(content: string): void;
+        $notifySecondary(content: string): void;
+        $notifyDark(content: string): void;
+        $notifyLight(content: string): void;
     }
 }
 

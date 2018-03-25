@@ -1,5 +1,16 @@
 import v4 from "uuid/v4";
 
+enum NotifyType {
+    "success",
+    "danger",
+    "info",
+    "warning",
+    "primary",
+    "secondary",
+    "dark",
+    "light"
+}
+
 // NotificationService definition -- this is where you send and remove
 // notifications from. Generally speaking, all you have to do is that.
 //

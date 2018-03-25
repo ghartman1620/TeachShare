@@ -5,21 +5,21 @@
     </form>
 </template>
 
-<script>
-import Vue from "vue";
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
 
-export default Vue.component("search-box", {
-    data() {
-        return {
-            query: "",
-        }
-    },
-    methods: {
-        search() {
-            this.$router.push({name: "dashboard", query: {term: this.query}});
-        },
+@Component({
+    name: "search-box"
+})
+export default class SearchBox extends Vue {
+    
+    query: string = "";
+
+    search() {
+        this.$router.push({name: "dashboard", query: {term: this.query}});
     }
-  })
+    
+}
 </script>
 
 <style>

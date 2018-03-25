@@ -62,7 +62,7 @@ export default Vue.component("register",{
             var b1 = this.pw1.localeCompare(this.pw2) == 0;
             var b2 = this.pw1.length >= 8;
             var b3 = this.pw2.length >= 8;
-            this.$log(b1 + b2 + b3 + (b1&&b2&&b1));   
+            console.log(b1 + b2 + b3 + (b1&&b2&&b1));   
             return this.pw1.localeCompare(this.pw2)==0 &&
                  this.pw1.length >= 8 && this.pw2.length >=8;
         },
@@ -78,8 +78,8 @@ export default Vue.component("register",{
             //TODO: do more meaningful email
             //check than something@something.something
             var regex = /\S+@\S+\.\S+/
-            this.$log(regex.test(this.email));
-            this.$log(this.regex);
+            console.log(regex.test(this.email));
+            console.log(this.regex);
             return regex.test(this.email);
         },
         emailFeedback() {
@@ -100,30 +100,30 @@ export default Vue.component("register",{
     methods: {
 
         register() {
-            this.$log("in register");
+            console.log("in register");
 
             if(this.emailValid && this.usernameValid && this.passwordValid){
                 var vm = this;
-                this.$log("creating user...");
+                console.log("creating user...");
                 this.$store.dispatch("createUser", {
                     username: this.username,
                     password: this.pw1,
                     email: this.email,
                     
                 }).then(function(ret) {
-                    this.$log("RETURNED: ", ret);
+                    console.log("RETURNED: ", ret);
                     
                     vm.$router.push({name: "login"});
                 })
                 .catch(function(err) {
-                    this.$log("caught error!");
+                    console.log("caught error!");
                     Object.keys(err).forEach(function(key){
-                        this.$log(key);
-                        this.$log(err[key]);
+                        console.log(key);
+                        console.log(err[key]);
                     })
-                    this.$log(err);
-                    this.$log(err.response.data);
-                    vm.$notifyDanger("There was a problem creating your account!<br>" + err.response.data.error.toString());
+                    console.log(err);
+                    console.log(err.response.data);
+                    vm.$notifyDanger("There was a problem creating your account!<br>" + err.response.data.error);
                 });
     
             }else{
@@ -132,7 +132,7 @@ export default Vue.component("register",{
                             (this.passwordValid ? "" : (this.passwordFeedback + "<br>")) + 
                             (this.usernameValid ? "" : (this.usernameFeedback + "<br>")) + 
                             "Please fix them and try again."
-                this.$log(str);
+                console.log(str);
 
                 this.$notifyDanger(str );
 

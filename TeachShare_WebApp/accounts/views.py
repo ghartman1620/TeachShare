@@ -102,7 +102,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     """
     API endpoint for UserProfile model
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
     filter_backends = (filters.DjangoFilterBackend,)
@@ -114,13 +114,14 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint for UserProfile model
     """
-    
+    permission_classes = (AllowAny,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('username', 'email')
     def create(self, request, format=None):
-
+        print(request._data['username'])
+        print(format)
         try:
             User.objects.create_user(username = request._data['username'],
                 email=request._data['email'],
@@ -135,7 +136,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = Group.objects.all()
     required_scopes = ['groups']
     serializer_class = GroupSerializer

@@ -20,7 +20,6 @@ import { Component, Vue } from "vue-property-decorator";
 import RawFeed from "./RawFeed.vue";
 
 @Component({
-    name: "base-page",
     props: [],
     components: { RawFeed }
 })

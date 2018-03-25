@@ -63,22 +63,22 @@ Uses TextElement, VideoElement, etc.
     </div>
 </template>
 
-<script>
-import Vue from "vue";
-import SeeMore from "./SeeMore"
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
 
-import TextElement from "./text/TextElement";
+import SeeMore from "./SeeMore.vue"
+import TextElement from "./text/TextElement.vue";
+import AudioElement from "./audio/AudioElement.vue";
+import VideoElement from "./video/VideoElement.vue";
+import FileElement from "./file/FileElement.vue";
+import ImageElement from "./image/ImageElement.vue";
 
-import AudioElement from "./audio/AudioElement";
-import VideoElement from "./video/VideoElement";
-import FileElement from "./file/FileElement";
-import ImageElement from "./image/ImageElement";
-
-
-export default Vue.component("post-element", {
+@Component({
+    name: "post-element",
     props: ["element", "index"],
-    components: {SeeMore, TextElement, VideoElement, FileElement, ImageElement},
-});
+    components: {SeeMore, TextElement, VideoElement, FileElement, ImageElement}
+})
+export default class PostElement extends Vue {}
 </script>
 
 <style lang="scss" scoped>

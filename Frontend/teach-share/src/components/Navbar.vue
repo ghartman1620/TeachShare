@@ -54,15 +54,13 @@ import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import { Component, Vue } from "vue-property-decorator";
 
 @Component({
-    name:"nav-bar",
+    name: "nav-bar",
     props: {
         query: String
     },
     components: { SearchBox, FontAwesomeIcon }
 })
-
 export default class NavBar extends Vue {
-
     get isLoggedIn() {
         return this.$store.getters.getUser !== undefined;
     }

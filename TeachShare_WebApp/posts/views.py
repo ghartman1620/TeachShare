@@ -200,7 +200,7 @@ class AttachmentViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Attachment model
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     parser_classes = (JSONParser, )
     queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer

@@ -9,8 +9,9 @@
       "noImplicitAny": false,
       "noImplicitReturns": false,
       "experimentalDecorators": true,
+      "sourceMap": true,
       "allowSyntheticDefaultImports": true,
-      "allowJs": true,
+      // "allowJs": true,
       "importHelpers": true
     },
     "include": [

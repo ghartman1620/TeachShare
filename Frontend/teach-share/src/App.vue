@@ -8,11 +8,29 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
+
+const ModuleGetter = namespace("audio", Getter)
 
 @Component({
     props: {},
 })
 export default class App extends Vue {
+    @ModuleGetter("") imageModule
+    @State("audio") stateAudio;
+    @Action("audio/submitAudioFiles") submit;
+    mounted() {
+        console.log(ModuleGetter);
+        console.log(this.submit());
+        this.submit().then((res)=> console.log(res));
+        console.log(this.stateAudio);
+    }
 
 };
 </script>

@@ -1,16 +1,15 @@
+import Base from "@/components/Base.vue";
 import Vue from "vue";
 import Router from "vue-router";
-import Base from "@/components/Base.vue"; 
 
 import api from "../api";
-import store from "../store"; 
 
 // typescript 'require' workaround hack
-declare function require(name:string): any;
+declare function require(name: string): any;
 
 // route-splitting to minimize necessary download size and will download javascript as-needed.
 // @ts-ignore
-const Home = () => 
+const Home = () =>
     import ( /* webpackChunkName: "home" */ "../components/HomePage.vue");
 const PostCreate = () =>
     import ( /* webpackChunkName: "post-create" */ "../components/PostCreate.vue");
@@ -130,7 +129,7 @@ const router = new Router({
 // Returns true or false if user is logged in.
 // Refreshes token if necessary.
 function verifyAndRefreshLogin() {
-    var token = Cookie.get("token");
+    const token = Cookie.get("token");
 
     // @TODO: using != causes a type cast before comparison, leading to inconsistent results
     // consider using !== and finding the correct comparison, to avoid unknown behavior.
@@ -143,23 +142,23 @@ function verifyAndRefreshLogin() {
         return new Promise<any>((resolve, reject) => {
             api
                 .get("/verify_token")
-                .then(response => resolve(true)) 
-                .catch(err => resolve(false));
+                .then((response) => resolve(true))
+                .catch((err) => resolve(false));
         });
     } else {
-        var refresh_token = window.localStorage.getItem("refresh_token");
+        const refresh_token: string | null = window.localStorage.getItem("refresh_token");
         if (refresh_token != undefined) {
-            var body = {
+            const body = {
                 grant_type: "refresh_token",
                 refresh_token: refresh_token,
                 username: window.localStorage.getItem("username")
             };
-            var head = { headers: { "content-type": "application/json" } };
+            const head = { headers: { "content-type": "application/json" } };
             return new Promise((resolve, reject) => {
                 api
                     .post("/get_token", body, head)
-                    .then(function(response) {
-                        var date = new Date();
+                    .then((response) => {
+                        const date = new Date();
                         date.setTime(
                             date.getTime() +
                             (response.data.body.expires_in * 1000 - 120000)
@@ -199,12 +198,12 @@ function verifyAndRefreshLogin() {
     }
 }
 
-var Cookie = require("tiny-cookie");
-const loginProtectedRoutes = ["create"];
+const Cookie = require("tiny-cookie");
+const loginProtectedRoutes = [];
 const loggedOutRoutes = ["login", "register"];
 router.beforeEach((to, from, next) => {
     if (loggedOutRoutes.some(val => val === to.name)) {
-        verifyAndRefreshLogin().then(function(loggedIn) {
+        verifyAndRefreshLogin().then((loggedIn) => {
             if (loggedIn) {
                 next({ name: "dashboard" });
             } else {
@@ -215,8 +214,8 @@ router.beforeEach((to, from, next) => {
 
     // Are we accessing a login-protected page? If no, we don't need to be logged in.
     // @TODO: make sure this works!!!
-    if (loginProtectedRoutes.some(val => val === to.name)) {
-        verifyAndRefreshLogin().then(function(loggedIn) {
+    if (loginProtectedRoutes.some((val) => val === to.name)) {
+        verifyAndRefreshLogin().then((loggedIn) => {
             if (loggedIn) {
                 next();
             } else {
@@ -228,7 +227,7 @@ router.beforeEach((to, from, next) => {
             Cookie.get("token") == undefined &&
             window.localStorage.getItem("refresh_token") != undefined
         ) {
-            verifyAndRefreshLogin().then(function() {
+            verifyAndRefreshLogin().then(() => {
                 next();
             });
         } else {
