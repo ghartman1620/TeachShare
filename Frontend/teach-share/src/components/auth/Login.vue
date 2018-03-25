@@ -31,7 +31,7 @@
 
 
 
-<script lang="ts">
+<script>
 import AuthPage from "./AuthPage";
 import UserMixin from "../../user";
 export default {
@@ -51,7 +51,7 @@ export default {
 
     },
     methods: {
-        loginSubmit: function(event) {
+        loginSubmit: function() {
             var vm = this;
             this.login(this.username, this.pw, this.persist)
             .then(function() {

@@ -203,7 +203,7 @@ const router = new Router({
 */
 var Cookie = require("tiny-cookie");
 function verifyAndRefreshLogin(): Promise<any> {
-    if(Vue.prototype.$isLoggedIn()){
+    if(store.getters.getLoggedInUser !== undefined){
         return new Promise((resolve) => {resolve(true);});
     }
     else if(Cookie.get("token") != null){

@@ -21,7 +21,7 @@
 
                     <!-- just an example dropdown -->
                     <li class="nav-item dropdown">
-                        <a v-if="!isLoggedIn" class="nav-link dropdown-toggle" href="#" id="Account Profile" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <a v-if="!isLoggedIn()" class="nav-link dropdown-toggle" href="#" id="Account Profile" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                             <font-awesome-icon icon="user-circle" fixed-width></font-awesome-icon> Profile
                         </a>
                         <a v-else class="nav-link dropdown-toggle" href="#" id="Account Profile" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -59,21 +59,18 @@ export default Vue.component("nav-bar", {
         return {};
     },
     computed: {
-        isLoggedIn() {
-            return this.$isLoggedIn();
-        },
         user() {
             return this.$store.getters.getLoggedInUser;
         }
     },
     methods: {
         logout() {
-            this.$logout();
+            this.logout();
             this.$router.push({name: "login"});
         }
     },
     mounted(){
-        console.log(this.$isLoggedIn());
+        console.log(this.isLoggedIn());
         console.log(this.$store.getters.getLoggedInUser);
     }
 });

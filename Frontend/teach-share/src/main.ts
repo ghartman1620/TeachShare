@@ -4,6 +4,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import VeeValidate, { Validator } from "vee-validate";
 import Notifications from "./notifications";
+import UserMixin from "./user";
 
 import Logger from "./logger";
 
@@ -88,7 +89,7 @@ Vue.use(FormTextarea);
 Vue.use(FormCheckbox);
 
 Vue.use(Badge);
-
+Vue.mixin(UserMixin);
 
 Vue.use(Notifications);
 Vue.use(Logger, true);
