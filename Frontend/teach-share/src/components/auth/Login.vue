@@ -1,9 +1,9 @@
 <template>
 <auth-page 
-    submitFunctionName="login"
+    submitFunctionName="loginSubmit"
     redirectText="Need an account? Register instead"
     redirectName="register"
-    @submitAuth="login"
+    @submitAuth="loginSubmit"
     >
     <!-- logo -->
     
@@ -31,10 +31,12 @@
 
 
 
-<script>
+<script lang="ts">
 import AuthPage from "./AuthPage";
+import UserMixin from "../../user";
 export default {
     name: "login",
+    mixins: [UserMixin],
     data: function(){
         return {
             username: "",
@@ -49,9 +51,9 @@ export default {
 
     },
     methods: {
-        login: function(event) {
+        loginSubmit: function(event) {
             var vm = this;
-            this.$login(this.username, this.pw, this.persist)
+            this.login(this.username, this.pw, this.persist)
             .then(function() {
                 vm.$router.push({name: "create"});
             })

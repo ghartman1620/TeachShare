@@ -267,7 +267,6 @@ router.beforeEach((to, from, next) => {
             }
         });
     }
-
     // @TODO: make sure this works!!!
     if (loginProtectedRoutes.some(val => val === to.name)) {
         verifyAndRefreshLogin().then(function(loggedIn) {

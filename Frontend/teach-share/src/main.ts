@@ -4,7 +4,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import VeeValidate, { Validator } from "vee-validate";
 import Notifications from "./notifications";
-import UserPlugin from "./user";
+
 import Logger from "./logger";
 
 // our stuff
@@ -89,7 +89,7 @@ Vue.use(FormCheckbox);
 
 Vue.use(Badge);
 
-Vue.use(UserPlugin);
+
 Vue.use(Notifications);
 Vue.use(Logger, true);
 

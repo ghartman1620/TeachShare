@@ -25,7 +25,7 @@
 
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import Notify from "../Notify";
 export default Vue.component('auth-page', {
@@ -38,7 +38,7 @@ export default Vue.component('auth-page', {
         }
     }
 });
-</script>
+</scrip>
 
 <style lang="scss" scoped>
 .auth-page {

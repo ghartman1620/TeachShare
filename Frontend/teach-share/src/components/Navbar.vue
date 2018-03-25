@@ -75,7 +75,6 @@ export default Vue.component("nav-bar", {
     mounted(){
         console.log(this.$isLoggedIn());
         console.log(this.$store.getters.getLoggedInUser);
-        console.log(this.$user);
     }
 });
 </script>

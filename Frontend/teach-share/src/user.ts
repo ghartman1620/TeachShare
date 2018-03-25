@@ -83,9 +83,9 @@ class User {
 //Does not persistently check for logged in user on access to routes that require it - that's
 //done in index.ts, which also happens to call these functions when a page is accessed
 //as necessary.
-const UserPlugin = {
-    install: function (Vue: any, options: any) {
-        Vue.prototype.$logout = function(): void {
+const UserMixin = {
+    methods: {
+        logout: function(): void {
             Cookie.remove("token");
             Cookie.remove("loggedIn");
             Cookie.remove("userId");
@@ -95,12 +95,12 @@ const UserPlugin = {
             window.localStorage.removeItem("refreshToken");
             window.localStorage.removeItem("username");
             
-        };
-        Vue.prototype.$isLoggedIn = function(): boolean {
+        },
+        isLoggedIn: function(): boolean {
             console.log(store.getters.getLoggedInUser);
             return store.state.user.user !== null;
-        };
-        Vue.prototype.$login = function(username: string, password: string, persist: boolean): Promise<void>{
+        },
+        login: function(username: string, password: string, persist: boolean): Promise<void>{
             var body = {
                 username: username,
                 password: password,
@@ -131,5 +131,5 @@ const UserPlugin = {
     }
 }
 
-export default UserPlugin;
+export default UserMixin;
 export {User};
