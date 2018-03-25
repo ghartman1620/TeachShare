@@ -106,7 +106,6 @@ interface SearchQueryString {
     name: "post-feed",
     components: { Post, SideBar },
 })
-
 export default class PostFeed extends Vue {
 
     keywords: string = "";
@@ -130,13 +129,11 @@ export default class PostFeed extends Vue {
         {text: "10", value: 10},
         {text: "11", value: 11},
         {text: "12", value: 12}
-            
     ];
     termTypeOptions: object[] = [
         {text: "Any terms", value: "or"},
         {text: "All terms", value: "and"}
     ];
-    
     searchInOptions: object[] = [
         {text: "Title", value: "title"},
         {text: "Content", value: "content"},
@@ -146,8 +143,7 @@ export default class PostFeed extends Vue {
     sortByOptions: object[] = [
         {text: "Date", value: "date"},
         {text: "Relevance", value: "score"}
-        //TODO
-        //{text: "Likes", value: "likes"},
+        // {text: "Likes", value: "likes"},
     ];
 
     get posts() {
@@ -159,7 +155,6 @@ export default class PostFeed extends Vue {
     get excludingRules() {
         return this.keywords.length ? "required" : ""
     }
-        
     getPosts() {
         this.$store.dispatch("fetchAllPosts");
     }
@@ -169,8 +164,8 @@ export default class PostFeed extends Vue {
         var height = document.documentElement.offsetHeight;
 
         if (offset >= height) {
-            //this.getPosts();
-        }        
+            // this.getPosts();
+        }
     }
     reloadPosts(){
         if(this.$route.query.term != undefined){
@@ -182,7 +177,7 @@ export default class PostFeed extends Vue {
         }
     }
 
-    advancedSearch() {    
+    advancedSearch() {
         var query = {
             term: "",
             exclude: "",
@@ -192,10 +187,10 @@ export default class PostFeed extends Vue {
             excludetype: ""
         };
 
-        if(this.keywords != ""){
+        if (this.keywords != ""){
             query.term = this.keywords;
         }
-        if(this.excluding != ""){
+        if (this.excluding != ""){
             query.exclude = this.excluding;
         }
         query.sort = this.sortBy;
@@ -212,18 +207,19 @@ export default class PostFeed extends Vue {
 
     beforeMount(){
         this.reloadPosts();
-        
-        // var t = this;
-        // window.addEventListener(
-        //     "scroll",
-        //     function() {
-        //         t.scroll();
-        //     },
-        //     false
-        // );
+
+        var t = this;
+        window.addEventListener(
+            "scroll",
+            function() {
+                t.scroll();
+            },
+            false
+        );
     }
     mounted() {}
     destroyed() {
+        // this doesn't work: because t is not defined.
         // window.removeEventListener("scroll", function() {t.scroll()}, false);
     }
     @Watch("$route")

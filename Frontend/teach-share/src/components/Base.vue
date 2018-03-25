@@ -11,29 +11,25 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Navbar from "./Navbar.vue";
+import NavBar from "./Navbar.vue";
 import Notify from "./Notify.vue";
 // import Image from "./image/Image";
 
 import Component from 'vue-class-component'
 
-
 @Component({
-    props: {
-        items: String
-    },
-    components: { Notify, Navbar}
+    components: { Notify, NavBar}
 })
-
 export default class Base extends Vue {
-
-    name: String = "base-page";
-    queryParam: String = "";
+    queryParam: string = "";
 
     get computedMsg() {
-        return `computed ${this.name}`;
+        return `computed ${this.queryParam}`;
     }
 
+    test() {
+        this.$notify("info", "value");
+    }
     // waitDelay(delayLength: Number|undefined, vm): void {
     //     var that = this;
 
@@ -62,16 +58,18 @@ export default class Base extends Vue {
     // }
 
     mounted() {
-        
-        // let uid = this.$cookie.get("userId");
-        // if (uid !== undefined && uid !== null) {
-        //     this.$store.dispatch("fetchCurrentUser", uid)
-        //         .then((resp) => {
-        //             this.$log(resp);
-        //             this.$store.dispatch("addUser", resp)
-        //         })
-        // }
-
+        let uid = document.cookie.match(new RegExp("(?:userId=(?<userid>[^;]+))"));
+        if (typeof uid !== "undefined") {
+            let id = uid as RegExpMatchArray;
+            let actualid = id["groups"]["userid"];
+            console.log("Groups: ", id["groups"]);
+            console.log("COOKIE: ", actualid, id, uid);
+            this.$store.dispatch("fetchCurrentUser", actualid)
+                    .then((resp) => {
+                        this.$log(resp);
+                        this.$store.dispatch("addUser", resp)
+            });
+        }
         // this is an example of how to check an images height/width without actually mounting it on the page
         // const Constructor = Vue.extend(Image);
         // const vm = new Constructor( { propsData: 
@@ -79,7 +77,6 @@ export default class Base extends Vue {
         //     }).$mount()
         // console.log(vm);
         // console.log("Height: ", vm.$el.children[0].height, "Width:", vm.$el.children[0].width);
-        
         // this.waitDelay(0, vm);
 
         // you can do this (has worked on my many tests) or a generic timeout just to ensure the data is propogated.

@@ -25,8 +25,6 @@ function ln (depth) {
     return stack[depth];
 }
 
-
-
 function logFull (level, depth, ...items) {
     for (let obj of items) {
         var formatting = LevelEnum[level];
@@ -60,6 +58,6 @@ function logFull (level, depth, ...items) {
             console.log(`Object: ${str}`);
         }
     }
-};
+}
 
 export default logFull;

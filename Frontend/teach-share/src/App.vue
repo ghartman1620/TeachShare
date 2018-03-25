@@ -8,13 +8,30 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
+import { AudioElement } from "./models";
 
 @Component({
     props: {},
 })
 export default class App extends Vue {
+    @State("audio") stateAudio;
+    @Action("audio/submitAudioFiles") submit;
+    mounted() {
+        let ae = new AudioElement({pk: 10, file: "file"});
+        console.log(this.submit(ae));
+        let ab = {...ae, pk: 3};
+        this.submit(ab).then((res)=> console.log(res));
+        console.log(this.stateAudio);
+    }
 
-};
+}
 </script>
 
 <style lang="scss">

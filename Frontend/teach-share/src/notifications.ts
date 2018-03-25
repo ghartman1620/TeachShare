@@ -2,8 +2,19 @@ import _Vue from "vue";
 import store from "./store";
 import Notify from "./components/Notify.vue";
 
+enum NotifyType {
+    "success",
+    "danger",
+    "info",
+    "warning",
+    "primary",
+    "secondary",
+    "dark",
+    "light"
+}
+
 export default function Notifications(Vue: typeof _Vue, options?: any): void {
-    Vue.prototype.$notify = function (type: any, content: any) {
+    Vue.prototype.$notify = function (type: NotifyType, content: any) {
         store.dispatch("sendNotification", {"type": type, "content": content});
     };
     Vue.prototype.$notifySuccess = function (content: any) {
@@ -30,7 +41,4 @@ export default function Notifications(Vue: typeof _Vue, options?: any): void {
     Vue.prototype.$notifyLight = function (content: any) {
         store.dispatch("sendNotification", {"type": "light", "content": content});
     };
-    Vue.mixin({
-
-    });
 }

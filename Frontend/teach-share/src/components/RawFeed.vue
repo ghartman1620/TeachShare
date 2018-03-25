@@ -24,7 +24,6 @@ import { Component, Vue } from "vue-property-decorator";
     name: "raw-feed",
     components: { Post }
 })
-
 export default class RawFeed extends Vue {
     get posts() {
         return this.$store.getters.getPosts();

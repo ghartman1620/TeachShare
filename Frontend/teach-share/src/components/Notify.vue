@@ -22,17 +22,17 @@ import { Component, Vue } from "vue-property-decorator";
 
 @Component({
     props: {},
+    name: "notify"
 })
 export default class Notify extends Vue {
-    name: string = "notify";
 
-    // mapGetters(["getAllNotifications"]);
+    // computed
     get getAllNotifications() {
-        return this.$store.getters;
+        return this.$store.getters.getAllNotifications;
     }
 
     close(note: any) {
-        console.log("This gets called for some reason...?")
+        console.log(note);
         this.$store.dispatch("removeNotification", note.id)
     }
 }

@@ -1,30 +1,25 @@
 import Vue from "vue";
-import Vuex, { GetterTree } from "vuex";
+// import Vuex, { GetterTree } from "vuex";
+import Vuex, { StoreOptions } from 'vuex';
+
 import api from "../src/api";
-import FileService from "./store_modules/FileService";
+import FileService from "./store_modules/file/FileService";
 import YouTubeService from "./store_modules/YouTubeService";
 import VideoService from "./store_modules/VideoService";
-import AudioService from "./store_modules/AudioService";
+import AudioService from "./store_modules/audio/AudioService";
 import ImageService from "./store_modules/ImageService";
 import PostCreateService from "./store_modules/PostCreateService";
 import NotificationService from "./store_modules/NotificationService";
 import UserService from "./store_modules/UserService";
 
+import { RootState } from "./models";
+import { Post, Comment, User } from "./models";
+
+import { getStoreBuilder } from "vuex-typex"
+
 Vue.use(Vuex);
 
-const state = {
-    user: null,
-    comment: null,
-    comments: [],
-    users: [],
-
-    // file upload
-    files: [],
-    filesPercents: [],
-
-    // Post feed
-    posts: []
-};
+export const storeBuilder = getStoreBuilder<RootState>();
 
 export const mutations = {
     LOAD_ALL_POSTS: (state, data) => {
@@ -150,15 +145,27 @@ export const actions = {
             .then(response => state.commit("ADD_USER", response.data))
             .catch(err => console.error(err));
     },
+
+    /**
+     * This is some text to test something. Below should have one type for user.
+     */
     addUser: (state, user) => {
         state.commit("ADD_USER", user);
     },
-    fetchComment: (state, commentID) => {
+
+    /**
+     * Fetch a comment with it's pk.
+     */
+    fetchComment: (state, commentID: number) => {
         api
             .get(`comments/${commentID}/`)
             .then(response => state.commit("LOAD_COMMENT", response.data))
             .catch(err => console.error(err));
     },
+
+    /**
+     * FetchComments will fetch comments.
+     */
     fetchComments: (state, commentID) => {
         api
             .get(`comments/${commentID}/`)
@@ -292,7 +299,20 @@ export const getters = {
     }
 };
 
-export default new Vuex.Store({
+const store: StoreOptions<RootState> = {
+    state: {
+        user: new User(),
+        comment: new Comment(),
+        comments: new Array<Comment>(),
+        users: new Array<User>(),
+
+        // file upload
+        files: new Array<any>(),
+        filesPercents: new Array<any>(),
+
+        // Post feed
+        posts: new Array<Post>()
+    },
     modules: {
         fs: FileService,
         yts: YouTubeService,
@@ -303,8 +323,8 @@ export default new Vuex.Store({
         notifications: NotificationService,
         user: UserService
     },
-    state,
     mutations,
     actions,
     getters
-});
+}
+export default new Vuex.Store<RootState>(store);

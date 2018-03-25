@@ -26,12 +26,13 @@
         "sass-loader": "^6.0.6",
         "uuid": "^3.2.1",
         "vee-validate": "^2.0.3",
-        "vue": "^2.5.2",
+        "vue": "^2.5.16",
         "vue-cookie": "^1.1.4",
         "vue-moment": "^3.2.0",
         "vue-quill-editor": "^3.0.5",
         "vue-router": "^3.0.1",
-        "vuex": "^3.0.1"
+        "vuex": "^3.0.1",
+        "vuex-class": "^0.3.0"
     },
     "devDependencies": {
         "@types/es6-promise": "^3.3.0",
@@ -100,6 +101,7 @@
         "sinon-chai": "^2.8.0",
         "ts-loader": "^3.5.0",
         "tslib": "^1.9.0",
+        "typedoc": "^0.11.1",
         "typescript": "^2.7.2",
         "uglifyjs-webpack-plugin": "^1.1.1",
         "url-loader": "^0.5.8",
@@ -107,7 +109,8 @@
         "vue-loader": "^13.3.0",
         "vue-property-decorator": "^6.0.0",
         "vue-style-loader": "^3.0.1",
-        "vue-template-compiler": "^2.5.2",
+        "vue-template-compiler": "^2.5.16",
+        "vuex-typex": "^3.0.1",
         "webpack": "^3.6.0",
         "webpack-bundle-analyzer": "^2.9.0",
         "webpack-dev-server": "^2.9.1",

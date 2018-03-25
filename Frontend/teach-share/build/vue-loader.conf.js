@@ -13,6 +13,7 @@ module.exports = {
         'scss': 'vue-style-loader!css-loader!sass-loader',
         'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
     }),
+    esModule: true,
     cssSourceMap: sourceMapEnabled,
     cacheBusting: config.dev.cacheBusting,
     transformToRequire: {
