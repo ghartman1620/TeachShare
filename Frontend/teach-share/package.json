@@ -32,7 +32,8 @@
         "vue-quill-editor": "^3.0.5",
         "vue-router": "^3.0.1",
         "vuex": "^3.0.1",
-        "vuex-class": "^0.3.0"
+        "vuex-class": "^0.3.0",
+        "vuex-typescript": "^3.0.2"
     },
     "devDependencies": {
         "@types/es6-promise": "^3.3.0",
