@@ -89,6 +89,29 @@ Vue.use(FormCheckbox);
 
 Vue.use(Badge);
 
+import _Vue from "vue"; 
+
+declare module "vue/types/vue" {
+    export interface Vue {
+        $log(Vue: VueConstructor<_Vue>, options?: any): void;
+        $logSuccess(Vue: VueConstructor<_Vue>, options?: any): void;
+
+        $notify(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifySuccess(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifyDanger(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifyInfo(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifyWarning(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifyPrimary(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifySecondary(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifyDark(Vue: VueConstructor<_Vue>, options?: any): void;
+        $notifyLight(Vue: VueConstructor<_Vue>, options?: any): void;
+        $login(Vue: VueConstructor<_Vue>, options?: any): void;
+        $logout(Vue: VueConstructor<_Vue>, options?: any): void;
+        $isLoggedIn(Vue: VueConstructor<_Vue>, options?: any): boolean;
+        
+    }
+}
+
 Vue.use(UserPlugin);
 Vue.use(Notifications);
 Vue.use(Logger, true);

@@ -49,7 +49,7 @@ export default {
 
     },
     methods: {
-        login: function(event) {
+        login: function() {
             var vm = this;
             this.$login(this.username, this.pw, this.persist)
             .then(function() {
