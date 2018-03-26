@@ -1,14 +1,26 @@
-export class Post{
 
+interface PostElement{
+    type: string;
+}
+
+interface TextElement extends PostElement{
+    content: string;
+}
+
+interface AudioElement extends PostElement{
     
+}
+
+
+
+
+
+
+export class Post{
     elements: any[];
     title: string;
     tags: string[];
     user: number;
-
-
-
-
     constructor(){
         this.elements = [];
         this.title = "";
@@ -39,4 +51,5 @@ export class Post{
         this.elements[i] = this.elements[j];
         this.elements[j] = tmp;
     }
+    
 }

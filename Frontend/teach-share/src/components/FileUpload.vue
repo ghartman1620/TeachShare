@@ -61,9 +61,17 @@
 </template>
 
 <!-- Javascript -->
-<script>
+<script lang="ts">
 import Vue from "vue";
 import { mapGetters } from "vuex";
+import { Component } from "vue-property-decorator";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
 
 var fileTypes = Object.freeze({
     FILE: "file/*",
@@ -77,79 +85,82 @@ const UPLOAD_INITIAL = 0,
     UPLOAD_SUCCESS = 2,
     UPLOAD_ERROR = 3;
 
-export default Vue.component("file-upload", {
-    components: {},
-    //file/*
+@Component({
+    name: "file-upload",
     props: ["title", "fileAcceptType", "fileLimit"],
-    data() {
-        return {
-            currentStatus: null
-        };
-    },
-    computed: {
-        accept() {
-            if (this.$route.query.type) {
-                return fileTypes[this.$route.query.type];
-            } else if (this.fileAcceptType) {
-                return fileTypes[this.fileAcceptType];
-            } else {
-                return fileTypes["FILE"];
-            }
-        },
-        isInitial() {
-            return this.currentStatus === UPLOAD_INITIAL;
-        },
-        isSaving() {
-            return this.currentStatus === UPLOAD_SAVING;
-        },
-        isSuccess() {
-            return this.currentStatus === UPLOAD_SUCCESS;
-        },
-        isError() {
-            return this.currentStatus === UPLOAD_ERROR;
-        },
-        currentUploadedFiles() {
-            return this.$store.state.fs.uploadedFiles;
-        },
-        ...mapGetters([
-            "filesUploadStatus",
-            "allFilesUploadComplete",
-            "pastLimit"
-        ])
-    },
-    methods: {
-        save(formData) {
-            this.$store.dispatch("fileUpload", formData);
-        },
-        resetState() {
-            this.currentStatus = UPLOAD_INITIAL;
-            this.uploadError = null;
-        },
-        filesChange(fieldName, fileList) {
-            const formData = new FormData();
-            if (!fileList.length) {
-                return;
-            }
-            Array.from(Array(fileList.length).keys()).map(x => {
-                formData.append(fieldName, fileList[x], fileList[x].name);
-            });
-            this.save(formData);
-            this.$refs.fileUpload.value = null;
-        },
-        removeItem(file) {
-            var vm = this;
-            this.$store.dispatch("removeFile", file).then(function() {
-                vm.$parent.$emit("RemoveItem", file);
-            });
+})
+export default class FileUpload extends Vue {
+    @State("fs") fileState;
+    @Action("fileUpload") fileUpload;
+    @Action("removeFile") removeFile;
+    @Action("changeFileLimit") changeFileLimit;
+    @Action("clearFIles") clearFiles;
+
+    currentStatus   : number | null = null;
+    get accept(){
+        if(this.$route.query.type){
+            return fileTypes[this.$route.query.type];
+        } else if(this.fileAcceptType){
+            return fileTypes[this.fileAcceptType];
+        } else {
+            return fileTypes["FILE"];
         }
-    },
+    }
+    get isInitial() {
+        return this.currentStatus === UPLOAD_INITIAL;
+    }
+    get isSaving() {
+        return this.currentStatus === UPLOAD_SAVING;
+    }
+    get isSuccess() {
+        return this.currentStatus === UPLOAD_SUCCESS;
+    }
+    get isError() {
+        return this.currentStatus === UPLOAD_ERROR;
+    }
+    get currentUploadedFiles() {
+        return this.fileState.uploadedFiles;
+    }
+    get filesUploadStatus() {
+        return this.fileState.filesUploadStatus;
+    }
+    get allFilesUploadComplete() {
+        return this.fileState.allFilesUploadComplete;
+    }
+    get pastLimit() {
+        return this.fileState.pastLimit;
+    }
+    save(formData) {
+        this.fileUpload(formData);
+    }
+    resetState() {
+        this.currentStatus = UPLOAD_INITIAL;
+        this.uploadError = null;
+    }
+    filesChange(fieldName, fileList) {
+        const formData = new FormData();
+        if (!fileList.length) {
+            return;
+        }
+        Array.from(Array(fileList.length).keys()).map(x => {
+            formData.append(fieldName, fileList[x], fileList[x].name);
+        });
+        this.save(formData);
+        this.$refs.fileUpload.value = null;
+    }
+    removeItem(file) {
+        var vm = this;
+        this.removeFile(file).then(function() {
+            vm.$parent.$emit("RemoveItem", file);
+        });
+    }
     mounted() {
-        this.$store.dispatch("changeFileLimit", this.fileLimit);
+        this.changeFileLimit(this.fileLimit);
         if (this.$store.state.create.postElements.length > this.$route.query.index) {}
         this.resetState();
     },
     destroyed() {
-        this.$store.dispatch("clearFiles");
+        this.clearFiles();
     }
 });
 </script>

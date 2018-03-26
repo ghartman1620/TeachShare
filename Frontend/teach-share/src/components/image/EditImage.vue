@@ -73,7 +73,10 @@ export default Vue.component("edit-image", {
         };
     },
     computed: {
-        ...mapGetters(["hasFiles", "allFilesUploadComplete"])
+        ...mapGetters(["hasFiles", "allFilesUploadComplete"]),
+        hasFiles() {
+            return this.$store.getters.hasFiles;
+        }
     },
     methods: {
         submit() {
