@@ -70,7 +70,7 @@
 </body>
 </template>
 
-<script>
+<script lang = "ts">
 import Vue from "vue";
 import VueQuillEditor from "vue-quill-editor";
 
@@ -80,42 +80,41 @@ import "quill/dist/quill.bubble.css";
 import { mapState } from "vuex";
 Vue.use(VueQuillEditor);
 
-export default Vue.component("edit-text", {
-    data() {
-        return {
-            element: {},
-            editorOption: {
-                modules: {
-                    toolbar: "#toolbar"
-                }
-            } //sooooooooo many options to pass for customizing the editor.
-        };
-    },
-    computed: {},
+@Component({
+    name: "edit-text",
+})
+export default class EditText extends Vue{
+    @State("create") postState;
 
-    methods: {
-        submit: function(event) {
-            if (
-                this.$route.query.index ==
-                this.$store.state.create.postElements.length
-            ) {
-                this.$store.dispatch("addElement", this.element);
-            } else {
-                this.$store.dispatch("editElement", {
-                    index: this.$route.query.index,
-                    element: this.element
-                });
-            }
-            this.$router.push({ name: "create" });
-        },
-        close: function(event) {
-            this.$router.push({ name: "create" });
+    element: {},
+    editorOption: {
+        modules: {
+            toolbar: "#toolbar"
         }
-    },
+    } //sooooooooo many options to pass for customizing the editor.
+
+    // methods
+    submit(event: any) {
+        if (
+            this.$route.query.index ==
+            this.postState.post.elements.length
+        ) {
+            this.$store.dispatch("addElement", this.element);
+        } else {
+            this.$store.dispatch("editElement", {
+                index: this.$route.query.index,
+                element: this.element
+            });
+        }
+        this.$router.push({ name: "create" });
+    }
+    close(event: any) {
+        this.$router.push({ name: "create" });
+    }
     mounted() {
         if (
             this.$route.query.index >=
-            this.$store.state.create.postElements.length
+            this.postState.post.elements.length
         ) {
             this.element = {
                 type: "text",
@@ -124,15 +123,15 @@ export default Vue.component("edit-text", {
         } else {
             this.element = Object.assign(
                 {},
-                this.$store.state.create.postElements[this.$route.query.index]
+                this.postState.post.elements[this.$route.query.index]
             );
         }
     }
-});
+};
 </script>
 
 <style lang="scss" scoped>
-.quill-editor,
+.quill-editor,notRedo
 .quill-code {
     height: 75%;
     width: 100%;
