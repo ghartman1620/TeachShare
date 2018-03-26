@@ -91,6 +91,7 @@ const UPLOAD_INITIAL = 0,
 })
 export default class FileUpload extends Vue {
     @State("fs") fileState;
+    @State("create") postState;
     @Action("fileUpload") fileUpload;
     @Action("removeFile") removeFile;
     @Action("changeFileLimit") changeFileLimit;
@@ -156,13 +157,13 @@ export default class FileUpload extends Vue {
     }
     mounted() {
         this.changeFileLimit(this.fileLimit);
-        if (this.$store.state.create.postElements.length > this.$route.query.index) {}
+        if (this.postState.post.elements.length > this.$route.query.index) {}
         this.resetState();
-    },
+    }
     destroyed() {
         this.clearFiles();
     }
-});
+};
 </script>
 
 <style lang="scss">

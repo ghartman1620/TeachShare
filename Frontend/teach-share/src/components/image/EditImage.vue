@@ -52,79 +52,89 @@
 </div>
 </template>
 
-<script>
+<script lang = "ts">
 import Vue from "vue";
 import FileUpload from "../FileUpload";
 import { mapGetters } from "vuex";
 import ImageElement from "./ImageElement";
 import DimensionPicker from "../DimensionPicker";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
 
 var _ = require("lodash");
 
-export default Vue.component("edit-image", {
+@Component({
+    name: "edit-image",
     components: { FileUpload, ImageElement, DimensionPicker },
-    props: [],
-    data() {
-    return {
-            title: "",
-            description: "",
-            height: 480,
-            width: 640
-        };
-    },
-    computed: {
-        ...mapGetters(["hasFiles", "allFilesUploadComplete"]),
-        hasFiles() {
-            return this.$store.getters.hasFiles;
-        }
-    },
-    methods: {
-        submit() {
-            var vm = this;
-            if (this.$route.query.index === this.$store.state.create.postElements.length) {
-                this.$store.dispatch("addElement", this.generateJSON())
-                    .then(function(){
-                        vm.$router.push({name: "create"});
-                });
-            } else {
-                this.$store.dispatch("editElement", {
-                    index: this.$route.query.index,
-                    component: this.generateJSON()
-                }).then(function(){
+    props: []
+})
+export default class EditImage extends Vue{
+    @State("create") postState;
+    @State("fs") fileState;
+    @Action("addElement") addElement;
+    @Action("editElement") editElement;
+
+    title: string = "";
+    description: string = "";
+    height: number = 480;
+    width: number = 640;
+    
+    // getters
+    get hasFiles(){
+        return this.$store.getters.hasFiles;
+    }
+   
+    // methods
+    submit() {
+        var vm = this;
+        if (this.$route.query.index === this.postState.post.elements.length) {
+            this.addElement(this.generateJSON())
+                .then(function(){
                     vm.$router.push({name: "create"});
-                });
-            }
-            // this.$store.dispatch("LoadImages", this.generateJSON());
-            // this.$router.push({name: "create"});
-        },
-        generateJSON() {
-            let output = new Array();
-            var vm = this;
-            _.map(this.$store.state.fs.uploadedFiles, function(val, ind, arr) {
-                output.push({
-                    post: 2,
-                    type: "image_file",
-                    id: val.db_id,
-                    title: vm.title,
-                    file: val.file,
-                    name: val.file.name,
-                    url: val.url,
-                    description: vm.description
-                });
             });
-            return { 
-                type: "image_file", 
-                description: this.description, 
-                title: this.title, 
-                content: output,
-                width: this.width,
-                height: this.height  
-            };
-        },
-        cancelEdit() {
-            this.$router.push({ name: "create" });
+        } else {
+            this.editElement({
+                index: this.$route.query.index,
+                component: this.generateJSON()
+            }).then(function(){
+                vm.$router.push({name: "create"});
+            });
         }
-    },
+        // this.$store.dispatch("LoadImages", this.generateJSON());
+        // this.$router.push({name: "create"});
+    }
+    generateJSON() {
+        let output = new Array();
+        var vm = this;
+        _.map(this.fileState.uploadedFiles, function(val, ind, arr) {
+            output.push({
+                post: 2,
+                type: "image_file",
+                id: val.db_id,
+                title: vm.title,
+                file: val.file,
+                name: val.file.name,
+                url: val.url,
+                description: vm.description
+            });
+        });
+        return { 
+            type: "image_file", 
+            description: this.description, 
+            title: this.title, 
+            content: output,
+            width: this.width,
+            height: this.height  
+        };
+    }
+    cancelEdit() {
+        this.$router.push({ name: "create" });
+    }
     mounted() {
         this.$on("changeHeight", function(h) {
             this.height = h;
@@ -133,7 +143,7 @@ export default Vue.component("edit-image", {
             this.width = w;
         });
     }
-});
+};
 </script>
 
 
