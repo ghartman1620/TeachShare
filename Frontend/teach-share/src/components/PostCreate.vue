@@ -47,6 +47,12 @@
                                 onmouseout="this.src='/static/file-button.png'">
                 </router-link>
             </div>
+
+            <div class="round-button" id="table-icon">
+                <router-link :to="{name: 'edit-table', query: {index: this.maxElementIndex()}}">
+                    Edit Table Element
+                </router-link>
+            </div>
         </div>
     </div>
 
@@ -297,8 +303,10 @@ export default {
                 routeName += "video";
             } else if (type === "image_file") {
                 routeName += "image";
-            } else {
+            } else if (type == "file"){
                 routeName += "file";
+            } else{
+                routeName += "table";
             }
             this.$router.push({ name: routeName, query: { index: index } });
         },

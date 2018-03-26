@@ -13,6 +13,7 @@ const EditText = () => import(/* webpackChunkName: "edit-text" */ "../components
 const EditVideo = () => import(/* webpackChunkName: "edit-video" */ "../components/video/EditVideo.vue");
 const EditAudio = () => import(/* webpackChunkName: "edit-audio" */ "../components/audio/EditAudio.vue");
 const EditImage = () => import(/* webpackChunkName: "edit-image" */ "../components/image/EditImage.vue");
+const EditTable = () => import(/* webpackChunkName: "edit-table" */ "../components/table/EditTable.vue");
 const EditFile = () => import(/* webpackChunkName: "edit-file" */ "../components/file/EditFile.vue");
 const PostFeed = () => import(/* webpackChunkName: "post-feed" */ "../components/PostFeed.vue");
 const PostDetail = () => import(/* webpackChunkName: "post-feed" */ "../components/PostDetail.vue");
@@ -60,6 +61,11 @@ const router = new Router({
                         name: "edit-file",
                         path: "file",
                         component: EditFile
+                    },
+                    {
+                        name: "edit-table",
+                        path: "table",
+                        component: EditTable
                     }
                 ]
             },

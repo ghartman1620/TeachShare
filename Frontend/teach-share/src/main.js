@@ -28,6 +28,7 @@ import {
     FormTextarea,
     FormCheckbox,
 
+    Table,
     Badge,
     Jumbotron
 
@@ -83,6 +84,7 @@ Vue.use(FormSelect);
 Vue.use(FormTextarea);
 Vue.use(FormCheckbox);
 
+Vue.use(Table);
 Vue.use(Badge);
 
 Vue.use(Notifications);

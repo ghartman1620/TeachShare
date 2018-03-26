@@ -60,6 +60,10 @@ Uses TextElement, VideoElement, etc.
         <div class="post-element card" v-else-if="element.type === 'file'">
             <file-element :element="element"/>
         </div>
+
+        <div class="post-element card" v-else-if="element.type == 'table'">
+            <table-element :element="element"/>
+        </div>
     </div>
 </template>
 
@@ -73,11 +77,12 @@ import AudioElement from "./audio/AudioElement";
 import VideoElement from "./video/VideoElement";
 import FileElement from "./file/FileElement";
 import ImageElement from "./image/ImageElement";
+import TableElement from "./table/TableElement"
 
 
 export default Vue.component("post-element", {
     props: ["element", "index"],
-    components: {SeeMore, TextElement, VideoElement, FileElement, ImageElement},
+    components: {SeeMore, TextElement, VideoElement, FileElement, ImageElement, TableElement},
 });
 </script>
 
