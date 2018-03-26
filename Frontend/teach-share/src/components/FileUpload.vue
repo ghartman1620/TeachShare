@@ -27,7 +27,7 @@
             </div>
             <div class="col">
                 <br>
-                <h4 v-if="this.$store.state.fs.uploadedFiles.length > 0">Uploaded files: </h4>
+                <h4 v-if="this.$store.state.fs.files.length > 0">Uploaded files: </h4>
                 <ul class="list-group">
                     <li v-bind:key="obj.file.name" v-for="obj in filesUploadStatus"
                         class="list-group-item d-flex justify-content-between align-items-center">
@@ -111,7 +111,7 @@ export default Vue.component("file-upload", {
         currentUploadedFiles() {
             return this.$store.state.fs.uploadedFiles;
         },
-        ...mapGetters([
+        ...mapGetters("fs", [
             "filesUploadStatus",
             "allFilesUploadComplete",
             "pastLimit"
@@ -119,7 +119,7 @@ export default Vue.component("file-upload", {
     },
     methods: {
         save(formData) {
-            this.$store.dispatch("fileUpload", formData);
+            this.$store.dispatch("fs/file_upload", formData);
         },
         resetState() {
             this.currentStatus = UPLOAD_INITIAL;
@@ -138,18 +138,18 @@ export default Vue.component("file-upload", {
         },
         removeItem(file) {
             var vm = this;
-            this.$store.dispatch("removeFile", file).then(function() {
+            this.$store.dispatch("fs/remove_file", file).then(function() {
                 vm.$parent.$emit("RemoveItem", file);
             });
         }
     },
     mounted() {
-        this.$store.dispatch("changeFileLimit", this.fileLimit);
+        this.$store.dispatch("fs/change_limit", this.fileLimit);
         if (this.$store.state.create.postElements.length > this.$route.query.index) {}
         this.resetState();
     },
     destroyed() {
-        this.$store.dispatch("clearFiles");
+        this.$store.dispatch("fs/clear_files");
     }
 });
 </script>

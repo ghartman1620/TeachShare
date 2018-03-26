@@ -1,6 +1,6 @@
-import { FileElement, FieldEnum } from "../../models";
+import { GenericFile, ModelMap } from "../../models";
 
 export interface FileState {
-    files?: { [id: number]: FileElement };
+    files?: ModelMap<GenericFile>;
     limit: number;
 }

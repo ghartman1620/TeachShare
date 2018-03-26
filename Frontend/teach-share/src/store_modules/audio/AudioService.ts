@@ -12,7 +12,7 @@ import { AudioElement } from "../../models";
 type AudioContext = ActionContext<AudioState, RootState>;
 
 const state: AudioState = {
-    audio: {},
+    audio: undefined,
     error: false
 }
 

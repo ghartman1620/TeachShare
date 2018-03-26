@@ -17,18 +17,7 @@ import {
 } from "vuex-class";
 import { Model, AudioElement, Comment, User } from "./models";
 import { submitAudio } from "./store_modules/audio/AudioService";
-
-class ModelMap<V> {
-    data: {[pk: number]: V};
-
-    constructor(V) {
-        this.data = {[V.pk]: V};
-        this.data[V.pk] = V;
-    }
-    has(key: number): boolean {
-        return typeof this.data[key] !== "undefined";
-    }
-}
+import { ModelMap } from "./models";
 
 @Component({
     props: {},
@@ -45,7 +34,8 @@ export default class App extends Vue {
         let mm = new ModelMap<Comment>(c);
         // mm["key"] = c;
         console.log(mm);
-        console.log(mm.has(d.pk));
+        console.log(mm.has(String(d.pk)));
+        console.log(mm.length);
 
         let ae = new AudioElement({pk: 10, file: "file"});
         console.log("Submit audio: ", submitAudio(this.$store, ae));

@@ -70,7 +70,7 @@ export default Vue.component("edit-audio", {
     },
     computed: {
         changedTextRecv() {},
-        ...mapGetters(["hasFiles", "allFilesUploadComplete"])
+        ...mapGetters("fs", ["hasFiles", "allFilesUploadComplete"])
     },
     methods: {
         submitAudio() {

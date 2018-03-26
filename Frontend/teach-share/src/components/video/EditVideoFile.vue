@@ -76,7 +76,7 @@ export default Vue.component("edit-video-file", {
                 this.title = val;
             }
         },
-        ...mapGetters(["hasFiles", "allFilesUploadComplete"])
+        ...mapGetters("fs", ["hasFiles", "allFilesUploadComplete"])
     },
     methods: {
         DebounceFileSubmit: _.throttle(function() {

@@ -27,7 +27,7 @@ import { mapGetters } from "vuex";
 export default Vue.component("edit-file", {
 	components: {FileUpload},
 	computed: {
-		...mapGetters(["hasFiles", "allFilesUploadComplete"])
+		...mapGetters("fs", ["hasFiles", "allFilesUploadComplete"])
 	},
 	methods: {
 		submit() {
