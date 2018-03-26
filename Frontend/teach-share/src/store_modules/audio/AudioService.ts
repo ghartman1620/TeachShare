@@ -68,7 +68,6 @@ const AudioService = {
 
 export default AudioService;
 
-
 /**
  * Type safe definitions for AudioService
  */
