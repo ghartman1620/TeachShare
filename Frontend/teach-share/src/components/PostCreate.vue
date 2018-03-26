@@ -152,12 +152,20 @@
 </template>
 
 
-<script>
+<script lang="ts">
 import Vue from "vue";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
 import { mapState } from "vuex";
 import forEach from "lodash/forEach";
 import PostElement from "./PostElement";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
+import { Component } from 'vue-property-decorator';
 
 function isBlank(str) {
     return !str || /^\s*$/.test(str);
@@ -186,147 +194,150 @@ const bodyVisible = {
     opacity: "1"
 };
 
-export default {
+@Component({
     name: "post-create",
-    components: { PostElement, FontAwesomeIcon },
-    data: function() {
-        return {
-            title: "",
-            editedElement: {},
-            editedElementIndex: -1,
-            inProgressTag: "",
-            tags: []
-        };
-    },
-    computed: {
-        storeElements() {
-            return this.$store.state.create.postElements;
-        },
-        nextStateId() {
-            return this.$store.state.create.nextStateId;
-        },
-        hasTitle() {
-            return this.title.length > 0;
+    components: { PostElement, FontAwesomeIcon }
+})
+export default class PostCreate extends Vue{
+    @State("create") postState;
+    @Action("create/setTags") setTags;
+    @Action("create/setTitle") setTitle;
+    @Action("create/createPost") createPost;
+    @Action("create/swapElements") swapElements;
+    @Action("create/deleteElement") deleteElement;
+    @Action("create/storeUndo") storeUndo;
+    @Action("create/storeRedo") storeRedo;
+
+    title: string = "";
+    editedElement: {};
+    editedElementIndex: number = -1;
+    inProgressTag: string = "";
+    tags: string[]
+    
+    // getters
+    get storeElements() { 
+        return this.postState.postElements; 
+    }
+    get nextStateId() {
+        return this.postState.nextStateId;
+    }
+    get hasTitle() {
+        return this.title.length > 0;
+    }
+
+    // methods
+    getEditorStyle() {
+        this.$log(this.$route.name !== "create");
+        if (this.$route.name !== "create") {
+            return editorVisible;
+        } else {
+            return editorHidden;
         }
-    },
-
-    methods: {
-        getEditorStyle() {
-            this.$log(this.$route.name !== "create");
-            if (this.$route.name !== "create") {
-                return editorVisible;
-            } else {
-                return editorHidden;
-            }
-        },
-        getBodyStyle() {
-            if (this.$route.name !== "create") {
-                return bodyHidden;
-            } else {
-                return bodyVisible;
-            }
-        },
-        nop: function() {},
-        removeTag: function(index) {
-            this.tags.splice(index, 1);
-        },
-        createTag: function(e) {
-            if (e.keyCode === 13 && this.inProgressTag !== "") {
-                this.createTagBtn();
-                this.$store.dispatch("setTags", this.tags);
-            }
-        },
-        titleChanged: function(e) {
-            this.$store.dispatch("setTitle", this.title);
-        },
-        createTagBtn: function() {
-            this.tags.push(this.inProgressTag);
-            this.inProgressTag = "";
-        },
-        getUser: function() {
-            // this.$store.dispatch("fetchUser", 1);
-        },
-        submitPost: function(event) {
-            var vm = this;
-
-            // Generate current post before posting..
-            //
-            var currentPost = this.$store.getters.getCurrentPost;
-            currentPost.content = this.$store.state.create.postElements;
-            currentPost.tags = this.$store.getters.getTags;
-            currentPost.title = this.$store.getters.getTitle;
-            currentPost.user = this.$store.getters.getCurrentUser.profile.pk;
-            currentPost.draft = false;
-
-            // dispatch createPost method in the store. This will send a
-            // post request to the backend server.
-            this.$store.dispatch("createPost", currentPost).then(function(ret) {
-                // handle the response from the server
-                if (ret === undefined) {
-                    vm.$notifyDanger(
-                        "There was a problem submitting your post."
-                    );
-                } else if (ret.status < 300) {
-                    // post was successful
-                    vm.$notifySuccess("Post submitted successfully!");
-                    
-                    vm.$router.push({
-                        name: "posts",
-                        params: { post_id: ret.data.pk }
-                    });
-                } else {
-                    let total = "";
-                    forEach(ret, function(val, key) {
-                        let currentValue = val.join(" ");
-                        total = `${total} "${key}: ${currentValue}" `;
-                    });
-                    vm.$notifyDanger(
-                        `There was a problem submitting your post. ${total}`
-                    );
-                }
-            });
-        },
-        editElement: function(index) {
-            var type = this.$store.state.create.postElements[index].type;
-            var routeName = "edit-";
-            if (type === "text") {
-                routeName += "text";
-            } else if (type === "audio") {
-                routeName += "audio";
-            } else if (type === "video_file" || type === "video_link") {
-                routeName += "video";
-            } else if (type === "image_file") {
-                routeName += "image";
-            } else {
-                routeName += "file";
-            }
-            this.$router.push({ name: routeName, query: { index: index } });
-        },
-
-        moveElementUp: function(index) {
-            if (index != 0) {
-                this.$store.dispatch("swapElements", [index, index - 1]);
-                //dispatch only allows one argument so we'll pass them as an array
-            }
-        },
-        moveElementDown: function(index) {
-            if (index != this.$store.state.create.postElements.length - 1) {
-                this.$store.dispatch("swapElements", [index, index + 1]);
-                //dispatch only allows one argument so we'll pass them as an array
-            }
-        },
-        removeElement: function(index) {
-            this.$store.dispatch("removeElement", index);
-        },
-        maxElementIndex() {
-            return this.$store.state.create.postElements.length;
-        },
-        undo() {
-            this.$store.dispatch("undo");
-        },
-        redo() {
-            this.$store.dispatch("redo");
+    }
+    getBodyStyle() {
+        if (this.$route.name !== "create") {
+            return bodyHidden;
+        } else {
+            return bodyVisible;
         }
+    }
+    nop() {}
+    removeTag(index: number) {
+        this.tags.splice(index, 1);
+    }
+    createTag(e: any) {
+        if (e.keyCode === 13 && this.inProgressTag !== "") {
+            this.createTagBtn();
+            this.setTags(this.tags);
+        }
+    }
+    titleChanged(e: any) {
+        this.setTitle(this.title);
+    }
+    createTagBtn() {
+        this.tags.push(this.inProgressTag);
+        this.inProgressTag = "";
+    }
+    submitPost(event: any) {
+        var vm = this;
+
+        // Generate current post before posting..
+        //
+        var currentPost = this.$store.getters.getCurrentPost;
+        currentPost.content = this.$store.state.create.postElements;
+        currentPost.tags = this.$store.getters.getTags;
+        currentPost.title = this.$store.getters.getTitle;
+        currentPost.user = this.$store.getters.getCurrentUser.profile.pk;
+        currentPost.draft = false;
+
+        // dispatch createPost method in the store. This will send a
+        // post request to the backend server.
+        this.createPost(currentPost).then(function(ret) {
+            // handle the response from the server
+            if (ret === undefined) {
+                vm.$notifyDanger(
+                    "There was a problem submitting your post."
+                );
+            } else if (ret.status < 300) {
+                // post was successful
+                vm.$notifySuccess("Post submitted successfully!");
+                
+                vm.$router.push({
+                    name: "posts",
+                    params: { post_id: ret.data.pk }
+                });
+            } else {
+                let total = "";
+                forEach(ret, function(val, key) {
+                    let currentValue = val.join(" ");
+                    total = `${total} "${key}: ${currentValue}" `;
+                });
+                vm.$notifyDanger(
+                    `There was a problem submitting your post. ${total}`
+                );
+            }
+        });
+    }
+    editElement(index: number) {
+        var type = this.postState.postElements[index].type;
+        var routeName = "edit-";
+        if (type === "text") {
+            routeName += "text";
+        } else if (type === "audio") {
+            routeName += "audio";
+        } else if (type === "video_file" || type === "video_link") {
+            routeName += "video";
+        } else if (type === "image_file") {
+            routeName += "image";
+        } else {
+            routeName += "file";
+        }
+        this.$router.push({ name: routeName, query: { index: index } });
+    }
+
+    moveElementUp(index: number) {
+        if (index != 0) {
+            this.swapElements([index, index - 1]);
+            //dispatch only allows one argument so we'll pass them as an array
+        }
+    }
+    moveElementDown(index: number) {
+        if (index != this.$store.state.create.postElements.length - 1) {
+            this.swapElements([index, index + 1]);
+            //dispatch only allows one argument so we'll pass them as an array
+        }
+    }
+    removeElement(index: number) {
+        this.deleteElement(index);
+    }
+    maxElementIndex() {
+        return this.postState.postElements.length;
+    }
+    undo() {
+        this.storeUndo();
+    }
+    redo() {
+        this.storeRedo();
     }
 };
 </script>
