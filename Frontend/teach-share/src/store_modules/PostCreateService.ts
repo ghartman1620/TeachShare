@@ -151,7 +151,7 @@ export const actions = {
             if (mut.mutation === "UNDO_ADD_ELEMENT") {
                 context.dispatch(
                     "removeAttachments",
-                    context.state.postElements[mut.arg].content
+                    context.state.post.elements[mut.arg].content
                 );
             }
             context.commit("UNDO");
@@ -197,7 +197,7 @@ export const actions = {
     removeElement: (context: PostContext, index: number) => {
         context.dispatch(
             "removeAttachments",
-            state.state.postElements[index].content
+            context.state.post.elements[index].content
         );
         context.commit("REMOVE_ELEMENT", index);
         context.commit("CLEAR_REDO");
@@ -238,7 +238,8 @@ const PostCreateService = {
                 return getters.getCurrentPost.pk;
             }
             return null;
-        }
+        },
+        postElements: (state: PostState) => state.post.elements,
     }
 };
 
