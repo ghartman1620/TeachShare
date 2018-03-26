@@ -68,7 +68,7 @@ ElasticSearch-DSL Django settings
 """
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': 'search:9200'
+        'hosts': 'localhost:9200'
     },
 }
 # TEMPORARY: will cause unneccesary load on the server but simplifies things for now.
@@ -187,7 +187,7 @@ DATABASES = {
         'NAME': 'teachshare',
         'USER': 'postgres',
         'PASSWORD': 'password123',
-        'HOST': 'db',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }

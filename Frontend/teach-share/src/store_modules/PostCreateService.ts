@@ -9,14 +9,25 @@ import { RootState } from "../models";
 
 // import { storeBuilder } from "../../store";
 
+interface Mutation {
+    mutation: string;
+    arg: any;
+}
+
 interface PostState {
-    post: Post
+    post: Post;
+    currentPost: any;
+    doneMutations: Mutation[];
+    unDoneMutations: Mutation[];
 }
 
 type PostContext = ActionContext<PostState, RootState>;
 
 const state: PostState = {
-    post: new Post()
+    post: new Post(),
+    currentPost: {},
+    doneMutations: [],
+    unDoneMutations: [],
 }
 
 export const mutations = {
@@ -26,10 +37,10 @@ export const mutations = {
     SET_TITLE: (state: PostState, newTitle: string) => {
         state.post.setTitle(newTitle);
     },
-    SET_POST: (state, post) => {
+    SET_POST: (state: PostState, post: any) => {
         state.currentPost = post;
     },
-    REMOVE_ATTACHMENT: (state, attachment) => {
+    REMOVE_ATTACHMENT: (state: PostState, attachment: any) => {
         let ind = state.currentPost.attachments.findIndex(function (val) {
             return val === attachment.id;
         });
@@ -37,59 +48,57 @@ export const mutations = {
             state.currentPost.attachments.splice(ind, 1);
         }
     },
-    ADD_ATTACHMENT: (state, attachment) => {
+    ADD_ATTACHMENT: (state: PostState, attachment: any) => {
         state.currentPost.attachments.push(attachment.id);
     },
-    UNDO: state => {
+    UNDO: (state: PostState) => {
         state.doneMutations.pop();
     },
-    REDO: state => {
+    REDO: (state: PostState) => {
         state.unDoneMutations.pop();
     },
-    UNDO_ADD_ELEMENT: (state, index) => {
+    UNDO_ADD_ELEMENT: (state: PostState, index: number) => {
         state.unDoneMutations.push({
             mutation: "ADD_ELEMENT",
-            arg: state.postElements[index]
+            arg: state.post.elements[index]
         });
-        state.postElements.splice(index, 1);
+        state.post.removeElement(index);
     },
-    UNDO_REMOVE_ELEMENT: (state, arg) => {
+    UNDO_REMOVE_ELEMENT: (state: PostState, arg: any) => {
         state.unDoneMutations.push({
             mutation: "REMOVE_ELEMENT",
             arg: arg.index
         });
-        state.postElements.splice(arg.index, 0, arg.element);
+        state.post.insertElement(arg.index, arg.element);
     },
-    UNDO_EDIT_ELEMENT: (state, arg) => {
+    UNDO_EDIT_ELEMENT: (state: PostState, arg: any) => {
         state.unDoneMutations.push({
             mutation: "EDIT_ELEMENT",
             arg: {
                 index: arg.index,
-                element: state.postElements[arg.index]
+                element: state.post.elements[arg.index]
             }
         });
-        state.postElements.splice(arg.index, 1, arg.element);
+        state.post.editElement(arg.index, arg.element);
     },
-    UNDO_SWAP_ELEMENTS: (state, iAndJ) => {
+    UNDO_SWAP_ELEMENTS: (state: PostState, iAndJ: number[]) => {
         state.unDoneMutations.push({
             mutation: "SWAP_ELEMENTS",
             arg: iAndJ
         });
         var i = iAndJ[0];
         var j = iAndJ[1];
-        var tmp = state.postElements[i];
-        Vue.set(state.postElements, i, state.postElements[j]);
-        Vue.set(state.postElements, j, tmp);
+        state.post.swapElements(i,j);
     },
     // Mutations for the currently edited post data:  and postElements
-    ADD_ELEMENT: (state, element) => {
+    ADD_ELEMENT: (state: PostState, element: any) => {
         state.doneMutations.push({
             mutation: "UNDO_ADD_ELEMENT",
-            arg: state.postElements.length
+            arg: state.post.elements.length
         });
-        state.postElements.push(element);
+        state.post.addElement(element);
     },
-    SWAP_ELEMENTS: (state, iAndJ) => {
+    SWAP_ELEMENTS: (state: PostState, iAndJ: number[]) => {
         // I wrote this code because i'm triggered by being limited
         // to one function argument so I'm going to pretend I can pass two.
         state.doneMutations.push({
@@ -98,256 +107,132 @@ export const mutations = {
         });
         var i = iAndJ[0];
         var j = iAndJ[1];
-        var tmp = state.postElements[i];
-        Vue.set(state.postElements, i, state.postElements[j]);
-        Vue.set(state.postElements, j, tmp);
+        state.post.swapElements(i,j);
     },
-    REMOVE_ELEMENT: (state, index) => {
+    REMOVE_ELEMENT: (state: PostState, index: number) => {
         state.doneMutations.push({
             mutation: "UNDO_REMOVE_ELEMENT",
-            arg: { element: state.postElements[index], index: index }
+            arg: { element: state.post.elements[index], index: index }
         });
-        state.postElements.splice(index, 1);
+        state.post.removeElement(index);
     },
-    EDIT_ELEMENT: (state, editedElement) => {
+    EDIT_ELEMENT: (state: PostState, editedElement: any) => {
         state.doneMutations.push({
             mutation: "UNDO_EDIT_ELEMENT",
             arg: {
-                element: state.postElements[editedElement.index],
+                element: state.post.elements[editedElement.index],
                 index: editedElement.index
             }
         });
-        state.postElements.splice(
-            editedElement.index,
-            1,
-            editedElement.element
-        );
+        state.post.editElement(editedElement.index, editedElement.element);
     },
-    CLEAR_REDO: state => {
-        state.unDoneMutations = [];
+    CLEAR_REDO: (state: PostState) => {
+        Object.assign(state.unDoneMutations, []);
     },
 
 }
 
+export const actions = {
+    setTags: (context: PostContext, tags: string[]) => {
+        context.commit("SET_TAGS", tags);
+    },
+    setTitle: (context: PostContext, title: string) => {
+        context.commit("SET_TITLE", title);
+    },
+    setCurrentPost: (context: PostContext, post: any) => {
+        context.commit("SET_POST", post);
+    },
+    undo: (context: PostContext) => {
+        if (context.state.doneMutations.length > 0) {
+            var mut =
+                context.state.doneMutations[
+                    context.state.doneMutations.length - 1
+                ];
+            if (mut.mutation === "UNDO_ADD_ELEMENT") {
+                context.dispatch(
+                    "removeAttachments",
+                    context.state.postElements[mut.arg].content
+                );
+            }
+            context.commit("UNDO");
+            context.commit(mut.mutation, mut.arg);
+            context.dispatch("saveDraft").then(res => console.error(res));
+        }
+    },
+    redo: (context: PostContext) => {
+        if (context.state.unDoneMutations.length > 0) {
+            var mut =
+                context.state.unDoneMutations[
+                    context.state.unDoneMutations.length - 1
+                ];
+            if (mut.mutation === "ADD_ELEMENT") {
+                console.error(
+                    "REDO ADD ELEMENT: ",
+                    context.state.unDoneMutations,
+                    mut
+                );
+
+                console.error("Add attachments", "success");
+                context.dispatch("addAttachments", mut.arg.content);
+            }
+            context.commit("REDO");
+            context.commit(mut.mutation, mut.arg);
+            context.dispatch("saveDraft").then(res => console.error(res));
+        }
+    },
+    addElement: (context: PostContext, element: any) => {
+        // clear order of actions from ADD_ELEMENT --> CLEAR_REDO --> saveDraft.
+        context.commit("ADD_ELEMENT", element);
+        context.commit("CLEAR_REDO");
+        context.dispatch("saveDraft").then(res => console.error(res));
+    },
+    // Actions are only allowed to have one argument so iAndJ is
+    // a list with index 0 as the first index to be swapped
+    // and index 1 the second
+    swapElements: (context: PostContext, iAndJ: number[]) => {
+        context.commit("SWAP_ELEMENTS", iAndJ);
+        context.commit("CLEAR_REDO");
+        context.dispatch("saveDraft").then(res => console.error(res));
+    },
+    removeElement: (context: PostContext, index: number) => {
+        context.dispatch(
+            "removeAttachments",
+            state.state.postElements[index].content
+        );
+        context.commit("REMOVE_ELEMENT", index);
+        context.commit("CLEAR_REDO");
+
+        context.dispatch("saveDraft").then(res => console.error(res));
+    },
+    removeAttachments: (context: PostContext, attachments) => {
+        for (var i in attachments) {
+            let attachment = attachments[i];
+            context.commit("REMOVE_ATTACHMENT", attachment);
+        }
+    },
+    addAttachments: (state: PostContext, attachments) => {
+        for (var i in attachments) {
+            console.error(attachments[i]);
+            let attachment = attachments[i];
+            state.commit("ADD_ATTACHMENT", attachment);
+        }
+    },
+    editElement: (context: PostContext, editedElement) => {
+        context.commit("EDIT_ELEMENT", editedElement);
+        context.commit("CLEAR_REDO");
+        context.dispatch("saveDraft").then(res => console.error(res));
+    }
+}
 
 const PostCreateService = {
-    state: {
-        postElements: [],
-        title: "",
-        tags: [],
-        currentPost: null,
-        doneMutations: [],
-        unDoneMutations: [],
-    },
-    mutations: {
-        SET_TAGS: (state, tags) => {
-            state.tags = tags;
-        },
-        SET_TITLE: (state, newTitle) => {
-            state.title = newTitle;
-        },
-        SET_POST: (state, post) => {
-            state.currentPost = post;
-        },
-        REMOVE_ATTACHMENT: (state, attachment) => {
-            let ind = state.currentPost.attachments.findIndex(function (val) {
-                return val === attachment.id;
-            });
-            if (ind !== -1) {
-                state.currentPost.attachments.splice(ind, 1);
-            }
-        },
-        ADD_ATTACHMENT: (state, attachment) => {
-            state.currentPost.attachments.push(attachment.id);
-        },
-        UNDO: state => {
-            state.doneMutations.pop();
-        },
-        REDO: state => {
-            state.unDoneMutations.pop();
-        },
-        UNDO_ADD_ELEMENT: (state, index) => {
-            state.unDoneMutations.push({
-                mutation: "ADD_ELEMENT",
-                arg: state.postElements[index]
-            });
-            state.postElements.splice(index, 1);
-        },
-        UNDO_REMOVE_ELEMENT: (state, arg) => {
-            state.unDoneMutations.push({
-                mutation: "REMOVE_ELEMENT",
-                arg: arg.index
-            });
-            state.postElements.splice(arg.index, 0, arg.element);
-        },
-        UNDO_EDIT_ELEMENT: (state, arg) => {
-            state.unDoneMutations.push({
-                mutation: "EDIT_ELEMENT",
-                arg: {
-                    index: arg.index,
-                    element: state.postElements[arg.index]
-                }
-            });
-            state.postElements.splice(arg.index, 1, arg.element);
-        },
-        UNDO_SWAP_ELEMENTS: (state, iAndJ) => {
-            state.unDoneMutations.push({
-                mutation: "SWAP_ELEMENTS",
-                arg: iAndJ
-            });
-            var i = iAndJ[0];
-            var j = iAndJ[1];
-            var tmp = state.postElements[i];
-            Vue.set(state.postElements, i, state.postElements[j]);
-            Vue.set(state.postElements, j, tmp);
-        },
-        // Mutations for the currently edited post data:  and postElements
-        ADD_ELEMENT: (state, element) => {
-            state.doneMutations.push({
-                mutation: "UNDO_ADD_ELEMENT",
-                arg: state.postElements.length
-            });
-            state.postElements.push(element);
-        },
-        SWAP_ELEMENTS: (state, iAndJ) => {
-            // I wrote this code because i'm triggered by being limited
-            // to one function argument so I'm going to pretend I can pass two.
-            state.doneMutations.push({
-                mutation: "UNDO_SWAP_ELEMENTS",
-                arg: iAndJ
-            });
-            var i = iAndJ[0];
-            var j = iAndJ[1];
-            var tmp = state.postElements[i];
-            Vue.set(state.postElements, i, state.postElements[j]);
-            Vue.set(state.postElements, j, tmp);
-        },
-        REMOVE_ELEMENT: (state, index) => {
-            state.doneMutations.push({
-                mutation: "UNDO_REMOVE_ELEMENT",
-                arg: { element: state.postElements[index], index: index }
-            });
-            state.postElements.splice(index, 1);
-        },
-        EDIT_ELEMENT: (state, editedElement) => {
-            state.doneMutations.push({
-                mutation: "UNDO_EDIT_ELEMENT",
-                arg: {
-                    element: state.postElements[editedElement.index],
-                    index: editedElement.index
-                }
-            });
-            state.postElements.splice(
-                editedElement.index,
-                1,
-                editedElement.element
-            );
-        },
-        CLEAR_REDO: state => {
-            state.unDoneMutations = [];
-        },
-
-    },
-    actions: {
-        // Actions for in progress posts
-        setTags: (context, tags) => {
-            context.commit("SET_TAGS", tags);
-        },
-        setTitle: (context, title) => {
-            context.commit("SET_TITLE", title);
-        },
-        setCurrentPost: (context, post) => {
-            context.commit("SET_POST", post);
-        },
-        undo: context => {
-            if (context.state.doneMutations.length > 0) {
-                var mut =
-                    context.state.doneMutations[
-                        context.state.doneMutations.length - 1
-                    ];
-                if (mut.mutation === "UNDO_ADD_ELEMENT") {
-                    context.dispatch(
-                        "removeAttachments",
-                        context.state.postElements[mut.arg].content
-                    );
-                }
-                context.commit("UNDO");
-                context.commit(mut.mutation, mut.arg);
-                context.dispatch("saveDraft").then(res => console.error(res));
-            }
-        },
-        redo: context => {
-            if (context.state.unDoneMutations.length > 0) {
-                var mut =
-                    context.state.unDoneMutations[
-                        context.state.unDoneMutations.length - 1
-                    ];
-                if (mut.mutation === "ADD_ELEMENT") {
-                    console.error(
-                        "REDO ADD ELEMENT: ",
-                        context.state.unDoneMutations,
-                        mut
-                    );
-
-                    console.error("Add attachments", "success");
-                    context.dispatch("addAttachments", mut.arg.content);
-                }
-                context.commit("REDO");
-                context.commit(mut.mutation, mut.arg);
-                context.dispatch("saveDraft").then(res => console.error(res));
-            }
-        },
-        addElement: (state, element) => {
-            // clear order of actions from ADD_ELEMENT --> CLEAR_REDO --> saveDraft.
-            state.commit("ADD_ELEMENT", element);
-            state.commit("CLEAR_REDO");
-            state.dispatch("saveDraft").then(res => console.error(res));
-        },
-        // Actions are only allowed to have one argument so iAndJ is
-        // a list with index 0 as the first index to be swapped
-        // and index 1 the second
-        swapElements: (state, iAndJ) => {
-            state.commit("SWAP_ELEMENTS", iAndJ);
-            state.commit("CLEAR_REDO");
-            state.dispatch("saveDraft").then(res => console.error(res));
-        },
-        removeElement: (state, index) => {
-            state.dispatch(
-                "removeAttachments",
-                state.state.postElements[index].content
-            );
-            state.commit("REMOVE_ELEMENT", index);
-            state.commit("CLEAR_REDO");
-
-            state.dispatch("saveDraft").then(res => console.error(res));
-        },
-        removeAttachments: (state, attachments) => {
-            for (var i in attachments) {
-                let attachment = attachments[i];
-                state.commit("REMOVE_ATTACHMENT", attachment);
-            }
-        },
-        addAttachments: (state, attachments) => {
-            for (var i in attachments) {
-                console.error(attachments[i]);
-                let attachment = attachments[i];
-                state.commit("ADD_ATTACHMENT", attachment);
-            }
-        },
-        editElement: (state, editedElement) => {
-            state.commit("EDIT_ELEMENT", editedElement);
-            state.commit("CLEAR_REDO");
-            state.dispatch("saveDraft").then(res => console.error(res));
-        },
-        openEditor: (context) => {},
-        closeEditor: (context) => {}
-
-    },
+    state: state,
+    mutations: mutations,
+    actions: actions,
     getters: {
-        getTags: state => state.tags,
-        getTitle: state => state.title,
-        getContent: state => state.postElements,
-        getCurrentPost: state => state.currentPost,
+        getTags: (state: PostState) => state.post.tags,
+        getTitle: (state: PostState) => state.post.title,
+        getContent: (state: PostState) => state.post.elements,
+        getCurrentPost: (state: PostState) => state.currentPost,
         getCurrentPostId: (state, getters) => {
             if (getters.getCurrentPost !== null) {
                 return getters.getCurrentPost.pk;

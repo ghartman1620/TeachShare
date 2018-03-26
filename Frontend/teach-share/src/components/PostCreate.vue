@@ -153,6 +153,14 @@
 
 
 <script>
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
+
 import Vue from "vue";
 import { mapState } from "vuex";
 import forEach from "lodash/forEach";
@@ -186,21 +194,14 @@ const bodyVisible = {
     opacity: "1"
 };
 
-export default {
-    name: "post-create",
-    components: { PostElement, FontAwesomeIcon },
-    data: function() {
-        return {
-            title: "",
-            editedElement: {},
-            editedElementIndex: -1,
-            inProgressTag: "",
-            tags: []
-        };
-    },
+
+export default{
+    @State("create") postState;
+    @Action("create/setTitle") setTitle;
+
     computed: {
         storeElements() {
-            return this.$store.state.create.postElements;
+            return this.postState.postElements;
         },
         nextStateId() {
             return this.$store.state.create.nextStateId;
@@ -237,7 +238,7 @@ export default {
             }
         },
         titleChanged: function(e) {
-            this.$store.dispatch("setTitle", this.title);
+            this.setTitle(this.title);
         },
         createTagBtn: function() {
             this.tags.push(this.inProgressTag);

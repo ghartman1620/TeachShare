@@ -17,6 +17,8 @@ const state: AudioState = {
     error: false
 }
 
+
+
 export const mutations = {
     loadAudioInstance: (state: AudioState, data: AudioElement) => {
         console.log(data);
