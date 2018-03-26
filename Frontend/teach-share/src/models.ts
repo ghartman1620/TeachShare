@@ -58,7 +58,6 @@ export class FileElement extends Model {
 
     constructor(pk) {
         super(pk);
-
     }
 }
 
@@ -66,7 +65,6 @@ function isString(str: string | undefined): str is string {
     return (str as string) !== undefined;
 }
 
-// 
 export class Comment extends Model {
     public user: User;
     public content: string;
@@ -99,6 +97,20 @@ export class Post extends Model {
         super(typeof pk === "undefined" ? -1 : pk);
         this.comments = typeof comments === "undefined" ? [] : comments;
         this.user = typeof user === "undefined" ? new User() : user;
+    }
+}
+
+export class GenericFile {
+    public id: string;
+    public percent: number;
+    public file: File | undefined;
+    public cancel: any;
+
+    constructor(id: string, percent = 0, file?: File, cancel?: any) {
+        this.id = id;
+        this.percent = percent;
+        this.file = file;
+        this.cancel = cancel;
     }
 }
 

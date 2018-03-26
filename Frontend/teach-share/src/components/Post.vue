@@ -63,7 +63,7 @@
 
 <script lang="ts">
 
-    import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 import SeeMore from "./SeeMore.vue";
 import PostElement from "./PostElement.vue";
 import Comments from "./comments/Comments.vue";
