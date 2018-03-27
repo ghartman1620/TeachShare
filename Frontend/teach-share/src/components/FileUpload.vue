@@ -146,7 +146,7 @@ export default Vue.component("file-upload", {
         },
         removeItem(file) {
             var vm = this;
-            this.$store.dispatch("remove_file", file).then(function() {
+            this.remove_file(file).then(function() {
                 vm.$parent.$emit("RemoveItem", file);
             });
         }
