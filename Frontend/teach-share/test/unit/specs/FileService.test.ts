@@ -4,12 +4,29 @@ import {actions as actionsfn} from "../../../src/store_modules/file/FileService"
 import { FileState } from "../../../src/store_modules/file/state";
 import { GenericFile, ModelMap } from "../../../src/models";
 
+import Vue from "vue";
+import Vuex from "vuex";
+import store from "../../../src/store";
+import { upload } from "../../../src/store_modules/file/FileService";
+
+Vue.use(Vuex);
+
+/* eslint-disable no-new */
+let vueInstance = new Vue({
+    el: "#app",
+    // router,
+    store,
+    components: { },
+    template: "<div/>"
+});
+
+
 // typescript 'require' workaround hack
 declare function require(name: string);
 
 console.log("MUTATIONS: ", Object.keys(mutations));
-const { create_file, create_update_file, change_limit, delete_file, clear_files } = mutations;
-;
+const { CREATE, UPDATE, CHANGE_LIMIT, DELETE, CLEAR } = mutations;
+
 
 function setup_state(): FileState {
     const state: FileState = {
@@ -19,14 +36,14 @@ function setup_state(): FileState {
     return state;
 }
 
-describe("create_file should create a file", () => {
+describe("CREATE should create a file", () => {
     it("should create one entry", () => {
         const state = setup_state();
         let file = new GenericFile("alphanumeric123", 0);
         let out = {};
         out[file.pk] = file;
         
-        create_file(state, file);
+        CREATE(state, file);
         let files = state.files as ModelMap<GenericFile>
         expect(files.data).to.eql(out as {});
         
@@ -38,12 +55,12 @@ describe("create_file should create a file", () => {
 
         let out = {}
         out[file.pk] = file;
-        create_file(state, file);
+        CREATE(state, file);
         let files = state.files as ModelMap<GenericFile>
         expect(files.data).to.eql(out);
 
         out[file2.pk] = file2;
-        create_file(state, file2);
+        CREATE(state, file2);
         let files2 = state.files as ModelMap<GenericFile>
 
         // let f = state.files.next().value as GenericFile;
@@ -58,13 +75,13 @@ describe("create_file should create a file", () => {
 
         let out = {}
         out[file.pk] = file;
-        create_file(state, file);
+        CREATE(state, file);
         let files = state.files as ModelMap<GenericFile>
         expect(files.data).to.eql(out);
 
         let out2 = {}
         out2[file2.pk] = file2;
-        create_file(state, file2);
+        CREATE(state, file2);
         let files2 = state.files as ModelMap<GenericFile>
         expect(files2.data).to.not.eql(out2);
     });
@@ -74,7 +91,7 @@ describe("create_file should create a file", () => {
     });
 });
 
-describe("update_file should update a file", () => {
+describe("UPDATE should update a file", () => {
     it("should update one entry", () => {
 
         // setup...
@@ -82,7 +99,7 @@ describe("update_file should update a file", () => {
         let file = new GenericFile("alphanumeric123", 0);
         let out = {}
         out[file.pk] = file;
-        create_update_file(state, file);
+        UPDATE(state, file);
         let files = state.files as ModelMap<GenericFile>
         expect(files.data).to.eql(out);
         
@@ -90,7 +107,7 @@ describe("update_file should update a file", () => {
         // update entry
         let updatedFile: GenericFile = {...file, percent: 100};
         out[updatedFile.pk] = updatedFile;
-        create_update_file(state, updatedFile);
+        UPDATE(state, updatedFile);
         let files2 = state.files as ModelMap<GenericFile>
         expect(files2.data).to.eql(out);
     });
@@ -101,7 +118,7 @@ describe("update_file should update a file", () => {
         let file = new GenericFile("alphanumeric123", 0);
         let out = {}
         out[file.pk] = file;
-        create_update_file(state, file);
+        UPDATE(state, file);
         let files = state.files as ModelMap<GenericFile>
         expect(files.data).to.eql(out);
 
@@ -109,12 +126,12 @@ describe("update_file should update a file", () => {
         let updatedFile: GenericFile = {...file, percent: 100, pk: "differentid123"};
         out[updatedFile.pk] = updatedFile;
         let files2 = state.files as ModelMap<GenericFile>
-        create_update_file(state, updatedFile);
+        UPDATE(state, updatedFile);
         expect(files2.data).to.eql(out);
     });
 });
 
-describe("delete_file deletes a file from the files object", () => {
+describe("DELETE deletes a file from the files object", () => {
     it("should delete one entry", () => {
 
         // setup...
@@ -122,13 +139,13 @@ describe("delete_file deletes a file from the files object", () => {
         let file = new GenericFile("alphanumeric123", 0);
         let out = {}
         out[file.pk] = file;
-        create_update_file(state, file);
+        UPDATE(state, file);
         let files = state.files as ModelMap<GenericFile>
         expect(files.data).to.eql(out);
 
         // delete entry
         let deletedFile: GenericFile = {...file};
-        delete_file(state, deletedFile);
+        DELETE(state, deletedFile);
         let files2 = state.files as ModelMap<GenericFile>
         expect(files2.data).to.eql({});
     });
@@ -139,13 +156,13 @@ describe("delete_file deletes a file from the files object", () => {
         let file = new GenericFile("alphanumeric123", 0);
         let out = {}
         out[file.pk] = file;
-        create_update_file(state, file);
+        UPDATE(state, file);
         let files = state.files as ModelMap<GenericFile>
         expect(files.data).to.eql(out);
 
         // delete entry
         let deletedFile: GenericFile = {...file};
-        delete_file(state, deletedFile.pk);
+        DELETE(state, deletedFile.pk);
         let files2 = state.files as ModelMap<GenericFile>
         expect(files2.data).to.eql({});
     });
@@ -154,19 +171,19 @@ describe("delete_file deletes a file from the files object", () => {
         // setup...
         const state = setup_state();
         let file = new GenericFile("alphanumeric123", 0);
-        delete_file(state, file);
+        DELETE(state, file);
         let files = state.files as ModelMap<GenericFile>
         expect(files.data).to.eql({});
     });
 });
-describe("clear_files", () => {
+describe("CLEAR", () => {
     it("should clear all files", () => {
         const state = setup_state();
         let file = new GenericFile("alphanumeric123", 0);
-        create_update_file(state, file);
+        UPDATE(state, file);
         let file2 = new GenericFile("alphanumeric456", 10);
-        create_update_file(state, file2);
-        clear_files(state)
+        UPDATE(state, file2);
+        CLEAR(state)
         let files = state.files as ModelMap<GenericFile>
         expect(files.data).to.eql({});
         let value = new ModelMap<GenericFile>(file, file2);
@@ -233,43 +250,6 @@ const testAction = (action, payload, state, expectedMutations, done) => {
 }
 
 
-describe("actions", () => {
-    it("file upload should work", (done) => {
-        var f = document.createElement("form");
-        f.setAttribute("method", "post");
-        f.setAttribute("action", "");
-        console.log(f);
-        let fd = new FormData(f);
-        console.log(fd);
-
-        let myBlob = new Blob();
-        let myFile = blobToFile(myBlob, "test.txt");
-        // let file = new File(["one", "two"], "filename.txt", {
-        //     type: "text/plain",
-        // });
-        console.log(myFile);
-        
-        var files = [myFile];
-        fd.append("test.txt", myFile);
-        console.log(fd);
-
-        // let fl = new FileList();
-        // for (var i = 0; i < files.length; i++) {
-        //     fl[i] = files[i];
-        // }
-
-        // console.log(fl);
-        console.log("ACTIONS:", actions);
-        testAction(actions.file_upload, files, {}, [
-            "saveDraft",
-            "create_update_file",
-            "create_update_file",
-            "delete_file"
-        ], done)
-
-    });
-});
-
 const blobToFile = (theBlob: Blob, fileName:string): File => {
     var b: any = theBlob;
     //A Blob() is almost a File() - it's just missing the two properties below which we will add
@@ -279,3 +259,48 @@ const blobToFile = (theBlob: Blob, fileName:string): File => {
     //Cast to a File() type
     return <File>theBlob;
 }
+
+
+describe("actions", () => {
+    // it("file upload should work", (done) => {
+    //     var f = document.createElement("form");
+    //     f.setAttribute("method", "post");
+    //     f.setAttribute("action", "");
+    //     console.log(f);
+    //     let fd = new FormData(f);
+    //     console.log(fd);
+
+    let myBlob = new Blob();
+    console.log("blob: ", myBlob);
+    let myFile = blobToFile(myBlob, "test.txt");
+    console.log("files: ", myFile);
+    //     // let file = new File(["one", "two"], "filename.txt", {
+    //     //     type: "text/plain",
+    //     // });
+    //     console.log(myFile);
+        
+    var files = [myFile];
+    console.log("files: ", files);
+    //     fd.append("test.txt", myFile);
+    //     console.log(fd);
+
+    //     // let fl = new FileList();
+    //     // for (var i = 0; i < files.length; i++) {
+    //     //     fl[i] = files[i];
+    //     // }
+
+    //     // console.log(fl);
+    //     console.log("ACTIONS:", actions);
+    //     testAction(actions.file_upload, files, {}, [
+    //         "saveDraft",
+    //         "UPDATE",
+    //         "UPDATE",
+    //         "sendNotification"
+    //     ], done)
+
+    // });
+
+    let store = vueInstance.$store;
+
+    upload(store, files).then(resp => console.log("RESP: ", resp));
+});

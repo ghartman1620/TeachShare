@@ -30,13 +30,16 @@ const uuidv4 = require("uuid/v4");
 /**
  * Actions - file_upload, remove_file, change_limit, and clear_files.
  */
-
+/****************************************************************************/
 /**
  * file_upload - for handling file uploads.
  *
  * @TODO: Simplify/break up
+ *
+ * @param  {Store} ctx
+ * @param  {File[]} files
  */
-export const upload_file =  async (ctx, files: any[]) => {
+export const upload_file =  async (ctx, files: File[]) => {
     console.log(ctx, files);
     try {
         let postid = await ctx.dispatch("saveDraft", null, {root: true});
@@ -111,19 +114,50 @@ export const upload_file =  async (ctx, files: any[]) => {
     });
 }
 
-export const create_file = async (ctx, file) => {
+/**
+ * create_file - creates a file. Doesn't handle uploading, just
+ * creating a file itself.
+ *
+ * @param  {Store} ctx
+ * @param  {File} file
+ */
+export const create_file = async (ctx, file: File) => {
 
 }
 
 export const actions = {
     create_file,
     upload_file,
-    remove_file: (ctx, file) => {
-        ctx.commit("DELETE", file);
+
+    /**
+     * remove_file - removes a file, looking it up using it's primary key,
+     * id, uuid, etc.. This could be refactored to also take the actual
+     * file instance.
+     *
+     * @param  {Store} ctx
+     * @param  {string} file_id
+     */
+    remove_file: (ctx, file_id: string) => {
+        ctx.commit("DELETE", file_id);
     },
-    change_limit: (ctx, limit) => {
+
+    /**
+     * change_limit - used to change the file upload limit. This is traditionally
+     * only enforced in the vue code, not this store.
+     *
+     * @param  {Store} ctx
+     * @param  {string} limit
+     */
+    change_limit: (ctx, limit: string) => {
         ctx.commit("CHANGE_LIMIT", limit);
     },
+
+    /**
+     * clear_files - used for resetting the files state item to a
+     * brand new instance, thereby deleting previous items.
+     *
+     * @param  {Store} ctx
+     */
     clear_files: (ctx) => {
         ctx.commit("CLEAR");
     }
@@ -138,6 +172,9 @@ export const mutations = {
     /**
      * create_file will create a file. It will NOT replace
      * a file with the same key. Use update for that.
+     *
+     * @param  {} state
+     * @param  {GenericFile} data
      */
     CREATE: (state, data: GenericFile) => {
         if (typeof data.pk !== "undefined") {
@@ -150,6 +187,9 @@ export const mutations = {
     /**
      * create_update_file will primarily update a file.
      * but will also create files that don't already exist.
+     *
+     * @param  {} state
+     * @param  {GenericFile} data
      */
     UPDATE: (state, data: GenericFile) => {
         if (typeof data.pk !== "undefined") {
@@ -161,6 +201,9 @@ export const mutations = {
      * delete_file deletes a file from the state, if it  exists.
      * It accepts either the full GenericFile or just the string
      * identifier.
+     *
+     * @param  {} state
+     * @param  {GenericFile|string} data
      */
     DELETE: (state, data: GenericFile | string) => {
         if (typeof data === "string") {
@@ -172,6 +215,9 @@ export const mutations = {
 
     /**
      * change_limit changes the limit of files you can upload.
+     *
+     * @param  {} state
+     * @param  {number} limit
      */
     CHANGE_LIMIT: (state, limit: number) => {
         state.limit = limit;
@@ -179,6 +225,8 @@ export const mutations = {
 
     /**
      * clear_files clears out all files
+     *
+     * @param  {} state
      */
     CLEAR: (state) => {
         state.files = new ModelMap<GenericFile>();
@@ -186,7 +234,7 @@ export const mutations = {
 }
 
 /**
- * Getters - 
+ * Getters - used for calculating/'getting' values based on the state.
  */
 export const getters = {
     filesUploadStatus: (state) => state.files.data,
