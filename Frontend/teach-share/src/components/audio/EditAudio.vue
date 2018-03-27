@@ -55,7 +55,7 @@
 import Vue from "vue";
 import FileUpload from "../FileUpload";
 import { mapGetters } from "vuex";
-import AudioElement from "./AudioElement";
+import { Component } from "vue-property-decorator";
 import {
   State,
   Getter,
@@ -68,8 +68,9 @@ var _ = require("lodash");
 
 @Component({
     name: "edit-audio",
-    components: { FileUpload, AudioElement },
-    props: []
+    components: { FileUpload },
+    props: [],
+    
 })
 export default class EditAudio extends Vue{
     @State("create") postState;
@@ -82,11 +83,19 @@ export default class EditAudio extends Vue{
     description: string = "";
 
     // getters
-    get changedTextRecv() {}
     get hasFiles(){
         return this.$store.getters.hasFiles;
     }
 
+    created() {
+        var vm: EditAudio = this; //to get rid of this implicitly has type any
+        vm.$on("changedTitle", function(res) {
+            vm.title = res;
+        });
+        vm.$on("changedBody", function(res) {
+            vm.description = res;
+        });
+    }
     // methods
     submitAudio() {
         this.submitAudioFiles(this.generateJSON());
@@ -128,14 +137,7 @@ export default class EditAudio extends Vue{
     close(event: any) {
         this.$router.push({ name: "create" });
     }
-    created() {
-        this.$on("changedTitle", function(res) {
-            this.title = res;
-        });
-        this.$on("changedBody", function(res) {
-            this.description = res;
-        });
-    }
+    
 };
 </script>
 

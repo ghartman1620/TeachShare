@@ -14,6 +14,13 @@ import Component from 'vue-class-component'
 import PostComp from "./Post.vue";
 import { Vue } from "vue-property-decorator";
 import { Post, Comment } from "../models";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
 
 @Component({
     props: {
@@ -22,10 +29,16 @@ import { Post, Comment } from "../models";
     components: { PostComp }
 })
 export default class PostDetail extends Vue {
+    @State("") state;
+    @Getter("getPostById") getPostById;
+    @Getter("getUsers") getUsers;
+    @Action("fetchCommentsForPost") fetchCommentsForPost;
+    @Action("fetechUser") fetchUser;
+    @Action("fetchPost") fetchPost;
     post: Post = new Post();
 
     get postLocal(): any {
-        return this.$store.getters.getPostById(this.$route.params.post_id);
+        return this.getPostById(this.$route.params.post_id);
     }
     get postid() {
         return this.postLocal !== undefined ? this.postLocal.pk : this.$route.params.post_id
@@ -34,24 +47,25 @@ export default class PostDetail extends Vue {
     getComments() {
         // let ae = new AudioElement(10, "filename.jpg");
 
-        var vm = this;
-        this.$store
-            .dispatch("fetchCommentsForPost", this.postLocal.pk)
+        var vm: PostDetail = this;
+        this.fetchCommentsForPost(this.postLocal.pk)
             .then(function(res) {
                 console.log(res);
-                for (let c of vm.post.comments) {
-                    console.log(c);
-                    let hasUser = vm.$store.state.users.find((val) => val.pk === c.pk);
+                var c: any;
+                for (c in vm.post.comments) {
+                    var comment = <Comment>c;
+                    console.log(comment);
+                    let hasUser: any = <any>(vm.getUsers).find((val: any) => val.pk === c.pk);
                     // vm.$logWarning("Post.vue", hasUser);
                     if (hasUser === null) {
 
                     }
-                    vm.$store.dispatch("fetchUser", c.user);
+                    vm.fetchUser(comment.user);
                 }
             });
     }
     created() {
-        this.$store.dispatch("fetchPost", this.$route.params.post_id).then((res) => {
+        this.fetchPost(this.$route.params.post_id).then((res) => {
             this.getComments();
         });
     }

@@ -15,11 +15,7 @@ import UserService from "./store_modules/UserService";
 import { RootState } from "./models";
 import { Post, Comment, User } from "./models";
 
-import { getStoreBuilder } from "vuex-typex"
-
 Vue.use(Vuex);
-
-export const storeBuilder = getStoreBuilder<RootState>();
 
 export const mutations = {
     LOAD_ALL_POSTS: (state, data) => {
@@ -227,6 +223,7 @@ export const actions = {
         });
     },
     saveDraft: ctx => {
+        console.log("CALLING SAVE DRAFT!!!");
         if (ctx.rootGetters.getCurrentPostId === null) {
             // hasn't yet been saved...
             var obj = {
@@ -296,6 +293,9 @@ export const getters = {
     },
     getUserByID: state => id => {
         return state.users.find((val, ind, obj) => val.pk === id);
+    },
+    getUsers: state => {
+        return state.users;
     }
 };
 

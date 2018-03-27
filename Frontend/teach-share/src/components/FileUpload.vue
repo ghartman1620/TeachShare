@@ -27,7 +27,7 @@
             </div>
             <div class="col">
                 <br>
-                <h4 v-if="this.$store.state.fs.uploadedFiles.length > 0">Uploaded files: </h4>
+                <h4 v-if="this.$store.state.fs.files.length > 0">Uploaded files: </h4>
                 <ul class="list-group">
                     <li v-bind:key="obj.file.name" v-for="obj in filesUploadStatus"
                         class="list-group-item d-flex justify-content-between align-items-center">
@@ -92,12 +92,17 @@ const UPLOAD_INITIAL = 0,
 export default class FileUpload extends Vue {
     @State("fs") fileState;
     @State("create") postState;
-    @Action("fileUpload") fileUpload;
+    @Action("file/file_upload") fileUpload;
     @Action("removeFile") removeFile;
     @Action("changeFileLimit") changeFileLimit;
     @Action("clearFIles") clearFiles;
 
+    //If we declare props do they get populated correctly? we'll see
+    title: string = "";
+    fileAcceptType: any = {};
+    fileLimit: number = 3;
     currentStatus   : number | null = null;
+    uploadError: any;
     get accept(){
         if(this.$route.query.type){
             return fileTypes[this.$route.query.type];
@@ -147,7 +152,9 @@ export default class FileUpload extends Vue {
             formData.append(fieldName, fileList[x], fileList[x].name);
         });
         this.save(formData);
-        this.$refs.fileUpload.value = null;
+        
+        var fileUpload: any = this.$refs.fileUpload;
+        fileUpload.value = null;
     }
     removeItem(file) {
         var vm = this;

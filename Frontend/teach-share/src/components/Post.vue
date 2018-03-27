@@ -63,7 +63,7 @@
 
 <script lang="ts">
 
-    import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 import SeeMore from "./SeeMore.vue";
 import PostElement from "./PostElement.vue";
 import Comments from "./comments/Comments.vue";
@@ -72,6 +72,13 @@ import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import forEach from "lodash/forEach";
 import Logger from "../logging/logger";
 import {Comment, Post} from "../models";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
 
 @Component({
     components: {
@@ -85,6 +92,14 @@ import {Comment, Post} from "../models";
     props: ["post", "index", "maxHeight"]
 })
 export default class PostComp extends Vue {
+    @State("") state;
+    @Action("fetchUser") fetchUser;
+    @Action("fetchCommentsForPost") fetchCommentsForPost;
+    @Action("fetchCurrentUser") fetchCurrentUser;
+    @Action("createOrUpdateComment") createOrUpdateComment;
+    @Getter("getCurrentUser") getCurrentUser;
+    @Getter("getUserById") getUserById;
+
     post: Post = new Post();
     newCommentText: string = "";
     index: number = 0;
@@ -98,7 +113,7 @@ export default class PostComp extends Vue {
         return this.newCommentText.length > 10;
     }
     get fullUser() {
-        return this.$store.getters.getUserByID(this.post.user);
+        return this.getUserById(this.post.user);
     }
     get fullUsername() {
         if (this.fullUser !== undefined) {
@@ -108,32 +123,33 @@ export default class PostComp extends Vue {
     }
 
     getComments() {
-        var vm = this;
-        this.$store
-            .dispatch("fetchCommentsForPost", this.post.pk)
+        var vm: PostComp = this;
+        this.fetchCommentsForPost(this.post.pk)
             .then(function(res) {
                 console.log(res);
-                for (let c of vm.post.comments) {
-                    console.log(c);
-                    let hasUser = vm.$store.state.users.find(
-                        val => val.pk === c.pk
+                var c: any;
+                for (c in vm.post.comments) {
+                    var comment = <Comment>c;
+                    console.log(comment);
+                    //We don't currently seem to be doing anything with hasUser?
+                    
+                    let hasUser = vm.state.users.find(
+                        (val: any) => val.pk === c.pk
                     );
 
                     if (hasUser === null) {
                     }
-                    vm.$store.dispatch("fetchUser", c.user);
+                    vm.fetchUser(comment.user);
                 }
             });
     }
     submitComment() {
         var vm = this;
-        let currentUser = this.$store.getters.getCurrentUser.profile;
+        let currentUser = this.getCurrentUser.profile;
         if (currentUser === undefined) {
             // this.$log("cookie: ", this.$cookie.get("userId"));
-            this.$store.dispatch(
-                "fetchCurrentUser",
+            this.fetchCurrentUser();
                 // this.$cookie.get("userId")
-            );
             this.actualSubmit();
         } else {
             this.actualSubmit();
@@ -143,9 +159,8 @@ export default class PostComp extends Vue {
     }
     actualSubmit() {
         var vm = this;
-        this.$logDanger(this.$store.state.user.profile);
-        this.$store
-            .dispatch("createOrUpdateComment", {
+        this.$logDanger(this.state.user.profile);
+        this.createOrUpdateComment( {
                 post: this.post.pk,
                 text: this.newCommentText,
                 user: this.$store.getters.getCurrentUser.profile.pk

@@ -6,145 +6,207 @@ import forEach from "lodash/forEach";
 import every from "lodash/every";
 import reduce from "lodash/reduce";
 
+import { RootState, GenericFile, ModelMap } from "../../models";
+import { FileState } from "./state";
+import { ActionContext, Store } from "vuex";
+import { getStoreAccessors } from "vuex-typescript";
+
+type FileContext = ActionContext<FileState, RootState>;
+
+/**
+ * The state for file uploads, other file operations.
+ */
+const state: FileState = {
+    files: new ModelMap<GenericFile>(),
+    limit: 0
+}
+
 // typescript 'require' workaround hack
-declare function require(name:string);
+declare function require(name: string);
 
 // Load some necessary libraries
 const uuidv4 = require("uuid/v4");
 
+/**
+ * Actions - file_upload, remove_file, change_limit, and clear_files.
+ */
+
+/**
+ * file_upload - for handling file uploads.
+ *
+ * @TODO: Simplify/break up
+ */
+export const file_upload =  async (context, files) => {
+    console.log(context, files);
+    try {
+        let postid = await context.dispatch("saveDraft", null, {root: true});
+        console.log(postid);
+    } catch (err) {
+        console.log(err);
+    }
+
+    let i: number = 0;
+    files.forEach( async (file) => {
+        let fileAlreadyUploaded = false;
+
+        context.state.files.forEach( element => {
+            /**
+             * @changed: ==, ===
+             * Test whether or not a file is already uploaded.
+             */
+            if (element.file.name === file.name) {
+                fileAlreadyUploaded = true;
+            }
+        });
+        if (!fileAlreadyUploaded && i + context.state.uploadedFiles.length < context.state.limit) {
+
+            let id = uuidv4();
+            let cancelToken = axios.CancelToken;
+            let cancel = cancelToken.source();
+            let config = {
+                onUploadProgress: progressEvent => {
+                    let percent = Math.floor(
+                        progressEvent.loaded * 100 / progressEvent.total
+                    );
+                    context.commit("create_update_file", {
+                        percent,
+                        file,
+                        pk: id,
+                        cancel
+                    });
+                },
+                cancelToken: cancel.token
+            };
+            try {
+                /**
+                 * make request
+                 */
+                let response = await api
+                    .put(`upload/${file.name}?id=${id}&post=${context.rootGetters.getCurrentPostId}`,
+                        file, config);
+
+                // update the current uploaded file object
+                context.commit("create_update_file", response);
+
+            } catch ( error ) {
+                /**
+                 * Uh-oh! there was an error in the axios request, while
+                 * attempting to upload the file.
+                 */
+                console.log(error);
+                if (axios.isCancel(error)) {
+                    context.commit("delete_file", file);
+                } else {
+                    console.error(error);
+                }
+            }
+        }
+        i++; // increment file count
+    });
+}
+
+export const actions = {
+    file_upload,
+    remove_file: (state, file) => {
+        state.commit("delete_file", file);
+    },
+    change_limit: (state, data) => {
+        state.commit("change_limit", data);
+    },
+    clear_files: (state, data) => {
+        state.commit("clear_files");
+    }
+}
+
+/**
+ * Mutations - Handles CRUD operations, as well as file upload
+ * limits and completely clearing files.
+ */
+export const mutations = {
+
+    /**
+     * create_file will create a file. It will NOT replace
+     * a file with the same key. Use update for that.
+     */
+    create_file: (state, data: GenericFile) => {
+        if (typeof data.pk !== "undefined") {
+            if (!state.files.data.hasOwnProperty(data.pk)) {
+                Vue.set(state.files.data, data.pk, data);
+            }
+        }
+    },
+
+    /**
+     * create_update_file will primarily update a file.
+     * but will also create files that don't already exist.
+     */
+    create_update_file: (state, data: GenericFile) => {
+        if (typeof data.pk !== "undefined") {
+            Vue.set(state.files.data, data.pk, data);
+        }
+    },
+
+    /**
+     * delete_file deletes a file from the state, if it  exists.
+     * It accepts either the full GenericFile or just the string
+     * identifier.
+     */
+    delete_file: (state, data: GenericFile | string) => {
+        if (typeof data === "string") {
+            Vue.delete(state.files.data, data);
+        } else  {
+            Vue.delete(state.files.data, data.pk);
+        }
+    },
+
+    /**
+     * change_limit changes the limit of files you can upload.
+     */
+    change_limit: (state, limit: number) => {
+        state.limit = limit;
+    },
+
+    /**
+     * clear_files clears out all files
+     */
+    clear_files: (state) => {
+        state.files = new ModelMap<GenericFile>();
+    }
+}
+
+/**
+ * Getters - 
+ */
+export const getters = {
+    filesUploadStatus: state => state.files.data,
+    allFilesUploadComplete: (state) => {
+        if (state.files.length > 0) {
+            let oneHundredPercent = every(state.files, {"percent": 100});
+            let hasURL = reduce(state.files, (res, val, key) => {
+                if (val.url !== undefined) {
+                    return true;
+                }
+                return false;
+            }, false);
+            return oneHundredPercent === true && hasURL === true;
+        }
+        return false;
+    },
+    hasFiles: state => {
+        return state.files.length > 0;
+    },
+    pastLimit: state => {
+        return state.files.length >= state.limit;
+    }
+}
+
 // FileService definition
 const FileService = {
-    state: {
-        uploadedFiles: [],
-        limit: 0,
-        cancelSource: null
-    },
-    mutations: {
-        UPDATE_UPLOAD_FILES: (state, data) => {
-            map(state.uploadedFiles, val => {
-                if (data.data.request_id === val.request_id) {
-                    var res = Object.assign(val, {
-                        db_id: data.data.id
-                    });
-                    var test = Vue.set(val, "url", data.data.url);
-                }
-            });
-        },
-        CHANGE_UPLOADED_FILES: (state, data) => {
-            var exists = false;
-            map(state.uploadedFiles, function (val, ind) {
-                if (val.request_id === data.request_id) {
-                    state.uploadedFiles.splice(ind, 1, data);
-                    exists = true;
-                }
-            });
-            if (!exists) {
-                state.uploadedFiles.push(data);
-            }
-        },
-        CANCEL_REQUEST: (state) => {
-            if (state.cancelSource != null) {
-                state.cancelSource.cancel("Operation cancelled by the user");
-            }
-        },
-        REMOVE_FILE: (state, file) => {
-            if (file.cancelSource != null) {
-                file.cancelSource.cancel("Operation cancelled by the user");
-            }
-            let ind = state.uploadedFiles.indexOf(file);
-            state.uploadedFiles.splice(ind, 1);
-        },
-        CHANGE_FILE_LIMIT: (state, data) => {
-            state.limit = data;
-        },
-        CLEAR_UPLOADED_FILES: (state) => {
-            state.uploadedFiles = [];
-        },
-        SET_CANCEL_TOKEN_SOURCE: (state, src) => {
-            state.cancelSource = src;
-        }
-    },
-    actions: {
-        fileUpload: (context, formData) => {
-            context.dispatch("saveDraft").then(function (postid) {
-                var files = formData.getAll("files");
-                var i = 0;
-                forEach(files, function (file) {
-                    var fileAlreadyUploaded = false;
-                    context.state.uploadedFiles.forEach(function (element) {
-                        if (element.file.name == file.name) {
-                            fileAlreadyUploaded = true;
-                        }
-                    });
-                    if (!fileAlreadyUploaded && i + context.state.uploadedFiles.length < context.state.limit) {
-                        var identifier = uuidv4();
-                        var cancelToken = axios.CancelToken;
-                        var source = cancelToken.source();
-                        let config = {
-                            onUploadProgress: progressEvent => {
-                                let percentCompleted = Math.floor(
-                                    progressEvent.loaded * 100 / progressEvent.total
-                                );
-                                context.commit("CHANGE_UPLOADED_FILES", {
-                                    percent: percentCompleted,
-                                    file: file,
-                                    request_id: identifier,
-                                    cancelSource: source
-                                });
-                            },
-                            cancelToken: source.token
-                        };
-                        api
-                            .put(`upload/${file.name}?id=${identifier}&post=${context.rootGetters.getCurrentPostId}`, file, config)
-                            .then(response => {
-                                context.commit("UPDATE_UPLOAD_FILES", response);
-                                context.commit("ADD_ATTACHMENT", response.data);
-                            })
-                            .catch(function (err) {
-                                if (axios.isCancel(err)) {
-                                    context.commit("REMOVE_FILE", file);
-                                } else {
-                                    console.error(err);
-                                }
-                            });
-                    }
-                    i++;
-                });
-            });
-        },
-        removeFile: (state, file) => {
-            state.commit("CANCEL_REQUEST");
-            state.commit("REMOVE_FILE", file);
-        },
-        changeFileLimit: (state, data) => {
-            state.commit("CHANGE_FILE_LIMIT", data);
-        },
-        clearFiles: (state) => {
-            state.commit("CLEAR_UPLOADED_FILES");
-        }
-    },
-    getters: {
-        filesUploadStatus: state => state.uploadedFiles,
-        allFilesUploadComplete: (state) => {
-            if (state.uploadedFiles.length > 0) {
-                let oneHundredPercent = every(state.uploadedFiles, {"percent": 100});
-                let hasURL = reduce(state.uploadedFiles, (res, val, key) => {
-                    if (val.url !== undefined) {
-                        return true;
-                    }
-                    return false;
-                }, false);
-                return oneHundredPercent === true && hasURL === true;
-            }
-            return false;
-        },
-        hasFiles: state => {
-            return state.uploadedFiles.length > 0;
-        },
-        pastLimit: state => {
-            return state.uploadedFiles.length >= state.limit;
-        }
-    }
+    namespaced: true,
+    state,
+    mutations,
+    actions,
+    getters
 };
 
 export default FileService;

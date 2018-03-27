@@ -47,32 +47,38 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
-import { mapFields } from "vee-validate";
+//import { mapFields } from "vee-validate";
+import { Component } from "vue-property-decorator";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
 
-export default Vue.component("dimension-picker", {
-  components: {},
-  props: [],
-  data() {
-      return {
-          width: Number(640),
-          height: Number(480)
-      };
-  },
-  computed: {},
-  methods: {
-      changeWidth() {
-          var vm = this;
-          Vue.nextTick(function() {
-              vm.$parent.$emit("changeWidth", {
-                  value: Number(vm.width),
-                  errors: vm.errors
-          });
-      });
-    },
+@Component({
+    name: "dimension-picker"
+})
+export default class DimensionPicker extends Vue{
+
+    width: number = 640;
+    height: number = 480;
+    errors: any = {};
+
+    changeWidth() {
+        var vm: DimensionPicker = this;
+        Vue.nextTick(function() {
+            vm.$parent.$emit("changeWidth", {
+                value: Number(vm.width),
+                errors: vm.errors
+            });
+        });
+    }
     changeHeight() {
-        var vm = this;
+        var vm: DimensionPicker = this;
         Vue.nextTick().then(function() {
             vm.$parent.$emit("changeHeight", {
                 value: Number(vm.height),
@@ -80,8 +86,7 @@ export default Vue.component("dimension-picker", {
             });
         });
     }
-  }
-});
+};
 </script>
 
 <style lang="scss" scoped>

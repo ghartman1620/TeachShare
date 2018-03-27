@@ -56,8 +56,8 @@
 import Vue from "vue";
 import FileUpload from "../FileUpload";
 import { mapGetters } from "vuex";
-import ImageElement from "./ImageElement";
 import DimensionPicker from "../DimensionPicker";
+import { Component } from "vue-property-decorator";
 import {
   State,
   Getter,
@@ -70,8 +70,9 @@ var _ = require("lodash");
 
 @Component({
     name: "edit-image",
-    components: { FileUpload, ImageElement, DimensionPicker },
-    props: []
+    components: { FileUpload, DimensionPicker },
+    props: [],
+    
 })
 export default class EditImage extends Vue{
     @State("create") postState;
@@ -89,6 +90,15 @@ export default class EditImage extends Vue{
         return this.$store.getters.hasFiles;
     }
    
+    mounted() {
+        var vm: EditImage = this; //get rid of "this implicitly has type any"
+        vm.$on("changeHeight", function(h) {
+            vm.height = h;
+        });
+        vm.$on("changeWidth", function(w) {
+            vm.width = w;
+        });
+    }
     // methods
     submit() {
         var vm = this;
@@ -135,14 +145,7 @@ export default class EditImage extends Vue{
     cancelEdit() {
         this.$router.push({ name: "create" });
     }
-    mounted() {
-        this.$on("changeHeight", function(h) {
-            this.height = h;
-        });
-        this.$on("changeWidth", function(w) {
-            this.width = w;
-        });
-    }
+    
 };
 </script>
 

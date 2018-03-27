@@ -1,24 +1,27 @@
 import Vue from "vue";
 import api from "../../api";
 
-import { getStoreBuilder } from "vuex-typex"
-import Vuex, { Store, ActionContext } from "vuex"
+import { ActionContext, Store } from "vuex";
+import { getStoreAccessors } from "vuex-typescript";
 
 import { RootState } from "../../models";
+
 import { AudioState } from "./state";
 import { AudioElement } from "../../models";
-
-import { storeBuilder } from "../../store";
 
 type AudioContext = ActionContext<AudioState, RootState>;
 
 const state: AudioState = {
-    audio: {},
+    audio: undefined,
     error: false
 }
 
-
-
+/**
+ * Mutations for audio elements
+ */
+const loadAudioInstance = "loadAudioInstance";
+const removeAudioInstance = "removeAudioInstance";
+const clearAudioInstance = "clearAudioInstance";
 export const mutations = {
     loadAudioInstance: (state: AudioState, data: AudioElement) => {
         console.log(data);
@@ -36,19 +39,18 @@ export const mutations = {
     }
 }
 
-const clearAudioInstance = "clearAudioInstance";
-const removeAudioInstance = "removeAudioInstance";
-const removeAudio = "removeAudio";
-
+/**
+ * Actions for audio elements.
+ */
 export const actions = {
-    submitAudioFiles: (context: AudioContext, file: AudioElement) => {
-        context.commit("loadAudioInstance", file);
+    submitAudioFiles: async (context, file) => {
+        await context.commit(loadAudioInstance, file);
     },
-    removeAllAudioInstances: async (context: AudioContext) => {
+    removeAllAudioInstances: async (context) => {
         context.commit(clearAudioInstance);
     },
-    removeAudio: async (context: AudioContext, data: AudioElement) => {
-        context.commit(removeAudio, data);
+    removeAudio: async (context, data) => {
+        context.commit(removeAudioInstance, data);
     }
 }
 
@@ -56,9 +58,7 @@ export const getters = {
 
 }
 
-// Module
 const AudioService = {
-    namespace: "audio",
     namespaced: true,
     state,
     mutations,
@@ -67,3 +67,12 @@ const AudioService = {
 }
 
 export default AudioService;
+
+/**
+ * Type safe definitions for AudioService
+ */
+const { commit, read, dispatch } =
+     getStoreAccessors<AudioState, RootState>("audio");
+
+export const submitAudio = dispatch(AudioService.actions.submitAudioFiles);
+export const clearAudio = commit(AudioService.actions.removeAllAudioInstances);

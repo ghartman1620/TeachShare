@@ -3,7 +3,7 @@
  *  Model is the base implementation for a database-backed object
  */
 export abstract class Model {
-    public pk: number;
+    public pk: number|string;
     constructor(pk: number) {
         this.pk = pk;
     }
@@ -58,7 +58,6 @@ export class FileElement extends Model {
 
     constructor(pk) {
         super(pk);
-
     }
 }
 
@@ -66,7 +65,6 @@ function isString(str: string | undefined): str is string {
     return (str as string) !== undefined;
 }
 
-// 
 export class Comment extends Model {
     public user: User;
     public content: string;
@@ -102,6 +100,20 @@ export class Post extends Model {
     }
 }
 
+export class GenericFile {
+    public pk: string;
+    public percent: number;
+    public file: File | undefined;
+    public cancel: any;
+
+    constructor(pk: string, percent = 0, file?: File, cancel?: any) {
+        this.pk = pk;
+        this.percent = percent;
+        this.file = file;
+        this.cancel = cancel;
+    }
+}
+
 export interface RootState {
     user: User,
     comment: Comment,
@@ -114,4 +126,66 @@ export interface RootState {
 
     // Post feed
     posts: Post[]
+}
+
+type Dictionary = {[id: string]: any};
+
+/**
+ * ModelMap is a structure for keeping track of a group of
+ * model instances using an associative object.
+ */
+export class ModelMap<V> implements IterableIterator<V> {
+    private _data: {[pk: string]: V} = {};
+    private counter: number = 0;
+
+    constructor(...V) {
+        if (typeof V !== "undefined") {
+            if (V.length < 1) {
+                this._data = {};
+                return;
+            }
+            for (let v of V) {
+                this._data[v.pk] = v;
+            }
+        }
+    }
+    next(): IteratorResult<V> {
+        let key = this.keys[this.counter];
+        this.counter++;
+        if (this.counter <= this.length) {
+            return {
+                done: false,
+                value: this._data[key]
+            }
+        }
+        return {
+            done: true
+        }
+    }
+
+    [Symbol.iterator](): IterableIterator<V> {
+        return this;
+    }
+
+    has(key: string): boolean {
+        return typeof this.data[key] !== "undefined";
+    }
+    get keys(): string[] {
+        return Object.keys(this._data);
+    }
+    get length(): number {
+        return this.keys.length;
+    }
+    get data(): {[pk: string]: V} {
+        return this._data;
+    }
+    set data(value: {[pk: string]: V}) {
+        this._data = value;
+    }
+    set(key: string, value: V) {
+        this._data[key] = value;
+    }
+    get(key: string): V{
+        return this._data[key];
+    }
 }

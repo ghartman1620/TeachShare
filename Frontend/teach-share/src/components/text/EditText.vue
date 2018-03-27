@@ -73,11 +73,7 @@
 <script lang = "ts">
 import Vue from "vue";
 import VueQuillEditor from "vue-quill-editor";
-
-import "quill/dist/quill.core.css";
-import "quill/dist/quill.snow.css";
-import "quill/dist/quill.bubble.css";
-import { mapState } from "vuex";
+import { Component } from "vue-property-decorator";
 import {
   State,
   Getter,
@@ -85,20 +81,27 @@ import {
   Mutation,
   namespace
 } from "vuex-class";
+import { mapState } from "vuex";
+
+
+import "quill/dist/quill.core.css";
+import "quill/dist/quill.snow.css";
+import "quill/dist/quill.bubble.css";
+
 Vue.use(VueQuillEditor);
 
 @Component({
     name: "edit-text",
-    editorOption: {
-        modules: {
-            toolbar: "#toolbar"
-        }
-    },
 })
 export default class EditText extends Vue{
     @State("create") postState;
 
     element: any =  {};
+    editorOption: any = {
+        modules: {
+            toolbar: "#toolbar"
+        }
+    };
      //sooooooooo many options to pass for customizing the editor.
 
     // methods

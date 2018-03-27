@@ -16,10 +16,11 @@ module.exports = function karmaConfig (config) {
     reporters: ['spec', 'coverage'],
     files: [
       '../../node_modules/babel-polyfill/dist/polyfill.js',
-      './index.js'
+      // './index.js',
+      {pattern: 'specs/**/*.test.ts', watch: false},
     ],
     preprocessors: {
-      './index.js': ['webpack', 'sourcemap']
+      'specs/**/*.test.ts': ['webpack', 'sourcemap'],
     },
     webpack: webpackConfig,
     webpackMiddleware: {
@@ -31,6 +32,9 @@ module.exports = function karmaConfig (config) {
         { type: 'lcov', subdir: '.' },
         { type: 'text-summary' }
       ]
+    },
+    client: {
+      captureConsole: true,
     }
   })
 }

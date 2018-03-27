@@ -1,16 +1,6 @@
-import { FileElement, FieldEnum } from "../../models";
-
-export interface File {
-    id: number;
-    description: string;
-    filetype: string;
-    name: string;
-    title: string;
-    type: FieldEnum;
-    url: string;
-}
+import { GenericFile, ModelMap } from "../../models";
 
 export interface FileState {
-    files?: FileElement[];
-    error: boolean;
+    files?: ModelMap<GenericFile>;
+    limit: number;
 }
