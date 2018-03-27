@@ -12,7 +12,7 @@
                             ref="fileUpload"
                             multiple
                             name="files"
-                            :disabled="isSaving || pastLimit"
+                            :disabled="isSaving || past_limit"
                             @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
                             :accept="accept"
                             class="input-file">
@@ -63,7 +63,7 @@
 <!-- Javascript -->
 <script>
 import Vue from "vue";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 var fileTypes = Object.freeze({
     FILE: "file/*",
@@ -83,7 +83,8 @@ export default Vue.component("file-upload", {
     props: ["title", "fileAcceptType", "fileLimit"],
     data() {
         return {
-            currentStatus: null
+            currentStatus: null,
+            fileCount: 0
         };
     },
     computed: {
@@ -114,12 +115,19 @@ export default Vue.component("file-upload", {
         ...mapGetters("fs", [
             "filesUploadStatus",
             "allFilesUploadComplete",
-            "pastLimit"
+            "past_limit"
         ])
     },
     methods: {
+        ...mapActions("fs", [
+            "upload_file",
+            "remove_file",
+            "change_limit"
+        ]),
         save(formData) {
-            this.$store.dispatch("fs/file_upload", formData);
+            console.log(this);
+            this.upload_file(formData);
+            // this.$store.dispatch("fs/upload", formData);
         },
         resetState() {
             this.currentStatus = UPLOAD_INITIAL;
@@ -138,18 +146,20 @@ export default Vue.component("file-upload", {
         },
         removeItem(file) {
             var vm = this;
-            this.$store.dispatch("fs/remove_file", file).then(function() {
+            this.$store.dispatch("remove_file", file).then(function() {
                 vm.$parent.$emit("RemoveItem", file);
             });
         }
     },
     mounted() {
-        this.$store.dispatch("fs/change_limit", this.fileLimit);
+        console.log(this);
+        debugger;
+        this.$store.dispatch("fs/change_limit", this.fileLimit, {root: true});
         if (this.$store.state.create.postElements.length > this.$route.query.index) {}
         this.resetState();
     },
     destroyed() {
-        this.$store.dispatch("fs/clear_files");
+        this.$store.dispatch("clear_files");
     }
 });
 </script>

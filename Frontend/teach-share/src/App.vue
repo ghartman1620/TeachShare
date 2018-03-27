@@ -16,15 +16,15 @@ import {
   namespace
 } from "vuex-class";
 import { Model, AudioElement, Comment, User } from "./models";
-import { submitAudio } from "./store_modules/audio/AudioService";
+// import { submitAudio } from "./store_modules/audio/AudioService";
 import { ModelMap } from "./models";
 
 @Component({
     props: {},
 })
 export default class App extends Vue {
-    @State("audio") stateAudio;
-    @Action("audio/submitAudioFiles") submit;
+    // @State("audio") stateAudio;
+    // @Action("audio/submitAudioFiles") submit;
     mounted() {
         let u = new User(1);
         let c = new Comment(10, u, "This is the comment content.");
@@ -38,11 +38,11 @@ export default class App extends Vue {
         console.log(mm.length);
 
         let ae = new AudioElement({pk: 10, file: "file"});
-        console.log("Submit audio: ", submitAudio(this.$store, ae));
-        console.log(this.submit(ae));
+        // console.log("Submit audio: ", submitAudio(this.$store, ae));
+        // console.log(this.submit(ae));
         let ab = {...ae, pk: 3};
-        this.submit(ab).then((res)=> console.log(res));
-        console.log(this.stateAudio);
+        // this.submit(ab).then((res)=> console.log(res));
+        // console.log(this.stateAudio);
     }
 
 }

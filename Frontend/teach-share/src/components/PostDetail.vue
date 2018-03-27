@@ -13,7 +13,7 @@
 import Component from 'vue-class-component'
 import PostComp from "./Post.vue";
 import { Vue } from "vue-property-decorator";
-import { Post, Comment } from "../models";
+import { Post, Comment, User } from "../models";
 
 @Component({
     props: {
@@ -41,12 +41,14 @@ export default class PostDetail extends Vue {
                 console.log(res);
                 for (let c of vm.post.comments) {
                     console.log(c);
-                    let hasUser = vm.$store.state.users.find((val) => val.pk === c.pk);
+                    let hasUser = vm.$store.state.users.find((val: User) => val.pk === (c as Comment).pk);
                     // vm.$logWarning("Post.vue", hasUser);
                     if (hasUser === null) {
 
                     }
-                    vm.$store.dispatch("fetchUser", c.user);
+                    if (typeof c !== "undefined") {
+                        vm.$store.dispatch("fetchUser", c.user);
+                    }
                 }
             });
     }

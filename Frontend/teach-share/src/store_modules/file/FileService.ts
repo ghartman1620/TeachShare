@@ -18,7 +18,7 @@ type FileContext = ActionContext<FileState, RootState>;
  */
 const state: FileState = {
     files: new ModelMap<GenericFile>(),
-    limit: 0
+    limit: 1
 }
 
 // typescript 'require' workaround hack
@@ -36,30 +36,33 @@ const uuidv4 = require("uuid/v4");
  *
  * @TODO: Simplify/break up
  */
-export const file_upload =  async (context, files) => {
-    console.log(context, files);
+export const upload_file =  async (ctx, files: any[]) => {
+    console.log(ctx, files);
     try {
-        let postid = await context.dispatch("saveDraft", null, {root: true});
+        let postid = await ctx.dispatch("saveDraft", null, {root: true});
         console.log(postid);
     } catch (err) {
         console.log(err);
     }
 
     let i: number = 0;
-    files.forEach( async (file) => {
+    files.forEach( async (file: File) => {
         let fileAlreadyUploaded = false;
 
-        context.state.files.forEach( element => {
+        ctx.state.files.keys.forEach( element => {
             /**
              * @changed: ==, ===
              * Test whether or not a file is already uploaded.
              */
-            if (element.file.name === file.name) {
+            debugger;
+            console.log("element", element);
+            console.log("file", file);
+            if (ctx.state.files.get(element).file.name === file.name) {
                 fileAlreadyUploaded = true;
             }
         });
-        if (!fileAlreadyUploaded && i + context.state.uploadedFiles.length < context.state.limit) {
-
+        if (!fileAlreadyUploaded && i + ctx.state.files.length < ctx.state.limit) {
+            console.log(ctx.state.files)
             let id = uuidv4();
             let cancelToken = axios.CancelToken;
             let cancel = cancelToken.source();
@@ -68,7 +71,7 @@ export const file_upload =  async (context, files) => {
                     let percent = Math.floor(
                         progressEvent.loaded * 100 / progressEvent.total
                     );
-                    context.commit("create_update_file", {
+                    ctx.commit("UPDATE", {
                         percent,
                         file,
                         pk: id,
@@ -82,11 +85,11 @@ export const file_upload =  async (context, files) => {
                  * make request
                  */
                 let response = await api
-                    .put(`upload/${file.name}?id=${id}&post=${context.rootGetters.getCurrentPostId}`,
+                    .put(`upload/${file.name}?id=${id}&post=${ctx.rootGetters.getCurrentPostId}`,
                         file, config);
 
                 // update the current uploaded file object
-                context.commit("create_update_file", response);
+                ctx.commit("UPDATE", response);
 
             } catch ( error ) {
                 /**
@@ -95,8 +98,11 @@ export const file_upload =  async (context, files) => {
                  */
                 console.log(error);
                 if (axios.isCancel(error)) {
-                    context.commit("delete_file", file);
+                    ctx.commit("DELETE", file);
                 } else {
+                    ctx.dispatch("sendNotification",
+                        {"type": "danger", "content": "Error uploading file!"}, {root: true},
+                        null, {root: true});
                     console.error(error);
                 }
             }
@@ -105,16 +111,21 @@ export const file_upload =  async (context, files) => {
     });
 }
 
+export const create_file = async (ctx, file) => {
+
+}
+
 export const actions = {
-    file_upload,
-    remove_file: (state, file) => {
-        state.commit("delete_file", file);
+    create_file,
+    upload_file,
+    remove_file: (ctx, file) => {
+        ctx.commit("DELETE", file);
     },
-    change_limit: (state, data) => {
-        state.commit("change_limit", data);
+    change_limit: (ctx, limit) => {
+        ctx.commit("CHANGE_LIMIT", limit);
     },
-    clear_files: (state, data) => {
-        state.commit("clear_files");
+    clear_files: (ctx) => {
+        ctx.commit("CLEAR");
     }
 }
 
@@ -128,7 +139,7 @@ export const mutations = {
      * create_file will create a file. It will NOT replace
      * a file with the same key. Use update for that.
      */
-    create_file: (state, data: GenericFile) => {
+    CREATE: (state, data: GenericFile) => {
         if (typeof data.pk !== "undefined") {
             if (!state.files.data.hasOwnProperty(data.pk)) {
                 Vue.set(state.files.data, data.pk, data);
@@ -140,7 +151,7 @@ export const mutations = {
      * create_update_file will primarily update a file.
      * but will also create files that don't already exist.
      */
-    create_update_file: (state, data: GenericFile) => {
+    UPDATE: (state, data: GenericFile) => {
         if (typeof data.pk !== "undefined") {
             Vue.set(state.files.data, data.pk, data);
         }
@@ -151,7 +162,7 @@ export const mutations = {
      * It accepts either the full GenericFile or just the string
      * identifier.
      */
-    delete_file: (state, data: GenericFile | string) => {
+    DELETE: (state, data: GenericFile | string) => {
         if (typeof data === "string") {
             Vue.delete(state.files.data, data);
         } else  {
@@ -162,14 +173,14 @@ export const mutations = {
     /**
      * change_limit changes the limit of files you can upload.
      */
-    change_limit: (state, limit: number) => {
+    CHANGE_LIMIT: (state, limit: number) => {
         state.limit = limit;
     },
 
     /**
      * clear_files clears out all files
      */
-    clear_files: (state) => {
+    CLEAR: (state) => {
         state.files = new ModelMap<GenericFile>();
     }
 }
@@ -178,12 +189,13 @@ export const mutations = {
  * Getters - 
  */
 export const getters = {
-    filesUploadStatus: state => state.files.data,
+    filesUploadStatus: (state) => state.files.data,
     allFilesUploadComplete: (state) => {
         if (state.files.length > 0) {
-            let oneHundredPercent = every(state.files, {"percent": 100});
-            let hasURL = reduce(state.files, (res, val, key) => {
-                if (val.url !== undefined) {
+            let oneHundredPercent = state.files.keys.every(val => state.files.get(val).percent === 100);
+            let hasURL = reduce(state.files.keys, (res, val, key) => {
+                console.log(res, key, val)
+                if (state.files.get(val).url !== undefined) {
                     return true;
                 }
                 return false;
@@ -192,11 +204,15 @@ export const getters = {
         }
         return false;
     },
-    hasFiles: state => {
+    has_files: state => {
         return state.files.length > 0;
     },
-    pastLimit: state => {
+    past_limit: state => {
         return state.files.length >= state.limit;
+    },
+    get: state => (id: string): GenericFile => {
+        console.log("getting id: ", id);
+        return state.files.get(id);
     }
 }
 
@@ -210,3 +226,34 @@ const FileService = {
 };
 
 export default FileService;
+
+/**
+ * Type safe definitions for AudioService
+ */
+const { commit, read, dispatch } =
+     getStoreAccessors<FileState, RootState>("fs");
+
+/**
+ * Action Handlers
+ */
+export const upload = dispatch(FileService.actions.upload_file);
+export const create = dispatch(FileService.actions.create_file);
+export const remove = dispatch(FileService.actions.remove_file)
+export const changeLimit = dispatch(FileService.actions.change_limit);
+export const clear = dispatch(FileService.actions.clear_files);
+
+/**
+ * Getter Handlers
+ */
+export const hasFiles = read(FileService.getters.has_files);
+export const isPastLimit = read(FileService.getters.past_limit);
+export const test_lookup = read(FileService.getters.get);
+
+/**
+ * Mutations Handlers
+ */
+export const mutCreate = commit(FileService.mutations.CREATE);
+export const mutUpdate = commit(FileService.mutations.UPDATE);
+export const mutDelete = commit(FileService.mutations.DELETE);
+export const mutChangeLimit = commit(FileService.mutations.CHANGE_LIMIT);
+export const mutClear = commit(FileService.mutations.CLEAR);

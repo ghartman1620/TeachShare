@@ -71,7 +71,7 @@ import CommentEntry from "./comments/CommentEntry.vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import forEach from "lodash/forEach";
 import Logger from "../logging/logger";
-import {Comment, Post} from "../models";
+import {Comment, Post, User} from "../models";
 
 @Component({
     components: {
@@ -83,7 +83,7 @@ import {Comment, Post} from "../models";
     },
     name: "PostComp",
     props: ["post", "index", "maxHeight"]
-})
+}) 
 export default class PostComp extends Vue {
     post: Post = new Post();
     newCommentText: string = "";
@@ -116,12 +116,14 @@ export default class PostComp extends Vue {
                 for (let c of vm.post.comments) {
                     console.log(c);
                     let hasUser = vm.$store.state.users.find(
-                        val => val.pk === c.pk
+                        (val: User) => val.pk === (c as Comment).pk
                     );
 
                     if (hasUser === null) {
                     }
-                    vm.$store.dispatch("fetchUser", c.user);
+                    if (typeof c !== "undefined") {
+                        vm.$store.dispatch("fetchUser", c.user);
+                    }
                 }
             });
     }

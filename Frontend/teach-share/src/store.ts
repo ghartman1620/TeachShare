@@ -5,9 +5,6 @@ import Vuex, { StoreOptions } from 'vuex';
 import api from "../src/api";
 import FileService from "./store_modules/file/FileService";
 import YouTubeService from "./store_modules/YouTubeService";
-import VideoService from "./store_modules/VideoService";
-import AudioService from "./store_modules/audio/AudioService";
-import ImageService from "./store_modules/ImageService";
 import PostCreateService from "./store_modules/PostCreateService";
 import NotificationService from "./store_modules/NotificationService";
 import UserService from "./store_modules/UserService";
@@ -313,9 +310,6 @@ const store: StoreOptions<RootState> = {
     modules: {
         fs: FileService,
         yts: YouTubeService,
-        video: VideoService,
-        audio: AudioService,
-        image: ImageService,
         create: PostCreateService,
         notifications: NotificationService,
         user: UserService
