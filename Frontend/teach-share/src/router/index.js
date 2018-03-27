@@ -20,6 +20,7 @@ const PostDetail = () => import(/* webpackChunkName: "post-feed" */ "../componen
 const Comments = () => import(/* webpackChunkName: "comments" */ "../components/comments/Comments.vue");
 const CommentEntry = () => import(/* webpackChunkName: "comments" */ "../components/comments/CommentEntry.vue");
 
+const UserPostList = () => import(/* webpackChunkName: "user-posts" */ "../components/UserPostList.vue");
 const Login = () => import(/* webpackChunkName: "login" */ "../components/auth/Login.vue");
 const Register = () => import(/* webpackChunkName: "register" */ "../components/auth/Register.vue");
 
@@ -31,6 +32,7 @@ const router = new Router({
         path: "/",
         component: Base,
         children: [
+            { name: "user-posts", path: "users", component: UserPostList},
             { name: "base", path: "", component: Home },
             {
                 path: "/create",

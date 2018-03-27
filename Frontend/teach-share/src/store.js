@@ -137,7 +137,7 @@ export default new Vuex.Store({
             console.log("fetchAllPostsRaw");
             api
                 .get(`posts/?draft=False&page_size=5`)
-                .then(response => {
+                .then(function(response) {
                     state.commit("LOAD_ALL_POSTS", response.data.results);
                     console.log(response);
                 })
