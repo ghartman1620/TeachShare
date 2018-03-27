@@ -37,9 +37,9 @@ export class AudioElement extends Model {
             file = "",
             description = "",
             filetype = "",
-            name = "", 
+            name = "",
             title = "",
-            type=FieldEnum.audio_file,
+            type = FieldEnum.audio_file,
             url = ""}) {
 
         super(pk);

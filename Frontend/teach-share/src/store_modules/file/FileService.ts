@@ -295,7 +295,7 @@ export const clear = dispatch(FileService.actions.clear_files);
  */
 export const hasFiles = read(FileService.getters.has_files);
 export const isPastLimit = read(FileService.getters.past_limit);
-export const test_lookup = read(FileService.getters.get);
+export const getFile = read(FileService.getters.get);
 
 /**
  * Mutations Handlers

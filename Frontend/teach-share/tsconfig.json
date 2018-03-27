@@ -13,7 +13,7 @@
       "experimentalDecorators": true,
       "sourceMap": true,
       "allowSyntheticDefaultImports": true,
-      "allowJs": true,
+      "allowJs": false,
       "importHelpers": true
     },
     "include": [
