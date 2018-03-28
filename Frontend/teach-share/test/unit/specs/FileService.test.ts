@@ -1,13 +1,14 @@
 import { expect } from "chai";
-import { mutations, getters } from "../../../src/store_modules/file/FileService";
-import {actions as actionsfn} from "../../../src/store_modules/file/FileService";
-import { FileState } from "../../../src/store_modules/file/state";
+import { mutations, getters, remove } from "../../../src/store_modules/files/FileService";
+import FileService from "../../../src/store_modules/files/FileService";
+import {actions as actionsfn} from "../../../src/store_modules/files/FileService";
+import { FileState } from "../../../src/store_modules/files/state";
 import { GenericFile, ModelMap } from "../../../src/models";
 
 import Vue from "vue";
 import Vuex from "vuex";
 import store from "../../../src/store";
-import { upload } from "../../../src/store_modules/file/FileService";
+import { upload } from "../../../src/store_modules/files/FileService";
 
 Vue.use(Vuex);
 
@@ -192,15 +193,13 @@ describe("CLEAR", () => {
 });
 
 
-const actionsInjector = require('inject-loader!../../../src/store_modules/file/FileService')
+const actionsInjector = require('inject-loader!../../../src/store_modules/files/FileService')
 
 // create the module with our mocks
 const actions = actionsInjector({
     'axios': {
         put(resolve, reject) {
             setTimeout(() => {
-                console.log(`RESOLVE: ${resolve}`, resolve);
-                console.log(`REJECT: ${reject}`, reject);
                 resolve({});
             }, 100)
         }
@@ -209,37 +208,27 @@ const actions = actionsInjector({
 
 // helper for testing action with expected mutations
 const testAction = (action, payload, state, expectedMutations, done) => {
-    console.log(action, payload, state, expectedMutations, done);
     let count = 0
   
     // mock commit
     const commit = (type, payload) => {
-        console.log(`TYPE: ${type}`, type);
-        console.log(`PAYLOAD: ${payload}`, payload);
         const mutation = expectedMutations[count]
-        console.log(`MUTATION: ${mutation}`, mutation);
         try {
-            console.log(mutation.type, type);
             expect(mutation.type).to.equal(type)
             if (payload) {
-                console.log(payload);
                 expect(mutation.payload).to.deep.equal(payload)
             }
         } catch (error) {
-            console.log("ERROR: ", error);
             done(error)
         } 
   
         count++
-        console.log(count);
         if (count >= expectedMutations.length) {
-            console.log(count, expectedMutations.length);
             done()
         }
     }
   
     // call the action with mocked store and arguments
-    console.log(commit, state, payload);
     action({ commit, state }, payload)
   
     // check if no mutations should have been dispatched
@@ -261,46 +250,22 @@ const blobToFile = (theBlob: Blob, fileName:string): File => {
 }
 
 
-describe("actions", () => {
-    // it("file upload should work", (done) => {
-    //     var f = document.createElement("form");
-    //     f.setAttribute("method", "post");
-    //     f.setAttribute("action", "");
-    //     console.log(f);
-    //     let fd = new FormData(f);
-    //     console.log(fd);
+describe("ACTIONS", () => {
+    it("should complete the upload action", () => {
+        let myBlob = new Blob();
+        let myFile = blobToFile(myBlob, "test.txt");
+        var files = [myFile];
+        let store = vueInstance.$store;
+        upload(store, files).then(resp => {
+            console.log("RESP: ", resp)
+            expect(resp.finished).to.equal(true);
+        });
+    });
+    it("should complete the remove action", () => {
+        let file = new GenericFile("alphanumeric123", 0);
 
-    let myBlob = new Blob();
-    console.log("blob: ", myBlob);
-    let myFile = blobToFile(myBlob, "test.txt");
-    console.log("files: ", myFile);
-    //     // let file = new File(["one", "two"], "filename.txt", {
-    //     //     type: "text/plain",
-    //     // });
-    //     console.log(myFile);
-        
-    var files = [myFile];
-    console.log("files: ", files);
-    //     fd.append("test.txt", myFile);
-    //     console.log(fd);
-
-    //     // let fl = new FileList();
-    //     // for (var i = 0; i < files.length; i++) {
-    //     //     fl[i] = files[i];
-    //     // }
-
-    //     // console.log(fl);
-    //     console.log("ACTIONS:", actions);
-    //     testAction(actions.file_upload, files, {}, [
-    //         "saveDraft",
-    //         "UPDATE",
-    //         "UPDATE",
-    //         "sendNotification"
-    //     ], done)
-
-    // });
-
-    let store = vueInstance.$store;
-
-    upload(store, files).then(resp => console.log("RESP: ", resp));
+        store.dispatch("fs/remove_file", file).then(resp => {
+            expect(resp).to.be.undefined;
+        }).catch(err => expect(err).to.not.be.undefined);
+    });
 });

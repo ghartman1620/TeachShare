@@ -42,6 +42,7 @@ const uuidv4 = require("uuid/v4");
 export const upload_file =  async (ctx, files: File[]) => {
     console.log(ctx, files);
     try {
+        // @TODO: get type safe definition for this.
         let postid = await ctx.dispatch("saveDraft", null, {root: true});
         console.log(postid);
     } catch (err) {
@@ -74,12 +75,18 @@ export const upload_file =  async (ctx, files: File[]) => {
                     let percent = Math.floor(
                         progressEvent.loaded * 100 / progressEvent.total
                     );
-                    ctx.commit("UPDATE", {
+                    mutUpdate(ctx, {
                         percent,
                         file,
                         pk: id,
                         cancel
                     });
+                    // ctx.commit("UPDATE", {
+                    //     percent,
+                    //     file,
+                    //     pk: id,
+                    //     cancel
+                    // });
                 },
                 cancelToken: cancel.token
             };
@@ -92,7 +99,9 @@ export const upload_file =  async (ctx, files: File[]) => {
                         file, config);
 
                 // update the current uploaded file object
-                ctx.commit("UPDATE", response);
+                console.log(response.data);
+                mutUpdate(ctx, response.data);
+                // ctx.commit("UPDATE", response);
 
             } catch ( error ) {
                 /**
@@ -101,8 +110,11 @@ export const upload_file =  async (ctx, files: File[]) => {
                  */
                 console.log(error);
                 if (axios.isCancel(error)) {
-                    ctx.commit("DELETE", file);
+                    // let genFile = new GenericFile(id);
+                    mutDelete(ctx, id);
+                    // ctx.commit("DELETE", file);
                 } else {
+                    // @TODO: get type-checked send-notifications
                     ctx.dispatch("sendNotification",
                         {"type": "danger", "content": "Error uploading file!"}, {root: true},
                         null, {root: true});
@@ -112,6 +124,7 @@ export const upload_file =  async (ctx, files: File[]) => {
         }
         i++; // increment file count
     });
+    return { status: "complete", error: null, finished: true };
 }
 
 /**
@@ -121,8 +134,8 @@ export const upload_file =  async (ctx, files: File[]) => {
  * @param  {Store} ctx
  * @param  {File} file
  */
-export const create_file = async (ctx, file: File) => {
-
+export const create_file = (ctx, file: GenericFile) => {
+    mutCreate(ctx, file);
 }
 
 export const actions = {
@@ -132,13 +145,14 @@ export const actions = {
     /**
      * remove_file - removes a file, looking it up using it's primary key,
      * id, uuid, etc.. This could be refactored to also take the actual
-     * file instance.
+     * file instance. Changed.
      *
      * @param  {Store} ctx
      * @param  {string} file_id
      */
     remove_file: (ctx, file_id: string) => {
-        ctx.commit("DELETE", file_id);
+        mutDelete(ctx, file_id);
+        // ctx.commit("DELETE", file_id);
     },
 
     /**
@@ -148,8 +162,9 @@ export const actions = {
      * @param  {Store} ctx
      * @param  {string} limit
      */
-    change_limit: (ctx, limit: string) => {
-        ctx.commit("CHANGE_LIMIT", limit);
+    change_limit: (ctx, limit: number) => {
+        mutChangeLimit(ctx, limit);
+        // ctx.commit("CHANGE_LIMIT", limit);
     },
 
     /**
@@ -159,7 +174,8 @@ export const actions = {
      * @param  {Store} ctx
      */
     clear_files: (ctx) => {
-        ctx.commit("CLEAR");
+        mutClear(ctx);
+        // ctx.commit("CLEAR");
     }
 }
 
@@ -276,7 +292,7 @@ const FileService = {
 export default FileService;
 
 /**
- * Type safe definitions for AudioService
+ * Type safe definitions for FileService
  */
 const { commit, read, dispatch } =
      getStoreAccessors<FileState, RootState>("fs");
@@ -304,4 +320,4 @@ export const mutCreate = commit(FileService.mutations.CREATE);
 export const mutUpdate = commit(FileService.mutations.UPDATE);
 export const mutDelete = commit(FileService.mutations.DELETE);
 export const mutChangeLimit = commit(FileService.mutations.CHANGE_LIMIT);
-export const mutClear = commit(FileService.mutations.CLEAR);
+export const mutClear = commit(FileService.mutations.CLEAR); 

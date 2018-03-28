@@ -3,11 +3,12 @@ import Vue from "vue";
 import Vuex, { StoreOptions } from 'vuex';
 
 import api from "../src/api";
-import FileService from "./store_modules/file/FileService";
+import FileService from "./store_modules/files/FileService";
 import YouTubeService from "./store_modules/YouTubeService";
 import PostCreateService from "./store_modules/PostCreateService";
-import NotificationService from "./store_modules/NotificationService";
 import UserService from "./store_modules/UserService";
+import CommentService from "./store_modules/comments/CommentService";
+import NotificationService from "./store_modules/NotificationService";
 
 import { RootState } from "./models";
 import { Post, Comment, User } from "./models";
@@ -46,35 +47,6 @@ export const mutations = {
         }
         state.users.push(user);
         console.log(state.users);
-    },
-    LOAD_COMMENT: (state, data) => {
-        state.comment = Object.assign({}, data);
-    },
-    LOAD_COMMENTS_FOR_POST: (state, data) => {
-        let index = state.posts.findIndex(val => val.pk === data.post);
-        if (index !== -1) {
-            state.posts[index].comments = Object.assign([], data.comments);
-        }
-        state.comments = Object.assign([], data);
-    },
-    CREATE_UPDATE_COMMENT: (state, comment) => {
-        let postindex = state.posts.findIndex(val => val.pk === comment.post);
-        if (postindex === -1) {
-            console.error("Couldn't find it!", "danger");
-        } else {
-            let post = state.posts[postindex];
-            let comments = post.comments;
-            let commentindex = post.comments.findIndex(
-                val => val.pk === comment.pk
-            );
-            if (commentindex === -1) {
-                comments.push(comment);
-                // Vue.$set(state.posts.postindex.comments, comments);
-            } else {
-                comments.splice(commentindex, comment);
-                // Vue.$set(state.posts.postindex.comments, comments);
-            }
-        }
     },
     LOAD_FILTERED_POSTS: (state, data) => {
         state.posts = Object.assign([], data);
@@ -296,13 +268,7 @@ export const getters = {
 const store: StoreOptions<RootState> = {
     state: {
         user: new User(),
-        comment: new Comment(),
-        comments: new Array<Comment>(),
         users: new Array<User>(),
-
-        // file upload
-        files: new Array<any>(),
-        filesPercents: new Array<any>(),
 
         // Post feed
         posts: new Array<Post>()
@@ -312,6 +278,7 @@ const store: StoreOptions<RootState> = {
         yts: YouTubeService,
         create: PostCreateService,
         notifications: NotificationService,
+        comments: CommentService,
         user: UserService
     },
     mutations,

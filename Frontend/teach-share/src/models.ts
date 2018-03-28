@@ -116,13 +116,7 @@ export class GenericFile {
 
 export interface RootState {
     user: User,
-    comment: Comment,
-    comments: Comment[],
     users: User[],
-
-    // file upload
-    files: any[],
-    filesPercents: any[],
 
     // Post feed
     posts: Post[]

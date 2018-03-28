@@ -66,7 +66,7 @@
 
 import { Vue } from "vue-property-decorator";
 import { mapGetters, mapActions } from "vuex";
-import { remove, upload, changeLimit, getFile } from "../store_modules/file/FileService"
+import { remove, upload, changeLimit, getFile, clear } from "../store_modules/files/FileService"
 import { Dictionary} from "vue-router/types/router.d";
 import Component from 'vue-class-component';
 // import * as vuetypes from "vue-router/types/vue.d";
@@ -142,7 +142,7 @@ export default class FileUpload extends Vue {
         upload(this.$store, formData).then(resp => console.log("upload response: ", resp));
     }
 
-    resetState() {
+    resetState() { 
         this.currentStatus = UPLOAD_INITIAL;
     }
     filesChange(fieldName, fileList) {
@@ -166,12 +166,12 @@ export default class FileUpload extends Vue {
 
     mounted() {
         console.log(this);
-        this.$store.dispatch("fs/change_limit", this.fileLimit, {root: true});
+        changeLimit(this.$store, this.fileLimit);
         if (this.$store.state.create.postElements.length > this.$route.query.index) {}
         this.resetState();
     }
     destroyed() {
-        this.$store.dispatch("clear_files");
+        clear(this.$store);
     }
 }
 </script>
