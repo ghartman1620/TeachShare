@@ -25,7 +25,7 @@ let vueInstance = new Vue({
 // typescript 'require' workaround hack
 declare function require(name: string);
 
-console.log("MUTATIONS: ", Object.keys(mutations));
+// console.log("MUTATIONS: ", Object.keys(mutations));
 const { CREATE, UPDATE, CHANGE_LIMIT, DELETE, CLEAR } = mutations;
 
 
@@ -257,7 +257,7 @@ describe("ACTIONS", () => {
         var files = [myFile];
         let store = vueInstance.$store;
         upload(store, files).then(resp => {
-            console.log("RESP: ", resp)
+            // console.log("RESP: ", resp)
             expect(resp.finished).to.equal(true);
         });
     });

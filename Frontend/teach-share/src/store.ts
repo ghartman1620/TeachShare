@@ -117,40 +117,6 @@ export const actions = {
     addUser: (state, user) => {
         state.commit("ADD_USER", user);
     },
-
-    /**
-     * Fetch a comment with it's pk.
-     */
-    fetchComment: (state, commentID: number) => {
-        api
-            .get(`comments/${commentID}/`)
-            .then(response => state.commit("LOAD_COMMENT", response.data))
-            .catch(err => console.error(err));
-    },
-
-    /**
-     * FetchComments will fetch comments.
-     */
-    fetchComments: (state, commentID) => {
-        api
-            .get(`comments/${commentID}/`)
-            .then(response => state.commit("LOAD_COMMENTS", response.data))
-            .catch(err => console.error(err));
-    },
-    fetchCommentsForPost: (state, postID) => {
-        return new Promise((resolve, reject) => {
-            api
-                .get(`comments/?post=${postID}`)
-                .then(response => {
-                    state.commit("LOAD_COMMENTS_FOR_POST", {
-                        comments: response.data,
-                        post: postID
-                    });
-                    resolve(response);
-                })
-                .catch(err => reject(err));
-        });
-    },
     fetchFilteredPosts: (state, filterParams) => {
         api
             .get(`posts/?user=${filterParams}`)
@@ -223,29 +189,6 @@ export const actions = {
                 return ctx.dispatch("setCurrentPost", res.data);
             });
         }
-    },
-    createOrUpdateComment: (state, comment) => {
-        if (comment.pk !== undefined) {
-            return new Promise((resolve, reject) => {
-                api
-                    .put(`comments/${comment.pk}/`, comment)
-                    .then(response => {
-                        state.commit("CREATE_UPDATE_COMMENT", response.data);
-                        return resolve(response);
-                    })
-                    .catch(err => reject(err));
-            });
-        } else {
-            return new Promise((resolve, reject) => {
-                api
-                    .post("comments/", comment)
-                    .then(response => {
-                        state.commit("CREATE_UPDATE_COMMENT", response.data);
-                        return resolve(response);
-                    })
-                    .catch(err => resolve(err.response.data));
-            });
-        }
     }
 };
 
@@ -253,9 +196,6 @@ export const getters = {
     getPosts: state => () => state.posts,
     getPostById: state => id => {
         return state.posts.filter(post => post.pk === Number(id))[0];
-    },
-    getCommentsByPost: (state, getters) => postid => {
-        return getters.getPostById(postid).comments;
     },
     getCurrentUser: (state, getters) => {
         return state.user;

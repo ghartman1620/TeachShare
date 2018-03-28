@@ -4,4 +4,4 @@ import { CommentState } from "../../../src/store_modules/comments/state";
 import { GenericFile, ModelMap } from "../../../src/models";
 
 console.log("MUTATIONS: ", Object.keys(mutations));
-const { } = mutations;
+const {  } = mutations;
