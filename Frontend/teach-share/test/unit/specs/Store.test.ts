@@ -4,7 +4,7 @@ import { mutations } from "../../../src/store";
 console.log("MUTATIONS: ", Object.keys(mutations));
 const { LOAD_ALL_POSTS, LOAD_POST } = mutations;
 
-describe("mutations", () => {
+describe("[STORE] mutations", () => {
     it("LOAD_ALL_POSTS - empty", () => {
         // mock state
         const state = { posts: [] };
@@ -38,7 +38,7 @@ describe("mutations", () => {
         // mock state
         const state = { posts: [] };
         // apply mutation
-        LOAD_POST(state);
+        LOAD_POST(state, undefined);
         // assert result
 
         expect(state.posts).to.eql([]);

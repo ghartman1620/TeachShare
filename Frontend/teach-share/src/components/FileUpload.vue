@@ -66,7 +66,7 @@
 
 import { Vue } from "vue-property-decorator";
 import { mapGetters, mapActions } from "vuex";
-import { remove, upload, changeLimit, getFile, clear } from "../store_modules/files/FileService"
+import { removeFile, uploadFiles, changeLimit, getFile, clearFiles } from "../store_modules/files/FileService"
 import { Dictionary} from "vue-router/types/router.d";
 import Component from 'vue-class-component';
 // import * as vuetypes from "vue-router/types/vue.d";
@@ -139,10 +139,10 @@ export default class FileUpload extends Vue {
     }
     save(formData) {
         console.log(this);
-        upload(this.$store, formData).then(resp => console.log("upload response: ", resp));
+        uploadFiles(this.$store, formData).then(resp => console.log("upload response: ", resp));
     }
 
-    resetState() { 
+    resetState() {
         this.currentStatus = UPLOAD_INITIAL;
     }
     filesChange(fieldName, fileList) {
@@ -159,7 +159,7 @@ export default class FileUpload extends Vue {
     removeItem(file) {
         var vm = this;
         console.log("get_file: ", this.getFile(file.pk));
-        remove(this.$store, file).then(function() {
+        removeFile(this.$store, file).then(function() {
             vm.$parent.$emit("RemoveItem", file);
         });
     }
@@ -171,7 +171,7 @@ export default class FileUpload extends Vue {
         this.resetState();
     }
     destroyed() {
-        clear(this.$store);
+        clearFiles(this.$store);
     }
 }
 </script>

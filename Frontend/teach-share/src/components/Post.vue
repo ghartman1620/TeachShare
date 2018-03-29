@@ -63,7 +63,7 @@
 
 <script lang="ts">
 
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 import SeeMore from "./SeeMore.vue";
 import PostElement from "./PostElement.vue";
 import Comments from "./comments/Comments.vue";
@@ -72,6 +72,7 @@ import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import forEach from "lodash/forEach";
 import Logger from "../logging/logger";
 import {Comment, Post, User} from "../models";
+import { createUpdateComment } from "../store_modules/comments/CommentService";
 
 @Component({
     components: {
@@ -81,14 +82,15 @@ import {Comment, Post, User} from "../models";
         CommentEntry,
         FontAwesomeIcon
     },
-    name: "PostComp",
+    name: "Post",
     props: ["post", "index", "maxHeight"]
-}) 
+})
 export default class PostComp extends Vue {
-    post: Post = new Post();
+    @Prop({required: true}) post!: Post;
+    @Prop() index: number = 0;
+    @Prop() maxHeight!: number;
+
     newCommentText: string = "";
-    index: number = 0;
-    maxHeight: number = 0;
 
     get actualMaxHeight() {
         // @TODO: make this actually show the WHOLE content, not just an arbitrarily huge maxHeight
@@ -98,7 +100,7 @@ export default class PostComp extends Vue {
         return this.newCommentText.length > 10;
     }
     get fullUser() {
-        return this.$store.getters.getUserByID(this.post.user);
+        return this.$store.getters.getUserByID(this.post.user as User);
     }
     get fullUsername() {
         if (this.fullUser !== undefined) {
@@ -109,6 +111,7 @@ export default class PostComp extends Vue {
 
     getComments() {
         var vm = this;
+        // createUpdateComment(this.$store, )
         this.$store
             .dispatch("fetchCommentsForPost", this.post.pk)
             .then(function(res) {
@@ -146,14 +149,15 @@ export default class PostComp extends Vue {
     actualSubmit() {
         var vm = this;
         this.$logDanger(this.$store.state.user.profile);
-        this.$store
-            .dispatch("createOrUpdateComment", {
-                post: this.post.pk,
-                text: this.newCommentText,
-                user: this.$store.getters.getCurrentUser.profile.pk
-            })
-            .then(function(ret) {
+        let comment = new Comment(
+            undefined,
+            Number(this.post.pk),
+            this.$store.getters.getCurrentUser.profile.pk,
+            this.newCommentText
+        );
+        createUpdateComment(this.$store, comment).then(function(ret: any): any {
                 if (ret.status < 300) {
+                    console.log(ret);
                     vm.$notifySuccess(
                         "Your comment was successfully posted!"
                     );
@@ -170,6 +174,7 @@ export default class PostComp extends Vue {
                 }
             })
             .catch(function(ret) {
+                console.log(ret);
                 vm.$notifyDanger(
                     "There was an unknown error with your request."
                 );
@@ -179,7 +184,7 @@ export default class PostComp extends Vue {
     created() {
         // this.$store.dispatch("fetchUser", this.post.user);
     }
-};
+}
 </script>
 
 <style lang="scss" scoped>

@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { GenericFile, ModelMap } from "../../../src/models";
 
-describe("ModelMap should work", () => {
+describe("[MODELMAP<V>] ModelMap class should work", () => {
     it("should iterate, have keys, length", () => {
         let a = new GenericFile("key", 10, undefined, undefined);
         let b = new GenericFile("key2", 10, undefined, undefined);

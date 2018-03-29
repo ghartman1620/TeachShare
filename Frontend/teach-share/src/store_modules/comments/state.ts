@@ -1,5 +1,5 @@
-import { Comment } from "../../models";
+import { Comment, ModelMap } from "../../models";
 
 export interface CommentState {
-    comments?: { [id: number]: Comment };
+    comments?: ModelMap<Comment>;
 }

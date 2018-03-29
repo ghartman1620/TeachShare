@@ -282,6 +282,7 @@ export const getters = {
 
 // FileService definition
 const FileService = {
+    strict: true,
     namespaced: true,
     state,
     mutations,
@@ -300,11 +301,11 @@ const { commit, read, dispatch } =
 /**
  * Action Handlers
  */
-export const upload = dispatch(FileService.actions.upload_file);
-export const create = dispatch(FileService.actions.create_file);
-export const remove = dispatch(FileService.actions.remove_file)
+export const uploadFiles = dispatch(FileService.actions.upload_file);
+export const createFile = dispatch(FileService.actions.create_file);
+export const removeFile = dispatch(FileService.actions.remove_file)
 export const changeLimit = dispatch(FileService.actions.change_limit);
-export const clear = dispatch(FileService.actions.clear_files);
+export const clearFiles = dispatch(FileService.actions.clear_files);
 
 /**
  * Getter Handlers

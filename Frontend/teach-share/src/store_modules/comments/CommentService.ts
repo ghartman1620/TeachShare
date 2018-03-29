@@ -1,4 +1,5 @@
 import { ActionContext, Store } from "vuex";
+import Vue from "vue";
 import { getStoreAccessors } from "vuex-typescript";
 
 import { RootState, ModelMap, Comment } from "../../models";
@@ -14,105 +15,135 @@ const state = {
 export const actions = {
 
     /**
-     * FetchComments will fetch comments.
+     * FetchAllComments will fetch comments.
      */
-    fetchComments: (state, commentID) => {
-        api
-            .get(`comments/${commentID}/`)
-            .then(response => state.commit("LOAD_COMMENTS", response.data))
-            .catch(err => console.error(err));
+    getAll: async (ctx) => {
+        try {
+            let response = await api.get(`comments/`);
+            ctx.commit("LOAD_COMMENTS", response.data);
+
+        } catch (err) {
+            console.error(err)
+        }
     },
-    fetchCommentsForPost: (state, postID) => {
-        return new Promise((resolve, reject) => {
-            api
-                .get(`comments/?post=${postID}`)
-                .then(response => {
-                    state.commit("LOAD_COMMENTS_FOR_POST", {
-                        comments: response.data,
-                        post: postID
-                    });
-                    resolve(response);
-                })
-                .catch(err => reject(err));
-        });
+
+    /**
+     * getByPost - get's all comments for a post, but the
+     * posts primary key.
+     *
+     * @param  {} ctx
+     * @param  {number} postID
+     */
+    getByPost: async (ctx, postID: number) => {
+        try {
+            let response = await api.get(`comments/?post=${postID}`);
+            console.log(response.data);
+            // mutCreate(ctx, );
+            return response;
+        } catch (err) {
+            return err;
+        }
     },
+
     /**
      * Fetch a comment with it's pk.
      */
-    fetchComment: (state, commentID: number) => {
+    getComment: (state, commentID: number) => {
         api
             .get(`comments/${commentID}/`)
-            .then(response => state.commit("LOAD_COMMENT", response.data))
+            .then(response => state.commit("UPDATE", response.data))
             .catch(err => console.error(err));
     },
-    createOrUpdateComment: (state, comment) => {
-        if (comment.pk !== undefined) {
-            return new Promise((resolve, reject) => {
-                api
-                    .put(`comments/${comment.pk}/`, comment)
-                    .then(response => {
-                        state.commit("CREATE_UPDATE_COMMENT", response.data);
-                        return resolve(response);
-                    })
-                    .catch(err => reject(err));
-            });
+    createUpdate: async (state, comment: Comment) => {
+        if (typeof comment.pk === "undefined") {
+            try {
+                let response = await api.put(`comments/${comment.pk}/`, comment);
+                state.commit("CREATE", response.data);
+                return response;
+            } catch (err) {
+                console.log(err);
+                return err;
+            }
         } else {
-            return new Promise((resolve, reject) => {
-                api
-                    .post("comments/", comment)
-                    .then(response => {
-                        state.commit("CREATE_UPDATE_COMMENT", response.data);
-                        return resolve(response);
-                    })
-                    .catch(err => resolve(err.response.data));
-            });
-        }
-    }
-};
-
-export const mutations = {
-
-    // @TODO: finish this.
-    // NOT FINISHED!
-    CREATE: (state, data: Comment) => {
-        state.comment = Object.assign({}, data);
-    },
-    FOR_POST: (state, data) => {
-        let index = state.posts.findIndex(val => val.pk === data.post);
-        if (index !== -1) {
-            state.posts[index].comments = Object.assign([], data.comments);
-        }
-        state.comments = Object.assign([], data);
-    },
-    UPDATE: (state, comment) => {
-        let postindex = state.posts.findIndex(val => val.pk === comment.post);
-        if (postindex === -1) {
-            console.error("Couldn't find it!", "danger");
-        } else {
-            let post = state.posts[postindex];
-            let comments = post.comments;
-            let commentindex = post.comments.findIndex(
-                val => val.pk === comment.pk
-            );
-            if (commentindex === -1) {
-                comments.push(comment);
-                // Vue.$set(state.posts.postindex.comments, comments);
-            } else {
-                comments.splice(commentindex, comment);
-                // Vue.$set(state.posts.postindex.comments, comments);
+            try {
+                let response = await api.post("comments/", comment);
+                state.commit("UPDATE", response.data);
+                return response;
+            } catch (err) {
+                console.log(err);
+                console.log(err.response.data);
+                return err;
             }
         }
     }
 };
 
+export const mutations = {
+    /**
+     * CREATE - mutation to create a comment and save it into the store.
+     * will ignore duplicates. If you want to be able to create-or-update,
+     * just use UPDATE, which will do either.
+     * 
+     * @param  {} state
+     * @param  {Comment} comment
+     */
+    CREATE: (state, comment: Comment) => {
+        let c = (state.comments as ModelMap<Comment>)
+        if (typeof comment.pk === "undefined" || !c.has(comment.pk)) {
+            Vue.set(state.comments.data, String(comment.pk), comment);
+        }
+    },
+
+    /**
+     * UPDATE - mutation for update. Also will create. The difference being
+     * that using a create-or-update for certain things can hide bugs by covering
+     * up errors. This way lets you code based on your truest intention.
+     * 
+     * @param  {} state
+     * @param  {Comment} comment
+     */
+    UPDATE: (state, comment: Comment) => {
+        Vue.set(state.comments.data, String(comment.pk), comment);
+    },
+
+    /** 
+     * DELETE - mutation for deleting a comment from the associative array.
+     * 
+     * @param  {} state
+     * @param  {number|string} commentid
+     */
+    DELETE: (state, commentid: number|string) => {
+        Vue.delete(state.comments.data, String(commentid));
+    },
+
+    /**
+     * CLEAR - completely clears out all comments.
+     * 
+     * @param  {} state
+     */
+    CLEAR: (state) => {
+        state.comments = new ModelMap<Comment>();
+    }
+};
+
 export const getters = {
-    getCommentsByPost: (state, getters) => postid => {
-        return getters.getPostById(postid).comments;
+    getCommentsForPost: state => (postid: number): Comment[] => {
+        let comm: Comment[] = [];
+        console.log("*************************************************");
+        console.log(postid);
+        console.log(state.comments);
+        for (let c of (state.comments as ModelMap<Comment>)) {
+            c = <Comment>c;
+            if (typeof c.pk !== "undefined" && c.pk === postid) { comm.push(c); }
+            console.log(c);
+        }
+        return comm;
     }
 };
 
 const CommentService = {
     namespaced: true,
+    strict: true,
     state,
     mutations,
     actions,
@@ -125,4 +156,23 @@ export default CommentService;
  * Type safe definitions for CommentService
  */
 const { commit, read, dispatch } =
-     getStoreAccessors<CommentState, RootState>("comment");
+     getStoreAccessors<CommentState, RootState>("comments");
+
+
+/**
+ * Actions Handlers
+ */
+export const createUpdateComment = dispatch(CommentService.actions.createUpdate);
+
+/**
+ * Getters Handlers
+ */
+export const getCommentsForPost = read(CommentService.getters.getCommentsForPost);
+
+/**
+ * Mutations Handlers
+ */
+export const mutCreate = commit(CommentService.mutations.CREATE);
+export const mutUpdate = commit(CommentService.mutations.UPDATE);
+export const mutDelete = commit(CommentService.mutations.DELETE);
+export const mutClear = commit(CommentService.mutations.CLEAR);

@@ -58,60 +58,66 @@
     </div>
 </template>
 
-<script>
-import TextElement from "../text/TextElement";
-import EditText from "../text/EditText";
+<script lang="ts">
+import { Vue, Component, Prop } from "vue-property-decorator";
+import TextElement from "../text/TextElement.vue";
+import EditText from "../text/EditText.vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
+import { createUpdateComment } from "../../store_modules/comments/CommentService";
+import { Comment, User, Post } from "../../models";
 
-export default {
+@Component({
     name: "comment-entry",
-    props: ["comment", "post", "user", "edit"],
     components: { TextElement, EditText, FontAwesomeIcon },
-    data: function() {
-        return {
-            editing: false,
-            text: "",
-            newComment: true,
-            prevText: ""
-        };
-    },
-    computed: {
-        fullUser() {
-           return this.$store.getters.getUserByID(this.user);
-        },
-        fullUsername() {
-            if (this.fullUser !== undefined) {
-                return this.fullUser.username;
-            }
-            return "";
-        },
+    props: {
+        comment: Comment,
+        post: Post,
+        user: User
+    }
+})
+export default class CommentEntry extends Vue {
+    comment: any;
+    post: any;
+    user: any;
+    edit: any;
+    editing = false;
+    text: string = "";
+    newComment = true;
+    prevText = "";
 
-    },
-    methods: {
-        submit() {
-            this.editing = false;
-            this.prevText = this.text;
-            this.$emit("changedComment", this.text);
-            this.$store.dispatch("createOrUpdateComment", {
-                pk: this.comment.pk,
-                post: this.post.pk,
-                text: this.text,
-                user: this.user.pk
-            });
-        },
-        cancel() {
-            this.editing = false;
-            this.text = this.prevText;
+    get fullUser() {
+        return this.$store.getters.getUserByID(this.user);
+    }
+
+    get fullUsername() {
+        if (this.fullUser !== undefined) {
+            return this.fullUser.username;
         }
-    },
+        return "";
+    }
+
+    submit() {
+        this.editing = false;
+        this.prevText = this.text;
+        this.$emit("changedComment", this.text);
+        let obj = {
+            pk: this.comment.pk,
+            post: this.post.pk,
+            content: this.text,
+            user: this.user.pk
+        };
+        createUpdateComment(this.$store, new Comment(1, 1, 1, "hey there!"));
+    }
+    cancel() {
+        this.editing = false;
+        this.text = this.prevText;
+    }
     mounted() {
-        
         this.text = this.comment.text;
         this.prevText = this.text;
         this.editing = this.edit;
-        
     }
-};
+}
 </script>
 
 <style lang="scss" scoped>

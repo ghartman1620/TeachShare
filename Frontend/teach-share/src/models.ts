@@ -3,7 +3,7 @@
  *  Model is the base implementation for a database-backed object
  */
 export abstract class Model {
-    public pk: number|string;
+    public pk?: number|string;
     constructor(pk: number) {
         this.pk = pk;
     }
@@ -66,16 +66,18 @@ function isString(str: string | undefined): str is string {
 }
 
 export class Comment extends Model {
-    public user: User;
-    public content: string;
+    public user?: User|number;
+    public post?: Post|number;
+    public text: string;
 
-    constructor(pk?: number, user?: User, content?: string) {
+    constructor(pk?: number, post?: Post|number, user?: User|number, text?: string) {
         super(typeof pk === "undefined" ? -1 : pk);
-        this.user = typeof user === "undefined" ? new User(-1) : user;
-        if (isString(content)) {
-            this.content = content;
+        this.user = user;
+        this.post = post;
+        if (isString(text)) {
+            this.text = text;
         } else {
-            this.content =  "";
+            this.text =  "";
         }
     }
     public hasUser(): boolean {
@@ -161,8 +163,8 @@ export class ModelMap<V> implements IterableIterator<V> {
         return this;
     }
 
-    has(key: string): boolean {
-        return typeof this.data[key] !== "undefined";
+    has(key: string|number): boolean {
+        return typeof this.data[String(key)] !== "undefined";
     }
     get keys(): string[] {
         return Object.keys(this._data);
@@ -179,7 +181,7 @@ export class ModelMap<V> implements IterableIterator<V> {
     set(key: string, value: V) {
         this._data[key] = value;
     }
-    get(key: string): V{
-        return this._data[key];
+    get(key: string|number): V{
+        return this._data[String(key)];
     }
 }

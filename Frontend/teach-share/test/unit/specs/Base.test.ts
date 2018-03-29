@@ -16,7 +16,7 @@ import { expect } from "chai";
 // vue-cookie because js cookies are awful
 // Vue.use(require("vue-cookie"));
 
-describe("Base.vue", () => {
+describe("[BASE.VUE] Base view component", () => {
     it("should render correct contents", () => {
         // const Constructor = Vue.extend(Base);
 

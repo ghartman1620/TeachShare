@@ -25,25 +25,7 @@ import { ModelMap } from "./models";
 export default class App extends Vue {
     // @State("audio") stateAudio;
     // @Action("audio/submitAudioFiles") submit;
-    mounted() {
-        let u = new User(1);
-        let c = new Comment(10, u, "This is the comment content.");
-        let d = new Comment(1, u, "this is different content.");
-        console.log(u, c);
-
-        let mm = new ModelMap<Comment>(c);
-        // mm["key"] = c;
-        console.log(mm);
-        console.log(mm.has(String(d.pk)));
-        console.log(mm.length);
-
-        let ae = new AudioElement({pk: 10, file: "file"});
-        // console.log("Submit audio: ", submitAudio(this.$store, ae));
-        // console.log(this.submit(ae));
-        let ab = {...ae, pk: 3};
-        // this.submit(ab).then((res)=> console.log(res));
-        // console.log(this.stateAudio);
-    }
+    mounted() {}
 
 }
 </script>
