@@ -33,7 +33,7 @@ export default class Comments extends Vue {
 
     get watchComments() {
 
-        return getCommentsForPost(this.$store)(1);
+        return getCommentsForPost(this.$store)(2);
     }
     mounted() {}
 }

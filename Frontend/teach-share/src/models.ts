@@ -153,6 +153,8 @@ export class ModelMap<V> implements IterableIterator<V> {
                 done: false,
                 value: this._data[key]
             }
+        } else {
+            this.counter = 0;
         }
         return {
             done: true

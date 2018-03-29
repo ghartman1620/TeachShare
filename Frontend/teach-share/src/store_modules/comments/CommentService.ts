@@ -134,9 +134,13 @@ export const getters = {
         console.log(state.comments);
         for (let c of (state.comments as ModelMap<Comment>)) {
             c = <Comment>c;
-            if (typeof c.pk !== "undefined" && c.pk === postid) { comm.push(c); }
+            if (typeof c.pk !== "undefined") {
+                console.log(c, "***");
+                comm.push(c);
+            }
             console.log(c);
         }
+        console.log(comm);
         return comm;
     }
 };
