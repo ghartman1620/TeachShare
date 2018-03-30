@@ -254,7 +254,8 @@ whitelist = ['pdf','doc', 'ppt','docx', 'odt', 'xlsx', 'xls', 'xlt', 'csv', 'ods
 
 
 class FileUploadView(views.APIView):
-    permission_classes = (IsAuthenticated,)
+    #SHOULD not be commented - at time of writing frontend has issues with login (fixed on another branch but requires merge)
+    #permission_classes = (IsAuthenticated,)
     parser_classes = (FileUploadParser, JSONParser)
 
     def put(self, request, filename, format=None):

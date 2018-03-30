@@ -78,14 +78,14 @@ export default class EditAudio extends Vue{
     @Action("addElement") addElement;
     @Action("editElement") editElement;
     @Action("submitAudioFiles") submitAudioFiles;
-
+    @Getter("fs/allFilesUploadComplete") allFilesUploadComplete;
+    @Getter("fs/hasFiles") hasFiles;
+    @Getter("fs/files") files;
     title: string = "";
     description: string = "";
 
     // getters
-    get hasFiles(){
-        return this.$store.getters.hasFiles;
-    }
+
 
     created() {
         var vm: EditAudio = this; //to get rid of this implicitly has type any
@@ -101,38 +101,19 @@ export default class EditAudio extends Vue{
         this.submitAudioFiles(this.generateJSON());
     }
     generateJSON() {
-        let output = new Array();
-        var vm = this;
-        _.map(this.fileState.uploadedFiles, function(val, ind, arr) {
-        output.push({
-            post: 2,
+        var val = this.files.objectify()[0]; //one file max in audio elements
+        return  {
             type: "audio_file",
             id: val.db_id,
-            title: vm.title,
+            title: this.title,
             filetype: val.file.type,
             name: val.file.name,
             url: val.url,
-            description: vm.description});
-        });
-        return output;
+            description: this.description
+        };
     }
     submit() {
-        var vm = this;
-        if (this.$route.query.index === this.postState.post.elements.length) {
-            this.addElement({
-                type: "audio",
-                content: this.generateJSON()
-            }).then(function(){
-                vm.$router.push({name: "create"});
-            });
-        } else {
-            this.editElement({
-                index: this.$route.query.index,
-                element: { type: "audio", content: this.generateJSON() }
-            }).then(function(){
-                vm.$router.push({name: "create"});
-            });
-        }
+        this.$parent.$emit("submitElement", this.generateJSON(), this.$route.query.index);
     }
     close(event: any) {
         this.$router.push({ name: "create" });

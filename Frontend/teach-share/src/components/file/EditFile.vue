@@ -20,51 +20,60 @@
 </body>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
+
 import FileUpload from "../FileUpload";
 import { mapGetters } from "vuex";
-export default Vue.component("edit-file", {
+import { Component, Prop } from "vue-property-decorator";
+import {GenericFile} from "../../models";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
+
+@Component({
 	components: {FileUpload},
-	computed: {
-		...mapGetters("fs", ["hasFiles", "allFilesUploadComplete"])
-	},
-	methods: {
-		submit() {
-			var vm = this;
-			if (this.$route.query.index === this.$store.state.create.postElements.length) {
-				this.$store.dispatch("addElement", this.generateJSON())
-					.then(function(){
-						vm.$router.push({name: "create"});
-					});
-			} else {
-				this.$store.dispatch("editElement", {
-					index: this.$route.query.index,
-					element: this.generateJSON()
-				}).then(function(){
-                    vm.$router.push({name: "create"});
-                });
+	name: "edit-file",
+})
+export default class EditFile extends Vue{
+	@Getter("fs/hasFiles") hasFiles;
+	@Getter("fs/allFilesUploadComplete") allFilesUploadComplete;
+	@Getter("fs/files") files;
+	@Action("addElement") addElement;
+
+	submit() {
+		console.log("submitting file element");
+		console.log(this.generateJSON());
+		this.$parent.$emit("submitElement", this.generateJSON(), this.$route.query.index);
+		/*
+		var vm = this;
+		if (this.$route.query.index === this.$store.state.create.postElements.length) {
+			this.addElement(this.generateJSON())
+				.then(function(){
+					vm.$router.push({name: "create"});
+				});
+		} else {
+			this.$store.dispatch("editElement", {
+				index: this.$route.query.index,
+				element: this.generateJSON()
+			}).then(function(){
+				vm.$router.push({name: "create"});
+			
 			}
-		},
-		generateJSON() {
-			var files = [];
-			this.$store.state.fs.uploadedFiles.forEach(function(val){
-				files.push({
-                    post: 2,
-                    type: "file",
-                    id: val.db_id,
-                    file: val.file,
-                    name: val.file.name,
-                    url: val.url,
-                });
-			});
-			return {type: "file", content: files}
-		},
-		cancel() {
-            this.$router.push({ name: "create" });
-        }
+		}
+		*/
 	}
-});
+	generateJSON(): any {
+		return {type: "file", content: this.files.objectify()}
+	}
+	cancel(){
+		this.$router.push({ name: "create" });
+	}
+};
 </script>
 
 

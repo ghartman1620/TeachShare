@@ -95,6 +95,7 @@ Vue.use(VueQuillEditor);
 })
 export default class EditText extends Vue{
     @State("create") postState;
+    @Action("addElement") addElement;
 
     element: any =  {};
     editorOption: any = {
@@ -106,18 +107,7 @@ export default class EditText extends Vue{
 
     // methods
     submit(event: any) {
-        if (
-            this.$route.query.index ==
-            this.postState.post.elements.length
-        ) {
-            this.$store.dispatch("addElement", this.element);
-        } else {
-            this.$store.dispatch("editElement", {
-                index: this.$route.query.index,
-                element: this.element
-            });
-        }
-        this.$router.push({ name: "create" });
+        this.$parent.$emit("submitElement", this.element, this.$route.query.index);
     }
     close(event: any) {
         this.$router.push({ name: "create" });

@@ -1,4 +1,4 @@
-
+import Vue from "vue";
 interface PostElement{
     type: string;
 }
@@ -48,8 +48,14 @@ export class Post{
     }
     swapElements(i: number, j: number): void{
         var tmp: any = this.elements[i];
-        this.elements[i] = this.elements[j];
-        this.elements[j] = tmp;
+        Vue.set(this.elements, i,this.elements[j]);
+        Vue.set(this.elements, j, tmp);
     }
-    
+    printElements(){
+        var print: string = ""
+        for(var ele in this.elements){
+            print += ele.toString() + " " ;
+        }
+        console.log(print);
+    }
 }

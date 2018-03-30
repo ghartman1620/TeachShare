@@ -222,39 +222,7 @@ export const actions = {
                 });
         });
     },
-    saveDraft: ctx => {
-        console.log("CALLING SAVE DRAFT!!!");
-        if (ctx.rootGetters.getCurrentPostId === null) {
-            // hasn't yet been saved...
-            var obj = {
-                user: ctx.rootGetters.getCurrentUser.profile.pk,
-                title: ctx.rootGetters.getTitle,
-                content: ctx.rootGetters.getContent,
-                likes: 0,
-                comments: [],
-                tags: ctx.rootGetters.getTags,
-                attachments: [],
-                content_type: 0,
-                grade: 0,
-                length: 0
-            };
-            return ctx.dispatch("createPost", obj).then(result => {
-                ctx.dispatch("setCurrentPost", result.data);
-                return result.data.pk;
-            });
-        } else {
-            // might be redundant! Check.
-            var currentPost = ctx.rootGetters.getCurrentPost;
-            currentPost.content = ctx.state.create.postElements;
-            currentPost.user = ctx.rootGetters.getCurrentUser.profile.pk;
-            currentPost.tags = ctx.rootGetters.getTags;
-            currentPost.title = ctx.rootGetters.getTitle;
-
-            return ctx.dispatch("updateExistingPost", currentPost).then(res => {
-                return ctx.dispatch("setCurrentPost", res.data);
-            });
-        }
-    },
+    
     createOrUpdateComment: (state, comment) => {
         if (comment.pk !== undefined) {
             return new Promise((resolve, reject) => {

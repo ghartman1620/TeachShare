@@ -27,9 +27,9 @@
             </div>
             <div class="col">
                 <br>
-                <h4 v-if="this.$store.state.fs.files.length > 0">Uploaded files: </h4>
+                <h4 v-if="this.getFiles > 0">Uploaded files: </h4>
                 <ul class="list-group">
-                    <li v-bind:key="obj.file.name" v-for="obj in filesUploadStatus"
+                    <li v-bind:key="obj.file.name" v-for="obj in getFiles"
                         class="list-group-item d-flex justify-content-between align-items-center">
                         <div class="col-5">
                             <span v-if="obj.url">
@@ -64,7 +64,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapGetters } from "vuex";
-import { Component } from "vue-property-decorator";
+import { Component, Prop } from "vue-property-decorator";
 import {
   State,
   Getter,
@@ -85,22 +85,45 @@ const UPLOAD_INITIAL = 0,
     UPLOAD_SUCCESS = 2,
     UPLOAD_ERROR = 3;
 
+interface FileUploadProps{
+    title: string;
+    fileLimit: number;
+    fileAcceptType: any;
+}
+var props: FileUploadProps = {
+    title: "",
+    fileLimit: 3,
+    fileAcceptType: fileTypes.FILE,
+}
 @Component({
     name: "file-upload",
-    props: ["title", "fileAcceptType", "fileLimit"],
 })
 export default class FileUpload extends Vue {
     @State("fs") fileState;
     @State("create") postState;
-    @Action("file/file_upload") fileUpload;
-    @Action("removeFile") removeFile;
-    @Action("changeFileLimit") changeFileLimit;
-    @Action("clearFIles") clearFiles;
+    @Action("fs/file_upload") fileUpload;
+    @Action("fs/remove_file") removeFile;
+    @Action("fs/change_limit") changeFileLimit;
+    @Action("fs/clear_files") clearFiles;
+    @Getter("fs/filesUploadStatus") getFiles;
 
+    @Prop({default: ""})
+    title!: string;
+
+    @Prop({default: 3})
+    fileLimit!: number;
+
+    @Prop({default: fileTypes.FILE})
+    fileAcceptType!: string;
+
+    /**constructor(title: string, fileLimit: number, fileAcceptType: string){
+        super();
+        this.title = title;
+        this.fileLimit = fileLimit;
+        this.fileAcceptType = fileAcceptType;
+    }*/
     //If we declare props do they get populated correctly? we'll see
-    title: string = "";
-    fileAcceptType: any = {};
-    fileLimit: number = 3;
+
     currentStatus   : number | null = null;
     uploadError: any;
     get accept(){
@@ -152,7 +175,7 @@ export default class FileUpload extends Vue {
             formData.append(fieldName, fileList[x], fileList[x].name);
         });
         this.save(formData);
-        
+
         var fileUpload: any = this.$refs.fileUpload;
         fileUpload.value = null;
     }

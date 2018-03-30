@@ -78,29 +78,37 @@ import FileUpload from "../FileUpload";
 import EditVideoEmbed from "./EditVideoEmbed";
 import DimensionPicker from "../DimensionPicker";
 import { mapGetters } from "vuex";
+import { Component, Prop } from "vue-property-decorator";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
 
 var _ = require("lodash");
 
 export default Vue.component("edit-video-embed", {
-    components: { DimensionPicker },
-    props: [],
-    data() {
-        return {
+
+    data(){
+        return{        
             width: 640,
             height: 480,
             title: "",
-            source: "",
-            EmbedURL: "",
+            source:  "",
+            EmbedURL:"",
             EmbedDescription: "",
-            EmbedHeight: 480,
-            includeYtData: true,
+            EmbedHeight:480,
+            includeYtData:true,
             dimensionErrors: {
                 any: function() {
                     return false;
                 } 
             }
-        };
+        }
     },
+
     computed: {
         ActualDescription() {
             if (this.includeYtData) {
@@ -122,17 +130,7 @@ export default Vue.component("edit-video-embed", {
             this.getYoutubeData();
         }, 400),
         submit() {
-            if (
-                this.$route.query.index ==
-                this.$store.state.create.postElements.length
-            ) {
-                this.$store.dispatch("addElement", this.generateEmbedJSON());
-            } else {
-                this.$store.dispatch("editElement", {
-                    index: this.$route.query.index,
-                    element: this.generateEmbedJSON()
-                });
-            }
+            this.$parent.$emit("submitElement", this.generateEmbedJSON(), this.$route.query.index);
         },
 
         getYoutubeData() {

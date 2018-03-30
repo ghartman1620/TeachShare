@@ -79,6 +79,8 @@ export default class EditImage extends Vue{
     @State("fs") fileState;
     @Action("addElement") addElement;
     @Action("editElement") editElement;
+    @Getter("fs/allFilesUploadComplete") allFilesUploadComplete;
+    @Getter("fs/files") files;
 
     title: string = "";
     description: string = "";
@@ -101,20 +103,7 @@ export default class EditImage extends Vue{
     }
     // methods
     submit() {
-        var vm = this;
-        if (this.$route.query.index === this.postState.post.elements.length) {
-            this.addElement(this.generateJSON())
-                .then(function(){
-                    vm.$router.push({name: "create"});
-            });
-        } else {
-            this.editElement({
-                index: this.$route.query.index,
-                component: this.generateJSON()
-            }).then(function(){
-                vm.$router.push({name: "create"});
-            });
-        }
+        this.$parent.$emit("submitElement", this.generateJSON(), this.$route.query.index);
         // this.$store.dispatch("LoadImages", this.generateJSON());
         // this.$router.push({name: "create"});
     }
@@ -137,7 +126,7 @@ export default class EditImage extends Vue{
             type: "image_file", 
             description: this.description, 
             title: this.title, 
-            content: output,
+            content: this.files.objectify(),
             width: this.width,
             height: this.height  
         };

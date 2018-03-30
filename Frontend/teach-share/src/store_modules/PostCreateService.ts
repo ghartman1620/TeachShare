@@ -20,6 +20,10 @@ interface PostState {
     doneMutations: Mutation[];
     unDoneMutations: Mutation[];
 }
+interface EditedElement{
+    element: any;
+    index: number;
+}
 
 type PostContext = ActionContext<PostState, RootState>;
 
@@ -71,7 +75,7 @@ export const mutations = {
         });
         state.post.insertElement(arg.index, arg.element);
     },
-    UNDO_EDIT_ELEMENT: (state: PostState, arg: any) => {
+    UNDO_EDIT_ELEMENT: (state: PostState, arg: EditedElement) => {
         state.unDoneMutations.push({
             mutation: "EDIT_ELEMENT",
             arg: {
@@ -99,6 +103,7 @@ export const mutations = {
         state.post.addElement(element);
     },
     SWAP_ELEMENTS: (state: PostState, iAndJ: number[]) => {
+        console.log("swap elements");
         // I wrote this code because i'm triggered by being limited
         // to one function argument so I'm going to pretend I can pass two.
         state.doneMutations.push({
@@ -140,6 +145,7 @@ export const actions = {
         context.commit("SET_TITLE", title);
     },
     setCurrentPost: (context: PostContext, post: any) => {
+        console.log("seting current post");
         context.commit("SET_POST", post);
     },
     undo: (context: PostContext) => {
@@ -190,6 +196,7 @@ export const actions = {
     // a list with index 0 as the first index to be swapped
     // and index 1 the second
     swapElements: (context: PostContext, iAndJ: number[]) => {
+        console.log("swapElements");
         context.commit("SWAP_ELEMENTS", iAndJ);
         context.commit("CLEAR_REDO");
         context.dispatch("saveDraft").then(res => console.error(res));
@@ -217,11 +224,56 @@ export const actions = {
             state.commit("ADD_ATTACHMENT", attachment);
         }
     },
-    editElement: (context: PostContext, editedElement) => {
+    editElement: (context: PostContext, editedElement: EditedElement) => {
         context.commit("EDIT_ELEMENT", editedElement);
         context.commit("CLEAR_REDO");
         context.dispatch("saveDraft").then(res => console.error(res));
-    }
+    },
+    saveDraft: (ctx: PostContext) => {
+        console.log("CALLING SAVE DRAFT!!!");
+        console.log(ctx.rootGetters.getCurrentPostId);
+        //This is temporarily in place while I merge post create and the new login/auth stuff! It
+        //Should be gotten rid of ASAP
+        const USER_PK = 10;
+        if (ctx.rootGetters.getCurrentPostId === null || ctx.rootGetters.getCurrentPostId === undefined) {
+            // hasn't yet been saved...
+            console.log("new post");
+            var obj = {
+                ///user: ctx.rootGetters.getCurrentUser.profile.pk,
+                user: USER_PK,
+                title: ctx.rootGetters.getTitle,
+                content: ctx.rootGetters.getContent,
+                likes: 0,
+                comments: [],
+                tags: ctx.rootGetters.getTags,
+                attachments: [],
+                content_type: 0,
+                grade: 0,
+                length: 0
+            };
+            console.log(obj);
+            console.log("creating new post");
+            return ctx.dispatch("createPost", obj).then(result => {
+                console.log(result);
+                ctx.dispatch("setCurrentPost", result.data);
+                return result.data.pk;
+            });
+        } else {
+            console.log("in already created post");
+            console.log(ctx.rootGetters.getCurrentPost);
+            // might be redundant! Check.
+            var currentPost = ctx.rootGetters.getCurrentPost;
+            currentPost.content = ctx.state.post.elements;
+            ///currentPost.user = ctx.rootGetters.getCurrentUser.profile.pk;
+            currentPost.user = USER_PK;
+            currentPost.tags = ctx.rootGetters.getTags;
+            currentPost.title = ctx.rootGetters.getTitle;
+
+            return ctx.dispatch("updateExistingPost", currentPost).then(res => {
+                return ctx.dispatch("setCurrentPost", res.data);
+            });
+        }
+    },
 }
 
 const PostCreateService = {

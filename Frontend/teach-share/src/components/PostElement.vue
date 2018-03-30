@@ -18,13 +18,8 @@ Uses TextElement, VideoElement, etc.
                 :height="element.height"
             />
         </div>
-        <div class="post-element card" v-else-if="element.type === 'audio'">
-            <audio-element :id="element.content[0].id"
-            :title="element.content[0].title"
-            :body="element.content[0].description"
-            :controls="true" :source="element.content[0].url"
-            :filetype="element.content[0].filetype"
-            autoplay="false"/>
+        <div class="post-element card" v-else-if="element.type === 'audio_file'">
+            <audio-element :element="element"/>
         </div>
 
         <div class="post-element card" id="outer-video-container" v-else-if="element.type === 'video_link' || element.type === 'video_file'">
@@ -64,7 +59,7 @@ Uses TextElement, VideoElement, etc.
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 
 import SeeMore from "./SeeMore.vue"
 import TextElement from "./text/TextElement.vue";
@@ -75,10 +70,15 @@ import ImageElement from "./image/ImageElement.vue";
 
 @Component({
     name: "post-element",
-    props: ["element", "index"],
-    components: {SeeMore, TextElement, VideoElement, FileElement, ImageElement}
+    components: {SeeMore, TextElement, VideoElement, AudioElement, FileElement, ImageElement}
 })
-export default class PostElement extends Vue {}
+export default class PostElement extends Vue {
+    @Prop({})
+    element!: any;
+
+    @Prop({})
+    index!: number;
+}
 </script>
 
 <style lang="scss" scoped>

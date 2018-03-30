@@ -36,7 +36,7 @@ const uuidv4 = require("uuid/v4");
  *
  * @TODO: Simplify/break up
  */
-export const file_upload =  async (context, files) => {
+export const file_upload =  async (context: FileContext, files) => {
     console.log(context, files);
     try {
         let postid = await context.dispatch("saveDraft", null, {root: true});
@@ -46,20 +46,21 @@ export const file_upload =  async (context, files) => {
     }
 
     let i: number = 0;
+    var uploadedFiles: ModelMap<GenericFile> = <ModelMap<GenericFile>>context.state.files;
     files.forEach( async (file) => {
         let fileAlreadyUploaded = false;
 
-        context.state.files.forEach( element => {
+        for(let element of uploadedFiles) {
             /**
              * @changed: ==, ===
              * Test whether or not a file is already uploaded.
              */
-            if (element.file.name === file.name) {
+            if (element!.file!.name === file.name) {
                 fileAlreadyUploaded = true;
             }
-        });
-        if (!fileAlreadyUploaded && i + context.state.uploadedFiles.length < context.state.limit) {
-
+        }
+        if (!fileAlreadyUploaded && i + uploadedFiles.length < context.state.limit) {
+            console.log("in uploading files");
             let id = uuidv4();
             let cancelToken = axios.CancelToken;
             let cancel = cancelToken.source();
@@ -68,12 +69,7 @@ export const file_upload =  async (context, files) => {
                     let percent = Math.floor(
                         progressEvent.loaded * 100 / progressEvent.total
                     );
-                    context.commit("create_update_file", {
-                        percent,
-                        file,
-                        pk: id,
-                        cancel
-                    });
+                    context.commit("create_update_file", new GenericFile(id, percent, file, cancel));
                 },
                 cancelToken: cancel.token
             };
@@ -81,12 +77,13 @@ export const file_upload =  async (context, files) => {
                 /**
                  * make request
                  */
+                console.log("make request");
                 let response = await api
                     .put(`upload/${file.name}?id=${id}&post=${context.rootGetters.getCurrentPostId}`,
-                        file, config);
-
+                        file, config)
+                console.log(response);
                 // update the current uploaded file object
-                context.commit("create_update_file", response);
+                context.commit("create_update_file", new GenericFile(id, 100, file, undefined, response.data.url));
 
             } catch ( error ) {
                 /**
@@ -141,8 +138,11 @@ export const mutations = {
      * but will also create files that don't already exist.
      */
     create_update_file: (state, data: GenericFile) => {
+        console.log(data);
         if (typeof data.pk !== "undefined") {
+            console.log("setting data in create update file");
             Vue.set(state.files.data, data.pk, data);
+            console.log(state.files.data);
         }
     },
 
@@ -178,16 +178,23 @@ export const mutations = {
  * Getters - 
  */
 export const getters = {
+    files: state => state.files,
     filesUploadStatus: state => state.files.data,
-    allFilesUploadComplete: (state) => {
-        if (state.files.length > 0) {
-            let oneHundredPercent = every(state.files, {"percent": 100});
+    allFilesUploadComplete: (state: FileState) => {
+        console.log(state.files);
+        console.log(state.files!.length);
+        if (state.files!.length > 0) {
+            let oneHundredPercent = every(state.files!.data, {"percent": 100});
+            console.log("one hundred: "  + oneHundredPercent);
+            //This currently doesn't compile - says val is a number or string.
+            /*
             let hasURL = reduce(state.files, (res, val, key) => {
                 if (val.url !== undefined) {
                     return true;
                 }
                 return false;
-            }, false);
+            }, false);*/
+            let hasURL = true;
             return oneHundredPercent === true && hasURL === true;
         }
         return false;

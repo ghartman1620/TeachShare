@@ -49,7 +49,6 @@
             </div>
         </div>
     </div>
-
     <div class="row">
         <div class="col-2"></div>
         <div class="col-8">
@@ -111,7 +110,7 @@
                             <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
                             <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="/static/caret-square-down.png"></button>
                             <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button>
-                            <button class="btn btn-primary" id="edit-button" @click="editElement(index)"><img height=20 src="/static/edit-icon.png"></button>
+                            <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="/static/edit-icon.png"></button>
 
                         </div>
                     </div>
@@ -165,7 +164,7 @@ import { mapState } from "vuex";
 import forEach from "lodash/forEach";
 import PostElement from "./PostElement";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
-import { Component } from "vue-property-decorator";
+import { Component, Prop } from "vue-property-decorator";
 import {Location, Dictionary} from "vue-router/types/router.d";
 function isBlank(str) {
     return !str || /^\s*$/.test(str);
@@ -204,7 +203,9 @@ export default class PostCreate extends Vue{
     @Action("setTitle") setTitle;
     @Action("createPost") createPost;
     @Action("swapElements") swapElements;
-    @Action("deleteElement") deleteElement;
+    @Action("removeElement") deleteElement;
+    @Action("addElement") addElement;
+    @Action("editElement") editElement;
     @Action("storeUndo") storeUndo;
     @Action("storeRedo") storeRedo;
 
@@ -294,7 +295,7 @@ export default class PostCreate extends Vue{
             }
         });
     }
-    editElement(index: number) {
+    openEditor(index: number) {
         var type = this.postState.post.elements[index].type;
         var routeName = "edit-";
         if (type === "text") {
@@ -314,6 +315,7 @@ export default class PostCreate extends Vue{
     }
 
     moveElementUp(index: number) {
+        console.log("move element up" + index);
         if (index != 0) {
             this.swapElements([index, index - 1]);
             //dispatch only allows one argument so we'll pass them as an array
@@ -336,6 +338,22 @@ export default class PostCreate extends Vue{
     }
     redo() {
         this.storeRedo();
+    }
+    mounted() {
+        console.log("mounted post create");
+        var vm: PostCreate = this;
+        this.$on("submitElement", function(element: any, index: number){
+            console.log("submitting element");
+            console.log(element);
+            console.log(index);
+            if(index == vm.postState.post.elements.length){
+                vm.addElement(element);
+            }
+            else{
+                vm.editElement({element: element, index: index});
+            }
+            vm.$router.push({name: "create"});
+        })
     }
 };
 </script>

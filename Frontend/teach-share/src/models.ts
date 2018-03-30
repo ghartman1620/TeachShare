@@ -105,13 +105,20 @@ export class GenericFile {
     public percent: number;
     public file: File | undefined;
     public cancel: any;
+    public url: string | undefined;
+    public name: string | undefined;
 
-    constructor(pk: string, percent = 0, file?: File, cancel?: any) {
+    constructor(pk: string, percent = 0, file?: File, cancel?: any, url?: string) {
         this.pk = pk;
         this.percent = percent;
         this.file = file;
         this.cancel = cancel;
+        this.url = url;
+        if(file !== undefined){
+            this.name = file.name;
+        }
     }
+    
 }
 
 export interface RootState {
@@ -187,5 +194,14 @@ export class ModelMap<V> implements IterableIterator<V> {
     }
     get(key: string): V{
         return this._data[key];
+    }
+    //returns an object representation of this modelMap's data for use in conversion to JSON
+    objectify(): any[] {
+        var objects: any[] = [];
+        for(let key in this.data){
+            var obj: any = {}
+            objects.push(this.get(key));
+        }
+        return objects;
     }
 }

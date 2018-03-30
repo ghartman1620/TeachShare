@@ -83,21 +83,11 @@ export default Vue.component("edit-video-file", {
             this.generateFileJSON();
         }, 1000),
         submit() {
-            if (
-                this.$route.query.index ==
-                this.$store.state.create.postElements.length
-            ) {
-                this.$store.dispatch("addElement", this.generateFileJSON());
-            } else {
-                this.$store.dispatch("editElement", {
-                    index: this.$route.query.index,
-                    element: this.generateFileJSON()
-                });
-            }
-            this.$router.push({ name: "create" });
+            this.$parent.$emit("submitElement", this.generateFileJSON(), this.$route.query.index);
         },
         generateFileJSON() {
-            let val = this.$store.state.fs.uploadedFiles[0];
+            console.log(this.$store.getters.filesUploadStatus);
+            let val = this.$store.getters.filesUploadStatus[0];
             var obj = {
                 post: 2,
                 type: "video_file",

@@ -16,14 +16,14 @@
                 type="number"
                 min="100"
                 max="1024"
-                :class="{'input': true, 'outline-danger': errors.has('height'), 'form-control': true }"
+                :class="{'input': true, /*'outline-danger': errors.has('height'),*/ 'form-control': true }"
                 name="height"
                 aria-describedby="basic-height">
             
             </div>
             <input class="fullwidth" type="range" min="100" max="1024" v-model="height">
 
-            <span v-show="errors.has('height')" class="help text-danger">{{ errors.first('height') }}</span>
+            <!-- <span v-show="errors.has('height')" class="help text-danger">{{ errors.first('height') }}</span> -->
         </div>
         
         <div class="col-6">
@@ -36,11 +36,11 @@
                 v-validate="'required|between:100,1024'"
                 v-model.number="width"
                 type="number"
-                :class="{'input': true, 'outline-danger': errors.has('width'), 'form-control': true }"
+                :class="{'input': true, /*'outline-danger': errors.has('width'), */'form-control': true }"
                 name="width"
                 aria-describedby="basic-width">
             </div>
-             <span v-show="errors.has('width')" class="help text-danger">{{ errors.first('width') }}</span>
+             <!-- <span v-show="errors.has('width')" class="help text-danger">{{ errors.first('width') }}</span> -->
              <input class="fullwidth" type="range" min="100" max="1024" v-model="width">
         </div>
        
@@ -48,6 +48,8 @@
 </template>
 
 <script lang="ts">
+//There were some issues with the validation errors in this file so they're commented out.
+//We can fix them when we go to make the dimesion functionality useful (click + drag)
 import Vue from "vue";
 //import { mapFields } from "vee-validate";
 import { Component } from "vue-property-decorator";
@@ -66,14 +68,14 @@ export default class DimensionPicker extends Vue{
 
     width: number = 640;
     height: number = 480;
-    errors: any = {};
+    //errors: any = {};
 
     changeWidth() {
         var vm: DimensionPicker = this;
         Vue.nextTick(function() {
             vm.$parent.$emit("changeWidth", {
                 value: Number(vm.width),
-                errors: vm.errors
+                //errors: vm.errors
             });
         });
     }
@@ -82,7 +84,7 @@ export default class DimensionPicker extends Vue{
         Vue.nextTick().then(function() {
             vm.$parent.$emit("changeHeight", {
                 value: Number(vm.height),
-                errors: vm.errors
+                //errors: vm.errors
             });
         });
     }
