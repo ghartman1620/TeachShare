@@ -8,7 +8,7 @@
                         show
                         dismissible
                         @dismissed="close(n)"
-                        :variant="n.type">
+                        :variant="convertNotifyType(n.type)">
                             <div v-html="n.content"></div>
                     </b-alert>
                 </div>
@@ -19,6 +19,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import { NotifyType } from "../models";
 
 @Component({
     props: {},
@@ -34,6 +35,10 @@ export default class Notify extends Vue {
     close(note: any) {
         console.log(note);
         this.$store.dispatch("removeNotification", note.id)
+    }
+    convertNotifyType(val: number): string {
+        console.log("NotifyType: ", NotifyType[val]);
+        return NotifyType[val];
     }
 }
 </script>

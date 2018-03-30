@@ -70,6 +70,7 @@ export default class Base extends Vue {
                         this.$store.dispatch("addUser", resp)
             });
         }
+        // this.$notifySuccess("please work....");
         // this is an example of how to check an images height/width without actually mounting it on the page
         // const Constructor = Vue.extend(Image);
         // const vm = new Constructor( { propsData: 

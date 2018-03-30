@@ -72,7 +72,7 @@ import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import forEach from "lodash/forEach";
 import Logger from "../logging/logger";
 import {Comment, Post, User} from "../models";
-import { createUpdateComment } from "../store_modules/comments/CommentService";
+import { createUpdateComment, getByPost } from "../store_modules/comments/CommentService";
 
 @Component({
     components: {
@@ -86,9 +86,9 @@ import { createUpdateComment } from "../store_modules/comments/CommentService";
     props: ["post", "index", "maxHeight"]
 })
 export default class PostComp extends Vue {
-    @Prop({required: true}) post!: Post;
-    @Prop() index: number = 0;
-    @Prop() maxHeight!: number;
+    @Prop({required: true}) post;
+    @Prop() index;
+    @Prop() maxHeight;
 
     newCommentText: string = "";
 
@@ -112,23 +112,21 @@ export default class PostComp extends Vue {
     getComments() {
         var vm = this;
         // createUpdateComment(this.$store, )
-        this.$store
-            .dispatch("fetchCommentsForPost", this.post.pk)
-            .then(function(res) {
-                console.log(res);
-                for (let c of vm.post.comments) {
-                    console.log(c);
-                    let hasUser = vm.$store.state.users.find(
-                        (val: User) => val.pk === (c as Comment).pk
-                    );
+        getByPost(this.$store, this.post.pk).then(function(res) {
+            console.log(res);
+            // for (let c of vm.post.comments) {
+            //     console.log(c);
+            //     let hasUser = vm.$store.state.users.find(
+            //         (val: User) => val.pk === (c as Comment).pk
+            //     );
 
-                    if (hasUser === null) {
-                    }
-                    if (typeof c !== "undefined") {
-                        vm.$store.dispatch("fetchUser", c.user);
-                    }
-                }
-            });
+            //     if (hasUser === null) {
+            //     }
+            //     if (typeof c !== "undefined") {
+            //         // vm.$store.dispatch("fetchUser", c.user);
+            //     }
+            // }
+        });
     }
     submitComment() {
         var vm = this;
@@ -163,7 +161,7 @@ export default class PostComp extends Vue {
                     );
                 } else {
                     let total = "";
-                    forEach(ret, function(val, key) {
+                    ret.forEach((val, key) => {
                         let currentValue = val.join(" ");
                         total = `${total} "${key}: ${currentValue}" `;
                     });

@@ -10,7 +10,7 @@
                     <span class="input-group-text" id="basic-addon3">Embed URL</span>
                 </div>
                 <input
-                    v-on:input="DebounceSubmit"
+                    v-on:input="debounceSubmit"
                     v-validate="'required|url|YoutubeEmbedURL'"
                     :class="{'input': true, 'outline-danger': errors.has('embedurl') }"
                     v-model="EmbedURL"
@@ -72,109 +72,119 @@
     </div>
 </template>
 
-<script>
-import Vue from "vue";
-import FileUpload from "../FileUpload";
-import EditVideoEmbed from "./EditVideoEmbed";
-import DimensionPicker from "../DimensionPicker";
+<script lang="ts">
+import { Vue, Component, Prop } from "vue-property-decorator";
+import FileUpload from "../FileUpload.vue";
+import DimensionPicker from "../DimensionPicker.vue";
 import { mapGetters } from "vuex";
+import debounce from "lodash/debounce";
 
 var _ = require("lodash");
 
-export default Vue.component("edit-video-embed", {
+@Component({
+    name: "edit-video-embed",
     components: { DimensionPicker },
     props: [],
-    data() {
-        return {
-            width: 640,
-            height: 480,
-            title: "",
-            source: "",
-            EmbedURL: "",
-            EmbedDescription: "",
-            EmbedHeight: 480,
-            includeYtData: true,
-            dimensionErrors: {
-                any: function() {
-                    return false;
-                } 
-            }
-        };
-    },
-    computed: {
-        ActualDescription() {
-            if (this.includeYtData) {
-                return this.ytVideoDescription;
-            } else {
-                return this.EmbedDescri1ption;
-            }
-        },
-        ...mapGetters([
+    computed: mapGetters([
             "ytVideoDescription",
             "ytVideoDescriptionShort",
             "ytVideoThumbnail",
             "ytVideoTitle",
             "ytVideoID"
-        ])
-    },
-    methods: {
-        DebounceSubmit: _.debounce(function() {
-            this.getYoutubeData();
-        }, 400),
-        submit() {
-            if (
-                this.$route.query.index ==
-                this.$store.state.create.postElements.length
-            ) {
-                this.$store.dispatch("addElement", this.generateEmbedJSON());
-            } else {
-                this.$store.dispatch("editElement", {
-                    index: this.$route.query.index,
-                    element: this.generateEmbedJSON()
-                });
-            }
-        },
+    ])
+})
+export default class EditVideoEmbed extends Vue {
 
-        getYoutubeData() {
-            var self = this;
-            this.$store
-                .dispatch("getYoutubeVideoInfo", this.EmbedURL)
-                .catch(err => console.log(err));
-        },
-        generateEmbedJSON() {
-            var obj = {
-                post: 2,
-                type: "video_link",
-                id: this.ytVideoID,
-                url: this.EmbedURL,
-                height: this.height,
-                width: this.width,
-                title: this.ytVideoTitle,
-                thumbnail: this.ytVideoThumbnail,
-                description: this.ActualDescription
-            };
-            this.$store.dispatch("submitVideoEmbed", obj);
-            this.$router.push({ name: "create" });
-            return { type: "video_link", content: obj };
-        },
-        cancelEdit() {
-            this.$router.push({ name: "create" });
+    ytVideoDescription!: string ;
+    ytVideoID!: string;
+    ytVideoTitle!: string;
+    ytVideoThumbnail!: any;
+
+    width: number = 640;
+    height: number = 480;
+    title: string = "";
+    source: string = "";
+    EmbedURL: string = "";
+    EmbedDescription: string = "";
+    EmbedHeight: number = 480;
+    includeYtData: boolean = true;
+    dimensionErrors: any = {
+        any: function() {
+            return false;
         }
-    },
+    };
+
+    get actualDescription() {
+        debugger;
+        if (this.includeYtData) {
+            return this.ytVideoDescription;
+        } else {
+            return this.EmbedDescription;
+        }
+    }
+
+    debounceSubmit() {
+        debugger;
+        var vm = this;
+        _.debounce(function() {
+            vm.getYoutubeData();
+        }, 400);
+    }
+    submit() {
+        debugger;
+        if (
+            this.$route.query.index ==
+            this.$store.state.create.postElements.length
+        ) {
+            this.$store.dispatch("addElement", this.generateEmbedJSON());
+        } else {
+            this.$store.dispatch("editElement", {
+                index: this.$route.query.index,
+                element: this.generateEmbedJSON()
+            });
+        }
+    }
+
+    getYoutubeData() {
+        var self = this;
+        this.$store
+            .dispatch("getYoutubeVideoInfo", this.EmbedURL)
+            .catch(err => console.log(err));
+    }
+    generateEmbedJSON() {
+        var obj = {
+            post: 2,
+            type: "video_link",
+            id: this.ytVideoID,
+            url: this.EmbedURL,
+            height: this.height,
+            width: this.width,
+            title: this.ytVideoTitle,
+            thumbnail: this.ytVideoThumbnail,
+            description: this.actualDescription
+        };
+        this.$store.dispatch("submitVideoEmbed", obj);
+        this.$router.push({ name: "create" });
+        return { type: "video_link", content: obj };
+    }
+    cancelEdit() {
+        this.$router.push({ name: "create" });
+    }
     mounted() {
+        var vm = this;
         this.$on("changeHeight", function(h) {
-            this.height = h.value;
-            this.dimensionErrors = h.errors;
+            vm.height = h.value;
+            vm.dimensionErrors = h.errors;
         });
         this.$on("changeWidth", function(w) {
-            this.width = w.value;
-            this.dimensionErrors = w.errors;
+            vm.width = w.value;
+            vm.dimensionErrors = w.errors;
         });
-    },
+    }
     destroyed() {
         this.$store.dispatch("clearYoutubeData");
     }
-});
+}
 </script>
 
 <style lang="scss" scoped>

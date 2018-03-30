@@ -12,28 +12,22 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
-import Post from "../Post.vue";
+import { Post } from "../../models";
 import CommentEntry from "./CommentEntry.vue";
 import { getCommentsForPost } from "../../store_modules/comments/CommentService";
 
 @Component({
     name: "Comments",
     components: { CommentEntry },
-    props: {
-        post: Post
-    }
+    props: [
+        "post"
+    ]
 })
 export default class Comments extends Vue {
-    @Prop({required: true}) post?: Post;
-
-    constructor() {
-        super();
-        console.log("constructor for comments was called.");
-    }
+    @Prop({required: true}) post;
 
     get watchComments() {
-
-        return getCommentsForPost(this.$store)(2);
+        return getCommentsForPost(this.$store)(this.post.pk as number);
     }
     mounted() {}
 }

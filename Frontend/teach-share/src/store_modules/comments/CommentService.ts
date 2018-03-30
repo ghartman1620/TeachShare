@@ -38,6 +38,10 @@ export const actions = {
         try {
             let response = await api.get(`comments/?post=${postID}`);
             console.log(response.data);
+            for (let c of response.data) {
+                console.log(c);
+                mutUpdate(ctx, c);
+            }
             // mutCreate(ctx, );
             return response;
         } catch (err) {
@@ -127,27 +131,40 @@ export const mutations = {
 };
 
 export const getters = {
-    getCommentsForPost: state => (postid: number): Comment[] => {
-        let comm: Comment[] = [];
-        console.log("*************************************************");
-        console.log(postid);
-        console.log(state.comments);
-        for (let c of (state.comments as ModelMap<Comment>)) {
-            c = <Comment>c;
-            if (typeof c.pk !== "undefined") {
-                console.log(c, "***");
-                comm.push(c);
-            }
+    /**
+     * loadedComments: is the base list of comments. It takes the associative
+     * 'dictionary' type value and flattens it into a list that is easy to manipulate
+     * like a list for eg. filter, reduce, etc...
+     * 
+     * @param  {} state
+     * @returns Comment[]
+     */
+    loadedComments: (state): Comment[] => {
+        let comments: Comment[] = [];
+        for (let c of state.comments) {
             console.log(c);
+            comments.push(c);
         }
-        console.log(comm);
-        return comm;
+        return comments;
+    },
+
+    /**
+     * getCommentsForPost: is the basic function for getting a list of just the comments
+     * related to a particular post id that are already loaded in the store.
+     *
+     * @param  {} state
+     * @param  {} getters
+     * @param  {number} => (postid)
+     * @returns Comment[]
+     */
+    getCommentsForPost: (state, getters) => (postid: number): Comment[] => {
+        return getters.loadedComments.filter(comment => comment.post === postid);
     }
 };
 
 const CommentService = {
     namespaced: true,
-    strict: true,
+    strict: process.env.NODE_ENV !== 'production',
     state,
     mutations,
     actions,
@@ -160,14 +177,14 @@ export default CommentService;
  * Type safe definitions for CommentService
  */
 const { commit, read, dispatch } =
-     getStoreAccessors<CommentState, RootState>("comments");
+     getStoreAccessors<CommentState, RootState>("comment");
 
 
 /**
  * Actions Handlers
  */
 export const createUpdateComment = dispatch(CommentService.actions.createUpdate);
-
+export const getByPost = dispatch(CommentService.actions.getByPost);
 /**
  * Getters Handlers
  */

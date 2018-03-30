@@ -8,7 +8,7 @@ import YouTubeService from "./store_modules/YouTubeService";
 import PostCreateService from "./store_modules/PostCreateService";
 import UserService from "./store_modules/UserService";
 import CommentService from "./store_modules/comments/CommentService";
-import NotificationService from "./store_modules/NotificationService";
+import NotificationService from "./store_modules/notify/NotificationService";
 
 import { RootState } from "./models";
 import { Post, Comment, User } from "./models";
@@ -217,8 +217,8 @@ const store: StoreOptions<RootState> = {
         fs: FileService,
         yts: YouTubeService,
         create: PostCreateService,
-        notifications: NotificationService,
-        comments: CommentService,
+        notify: NotificationService,
+        comment: CommentService,
         user: UserService
     },
     mutations,

@@ -75,7 +75,7 @@ export class Comment extends Model {
         this.user = user;
         this.post = post;
         if (isString(text)) {
-            this.text = text;
+            this.text = text;``
         } else {
             this.text =  "";
         }
@@ -114,6 +114,23 @@ export class GenericFile {
         this.file = file;
         this.cancel = cancel;
     }
+}
+
+export enum NotifyType {
+    "success",
+    "danger",
+    "info",
+    "warning",
+    "primary",
+    "secondary",
+    "dark",
+    "light"
+}
+
+export interface Notification {
+    id?: string;
+    type: NotifyType;
+    content: string;
 }
 
 export interface RootState {

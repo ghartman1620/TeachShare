@@ -282,8 +282,8 @@ export const getters = {
 
 // FileService definition
 const FileService = {
-    strict: true,
     namespaced: true,
+    strict: process.env.NODE_ENV !== 'production',
     state,
     mutations,
     actions,

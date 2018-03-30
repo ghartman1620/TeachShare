@@ -69,11 +69,11 @@ import { Comment, User, Post } from "../../models";
 @Component({
     name: "comment-entry",
     components: { TextElement, EditText, FontAwesomeIcon },
-    props: {
-        comment: Comment,
-        post: Post,
-        user: User
-    }
+    props: [
+        "comment",
+        "post",
+        "user"
+    ]
 })
 export default class CommentEntry extends Vue {
     comment: any;
@@ -106,7 +106,7 @@ export default class CommentEntry extends Vue {
             content: this.text,
             user: this.user.pk
         };
-        createUpdateComment(this.$store, new Comment(1, 1, 1, "hey there!"));
+        // createUpdateComment(this.$store, new Comment(1, 1, 1, "hey there!"));
     }
     cancel() {
         this.editing = false;
