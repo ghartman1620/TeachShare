@@ -1,6 +1,8 @@
 
 <template>
 <div>
+
+
 <div :style="getBodyStyle()">
     <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container">
         <div class="col-8 mx-auto card-deck" id="button-bar">
@@ -98,13 +100,13 @@
         <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
             <div class="post-element-container">
                 <div class="card-column column">
-                  <div class="col-12 container">
-                    <div class="post-element card">
-                      <post-element :element="element" :index="index"></post-element>
+                    <div class="col-12 container">
+                        <div class="post-element card">
+                            <post-element :element="element" :index="index"></post-element>
+                        </div>
                     </div>
-                  </div>
 
-                  <div class="justify-content-start">
+                    <div class="justify-content-start">
                         <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
 
                             <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
@@ -133,7 +135,7 @@
         <button type="button" class="redo-button align-right btn btn-sm btn-outline-success btn-primary-spacing" @click="redo">
             <font-awesome-icon icon="redo" fixed-width></font-awesome-icon> redo 
         </button>
-        <button type="button" :disabled="!hasTitle" class="submit-button btn btn-primary" @click="submitPost">
+        <button type="button" class="submit-button btn btn-primary" v-on:click="submitPost">
             <font-awesome-icon icon="check" fixed-width></font-awesome-icon> Publish post
         </button>
     </nav>
@@ -208,6 +210,9 @@ export default class PostCreate extends Vue{
     @Action("editElement") editElement;
     @Action("storeUndo") storeUndo;
     @Action("storeRedo") storeRedo;
+    @Action("beginPost") beginPost;
+
+    @Getter("getLoggedInUser") getLoggedInUser;
 
     title: string = "";
     inProgressTag: string = "";
@@ -264,8 +269,8 @@ export default class PostCreate extends Vue{
         currentPost.content = this.postState.post.elements;
         currentPost.tags = this.postState.post.tags;
         currentPost.title = this.postState.post.title;
-        currentPost.user = this.postState.post.user;
         currentPost.draft = false;
+        
 
         // dispatch createPost method in the store. This will send a
         // post request to the backend server.
@@ -339,8 +344,14 @@ export default class PostCreate extends Vue{
     redo() {
         this.storeRedo();
     }
+    created() {
+        console.log(this.getLoggedInUser);
+        this.beginPost(this.getLoggedInUser);
+    }
     mounted() {
+        
         console.log("mounted post create");
+        console.log(this.postState);
         var vm: PostCreate = this;
         this.$on("submitElement", function(element: any, index: number){
             console.log("submitting element");

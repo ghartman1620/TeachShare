@@ -3,7 +3,7 @@
     submitFunctionName="login"
     redirectText="Need an account? Register instead"
     redirectName="register"
-    @submitAuth="login"
+    @submitAuth="loginSubmit"
     >
     <!-- logo -->
     
@@ -31,36 +31,40 @@
 
 
 
-<script>
+<script lang="ts">
+import Vue from "vue";
 import AuthPage from "./AuthPage";
-export default {
-    name: "login",
-    data: function(){
-        return {
-            username: "",
-            pw: "",
-            persist: false,
-        }
-    },
-    computed: {
-        token() {
-            return this.$store.state.user.token;
-        }
+import { Component, Prop } from "vue-property-decorator";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
 
-    },
-    methods: {
-        login: function(event) {
-            var obj =  { username: this.username, pw: this.pw, persist: this.persist};
-            var vm = this;
-            this.$store.dispatch("login", obj)
-            .then(function(token) {
-                vm.$router.push({name: "create"});
-            })
-            .catch(function(err){
-                vm.$notifyDanger("You could not login!<br>" + err.response.data.error_description);
-            }); 
-        },
-    },
+@Component({
+    name: "login",
+    components: {AuthPage},
+})
+export default class Login extends Vue {
+    @Action("login") login;
+    username: string = "";
+    pw: string = "";
+    persist: boolean = false;
+
+
+    loginSubmit() {
+        var vm = this;
+        this.login({username: this.username, password: this.pw, persist: this.persist})
+        .then(function() {
+            vm.$router.push({name: "create"});
+        })
+        .catch(function(err){
+            console.log(err);
+            vm.$notifyDanger("You could not login<br>" + err.response.data.error_description);
+        }); 
+    }
 }
 </script>
 

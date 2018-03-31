@@ -190,22 +190,6 @@ export const actions = {
             )
             .catch(err => console.error(err));
     },
-    createPost: (state, postObj) => {
-        return new Promise((resolve, reject) => {
-            api
-                .post("posts/", postObj)
-                .then(response => resolve(response))
-                .catch(function(error) {
-                    if (error.response) {
-                        return resolve(error.response.data);
-                    } else if (error.request) {
-                        return resolve(error.request);
-                    } else {
-                        return resolve(error.message);
-                    }
-                });
-        });
-    },
     updateExistingPost: (state, postObj) => {
         return new Promise((resolve, reject) => {
             api

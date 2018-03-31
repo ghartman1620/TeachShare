@@ -1,4 +1,6 @@
 import Vue from "vue";
+import User from "./user";
+import api from "./api";
 interface PostElement{
     type: string;
 }
@@ -16,22 +18,34 @@ interface AudioElement extends PostElement{
 
 
 
-export class Post{
+export default class InProgressPost{
     elements: any[];
     title: string;
     tags: string[];
-    user: number;
-    constructor(){
+    userPk: number;
+    attachments: any[];
+    pk: number; //undefined if post is not yet saved as draft
+
+    constructor(user: User){
         this.elements = [];
         this.title = "";
         this.tags = [];
-        this.user = 0;
+        this.userPk = 0;
+        this.attachments = [];
+        this.pk = undefined;
+        console.log(user);
+        console.log("new post constructor");
+        this.saveDraft();
+        
     }
     setTags(tags: string[]): void {
         this.tags = tags;
     }
     setTitle(title: string): void {
         this.title = title;
+    }
+    setAttachments(attachments: any[]): void {
+        this.attachments = attachments;
     }
 
     addElement(element: any): void{
@@ -57,5 +71,25 @@ export class Post{
             print += ele.toString() + " " ;
         }
         console.log(print);
+    }
+    async saveDraft(){
+        var obj = {
+            ///user: ctx.rootGetters.getCurrentUser.profile.pk,
+            user: this.userPk,
+            title: this.title,
+            content: this.elements,
+            likes: 0,
+            comments: [],
+            tags: this.tags,
+            attachments: this.attachments,
+            content_type: 0,
+            grade: 0,
+            length: 0,
+            pk: this.pk,
+        };
+        var response = await api.post("posts/", obj)
+        console.log("draft saved!");
+        console.log(response);
+
     }
 }

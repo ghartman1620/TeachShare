@@ -10,7 +10,7 @@
                     <span class="input-group-text" id="basic-addon3">Embed URL</span>
                 </div>
                 <input
-                    v-on:input="DebounceSubmit"
+                    v-on:input="getYoutubeData"
                     v-validate="'required|url|YoutubeEmbedURL'"
                     :class="{'input': true, 'outline-danger': errors.has('embedurl') }"
                     v-model="EmbedURL"
@@ -72,13 +72,12 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import FileUpload from "../FileUpload";
-import EditVideoEmbed from "./EditVideoEmbed";
 import DimensionPicker from "../DimensionPicker";
 import { mapGetters } from "vuex";
-import { Component, Prop } from "vue-property-decorator";
+import { Component } from "vue-property-decorator";
 import {
   State,
   Getter,
@@ -89,90 +88,88 @@ import {
 
 var _ = require("lodash");
 
-export default Vue.component("edit-video-embed", {
+@Component({
+    name: "edit-video-embed",
+    components: {DimensionPicker}
+})
+export default class EditVideoEmbed extends Vue{
+    @Getter("ytVideoDescription") ytVideoDescription;
+    @Getter("ytVideoDescriptionShort") ytVideoDescriptionShort;
+    @Getter("ytVideoThumbnail") ytVideoThumbnail;
+    @Getter("ytVideoTitle") ytVideoTitle;
+    @Getter("ytVideoID") ytVideoID;
 
-    data(){
-        return{        
-            width: 640,
-            height: 480,
-            title: "",
-            source:  "",
-            EmbedURL:"",
-            EmbedDescription: "",
-            EmbedHeight:480,
-            includeYtData:true,
-            dimensionErrors: {
-                any: function() {
-                    return false;
-                } 
-            }
+    width:number =  640;
+    height: number = 480;
+    title: string = "";
+    source:  string = "";
+    EmbedURL: string = "";
+    EmbedDescription: string = "";
+    EmbedHeight: number = 480;
+    includeYtData: boolean = true;
+    dimensionErrors: any = {
+        any: function() {
+            return false;
+        } 
+    };
+
+    get ActualDescription() {
+        if (this.includeYtData) {
+            return this.ytVideoDescription;
+        } else {
+            return this.EmbedDescription;
         }
-    },
+    }
 
-    computed: {
-        ActualDescription() {
-            if (this.includeYtData) {
-                return this.ytVideoDescription;
-            } else {
-                return this.EmbedDescri1ption;
-            }
-        },
-        ...mapGetters([
-            "ytVideoDescription",
-            "ytVideoDescriptionShort",
-            "ytVideoThumbnail",
-            "ytVideoTitle",
-            "ytVideoID"
-        ])
-    },
-    methods: {
-        DebounceSubmit: _.debounce(function() {
-            this.getYoutubeData();
-        }, 400),
-        submit() {
-            this.$parent.$emit("submitElement", this.generateEmbedJSON(), this.$route.query.index);
-        },
+    //this doesnt work and I changed @Input to getYoutubeData instead of this debounce function. 
+    DebounceSubmit(){ var vm: EditVideoEmbed = this;
+        _.debounce(function() {
+        vm.getYoutubeData();
+    }, 400)}
+    submit() {
+        this.$parent.$emit("submitElement", this.generateEmbedJSON(), this.$route.query.index);
+    }
 
-        getYoutubeData() {
-            var self = this;
-            this.$store
-                .dispatch("getYoutubeVideoInfo", this.EmbedURL)
-                .catch(err => console.log(err));
-        },
-        generateEmbedJSON() {
-            var obj = {
-                post: 2,
-                type: "video_link",
-                id: this.ytVideoID,
-                url: this.EmbedURL,
-                height: this.height,
-                width: this.width,
-                title: this.ytVideoTitle,
-                thumbnail: this.ytVideoThumbnail,
-                description: this.ActualDescription
-            };
-            this.$store.dispatch("submitVideoEmbed", obj);
-            this.$router.push({ name: "create" });
-            return { type: "video_link", content: obj };
-        },
-        cancelEdit() {
-            this.$router.push({ name: "create" });
-        }
-    },
+    getYoutubeData() {
+        var self = this;
+        this.$store
+            .dispatch("getYoutubeVideoInfo", this.EmbedURL)
+            .catch(err => console.log(err));
+    }
+    generateEmbedJSON() {
+        var obj = {
+            post: 2,
+            type: "video_link",
+            id: this.ytVideoID,
+            url: this.EmbedURL,
+            height: this.height,
+            width: this.width,
+            title: this.ytVideoTitle,
+            thumbnail: this.ytVideoThumbnail,
+            description: this.ActualDescription
+        };
+        this.$store.dispatch("submitVideoEmbed", obj);
+        this.$router.push({ name: "create" });
+        return { type: "video_link", content: obj };
+    }
+    cancelEdit() {
+        this.$router.push({ name: "create" });
+    }
     mounted() {
-        this.$on("changeHeight", function(h) {
-            this.height = h.value;
-            this.dimensionErrors = h.errors;
+        var vm: EditVideoEmbed = this;
+        vm.$on("changeHeight", function(h) {
+            vm.height = h.value;
+            vm.dimensionErrors = h.errors;
         });
-        this.$on("changeWidth", function(w) {
-            this.width = w.value;
-            this.dimensionErrors = w.errors;
+        vm.$on("changeWidth", function(w) {
+            vm.width = w.value;
+            vm.dimensionErrors = w.errors;
         });
-    },
+    }
     destroyed() {
         this.$store.dispatch("clearYoutubeData");
     }
-});
+};
 </script>
 
 <style lang="scss" scoped>

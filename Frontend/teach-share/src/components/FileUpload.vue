@@ -174,6 +174,7 @@ export default class FileUpload extends Vue {
         Array.from(Array(fileList.length).keys()).map(x => {
             formData.append(fieldName, fileList[x], fileList[x].name);
         });
+        console.log(formData);
         this.save(formData);
 
         var fileUpload: any = this.$refs.fileUpload;

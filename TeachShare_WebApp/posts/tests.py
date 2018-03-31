@@ -5,7 +5,9 @@ from posts.models import Post
 from accounts.models import User
 from posts.serializers import PostSerializer
 from django.core.management import call_command
+from datetime import timedelta
 import json
+
 
 class PostSearchTestCase(TestCase):
     @classmethod
@@ -23,7 +25,10 @@ class PostSearchTestCase(TestCase):
                     user=cls.u,
                     content=obj['content'],
                     tags=obj['tags'],
-                )
+                    grade=0,
+                    content_type=0,
+                    length=timedelta(seconds=0),
+                )   
         #call_command('search_index', '--rebuild')
     
 

@@ -15,12 +15,21 @@
                         style="height: 480px; width: auto;"
                     />
                 </div>
+            
             </b-carousel>
         </div>
+
+
     </div>
 </template>
 
 <script>
+
+const carouselWidth = 900;
+const carouselHeight = 600;
+var carouselAR = carouselWidth/carouselHeight;
+
+
 import Vue from "vue";
 
 export default Vue.component("image-element", {
@@ -64,6 +73,7 @@ export default Vue.component("image-element", {
         changedBody() {
             this.$parent.$emit("changedBody", this.localBody);
         },
+
         changeSizeStyle() {
             var maxImageHeight = 0;
             var self = this;
@@ -84,6 +94,46 @@ export default Vue.component("image-element", {
     },
     mounted() {
         window.setTimeout(this.changeSizeStyle, 500);
+        console.log("in mounted function");
     }
 });
+
 </script>
+
+<style lang="scss" scoped>
+$background-color: lighten(#bececa, 10%);
+
+    // have to set carousel height/width when changing javascript variables
+
+    #carousel {
+        top: 50%;
+        width: 900px;
+        height: 600px;
+    }
+
+    #carousel-card {
+        background: $background-color;
+    }
+
+    #carousel-container {
+        padding: 0px;
+    }
+
+    #image-carousel {
+        width: 900px;
+        height: 600px;
+        background: $background-color;
+    }
+
+
+    .slide {
+        margin-top: auto;
+        margin-bottom: auto;
+        margin-left: auto;
+        margin-right: auto;
+        background: $background-color;
+        height: 600px;
+        width: auto;
+    }
+
+</style>

@@ -63,7 +63,7 @@
 
 <script lang="ts">
 
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 import SeeMore from "./SeeMore.vue";
 import PostElement from "./PostElement.vue";
 import Comments from "./comments/Comments.vue";
@@ -88,8 +88,7 @@ import {
         CommentEntry,
         FontAwesomeIcon
     },
-    name: "PostComp",
-    props: ["post", "index", "maxHeight"]
+    name: "post",
 })
 export default class PostComp extends Vue {
     @State("") state;
@@ -100,10 +99,15 @@ export default class PostComp extends Vue {
     @Getter("getCurrentUser") getCurrentUser;
     @Getter("getUserById") getUserById;
 
-    post: Post = new Post();
+    @Prop({})
+    post!: Post;
+    @Prop({})
+    index!: number;
+    @Prop({})
+    maxHeight!: number;
+
+
     newCommentText: string = "";
-    index: number = 0;
-    maxHeight: number = 0;
 
     get actualMaxHeight() {
         // @TODO: make this actually show the WHOLE content, not just an arbitrarily huge maxHeight
@@ -191,6 +195,7 @@ export default class PostComp extends Vue {
 
     created() {
         // this.$store.dispatch("fetchUser", this.post.user);
+        this.$log(this.post);
     }
 };
 </script>

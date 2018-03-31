@@ -69,6 +69,7 @@ export const file_upload =  async (context: FileContext, files) => {
                     let percent = Math.floor(
                         progressEvent.loaded * 100 / progressEvent.total
                     );
+                    console.log(new GenericFile(id, percent, file, cancel));
                     context.commit("create_update_file", new GenericFile(id, percent, file, cancel));
                 },
                 cancelToken: cancel.token
@@ -79,7 +80,7 @@ export const file_upload =  async (context: FileContext, files) => {
                  */
                 console.log("make request");
                 let response = await api
-                    .put(`upload/${file.name}?id=${id}&post=${context.rootGetters.getCurrentPostId}`,
+                    .put(`upload/${file.name}?id=${id}&post=${context.getters.getCurrentPostId}`,
                         file, config)
                 console.log(response);
                 // update the current uploaded file object

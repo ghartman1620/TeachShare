@@ -1,6 +1,7 @@
 import api from "../api";
 import Vue from "vue";
-import {Post} from "../post";
+import InProgressPost from "../post";
+import User from "../user";
 
 import { getStoreBuilder } from "vuex-typex"
 import Vuex, { Store, ActionContext } from "vuex"
@@ -15,8 +16,7 @@ interface Mutation {
 }
 
 interface PostState {
-    post: Post;
-    currentPost: any;
+    post: InProgressPost | undefined;
     doneMutations: Mutation[];
     unDoneMutations: Mutation[];
 }
@@ -28,32 +28,28 @@ interface EditedElement{
 type PostContext = ActionContext<PostState, RootState>;
 
 const state: PostState = {
-    post: new Post(),
-    currentPost: {},
+    post: undefined,
     doneMutations: [],
     unDoneMutations: [],
 }
 
 export const mutations = {
     SET_TAGS: (state: PostState, tags: string[]) => {
-        state.post.setTags(tags);
+        state.post!.setTags(tags);
     },
     SET_TITLE: (state: PostState, newTitle: string) => {
-        state.post.setTitle(newTitle);
-    },
-    SET_POST: (state: PostState, post: any) => {
-        state.currentPost = post;
+        state.post!.setTitle(newTitle);
     },
     REMOVE_ATTACHMENT: (state: PostState, attachment: any) => {
-        let ind = state.currentPost.attachments.findIndex(function (val) {
+        let ind = state.post!.attachments.findIndex(function (val) {
             return val === attachment.id;
         });
         if (ind !== -1) {
-            state.currentPost.attachments.splice(ind, 1);
+            state.post!.attachments.splice(ind, 1);
         }
     },
     ADD_ATTACHMENT: (state: PostState, attachment: any) => {
-        state.currentPost.attachments.push(attachment.id);
+        state.post!.attachments.push(attachment.id);
     },
     UNDO: (state: PostState) => {
         state.doneMutations.pop();
@@ -64,26 +60,26 @@ export const mutations = {
     UNDO_ADD_ELEMENT: (state: PostState, index: number) => {
         state.unDoneMutations.push({
             mutation: "ADD_ELEMENT",
-            arg: state.post.elements[index]
+            arg: state.post!.elements[index]
         });
-        state.post.removeElement(index);
+        state.post!.removeElement(index);
     },
     UNDO_REMOVE_ELEMENT: (state: PostState, arg: any) => {
         state.unDoneMutations.push({
             mutation: "REMOVE_ELEMENT",
             arg: arg.index
         });
-        state.post.insertElement(arg.index, arg.element);
+        state.post!.insertElement(arg.index, arg.element);
     },
     UNDO_EDIT_ELEMENT: (state: PostState, arg: EditedElement) => {
         state.unDoneMutations.push({
             mutation: "EDIT_ELEMENT",
             arg: {
                 index: arg.index,
-                element: state.post.elements[arg.index]
+                element: state.post!.elements[arg.index]
             }
         });
-        state.post.editElement(arg.index, arg.element);
+        state.post!.editElement(arg.index, arg.element);
     },
     UNDO_SWAP_ELEMENTS: (state: PostState, iAndJ: number[]) => {
         state.unDoneMutations.push({
@@ -92,15 +88,15 @@ export const mutations = {
         });
         var i = iAndJ[0];
         var j = iAndJ[1];
-        state.post.swapElements(i,j);
+        state.post!.swapElements(i,j);
     },
     // Mutations for the currently edited post data:  and postElements
     ADD_ELEMENT: (state: PostState, element: any) => {
         state.doneMutations.push({
             mutation: "UNDO_ADD_ELEMENT",
-            arg: state.post.elements.length
+            arg: state.post!.elements.length
         });
-        state.post.addElement(element);
+        state.post!.addElement(element);
     },
     SWAP_ELEMENTS: (state: PostState, iAndJ: number[]) => {
         console.log("swap elements");
@@ -112,41 +108,45 @@ export const mutations = {
         });
         var i = iAndJ[0];
         var j = iAndJ[1];
-        state.post.swapElements(i,j);
+        state.post!.swapElements(i,j);
     },
     REMOVE_ELEMENT: (state: PostState, index: number) => {
         state.doneMutations.push({
             mutation: "UNDO_REMOVE_ELEMENT",
-            arg: { element: state.post.elements[index], index: index }
+            arg: { element: state.post!.elements[index], index: index }
         });
-        state.post.removeElement(index);
+        state.post!.removeElement(index);
     },
     EDIT_ELEMENT: (state: PostState, editedElement: any) => {
         state.doneMutations.push({
             mutation: "UNDO_EDIT_ELEMENT",
             arg: {
-                element: state.post.elements[editedElement.index],
+                element: state.post!.elements[editedElement.index],
                 index: editedElement.index
             }
         });
-        state.post.editElement(editedElement.index, editedElement.element);
+        state.post!.editElement(editedElement.index, editedElement.element);
     },
     CLEAR_REDO: (state: PostState) => {
         Object.assign(state.unDoneMutations, []);
     },
-
+    SAVE_DRAFT: (state: PostState) => {
+        state.post!.saveDraft();
+    },
+    BEGIN_POST: (state: PostState, user: User) => {
+        state.post = new InProgressPost(user);
+    }
 }
 
 export const actions = {
+    beginPost: (context: PostContext, user: User) => {
+        context.commit("BEGIN_POST", user);
+    },
     setTags: (context: PostContext, tags: string[]) => {
         context.commit("SET_TAGS", tags);
     },
     setTitle: (context: PostContext, title: string) => {
         context.commit("SET_TITLE", title);
-    },
-    setCurrentPost: (context: PostContext, post: any) => {
-        console.log("seting current post");
-        context.commit("SET_POST", post);
     },
     undo: (context: PostContext) => {
         if (context.state.doneMutations.length > 0) {
@@ -157,7 +157,7 @@ export const actions = {
             if (mut.mutation === "UNDO_ADD_ELEMENT") {
                 context.dispatch(
                     "removeAttachments",
-                    context.state.post.elements[mut.arg].content
+                    context.state.post!.elements[mut.arg].content
                 );
             }
             context.commit("UNDO");
@@ -204,7 +204,7 @@ export const actions = {
     removeElement: (context: PostContext, index: number) => {
         context.dispatch(
             "removeAttachments",
-            context.state.post.elements[index].content
+            context.state.post!.elements[index].content
         );
         context.commit("REMOVE_ELEMENT", index);
         context.commit("CLEAR_REDO");
@@ -230,49 +230,24 @@ export const actions = {
         context.dispatch("saveDraft").then(res => console.error(res));
     },
     saveDraft: (ctx: PostContext) => {
-        console.log("CALLING SAVE DRAFT!!!");
-        console.log(ctx.rootGetters.getCurrentPostId);
-        //This is temporarily in place while I merge post create and the new login/auth stuff! It
-        //Should be gotten rid of ASAP
-        const USER_PK = 10;
-        if (ctx.rootGetters.getCurrentPostId === null || ctx.rootGetters.getCurrentPostId === undefined) {
-            // hasn't yet been saved...
-            console.log("new post");
-            var obj = {
-                ///user: ctx.rootGetters.getCurrentUser.profile.pk,
-                user: USER_PK,
-                title: ctx.rootGetters.getTitle,
-                content: ctx.rootGetters.getContent,
-                likes: 0,
-                comments: [],
-                tags: ctx.rootGetters.getTags,
-                attachments: [],
-                content_type: 0,
-                grade: 0,
-                length: 0
-            };
-            console.log(obj);
-            console.log("creating new post");
-            return ctx.dispatch("createPost", obj).then(result => {
-                console.log(result);
-                ctx.dispatch("setCurrentPost", result.data);
-                return result.data.pk;
-            });
-        } else {
-            console.log("in already created post");
-            console.log(ctx.rootGetters.getCurrentPost);
-            // might be redundant! Check.
-            var currentPost = ctx.rootGetters.getCurrentPost;
-            currentPost.content = ctx.state.post.elements;
-            ///currentPost.user = ctx.rootGetters.getCurrentUser.profile.pk;
-            currentPost.user = USER_PK;
-            currentPost.tags = ctx.rootGetters.getTags;
-            currentPost.title = ctx.rootGetters.getTitle;
-
-            return ctx.dispatch("updateExistingPost", currentPost).then(res => {
-                return ctx.dispatch("setCurrentPost", res.data);
-            });
-        }
+        ctx.commit("SAVE_DRAFT");
+    },
+    createPost: (state, postObj) => {
+        return new Promise((resolve, reject) => {
+            console.log(postObj);
+            api
+                .post("posts/", postObj)
+                .then(response => resolve(response))
+                .catch(function(error) {
+                    if (error.response) {
+                        return resolve(error.response.data);
+                    } else if (error.request) {
+                        return resolve(error.request);
+                    } else {
+                        return resolve(error.message);
+                    }
+                });
+        });
     },
 }
 
@@ -281,17 +256,17 @@ const PostCreateService = {
     mutations: mutations,
     actions: actions,
     getters: {
-        getTags: (state: PostState) => state.post.tags,
-        getTitle: (state: PostState) => state.post.title,
-        getContent: (state: PostState) => state.post.elements,
-        getCurrentPost: (state: PostState) => state.currentPost,
+        getTags: (state: PostState) => state.post!.tags,
+        getTitle: (state: PostState) => state.post!.title,
+        getContent: (state: PostState) => state.post!.elements,
+        getCurrentPost: (state: PostState) => state.post,
         getCurrentPostId: (state, getters) => {
-            if (getters.getCurrentPost !== null) {
+            if (state.post !== null) {
                 return getters.getCurrentPost.pk;
             }
             return null;
         },
-        postElements: (state: PostState) => state.post.elements,
+        postElements: (state: PostState) => state.post!.elements,
     }
 };
 

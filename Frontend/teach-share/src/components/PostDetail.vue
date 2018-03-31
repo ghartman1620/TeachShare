@@ -1,18 +1,18 @@
 <template>
     <div>
-        <post
+        <PostComp
             v-if="postLocal !== undefined"
             :post="postLocal"
             :index="postid">
-        </post>
+        </PostComp>
     </div>
 </template>
 
 <script lang="ts">
 
-import Component from 'vue-class-component'
+import Vue from "vue";
 import PostComp from "./Post.vue";
-import { Vue } from "vue-property-decorator";
+import { Component, Prop } from "vue-property-decorator";
 import { Post, Comment } from "../models";
 import {
   State,
@@ -23,10 +23,8 @@ import {
 } from "vuex-class";
 
 @Component({
-    props: {
-        post: Post,
-    },
-    components: { PostComp }
+    components: { PostComp },
+    name: "post-detail",
 })
 export default class PostDetail extends Vue {
     @State("") state;
@@ -35,7 +33,10 @@ export default class PostDetail extends Vue {
     @Action("fetchCommentsForPost") fetchCommentsForPost;
     @Action("fetechUser") fetchUser;
     @Action("fetchPost") fetchPost;
-    post: Post = new Post();
+    @Getter("getUserByID") getUserById;
+
+    @Prop({})
+    post!: Post;
 
     get postLocal(): any {
         return this.getPostById(this.$route.params.post_id);

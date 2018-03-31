@@ -43,104 +43,110 @@
 </template>
 
 
-<script>
+<script lang="ts">
 import Vue from "vue";
+import { Component, Prop } from "vue-property-decorator";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
+
 import forEach from "lodash/forEach";
 import AuthPage from "./AuthPage";
-export default Vue.component("register",{
-    components: {AuthPage,},
-    data() {
-        return {
-            username: "",
-            pw1: "",
-            pw2: "",
-            email: "",
-        }
-    },
-    computed: {
-        passwordValid(){
-            var b1 = this.pw1.localeCompare(this.pw2) == 0;
-            var b2 = this.pw1.length >= 8;
-            var b3 = this.pw2.length >= 8;
-            console.log(b1 + b2 + b3 + (b1&&b2&&b1));   
-            return this.pw1.localeCompare(this.pw2)==0 &&
-                 this.pw1.length >= 8 && this.pw2.length >=8;
-        },
-        passwordFeedback(){
-            if(this.pw1.localeCompare(this.pw2)){
-                return "Passwords do not match.";
-            }
-            if(this.pw1.length < 8){
-                return "Passwords must be at least 8 characters in length.";
-            }
-        },
-        emailValid() {
-            //TODO: do more meaningful email
-            //check than something@something.something
-            var regex = /\S+@\S+\.\S+/
-            console.log(regex.test(this.email));
-            console.log(this.regex);
-            return regex.test(this.email);
-        },
-        emailFeedback() {
-            return "That is not an email address.";
-        },
-        usernameValid() {
-
-            return this.username.length >= 7 && 
-                this.username.length <= 25;
-
-        },
-        usernameFeedback() {
-            //TODO: check here for username exists - right now
-            //it's only done on the server
-            return "Usernames must be between 7 and 25 characters in length.";
-        }
-    },
-    methods: {
-
-        register() {
-            console.log("in register");
-
-            if(this.emailValid && this.usernameValid && this.passwordValid){
-                var vm = this;
-                console.log("creating user...");
-                this.$store.dispatch("createUser", {
-                    username: this.username,
-                    password: this.pw1,
-                    email: this.email,
-                    
-                }).then(function(ret) {
-                    console.log("RETURNED: ", ret);
-                    
-                    vm.$router.push({name: "login"});
-                })
-                .catch(function(err) {
-                    console.log("caught error!");
-                    Object.keys(err).forEach(function(key){
-                        console.log(key);
-                        console.log(err[key]);
-                    })
-                    console.log(err);
-                    console.log(err.response.data);
-                    vm.$notifyDanger("There was a problem creating your account!<br>" + err.response.data.error);
-                });
-    
-            }else{
-                var str = "There are one or more problems registering!<br>" +
-                            (this.emailValid ? "" : (this.emailFeedback + "<br>") )+ 
-                            (this.passwordValid ? "" : (this.passwordFeedback + "<br>")) + 
-                            (this.usernameValid ? "" : (this.usernameFeedback + "<br>")) + 
-                            "Please fix them and try again."
-                console.log(str);
-
-                this.$notifyDanger(str );
-
-            }
-        }
-    },
-
+@Component({
+    name: "register",
+    components: {AuthPage}
 })
+export default class Register extends Vue{
+    @Action("createUser") createUser;
+
+    username: string = "";
+    pw1: string = "";
+    pw2: string = "";
+    email: string = "";
+
+
+    get passwordValid(){
+        var b1 = this.pw1.localeCompare(this.pw2) == 0;
+        var b2 = this.pw1.length >= 8;
+        var b3 = this.pw2.length >= 8;
+        return this.pw1.localeCompare(this.pw2)==0 &&
+                this.pw1.length >= 8 && this.pw2.length >=8;
+    }
+    get passwordFeedback(){
+        if(this.pw1.localeCompare(this.pw2)){
+            return "Passwords do not match.";
+        }
+        if(this.pw1.length < 8){
+            return "Passwords must be at least 8 characters in length.";
+        }
+    }
+    get emailValid() {
+        //TODO: do more meaningful email
+        //check than something@something.something
+        var regex = /\S+@\S+\.\S+/
+        console.log(regex.test(this.email));
+        return regex.test(this.email);
+    }
+    get emailFeedback() {
+        return "That is not an email address.";
+    }
+    get usernameValid() {
+
+        return this.username.length >= 7 && 
+            this.username.length <= 25;
+
+    }
+    get usernameFeedback() {
+        //TODO: check here for username exists - right now
+        //it's only done on the server
+        return "Usernames must be between 7 and 25 characters in length.";
+    }
+
+    register() {
+        console.log("in register");
+
+        if(this.emailValid && this.usernameValid && this.passwordValid){
+            var vm = this;
+            console.log("creating user...");
+            this.createUser("createUser", {
+                username: this.username,
+                password: this.pw1,
+                email: this.email,
+                
+            }).then(function(ret) {
+                console.log("RETURNED: ", ret);
+                
+                vm.$router.push({name: "login"});
+            })
+            .catch(function(err) {
+                console.log("caught error!");
+                Object.keys(err).forEach(function(key){
+                    console.log(key);
+                    console.log(err[key]);
+                })
+                console.log(err);
+                console.log(err.response.data);
+                vm.$notifyDanger("There was a problem creating your account!<br>" + err.response.data.error);
+            });
+
+        }else{
+            var str = "There are one or more problems registering!<br>" +
+                        (this.emailValid ? "" : (this.emailFeedback + "<br>") )+ 
+                        (this.passwordValid ? "" : (this.passwordFeedback + "<br>")) + 
+                        (this.usernameValid ? "" : (this.usernameFeedback + "<br>")) + 
+                        "Please fix them and try again."
+            console.log(str);
+
+            this.$notifyDanger(str );
+
+        }
+    }
+
+};
 
 </script>
 

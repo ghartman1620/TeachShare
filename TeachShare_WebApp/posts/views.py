@@ -261,6 +261,10 @@ class FileUploadView(views.APIView):
     def put(self, request, filename, format=None):
         post_id = request.query_params['post']
         file_obj = request.data['file']
+        print("file upload")
+        from pprint import pprint
+        print(request.data)
+        print(request.query_params['post'])
         p = Post.objects.get(pk=post_id) # this is where we need to actually know the post.
         a = Attachment.objects.create(post=p, file=file_obj)
         
