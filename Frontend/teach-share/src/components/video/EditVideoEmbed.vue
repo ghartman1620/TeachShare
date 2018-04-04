@@ -145,10 +145,8 @@ export default class EditVideoEmbed extends Vue {
     }
 
     async getYoutubeData(input: string = this.EmbedURL) {
-        var self = this;
         try {
             let resp = await getVideoInfo(this.$store, input);
-            console.log("RESP:", resp);
             return resp;
         } catch (err) {
             console.log(err);
