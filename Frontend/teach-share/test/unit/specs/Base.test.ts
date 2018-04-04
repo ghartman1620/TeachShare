@@ -1,6 +1,7 @@
-import Vue from "vue";
-import Base from "../../../src/components/Base.vue";
+import Vue, {VueConstructor} from "vue";
+import Base from "@/components/Base.vue";
 import router from "../../../src/router";
+import store from "../../../src/store";
 // import store from "../../../src/store";
 import { expect } from "chai";
 
@@ -16,48 +17,38 @@ import { expect } from "chai";
 // vue-cookie because js cookies are awful
 // Vue.use(require("vue-cookie"));
 
+const CONSTRUCT = function (component: any): object & Record<never, any> & Vue {
+    let ctor = Vue.extend(component);
+    return new ctor({ router, store }).$mount();
+}
+
 describe("[BASE.VUE] Base view component", () => {
     it("should render correct contents", () => {
-        // const Constructor = Vue.extend(Base);
-
-        
-        // const vm = new Constructor({ router }).$mount();
-        
-        // console.log(vm.$data);
-        // let re = new RegExp("([\\n]|[\\s])*", "g");
-        // var val: Element;
-        // val = vm.$el
-        //     .querySelector(".navbar") as Element;
-        
-        // let outstring = val.textContent.replace(re, "") as string;
-        
-        // // console.log("VAL: ", val);
-        // expect(outstring).to.equal(
-        //     "CreatePostProfileYourpostfeedYourpostsAccountdetailsLogoutSearch"
-        // );
+        const vm = CONSTRUCT(Base);
+        let re = new RegExp("([\\n]|[\\s])*", "g");
+        var val = vm.$el
+            .querySelector(".navbar") as Element;
+        let outstring = val.textContent.replace(re, "") as string;
+        expect(outstring).to.equal(
+            "CreatePostProfileYourpostfeedYourpostsAccountdetailsLogoutSearch"
+        );
     });
     it("should have a queryParam data item", () => {
-        // const Constructor = Vue.extend(Base);
-        // const vm = new Constructor({ router, store }).$mount();
-        // const qp = vm.$data.queryParam;
-        // // console.log("TYPE OF: ", typeof vm);
-        // // // expect(typeof vm.$data).toBe("function");
-        // // console.log(Object.keys(vm));
-
-        // // const qp = vm.$data()
-        // expect(qp).to.equal("");
-        // iterChildren(vm.$children);
+        const vm = CONSTRUCT(Base);
+        const qp = vm.$data.queryParam;
+        expect(qp).to.equal("");
     });
+    it("should have the correct innerhtml", () => {
+        const vm = CONSTRUCT(Base);
+        console.log(vm.$el.children.length);
+        console.log(vm.$el.childNodes.forEach((val, ind, obj) => {
+            console.log(ind, val);
+        }));
+        console.log(vm.$el.children.item(0));
+        console.log(vm.$el.children.item(1));
+    })
 });
 
-// function iterChildren (children) {
-//     _.forEach(children, function (val, key) {
-//         // console.log(key, ': ', val, '\n\n\n')
-//         _.forEach(val, function (val, key) {
-//             console.log(key);
-//         });
-//     });
-// }
 
 function test(val: "something" | "else") {
 

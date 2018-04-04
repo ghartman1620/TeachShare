@@ -115,7 +115,7 @@ export default class EditVideoEmbed extends Vue {
     };
 
     get actualDescription() {
-        debugger;
+
         if (this.includeYtData) {
             return this.ytVideoDescription;
         } else {
@@ -124,14 +124,14 @@ export default class EditVideoEmbed extends Vue {
     }
 
     debounceSubmit() {
-        debugger;
+
         var vm = this;
         _.debounce(function() {
             vm.getYoutubeData();
         }, 400);
     }
     submit() {
-        debugger;
+        
         if (
             this.$route.query.index ==
             this.$store.state.create.postElements.length

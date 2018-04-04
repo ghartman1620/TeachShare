@@ -61,6 +61,7 @@ export default class SeeMore extends Vue {
 
     mounted() {
         var vm = this;
+        
         console.log(this);
         Vue.nextTick().then(function() {
             var ele = vm.$refs.content as HTMLElement;
