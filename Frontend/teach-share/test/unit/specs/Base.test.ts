@@ -5,22 +5,8 @@ import store from "../../../src/store";
 // import store from "../../../src/store";
 import { expect } from "chai";
 
-// font-awesome icons
-// import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
-// import fontawesome from "@fortawesome/fontawesome";
+import { CONSTRUCT } from "../utils";
 
-// import faUserCircle from "@fortawesome/fontawesome-free-solid/faUserCircle";
-// import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
-
-// fontawesome.library.add(faUserCircle, faEdit);
-
-// vue-cookie because js cookies are awful
-// Vue.use(require("vue-cookie"));
-
-const CONSTRUCT = function (component: any): object & Record<never, any> & Vue {
-    let ctor = Vue.extend(component);
-    return new ctor({ router, store }).$mount();
-}
 
 describe("[BASE.VUE] Base view component", () => {
     it("should render correct contents", () => {

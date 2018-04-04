@@ -215,7 +215,7 @@ const store: StoreOptions<RootState> = {
     },
     modules: {
         fs: FileService,
-        yts: YouTubeService,
+        yt: YouTubeService,
         create: PostCreateService,
         notify: NotificationService,
         comment: CommentService,

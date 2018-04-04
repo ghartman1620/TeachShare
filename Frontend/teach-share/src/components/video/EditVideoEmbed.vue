@@ -78,6 +78,7 @@ import FileUpload from "../FileUpload.vue";
 import DimensionPicker from "../DimensionPicker.vue";
 import { mapGetters } from "vuex";
 import debounce from "lodash/debounce";
+import { getVideoInfo } from "../../store_modules/YouTubeService";
 
 var _ = require("lodash");
 
@@ -115,7 +116,6 @@ export default class EditVideoEmbed extends Vue {
     };
 
     get actualDescription() {
-
         if (this.includeYtData) {
             return this.ytVideoDescription;
         } else {
@@ -124,14 +124,13 @@ export default class EditVideoEmbed extends Vue {
     }
 
     debounceSubmit() {
-
+        this.getYoutubeData();
         var vm = this;
-        _.debounce(function() {
+        debounce(function() {
             vm.getYoutubeData();
         }, 400);
     }
     submit() {
-        
         if (
             this.$route.query.index ==
             this.$store.state.create.postElements.length
@@ -145,11 +144,16 @@ export default class EditVideoEmbed extends Vue {
         }
     }
 
-    getYoutubeData() {
+    async getYoutubeData(input: string = this.EmbedURL) {
         var self = this;
-        this.$store
-            .dispatch("getYoutubeVideoInfo", this.EmbedURL)
-            .catch(err => console.log(err));
+        try {
+            let resp = await getVideoInfo(this.$store, input);
+            console.log("RESP:", resp);
+            return resp;
+        } catch (err) {
+            console.log(err);
+            return err;
+        }
     }
     generateEmbedJSON() {
         var obj = {

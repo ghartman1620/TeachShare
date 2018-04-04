@@ -3,7 +3,7 @@ import { ActionContext, Store } from "vuex";
 import { getStoreAccessors } from "vuex-typescript";
 import { RootState } from "../models";
 
-import axios from "axios";
+import axios, { AxiosRequestConfig, AxiosPromise, AxiosResponse } from "axios";
 import api from "../api";
 
 export interface YTState {
@@ -40,13 +40,18 @@ export const generateURL =
 
 export const actions = {
     getYoutubeVideoInfo: async (ctx, url: string) => {
+        console.log("url: ", url);
         let { apiRequest, videoID } = generateURL(url);
+        console.log(apiRequest, videoID);
         if (videoID.length > 10) {
             try {
-                let resp = await axios.get(apiRequest);
+                let resp: AxiosResponse = await axios.get(apiRequest);
+                console.log("ACTION:", resp);
                 mutSet(ctx, resp.data);
+                return resp;
             } catch (err) {
-                console.error(err);
+                console.error("ERR:", err);
+                return err;
             }
         }
     },
@@ -126,7 +131,7 @@ export default YouTubeService;
  * Type safe definitions for CommentService
  */
 const { commit, read, dispatch } =
-     getStoreAccessors<YTState, RootState>("youtube");
+     getStoreAccessors<YTState, RootState>("yt");
 
 /**
  * Actions Handlers
