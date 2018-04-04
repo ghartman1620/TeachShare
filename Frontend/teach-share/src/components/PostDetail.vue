@@ -56,7 +56,7 @@ export default class PostDetail extends Vue {
     created() {
         this.$store.dispatch("fetchPost", this.$route.params.post_id).then((res) => {
             this.getComments();
-        });
+        }); 
     }
 }
 </script>
