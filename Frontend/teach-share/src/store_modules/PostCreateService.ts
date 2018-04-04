@@ -232,7 +232,15 @@ export const actions = {
     saveDraft: (ctx: PostContext) => {
         ctx.commit("SAVE_DRAFT");
     },
-    createPost: (state, postObj) => {
+    createPost: (context: PostContext) => {
+        return new Promise((resolve, reject) => {
+            context.state.post!.publishPost().then(function(response){
+                resolve(response);
+            }).catch(function(error) { 
+                reject(error);
+            });
+        });
+        /*
         return new Promise((resolve, reject) => {
             console.log(postObj);
             api
@@ -247,7 +255,7 @@ export const actions = {
                         return resolve(error.message);
                     }
                 });
-        });
+        });*/
     },
 }
 

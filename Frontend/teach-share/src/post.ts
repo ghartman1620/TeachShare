@@ -24,18 +24,17 @@ export default class InProgressPost{
     tags: string[];
     userPk: number;
     attachments: any[];
-    pk: number; //undefined if post is not yet saved as draft
+    pk: number = -1; //-1 if post is not yet saved as draft
 
     constructor(user: User){
         this.elements = [];
         this.title = "";
         this.tags = [];
-        this.userPk = 0;
+        this.userPk = user.pk;
         this.attachments = [];
-        this.pk = undefined;
         console.log(user);
         console.log("new post constructor");
-        this.saveDraft();
+        this.createDraft();
         
     }
     setTags(tags: string[]): void {
@@ -72,9 +71,18 @@ export default class InProgressPost{
         }
         console.log(print);
     }
-    async saveDraft(){
-        var obj = {
-            ///user: ctx.rootGetters.getCurrentUser.profile.pk,
+    createDraft(){
+        
+        var post: InProgressPost = this;
+        var obj = this.json(true);
+        console.log("CREATING DRAFT");
+        api.post('posts/', obj).then(function(response){
+            console.log(response);
+            post.pk = response.data.pk;
+        })
+    }
+    json(draft: boolean): any{
+        return {
             user: this.userPk,
             title: this.title,
             content: this.elements,
@@ -85,11 +93,23 @@ export default class InProgressPost{
             content_type: 0,
             grade: 0,
             length: 0,
-            pk: this.pk,
-        };
-        var response = await api.post("posts/", obj)
-        console.log("draft saved!");
-        console.log(response);
-
+            draft: draft,
+        }
+    }
+    
+    saveDraft(): void{
+        api.put("posts/" + this.pk + "/", this.json(true)).then(function(response){
+            console.log("DRAFT SAVED!");
+        })
+    }
+    publishPost(): Promise<any>{
+        return new Promise((resolve, reject) => {
+            api.put("posts/" + this.pk + "/", this.json(false)).then(function(response){
+                console.log("post published");
+                resolve(response);
+            }).catch(function(error){
+                reject(error);
+            })
+        })
     }
 }

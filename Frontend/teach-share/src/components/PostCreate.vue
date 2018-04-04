@@ -262,19 +262,9 @@ export default class PostCreate extends Vue{
     }
     submitPost(event: any) {
         var vm = this;
-
-        // Generate current post before posting..
-        //
-        var currentPost = this.postState.currentPost;
-        currentPost.content = this.postState.post.elements;
-        currentPost.tags = this.postState.post.tags;
-        currentPost.title = this.postState.post.title;
-        currentPost.draft = false;
-        
-
         // dispatch createPost method in the store. This will send a
         // post request to the backend server.
-        this.createPost(currentPost).then(function(ret) {
+        this.createPost().then(function(ret) {
             // handle the response from the server
             if (ret === undefined) {
                 vm.$notifyDanger(

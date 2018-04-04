@@ -97,7 +97,7 @@ export default class PostComp extends Vue {
     @Action("fetchCurrentUser") fetchCurrentUser;
     @Action("createOrUpdateComment") createOrUpdateComment;
     @Getter("getCurrentUser") getCurrentUser;
-    @Getter("getUserById") getUserById;
+    @Getter("getUserByID") getUserByID;
 
     @Prop({})
     post!: Post;
@@ -117,7 +117,7 @@ export default class PostComp extends Vue {
         return this.newCommentText.length > 10;
     }
     get fullUser() {
-        return this.getUserById(this.post.user);
+        return this.getUserByID(this.post.user);
     }
     get fullUsername() {
         if (this.fullUser !== undefined) {
