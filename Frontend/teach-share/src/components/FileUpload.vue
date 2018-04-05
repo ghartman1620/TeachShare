@@ -28,9 +28,9 @@
             </div>
             <div class="col">
                 <br>
-                <h4 v-if="this.getFiles > 0">Uploaded files: </h4>
+                <h4 v-if="this.filesUploadStatus > 0">Uploaded files: </h4>
                 <ul class="list-group">
-                    <li v-bind:key="obj.file.name" v-for="obj in getFiles"
+                    <li v-bind:key="obj.file.name" v-for="obj in filesUploadStatus"
                         class="list-group-item d-flex justify-content-between align-items-center">
                         <div class="col-5">
                             <span v-if="obj.url">
@@ -54,6 +54,7 @@
                                     X
                                 </button>
                             </div>
+                           
                     </li>
                 </ul>
             </div> 
@@ -167,7 +168,6 @@ export default class FileUpload extends Vue {
     mounted() {
         console.log(this);
         changeLimit(this.$store, this.fileLimit);
-        if (this.$store.state.create.postElements.length > this.$route.query.index) {}
         this.resetState();
     }
     destroyed() {

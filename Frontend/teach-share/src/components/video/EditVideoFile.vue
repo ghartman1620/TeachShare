@@ -93,7 +93,9 @@ export default class EditVideoFile extends Vue{
     //     this.genDebounceerateFileJSON();
     // }, 1000),
     submit() {
+        console.log(this.generateFileJSON());
         this.$parent.$emit("submitElement", this.generateFileJSON(), this.$route.query.index);
+        this.$router.push({name: "create"});
     }
     generateFileJSON() {
         let val = this.files.objectify()[0];
@@ -109,7 +111,6 @@ export default class EditVideoFile extends Vue{
             url: val.url,
             description: this.fileDescription
         };
-        this.$store.dispatch("submitVideoFile", obj);
         return { type: "video_file", content: obj };
     }
     cancelEdit() {

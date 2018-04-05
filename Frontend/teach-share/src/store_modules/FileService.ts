@@ -110,10 +110,16 @@ export const upload_file = async (ctx, files: File[]) => {
                     file,
                     config
                 );
-
+                var fileResponse: GenericFile = new GenericFile(
+                    response.data.request_id,
+                    100,
+                    file,
+                    undefined,
+                    response.data.url,
+                )
                 // update the current uploaded file object
-                console.log(response.data);
-                mutUpdate(ctx, response.data);
+                console.log(fileResponse);
+                mutUpdate(ctx, fileResponse);
                 // ctx.commit("UPDATE", response);
             } catch (error) {
                 /**
@@ -211,21 +217,28 @@ export const mutations = {
         if (typeof data.pk !== "undefined") {
             if (!state.files.data.hasOwnProperty(data.pk)) {
                 Vue.set(state.files.data, data.pk, data);
+                
             }
         }
+        
     },
 
     /**
      * create_update_file will primarily update a file.
      * but will also create files that don't already exist.
      *
-     * @param  {} state
+     * @param  {FileState} state
      * @param  {GenericFile} data
      */
-    UPDATE: (state, data: GenericFile) => {
+    UPDATE: (state: FileState, data: GenericFile) => {
+        console.log("in update");
+        console.log(data);
         if (typeof data.pk !== "undefined") {
-            Vue.set(state.files.data, data.pk, data);
+            Vue.set(state.files!.data, data.pk, data);
+            console.log(state.files!.get(data.pk));
+            console.log(state.files!.data);
         }
+
     },
 
     /**
@@ -268,6 +281,7 @@ export const mutations = {
  * Getters - used for calculating/'getting' values based on the state.
  */
 export const getters = {
+    files: state => state.files,
     filesUploadStatus: state => state.files.data,
     allFilesUploadComplete: state => {
         if (state.files.length > 0) {
@@ -285,6 +299,8 @@ export const getters = {
                 },
                 false
             );
+            console.log(oneHundredPercent);
+            console.log(hasURL);
             return oneHundredPercent === true && hasURL === true;
         }
         return false;
@@ -337,6 +353,7 @@ export const hasFiles = read(FileService.getters.has_files);
 export const isPastLimit = read(FileService.getters.past_limit);
 export const getFile = read(FileService.getters.get);
 export const allFilesUploadComplete = read(FileService.getters.allFilesUploadComplete);
+export const files = read(FileService.getters.files);
 
 /**
  * Mutations Handlers

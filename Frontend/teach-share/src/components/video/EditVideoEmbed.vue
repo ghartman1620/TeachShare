@@ -78,7 +78,7 @@ import FileUpload from "../FileUpload.vue";
 import DimensionPicker from "../DimensionPicker.vue";
 import { mapGetters } from "vuex";
 import debounce from "lodash/debounce";
-import { getVideoInfo } from "../../store_modules/YouTubeService";
+import { getVideoInfo, clearVideoInfo, } from "../../store_modules/YouTubeService";
 
 var _ = require("lodash");
 
@@ -183,7 +183,7 @@ export default class EditVideoEmbed extends Vue {
         });
     }
     destroyed() {
-        this.$store.dispatch("clearYoutubeData");
+        clearVideoInfo(this.$store);
     }
 }
 </script>

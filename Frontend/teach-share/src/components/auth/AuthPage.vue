@@ -46,6 +46,8 @@ export default class AuthPage extends Vue{
     @Prop ({})
     submitFunctionName!: string;
 
+    
+
     @Prop({})
     redirectText!: string;
 
