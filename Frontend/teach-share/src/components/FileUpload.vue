@@ -28,9 +28,9 @@
             </div>
             <div class="col">
                 <br>
-                <h4 v-if="this.$store.state.fs.files.length > 0">Uploaded files: </h4>
+                <h4 v-if="this.getFiles > 0">Uploaded files: </h4>
                 <ul class="list-group">
-                    <li v-bind:key="obj.file.name" v-for="obj in filesUploadStatus"
+                    <li v-bind:key="obj.file.name" v-for="obj in getFiles"
                         class="list-group-item d-flex justify-content-between align-items-center">
                         <div class="col-5">
                             <span v-if="obj.url">
@@ -66,7 +66,7 @@
 
 import { Vue } from "vue-property-decorator";
 import { mapGetters, mapActions } from "vuex";
-import { removeFile, uploadFiles, changeLimit, getFile, clearFiles } from "../store_modules/files/FileService"
+import { removeFile, uploadFiles, changeLimit, getFile, clearFiles } from "../store_modules/FileService"
 import { Dictionary} from "vue-router/types/router.d";
 import Component from 'vue-class-component';
 // import * as vuetypes from "vue-router/types/vue.d";

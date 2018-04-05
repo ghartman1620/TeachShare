@@ -254,12 +254,17 @@ whitelist = ['pdf','doc', 'ppt','docx', 'odt', 'xlsx', 'xls', 'xlt', 'csv', 'ods
 
 
 class FileUploadView(views.APIView):
-    permission_classes = (IsAuthenticated,)
+    #SHOULD not be commented - at time of writing frontend has issues with login (fixed on another branch but requires merge)
+    #permission_classes = (IsAuthenticated,)
     parser_classes = (FileUploadParser, JSONParser)
 
     def put(self, request, filename, format=None):
         post_id = request.query_params['post']
         file_obj = request.data['file']
+        print("file upload")
+        from pprint import pprint
+        print(request.data)
+        print(request.query_params['post'])
         p = Post.objects.get(pk=post_id) # this is where we need to actually know the post.
         a = Attachment.objects.create(post=p, file=file_obj)
         

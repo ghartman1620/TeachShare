@@ -1,14 +1,13 @@
 import Vue from "vue";
-// import Vuex, { GetterTree } from "vuex";
-import Vuex, { StoreOptions } from 'vuex';
+import Vuex, { StoreOptions } from "vuex";
 
 import api from "../src/api";
-import FileService from "./store_modules/files/FileService";
+import FileService from "./store_modules/FileService";
 import YouTubeService from "./store_modules/YouTubeService";
 import PostCreateService from "./store_modules/PostCreateService";
 import UserService from "./store_modules/UserService";
-import CommentService from "./store_modules/comments/CommentService";
-import NotificationService from "./store_modules/notify/NotificationService";
+import CommentService from "./store_modules/CommentService";
+import NotificationService from "./store_modules/NotificationService";
 
 import { RootState } from "./models";
 import { Post, Comment, User } from "./models";
@@ -125,22 +124,6 @@ export const actions = {
             )
             .catch(err => console.error(err));
     },
-    createPost: (state, postObj) => {
-        return new Promise((resolve, reject) => {
-            api
-                .post("posts/", postObj)
-                .then(response => resolve(response))
-                .catch(function(error) {
-                    if (error.response) {
-                        return resolve(error.response.data);
-                    } else if (error.request) {
-                        return resolve(error.request);
-                    } else {
-                        return resolve(error.message);
-                    }
-                });
-        });
-    },
     updateExistingPost: (state, postObj) => {
         return new Promise((resolve, reject) => {
             api
@@ -157,36 +140,27 @@ export const actions = {
                 });
         });
     },
-    saveDraft: ctx => {
-        console.log("CALLING SAVE DRAFT!!!");
-        if (ctx.rootGetters.getCurrentPostId === null) {
-            // hasn't yet been saved...
-            var obj = {
-                user: ctx.rootGetters.getCurrentUser.profile.pk,
-                title: ctx.rootGetters.getTitle,
-                content: ctx.rootGetters.getContent,
-                likes: 0,
-                comments: [],
-                tags: ctx.rootGetters.getTags,
-                attachments: [],
-                content_type: 0,
-                grade: 0,
-                length: 0
-            };
-            return ctx.dispatch("createPost", obj).then(result => {
-                ctx.dispatch("setCurrentPost", result.data);
-                return result.data.pk;
+
+    createOrUpdateComment: (state, comment) => {
+        if (comment.pk !== undefined) {
+            return new Promise((resolve, reject) => {
+                api
+                    .put(`comments/${comment.pk}/`, comment)
+                    .then(response => {
+                        state.commit("CREATE_UPDATE_COMMENT", response.data);
+                        return resolve(response);
+                    })
+                    .catch(err => reject(err));
             });
         } else {
-            // might be redundant! Check.
-            var currentPost = ctx.rootGetters.getCurrentPost;
-            currentPost.content = ctx.state.create.postElements;
-            currentPost.user = ctx.rootGetters.getCurrentUser.profile.pk;
-            currentPost.tags = ctx.rootGetters.getTags;
-            currentPost.title = ctx.rootGetters.getTitle;
-
-            return ctx.dispatch("updateExistingPost", currentPost).then(res => {
-                return ctx.dispatch("setCurrentPost", res.data);
+            return new Promise((resolve, reject) => {
+                api
+                    .post("comments/", comment)
+                    .then(response => {
+                        state.commit("CREATE_UPDATE_COMMENT", response.data);
+                        return resolve(response);
+                    })
+                    .catch(err => resolve(err.response.data));
             });
         }
     }
@@ -202,6 +176,9 @@ export const getters = {
     },
     getUserByID: state => id => {
         return state.users.find((val, ind, obj) => val.pk === id);
+    },
+    getUsers: state => {
+        return state.users;
     }
 };
 
@@ -224,5 +201,5 @@ const store: StoreOptions<RootState> = {
     mutations,
     actions,
     getters
-}
+};
 export default new Vuex.Store<RootState>(store);

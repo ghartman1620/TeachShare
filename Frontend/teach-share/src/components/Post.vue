@@ -63,7 +63,7 @@
 
 <script lang="ts">
 
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 import SeeMore from "./SeeMore.vue";
 import PostElement from "./PostElement.vue";
 import Comments from "./comments/Comments.vue";
@@ -72,7 +72,7 @@ import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import forEach from "lodash/forEach";
 import Logger from "../logging/logger";
 import {Comment, Post, User} from "../models";
-import { createUpdateComment, getByPost } from "../store_modules/comments/CommentService";
+import { createUpdateComment, getByPost } from "../store_modules/CommentService";
 
 @Component({
     components: {
@@ -114,6 +114,9 @@ export default class PostComp extends Vue {
         // createUpdateComment(this.$store, )
         getByPost(this.$store, this.post.pk).then(function(res) {
             console.log(res);
+
+            // @TODO: fix user stuff
+
             // for (let c of vm.post.comments) {
             //     console.log(c);
             //     let hasUser = vm.$store.state.users.find(
@@ -124,19 +127,20 @@ export default class PostComp extends Vue {
             //     }
             //     if (typeof c !== "undefined") {
             //         // vm.$store.dispatch("fetchUser", c.user);
-            //     }
+            //     } 
             // }
         });
     }
     submitComment() {
         var vm = this;
-        let currentUser = this.$store.getters.getCurrentUser.profile;
+        let currentUser = this.$store.getters.user.getCurrentUser.profile;
         if (currentUser === undefined) {
             // this.$log("cookie: ", this.$cookie.get("userId"));
-            this.$store.dispatch(
-                "fetchCurrentUser",
-                // this.$cookie.get("userId")
-            );
+
+            // @TODO: fix this
+            // this.$store.fetchCurrentUser();
+            
+            // this.$cookie.get("userId")
             this.actualSubmit();
         } else {
             this.actualSubmit();
@@ -181,6 +185,7 @@ export default class PostComp extends Vue {
 
     created() {
         // this.$store.dispatch("fetchUser", this.post.user);
+        this.$log(this.post);
     }
 }
 </script>

@@ -1,18 +1,20 @@
 import { expect } from "chai";
 import sinon from "sinon";
 import sinonChai from "sinon-chai";
-import { mutations, getters } from "../../../src/store_modules/comments/CommentService";
-import { CommentState } from "../../../src/store_modules/comments/state";
+import {
+    mutations,
+    getters,
+    CommentState
+} from "../../../src/store_modules/CommentService";
 import { GenericFile, ModelMap, Comment, User } from "../../../src/models";
 
 console.log("MUTATIONS: ", Object.keys(mutations));
 const { CREATE, UPDATE, DELETE, CLEAR } = mutations;
 
-
 function setup_state(): CommentState {
     const state: CommentState = {
-        comments: new ModelMap<Comment>(),
-    }
+        comments: new ModelMap<Comment>()
+    };
     return state;
 }
 
@@ -26,26 +28,41 @@ function generate_user(id?: number): User {
 describe("[COMMENTS] create should create a comment", () => {
     it("should create one entry", () => {
         const state = setup_state();
-        let comment = new Comment(1, undefined, generate_user(), "this is the post text...");
+        let comment = new Comment(
+            1,
+            undefined,
+            generate_user(),
+            "this is the post text..."
+        );
         let out = {};
         out[comment.pk] = comment;
-        
+
         CREATE(state, comment);
         let comments = state.comments as ModelMap<Comment>;
         expect(comments.data).to.eql(out as {});
         expect(comments.length).to.equal(1);
         expect(comments.get(1).pk).to.equal(1);
-        expect(comments.has(1))
+        expect(comments.has(1));
         expect(comments.has(2)).to.be.false;
     });
     it("should create multiple comments", () => {
         const state = setup_state();
-        let comment = new Comment(1, undefined, generate_user(1), "this is the post text...");
-        let comment2 = new Comment(2, undefined, generate_user(2), "this is different text");
+        let comment = new Comment(
+            1,
+            undefined,
+            generate_user(1),
+            "this is the post text..."
+        );
+        let comment2 = new Comment(
+            2,
+            undefined,
+            generate_user(2),
+            "this is different text"
+        );
         let out = {};
         out[comment.pk] = comment;
         out[comment2.pk] = comment2;
-        
+
         CREATE(state, comment);
         CREATE(state, comment2);
 
@@ -62,8 +79,18 @@ describe("[COMMENTS] create should create a comment", () => {
 describe("[COMMENTS] create should create a duplicate comment", () => {
     it("should create one entry", () => {
         const state = setup_state();
-        let comment = new Comment(1, undefined, generate_user(), "this is the post text...");
-        let comment2 = new Comment(1, undefined, generate_user(), "this is the post text...");
+        let comment = new Comment(
+            1,
+            undefined,
+            generate_user(),
+            "this is the post text..."
+        );
+        let comment2 = new Comment(
+            1,
+            undefined,
+            generate_user(),
+            "this is the post text..."
+        );
         let out = {};
         out[comment.pk] = comment;
 
@@ -75,7 +102,7 @@ describe("[COMMENTS] create should create a duplicate comment", () => {
         expect(comments.data).to.eql(out as {});
         expect(comments.length).to.equal(1);
         expect(comments.get(1).pk).to.equal(1);
-        expect(comments.has(1))
+        expect(comments.has(1));
         expect(comments.has(2)).to.be.false;
     });
 });
@@ -83,11 +110,21 @@ describe("[COMMENTS] create should create a duplicate comment", () => {
 describe("[COMMENTS] update should update a comment", () => {
     it("should update one entry", () => {
         const state = setup_state();
-        let comment = new Comment(1, undefined, generate_user(), "this is the post text...");
-        let comment2 = new Comment(2, undefined, generate_user(2), "this isn't the post text...? lulz");
+        let comment = new Comment(
+            1,
+            undefined,
+            generate_user(),
+            "this is the post text..."
+        );
+        let comment2 = new Comment(
+            2,
+            undefined,
+            generate_user(2),
+            "this isn't the post text...? lulz"
+        );
         let out = {};
         out[comment.pk] = comment;
-        out[comment2.pk] = comment2
+        out[comment2.pk] = comment2;
 
         // create identical comments.
         CREATE(state, comment);
@@ -97,8 +134,8 @@ describe("[COMMENTS] update should update a comment", () => {
         expect(comments.data).to.eql(out as {});
         expect(comments.length).to.equal(2);
         expect(comments.get(1).pk).to.equal(1);
-        expect(comments.has(1))
-        expect(comments.has(2))
+        expect(comments.has(1));
+        expect(comments.has(2));
         expect(comments.has(3)).to.be.false;
         let testobj = { ...comment, text: "this is completely different now." };
 
@@ -115,11 +152,21 @@ describe("[COMMENTS] update should update a comment", () => {
 describe("[COMMENTS] delete should delete a comment", () => {
     it("should update one entry", () => {
         const state = setup_state();
-        let comment = new Comment(1, undefined, generate_user(), "this is the post text...");
-        let comment2 = new Comment(2, undefined, generate_user(2), "this isn't the post text...? lulz");
+        let comment = new Comment(
+            1,
+            undefined,
+            generate_user(),
+            "this is the post text..."
+        );
+        let comment2 = new Comment(
+            2,
+            undefined,
+            generate_user(2),
+            "this isn't the post text...? lulz"
+        );
         let out = {};
         out[comment.pk] = comment;
-        out[comment2.pk] = comment2
+        out[comment2.pk] = comment2;
 
         // create identical comments.
         CREATE(state, comment);
@@ -129,10 +176,13 @@ describe("[COMMENTS] delete should delete a comment", () => {
         expect(comments.data).to.eql(out as {});
         expect(comments.length).to.equal(2);
         expect(comments.get(1).pk).to.equal(1);
-        expect(comments.has(1))
-        expect(comments.has(2))
+        expect(comments.has(1));
+        expect(comments.has(2));
         expect(comments.has(3)).to.be.false;
-        let testobj = { ...comment, content: "this is completely different now." };
+        let testobj = {
+            ...comment,
+            content: "this is completely different now."
+        };
 
         // that's the baseline ^^^^^^^
         DELETE(state, comment2.pk);
@@ -149,11 +199,21 @@ describe("[COMMENTS] delete should delete a comment", () => {
 describe("[COMMENTS] clear should clear all comment(s)", () => {
     it("should clear all entries", () => {
         const state = setup_state();
-        let comment = new Comment(1, undefined, generate_user(), "this is the post text...");
-        let comment2 = new Comment(2, undefined, generate_user(2), "this isn't the post text...? lulz");
+        let comment = new Comment(
+            1,
+            undefined,
+            generate_user(),
+            "this is the post text..."
+        );
+        let comment2 = new Comment(
+            2,
+            undefined,
+            generate_user(2),
+            "this isn't the post text...? lulz"
+        );
         let out = {};
         out[comment.pk] = comment;
-        out[comment2.pk] = comment2
+        out[comment2.pk] = comment2;
 
         // create identical comments.
         CREATE(state, comment);
@@ -163,10 +223,13 @@ describe("[COMMENTS] clear should clear all comment(s)", () => {
         expect(comments.data).to.eql(out as {});
         expect(comments.length).to.equal(2);
         expect(comments.get(1).pk).to.equal(1);
-        expect(comments.has(1))
-        expect(comments.has(2))
+        expect(comments.has(1));
+        expect(comments.has(2));
         expect(comments.has(3)).to.be.false;
-        let testobj = { ...comment, content: "this is completely different now." };
+        let testobj = {
+            ...comment,
+            content: "this is completely different now."
+        };
 
         // that's the baseline ^^^^^^^
         CLEAR(state);
@@ -176,8 +239,6 @@ describe("[COMMENTS] clear should clear all comment(s)", () => {
         let two: any = c.get(2);
         expect(two).to.be.undefined;
         let one: any = c.get(1);
-        expect(one).to.be.undefined
+        expect(one).to.be.undefined;
     });
 });
-
-

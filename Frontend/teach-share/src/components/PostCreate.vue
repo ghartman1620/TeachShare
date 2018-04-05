@@ -1,6 +1,8 @@
 
 <template>
 <div>
+
+
 <div :style="getBodyStyle()">
     <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container">
         <div class="col-8 mx-auto card-deck" id="button-bar">
@@ -49,7 +51,6 @@
             </div>
         </div>
     </div>
-
     <div class="row">
         <div class="col-2"></div>
         <div class="col-8">
@@ -63,8 +64,8 @@
                             </div>
 
                             <div class="col-10">
-                                <input class="form-control" type="text" v-model="title"
-                                    @input="titleChanged"  placeholder="Title required" id="titleTextbox">
+                                <input class="form-control" type="text" v-model="postState.post.title"
+                                    placeholder="Title required" id="titleTextbox">
                             </div>
                         </div>
                     </div>
@@ -86,7 +87,7 @@
                             </div>
                         </div>
                         <hr>
-                        <span id="tag-container" :key="index" v-for="(tag,index) in tags">
+                        <span id="tag-container" :key="index" v-for="(tag,index) in postState.post.tags">
                             <span @click="removeTag(index)" class="tag-entry badge badge-dark">{{tag}} <span aria-hidden="true">&times;</span>
                                 <!-- <button id="tag-delete-button" type="button" class="btn btn-sm btn-dark" >{{"x"}}</button> -->
                             </span>
@@ -99,19 +100,19 @@
         <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
             <div class="post-element-container">
                 <div class="card-column column">
-                  <div class="col-12 container">
-                    <div class="post-element card">
-                      <post-element :element="element" :index="index"></post-element>
+                    <div class="col-12 container">
+                        <div class="post-element card">
+                            <post-element :element="element" :index="index"></post-element>
+                        </div>
                     </div>
-                  </div>
 
-                  <div class="justify-content-start">
+                    <div class="justify-content-start">
                         <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
 
                             <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
                             <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="/static/caret-square-down.png"></button>
                             <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button>
-                            <button class="btn btn-primary" id="edit-button" @click="editElement(index)"><img height=20 src="/static/edit-icon.png"></button>
+                            <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="/static/edit-icon.png"></button>
 
                         </div>
                     </div>
@@ -134,7 +135,7 @@
         <button type="button" class="redo-button align-right btn btn-sm btn-outline-success btn-primary-spacing" @click="redo">
             <font-awesome-icon icon="redo" fixed-width></font-awesome-icon> redo 
         </button>
-        <button type="button" :disabled="!hasTitle" class="submit-button btn btn-primary" @click="submitPost">
+        <button type="button" class="submit-button btn btn-primary" v-on:click="submitPost">
             <font-awesome-icon icon="check" fixed-width></font-awesome-icon> Publish post
         </button>
     </nav>
@@ -152,13 +153,21 @@
 </template>
 
 
-<script>
+<script lang="ts">
 import Vue from "vue";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
 import { mapState } from "vuex";
 import forEach from "lodash/forEach";
-import PostElement from "./PostElement";
+import PostElement from "./PostElement.vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
-
+import { Component, Prop } from "vue-property-decorator";
+import {Location, Dictionary} from "vue-router/types/router.d";
 function isBlank(str) {
     return !str || /^\s*$/.test(str);
 }
@@ -186,147 +195,166 @@ const bodyVisible = {
     opacity: "1"
 };
 
-export default {
+@Component({
     name: "post-create",
-    components: { PostElement, FontAwesomeIcon },
-    data: function() {
-        return {
-            title: "",
-            editedElement: {},
-            editedElementIndex: -1,
-            inProgressTag: "",
-            tags: []
-        };
-    },
-    computed: {
-        storeElements() {
-            return this.$store.state.create.postElements;
-        },
-        nextStateId() {
-            return this.$store.state.create.nextStateId;
-        },
-        hasTitle() {
-            return this.title.length > 0;
+    components: { PostElement, FontAwesomeIcon }
+})
+export default class PostCreate extends Vue{
+    @State("create") postState;
+    @Action("setTags") setTags;
+    @Action("setTitle") setTitle;
+    @Action("createPost") createPost;
+    @Action("swapElements") swapElements;
+    @Action("removeElement") deleteElement;
+    @Action("addElement") addElement;
+    @Action("editElement") editElement;
+    @Action("storeUndo") storeUndo;
+    @Action("storeRedo") storeRedo;
+    @Action("beginPost") beginPost;
+
+    @Getter("getLoggedInUser") getLoggedInUser;
+
+    title: string = "";
+    inProgressTag: string = "";
+    tags: string[] = [];
+    
+    // getters
+    get storeElements() { 
+        return this.postState.post.elements; 
+    }
+    get nextStateId() {
+        return this.postState.post.elements.length;
+    }
+    get hasTitle() {
+        return this.postState.post.title.length > 0;
+    }
+
+    // methods
+    getEditorStyle() {
+        this.$log(this.$route.name !== "create");
+        if (this.$route.name !== "create") {
+            return editorVisible;
+        } else {
+            return editorHidden;
         }
-    },
-
-    methods: {
-        getEditorStyle() {
-            this.$log(this.$route.name !== "create");
-            if (this.$route.name !== "create") {
-                return editorVisible;
-            } else {
-                return editorHidden;
-            }
-        },
-        getBodyStyle() {
-            if (this.$route.name !== "create") {
-                return bodyHidden;
-            } else {
-                return bodyVisible;
-            }
-        },
-        nop: function() {},
-        removeTag: function(index) {
-            this.tags.splice(index, 1);
-        },
-        createTag: function(e) {
-            if (e.keyCode === 13 && this.inProgressTag !== "") {
-                this.createTagBtn();
-                this.$store.dispatch("setTags", this.tags);
-            }
-        },
-        titleChanged: function(e) {
-            this.$store.dispatch("setTitle", this.title);
-        },
-        createTagBtn: function() {
-            this.tags.push(this.inProgressTag);
-            this.inProgressTag = "";
-        },
-        getUser: function() {
-            // this.$store.dispatch("fetchUser", 1);
-        },
-        submitPost: function(event) {
-            var vm = this;
-
-            // Generate current post before posting..
-            //
-            var currentPost = this.$store.getters.getCurrentPost;
-            currentPost.content = this.$store.state.create.postElements;
-            currentPost.tags = this.$store.getters.getTags;
-            currentPost.title = this.$store.getters.getTitle;
-            currentPost.user = this.$store.getters.getCurrentUser.profile.pk;
-            currentPost.draft = false;
-
-            // dispatch createPost method in the store. This will send a
-            // post request to the backend server.
-            this.$store.dispatch("createPost", currentPost).then(function(ret) {
-                // handle the response from the server
-                if (ret === undefined) {
-                    vm.$notifyDanger(
-                        "There was a problem submitting your post."
-                    );
-                } else if (ret.status < 300) {
-                    // post was successful
-                    vm.$notifySuccess("Post submitted successfully!");
-                    
-                    vm.$router.push({
-                        name: "posts",
-                        params: { post_id: ret.data.pk }
-                    });
-                } else {
-                    let total = "";
-                    forEach(ret, function(val, key) {
-                        let currentValue = val.join(" ");
-                        total = `${total} "${key}: ${currentValue}" `;
-                    });
-                    vm.$notifyDanger(
-                        `There was a problem submitting your post. ${total}`
-                    );
-                }
-            });
-        },
-        editElement: function(index) {
-            var type = this.$store.state.create.postElements[index].type;
-            var routeName = "edit-";
-            if (type === "text") {
-                routeName += "text";
-            } else if (type === "audio") {
-                routeName += "audio";
-            } else if (type === "video_file" || type === "video_link") {
-                routeName += "video";
-            } else if (type === "image_file") {
-                routeName += "image";
-            } else {
-                routeName += "file";
-            }
-            this.$router.push({ name: routeName, query: { index: index } });
-        },
-
-        moveElementUp: function(index) {
-            if (index != 0) {
-                this.$store.dispatch("swapElements", [index, index - 1]);
-                //dispatch only allows one argument so we'll pass them as an array
-            }
-        },
-        moveElementDown: function(index) {
-            if (index != this.$store.state.create.postElements.length - 1) {
-                this.$store.dispatch("swapElements", [index, index + 1]);
-                //dispatch only allows one argument so we'll pass them as an array
-            }
-        },
-        removeElement: function(index) {
-            this.$store.dispatch("removeElement", index);
-        },
-        maxElementIndex() {
-            return this.$store.state.create.postElements.length;
-        },
-        undo() {
-            this.$store.dispatch("undo");
-        },
-        redo() {
-            this.$store.dispatch("redo");
+    }
+    getBodyStyle() {
+        if (this.$route.name !== "create") {
+            return bodyHidden;
+        } else {
+            return bodyVisible;
         }
+    }
+    nop() {}
+    removeTag(index: number) {
+        this.postState.post.tags.splice(index, 1);
+    }
+    createTag(e: any) {
+        if (e.keyCode === 13 && this.inProgressTag !== "") {
+            this.createTagBtn();
+            this.setTags(this.postState.post.tags);
+        }
+    }
+
+    createTagBtn() {
+        this.postState.post.tags.push(this.inProgressTag);
+        this.inProgressTag = "";
+    }
+    submitPost(event: any) {
+        var vm = this;
+        // dispatch createPost method in the store. This will send a
+        // post request to the backend server.
+        this.createPost().then(function(ret) {
+            // handle the response from the server
+            if (ret === undefined) {
+                vm.$notifyDanger(
+                    "There was a problem submitting your post."
+                );
+            } else if (ret.status < 300) {
+                // post was successful
+                vm.$notifySuccess("Post submitted successfully!");
+                
+                vm.$router.push({
+                    name: "posts",
+                    params: { post_id: ret.data.pk }
+                });
+            } else {
+                let total = "";
+                forEach(ret, function(val, key) {
+                    let currentValue = val.join(" ");
+                    total = `${total} "${key}: ${currentValue}" `;
+                });
+                vm.$notifyDanger(
+                    `There was a problem submitting your post. ${total}`
+                );
+            }
+        });
+    }
+    openEditor(index: number) {
+        var type = this.postState.post.elements[index].type;
+        var routeName = "edit-";
+        if (type === "text") {
+            routeName += "text";
+        } else if (type === "audio") {
+            routeName += "audio";
+        } else if (type === "video_file" || type === "video_link") {
+            routeName += "video";
+        } else if (type === "image_file") {
+            routeName += "image";
+        } else {
+            routeName += "file";
+        }
+        var query: Dictionary<string> = {"index" : index.toString()};
+        var loc:Location = {name: routeName, query: query};
+        this.$router.push(loc);
+    }
+
+    moveElementUp(index: number) {
+        console.log("move element up" + index);
+        if (index != 0) {
+            this.swapElements([index, index - 1]);
+            //dispatch only allows one argument so we'll pass them as an array
+        }
+    }
+    moveElementDown(index: number) {
+        if (index != this.$store.state.create.post.elements.length - 1) {
+            this.swapElements([index, index + 1]);
+            //dispatch only allows one argument so we'll pass them as an array
+        }
+    }
+    removeElement(index: number) {
+        this.deleteElement(index);
+    }
+    maxElementIndex() {
+        return this.postState.post.elements.length;
+    }
+    undo() {
+        this.storeUndo();
+    }
+    redo() {
+        this.storeRedo();
+    }
+    created() {
+        console.log(this.getLoggedInUser);
+        this.beginPost(this.getLoggedInUser);
+    }
+    mounted() {
+        
+        console.log("mounted post create");
+        console.log(this.postState);
+        var vm: PostCreate = this;
+        this.$on("submitElement", function(element: any, index: number){
+            console.log("submitting element");
+            console.log(element);
+            console.log(index);
+            if(index == vm.postState.post.elements.length){
+                vm.addElement(element);
+            }
+            else{
+                vm.editElement({element: element, index: index});
+            }
+            vm.$router.push({name: "create"});
+        })
     }
 };
 </script>

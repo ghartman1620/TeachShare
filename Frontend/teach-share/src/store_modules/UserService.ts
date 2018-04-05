@@ -1,120 +1,106 @@
 import Vue from "vue";
 import api from "../api";
+import User from "../user";
+import { ActionContext, Store } from "vuex";
+import {RootState} from "../models";
+
 
 // typescript 'require' workaround hack
 declare function require(name:string): any;
+export interface UserState {
+    user?: User;
+}
+
+interface UserPostObject{
+    username: string;
+    password: string;
+    email: string;
+}
+interface LoginCredentials{
+    username: string;
+    password: string;
+    persist: boolean;
+}
+
+type UserContext = ActionContext<UserState, RootState>;
 
 var Cookie = require("tiny-cookie");
+
+
+export const actions = {
+    createUser (context: UserContext, user: UserPostObject): Promise<any>  {
+        return new Promise((resolve, reject) => {
+            api.post("users/", user)
+                .then(response => resolve(response))
+                .catch(function (error) {
+                    reject(error);
+                });
+        });
+    },
+    setUser (context: UserContext, user: User): void  {
+        context.commit("SET_USER", user);
+    },
+    //potentially move browser memory accesses to some other module in the future?
+    logout (context: UserContext): void  {
+        Cookie.remove("token");
+        Cookie.remove("loggedIn");
+        Cookie.remove("userId");
+        Cookie.remove("username");
+        Object.assign(api.defaults, {headers: {}});
+
+        window.localStorage.removeItem("refreshToken");
+        window.localStorage.removeItem("username");
+    },
+    login (context: UserContext, credentials: LoginCredentials): Promise<any> {
+        var body = {
+            username: credentials.username,
+            password: credentials.password,
+            grant_type: "password"
+        };
+        console.log(body);
+        var head = { headers: { "content-type": "application/json" } };
+        return new Promise( (resolve, reject) => {
+            api.post("get_token/", body, head).then(function(response: any){
+                console.log(response);
+                var user: User = new User(response.data.user.username, 
+                        response.data.user.pk, 
+                        response.data.user.email,
+                        response.data.user.first_name, 
+                        response.data.user.last_name, 
+                        response.data.body.access_token,
+                        new Date(Date.now() + response.data.body.expiresIn*1000),
+                        credentials.persist ? response.data.body.refresh_token : undefined);
+                context.commit("SET_USER", user);
+                resolve();
+
+            }).catch(function(error){
+                
+                reject(error);
+            })
+        });
+    }
+}
+const mutations = {
+    SET_USER: (state: UserState, user: User): void => {
+        state.user = user;
+    },
+}
+const state: UserState = {
+    user: undefined,
+}
+
 const UserService = {
-    state: {
-        token: "",
-        loggedIn: false,
-        profile: undefined
-    },
-    mutations: {
-        SET_TOKEN: (state, credentials) => {
-            var response = credentials.response;
-            state.token = response.data.body.access_token;
-            console.log(response.data.body);
-            var date = new Date();
-            console.log();
-            date.setTime(date.getTime() + (response.data.body.expires_in * 1000 - 120000));
-            Cookie.set("token", response.data.body.access_token, date.toISOString());
-            Cookie.set("loggedIn", true, date.toISOString());
-            Cookie.set("userId", response.data.userId, date.toISOString());
-            Cookie.set("username", response.data.username, date.toISOString());
-
-            console.log(response.data.body.access_token);
-
-            console.log(document.cookie);
-            Object.assign(api.defaults, {headers: {authorization: "Bearer " + state.token}});
-
-            if (credentials.persist) {
-                console.log("in windowstorage");
-                window.localStorage.setItem("access_token", response.data.body.access_token);
-                window.localStorage.setItem("refresh_token", response.data.body.refresh_token);
-                window.localStorage.setItem("userId", response.data.userId);
-                window.localStorage.setItem("username", response.data.username);
-            }
-            console.log("done with set token mutation");
-        },
-        CLEAR_USER: (state) => {
-            state.loggedIn = false;
-            state.profile = undefined;
-        },
-        LOGIN_USER: (state, user) => {
-            state.profile = user;
-            state.loggedIn = true;
-        }
-    },
-    actions: {
-        fetchCurrentUser: (state, userID) => {
-            return new Promise((resolve, reject) => {
-                api
-                    .get(`users/${userID}/`)
-                    .then(response => {
-                        state.commit("LOGIN_USER", response.data);
-                        resolve(response.data);
-                    })
-                    .catch(err => console.log(err));
-            });
-        },
-        login: (context, credentials) => {
-            console.log(credentials);
-            var body = {
-                username: credentials.username,
-                password: credentials.pw,
-                grant_type: "password"
-            };
-            var head = { headers: { "content-type": "application/json" } };
-
-            return new Promise((resolve, reject) => {
-                api.post("get_token/", body, head)
-                    .then(function (response) {
-                        console.log("success!");
-                        context.commit("SET_TOKEN", {response: response, persist: credentials.persist});
-                        console.log(context.state.token);
-                        context.commit("LOGIN_USER", response.data.user);
-                        console.log(response.data.user);
-                        resolve(response);
-                    })
-                    .catch(function (err) {
-                        console.log("oh no!");
-                        console.log(err);
-                        reject(err);
-                    });
-            });
-        },
-        logout: (context) => {
-            Cookie.remove("token");
-            Cookie.remove("loggedIn");
-            Cookie.remove("userId");
-            Cookie.remove("username");
-            Object.assign(api.defaults, {headers: {}});
-
-            window.localStorage.removeItem("access_token");
-            window.localStorage.removeItem("refresh_token");
-            window.localStorage.removeItem("userId");
-            window.localStorage.removeItem("username");
-            context.commit("CLEAR_USER");
-        },
-        createUser: (context, user) => {
-            return new Promise((resolve, reject) => {
-                api.post("users/", user)
-                    .then(response => resolve(response))
-                    .catch(function (error) {
-                        reject(error);
-                    });
-            });
-        }
-    },
+    state: state,
+    mutations: mutations,
+    actions: actions,
     getters: {
-        getToken: (state) => state.token,
-        getUser: (state, getters) => {
-            if (state.loggedIn) {
-                return getters.getCurrentUser;
-            }
-            return undefined;
+        getLoggedInUser (state: UserState) {
+            console.log("in  getLoggedInUser");
+            return state.user;
+        },
+        isLoggedIn (state: UserState) {
+            console.log("in isLoggedIn getter");
+            return state.user !== undefined;
         }
     }
 };

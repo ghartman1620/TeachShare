@@ -95,7 +95,6 @@ var _ = require("lodash");
     ])
 })
 export default class EditVideoEmbed extends Vue {
-
     ytVideoDescription!: string ;
     ytVideoID!: string;
     ytVideoTitle!: string;

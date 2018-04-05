@@ -1,10 +1,10 @@
 <template>
     <div>
-        <post
+        <PostComp
             v-if="postLocal !== undefined"
             :post="postLocal"
             :index="postid">
-        </post>
+        </PostComp>
     </div>
 </template>
 
@@ -13,7 +13,7 @@
 import PostComp from "./Post.vue";
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { Post, Comment, User } from "../models";
-import { getByPost } from "../store_modules/comments/CommentService";
+import { getByPost } from "../store_modules/CommentService";
 
 @Component({
     props: [
@@ -22,11 +22,13 @@ import { getByPost } from "../store_modules/comments/CommentService";
     components: { "post": PostComp }
 })
 export default class PostDetail extends Vue {
-    @Prop() post;
-    // post: Post = new Post();
+
+    // @TODO: fix this
+    @Prop({default: new Post()}) post!: Post;
+
 
     get postLocal(): any {
-        return this.$store.getters.getPostById(this.$route.params.post_id);
+        return <Post>this.$store.getters.getPostById(this.$route.params.post_id);
     }
     get postid() {
         return this.postLocal !== undefined ? this.postLocal.pk : this.$route.params.post_id
@@ -54,9 +56,11 @@ export default class PostDetail extends Vue {
         });
     }
     created() {
-        this.$store.dispatch("fetchPost", this.$route.params.post_id).then((res) => {
-            this.getComments();
-        }); 
+
+        // @TODO: fix this
+        // this.fetchPost(this.$route.params.post_id).then((res) => {
+        //     this.getComments();
+        // }); 
     }
 }
 </script>

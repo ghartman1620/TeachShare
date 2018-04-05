@@ -5,6 +5,7 @@ import Vuex from "vuex";
 import VeeValidate, { Validator } from "vee-validate";
 import Notifications from "./notifications";
 import Logger from "./logging/logger";
+import UserPlugin from "./user";
 
 // our stuff
 import App from "./App.vue";

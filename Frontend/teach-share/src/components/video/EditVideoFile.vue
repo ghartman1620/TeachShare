@@ -47,88 +47,87 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import FileUpload from "../FileUpload";
 import DimensionPicker from "../DimensionPicker";
 import { mapGetters } from "vuex";
+import { Component } from "vue-property-decorator";
+
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
+
 
 var _ = require("lodash");
 
-export default Vue.component("edit-video-file", {
+@Component({
+    name: "edit-video-file",
     components: { FileUpload, DimensionPicker },
-    props: [],
-    data() {
-        return {
-            width: 640,
-            height: 480,
-            title: "",
-            source: "",
-            fileDescription: ""
+})
+export default class EditVideoFile extends Vue{
+    @Getter("fs/hasFiles") hasFiles;
+    @Getter("fs/allFilesUploadComplete") allFilesUploadComplete;
+    @Getter("fs/files") files;
+
+    width: number = 640;
+    height: number = 480;
+    title: string = "";
+    source: string = "";
+    fileDescription: string = "";
+
+
+    get ActualTitle() {
+        return this.title;
+    }
+    set ActualTitle(val: string) {
+        this.title = val;
+    }
+
+
+    // DebounceFileSubmit: _.throttle(function() {
+    //     this.genDebounceerateFileJSON();
+    // }, 1000),
+    submit() {
+        this.$parent.$emit("submitElement", this.generateFileJSON(), this.$route.query.index);
+    }
+    generateFileJSON() {
+        let val = this.files.objectify()[0];
+        var obj = {
+            post: 2,
+            type: "video_file",
+            id: val.db_id,
+            height: this.height,
+            title: this.ActualTitle,
+            width: this.width,
+            file: val.file,
+            name: val.file.name,
+            url: val.url,
+            description: this.fileDescription
         };
-    },
-    computed: {
-        ActualTitle: {
-            get: function() {
-                return this.title;
-            },
-            set: function(val) {
-                this.title = val;
-            }
-        },
-        ...mapGetters("fs", ["hasFiles", "allFilesUploadComplete"])
-    },
-    methods: {
-        DebounceFileSubmit: _.throttle(function() {
-            this.generateFileJSON();
-        }, 1000),
-        submit() {
-            if (
-                this.$route.query.index ==
-                this.$store.state.create.postElements.length
-            ) {
-                this.$store.dispatch("addElement", this.generateFileJSON());
-            } else {
-                this.$store.dispatch("editElement", {
-                    index: this.$route.query.index,
-                    element: this.generateFileJSON()
-                });
-            }
-            this.$router.push({ name: "create" });
-        },
-        generateFileJSON() {
-            let val = this.$store.state.fs.uploadedFiles[0];
-            var obj = {
-                post: 2,
-                type: "video_file",
-                id: val.db_id,
-                height: this.height,
-                title: this.ActualTitle,
-                width: this.width,
-                file: val.file,
-                name: val.file.name,
-                url: val.url,
-                description: this.fileDescription
-            };
-            this.$store.dispatch("submitVideoFile", obj);
-            return { type: "video_file", content: obj };
-        },
-        cancelEdit() {
-            this.$router.push({ name: "create" });
-        }
-    },
+        this.$store.dispatch("submitVideoFile", obj);
+        return { type: "video_file", content: obj };
+    }
+    cancelEdit() {
+        this.$router.push({ name: "create" });
+    }
     mounted() {
-        this.$on("changeHeight", function(h) {
-            this.height = h;
+        var vm: EditVideoFile = this;
+        vm.$on("changeHeight", function(h) {
+            vm.height = h;
         });
-        this.$on("changeWidth", function(w) {
-            this.width = w;
+        vm.$on("changeWidth", function(w) {
+            vm.width = w;
         });
-    },
+    }
     destroyed() {
         this.$store.dispatch("removeAllVideos");
     }
-});
+};
 </script>
 
 

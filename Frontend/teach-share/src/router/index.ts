@@ -2,7 +2,10 @@ import Base from "@/components/Base.vue";
 import Vue from "vue";
 import Router from "vue-router";
 
+
 import api from "../api";
+import store from "../store"; 
+import User from "../user";
 
 // typescript 'require' workaround hack
 declare function require(name: string): any;
@@ -128,8 +131,8 @@ const router = new Router({
 
 // Returns true or false if user is logged in.
 // Refreshes token if necessary.
-function verifyAndRefreshLogin() {
-    const token = Cookie.get("token");
+/**function verifyAndRefreshLogin() {
+    var token = Cookie.get("token");
 
     // @TODO: using != causes a type cast before comparison, leading to inconsistent results
     // consider using !== and finding the correct comparison, to avoid unknown behavior.
@@ -197,11 +200,66 @@ function verifyAndRefreshLogin() {
         });
     }
 }
+*/
+var Cookie = require("tiny-cookie");
+function verifyAndRefreshLogin(): Promise<any> {
+    if(store.getters.isLoggedIn){
+        console.log("is logged in with store");
+        return new Promise((resolve) => {resolve(true);});
+    }
+    else if(Cookie.get("token") != null){
+        console.log("is logged in with token");
+        var u: User = new User();
+        store.dispatch("setUser", u);
+        return new Promise((resolve) => {resolve(true);});
+    }
+    else if(window.localStorage.getItem("refreshToken") !== null){
+        console.log("logging back in...");
+        console.log(window.localStorage.getItem("refreshToken"));
 
-const Cookie = require("tiny-cookie");
-const loginProtectedRoutes = [];
+        console.log(window.localStorage.getItem("username"));
+        return new Promise((resolve, reject) => {
+            var body = {
+                grant_type: "refresh_token",
+                refresh_token: window.localStorage.getItem("refreshToken"),
+                username: window.localStorage.getItem("username")
+            };
+            console.log(body);
+            var head = { headers: { "content-type": "application/json" } };
+            Object.assign(api.defaults, {});
+            api.post("get_token/", body, head).then(function(response: any) {
+                console.log(response);
+                console.log(response.data.user);
+                console.log(response.data.user.username);
+                var user: User = new User(response.data.user.username, 
+                    response.data.user.pk, 
+                    response.data.user.email,
+                    response.data.user.first_name, 
+                    response.data.user.last_name, 
+                    response.data.body.access_token,
+                    new Date(Date.now() + response.data.body.expiresIn*1000),
+                    response.data.body.refresh_token);
+                store.dispatch("setUser", user);
+                resolve(true);
+
+            }).catch(function(error: any) {
+                console.log(error);
+                resolve(false);
+            })
+        });
+    }   
+    else{
+        console.log("foobar");
+        return new Promise((resolve) => {resolve(false);});
+    }
+
+}
+
+
+const loginProtectedRoutes = ["create"];
 const loggedOutRoutes = ["login", "register"];
 router.beforeEach((to, from, next) => {
+    console.log(window.localStorage.getItem("refreshToken"));
     if (loggedOutRoutes.some(val => val === to.name)) {
         verifyAndRefreshLogin().then((loggedIn) => {
             if (loggedIn) {
@@ -212,7 +270,6 @@ router.beforeEach((to, from, next) => {
         });
     }
 
-    // Are we accessing a login-protected page? If no, we don't need to be logged in.
     // @TODO: make sure this works!!!
     if (loginProtectedRoutes.some((val) => val === to.name)) {
         verifyAndRefreshLogin().then((loggedIn) => {
@@ -222,18 +279,7 @@ router.beforeEach((to, from, next) => {
                 next({ name: "login" });
             }
         });
-    } else {
-        if (
-            Cookie.get("token") == undefined &&
-            window.localStorage.getItem("refresh_token") != undefined
-        ) {
-            verifyAndRefreshLogin().then(() => {
-                next();
-            });
-        } else {
-            next();
-        }
-    }
+    } 
     next();
 });
 

@@ -30,99 +30,80 @@
                 <!-- Description -->
                 <textarea v-model="description" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
                 <br>
- 
-
-                <div class="row">
-                    <div class="offset-3 col-6">
-                        <button @click.prevent="submit" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
-                            <span v-if="!allFilesUploadComplete">Please Select File(s) to upload</span>
-                            <span v-else>Submit Audio(s)</span>
-                        </button>
-                    </div>
-                    <div class="col-2">
-                        <button @click="close" type="button" class="btn btn-danger btn-block">
-                                Cancel
-                        </button>
-                    </div>
-                </div>
-                
             </form>
         </div>
-    </div>
+    </div>                
 </template>
 
-<script>
+<script lang = "ts">
 import Vue from "vue";
 import FileUpload from "../FileUpload";
 import { mapGetters } from "vuex";
-import AudioElement from "./AudioElement";
+import { Component } from "vue-property-decorator";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
 
 var _ = require("lodash");
 
-export default Vue.component("edit-audio", {
-    components: { FileUpload, AudioElement },
+@Component({
+    name: "edit-audio",
+    components: { FileUpload },
     props: [],
-    data() {
-        return {
-            title: "",
-            description: ""
-    };
-    },
-    computed: {
-        changedTextRecv() {},
-        ...mapGetters("fs", ["hasFiles", "allFilesUploadComplete"])
-    },
-    methods: {
-        submitAudio() {
-            this.$store.dispatch("submitAudioFiles", this.generateJSON());
-        },
-        generateJSON() {
-            let output = new Array();
-            var vm = this;
-            _.map(this.$store.state.fs.uploadedFiles, function(val, ind, arr) {
-            output.push({
-                post: 2,
-                type: "audio_file",
-                id: val.db_id,
-                title: vm.title,
-                filetype: val.file.type,
-                name: val.file.name,
-                url: val.url,
-                description: vm.description});
-            });
-            return output;
-        },
-        submit() {
-            var vm = this;
-            if (this.$route.query.index === this.$store.state.create.postElements.length) {
-                this.$store.dispatch("addElement", {
-                    type: "audio",
-                    content: this.generateJSON()
-                }).then(function(){
-                    vm.$router.push({name: "create"});
-                });
-            } else {
-                this.$store.dispatch("editElement", {
-                    index: this.$route.query.index,
-                    element: { type: "audio", content: this.generateJSON() }
-                }).then(function(){
-                    vm.$router.push({name: "create"});
-                });
-            }
-        },
-        close: function(event) {
-            this.$router.push({ name: "create" });
-        }
-    },
+    
+})
+export default class EditAudio extends Vue{
+    @State("create") postState;
+    @State("fs") fileState;
+    @Action("addElement") addElement;
+    @Action("editElement") editElement;
+    @Action("submitAudioFiles") submitAudioFiles;
+    @Getter("fs/allFilesUploadComplete") allFilesUploadComplete;
+    @Getter("fs/hasFiles") hasFiles;
+    @Getter("fs/files") files;
+    title: string = "";
+    description: string = "";
+
+    // getters
+
+
     created() {
-        this.$on("changedTitle", function(res) {
-            this.title = res;
+        var vm: EditAudio = this; //to get rid of this implicitly has type any
+        vm.$on("changedTitle", function(res) {
+            vm.title = res;
         });
-        this.$on("changedBody", function(res) {
-            this.description = res;
+        vm.$on("changedBody", function(res) {
+            vm.description = res;
         });
     }
-});
+    // methods
+    submitAudio() {
+        this.submitAudioFiles(this.generateJSON());
+    }
+    generateJSON() {
+        var val = this.files.objectify()[0]; //one file max in audio elements
+        return  {
+            type: "audio_file",
+            id: val.db_id,
+            title: this.title,
+            filetype: val.file.type,
+            name: val.file.name,
+            url: val.url,
+            description: this.description
+        };
+    }
+    submit() {
+        this.$parent.$emit("submitElement", this.generateJSON(), this.$route.query.index);
+    }
+    close(event: any) {
+        this.$router.push({ name: "create" });
+    }
+    
+};
 </script>
 
 

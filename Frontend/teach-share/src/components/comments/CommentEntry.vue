@@ -63,7 +63,7 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 import TextElement from "../text/TextElement.vue";
 import EditText from "../text/EditText.vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
-import { createUpdateComment } from "../../store_modules/comments/CommentService";
+import { createUpdateComment } from "../../store_modules/CommentService";
 import { Comment, User, Post } from "../../models";
 
 @Component({

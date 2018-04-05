@@ -205,37 +205,6 @@
         ]
     },
     {
-        "pk": 72,
-        
-        "title": "Python.exe!",
-        "content": [
-            {
-                "type": "file",
-                "files": [
-                    {
-                        "id": 1411,
-                        "url": "/media/uploads/2018/03/06/d8960378-b5b5-4bff-9f84-eb8c500ad095/python.exe",
-                        "file": {},
-                        "name": "python.exe",
-                        "post": 2,
-                        "type": "file"
-                    }
-                ]
-            },
-            {
-                "type": "text",
-                "content": "<p class=\"ql-align-right\"><s>kjlaerwu;ikf;</s></p>"
-            }
-        ],
-        "updated": "2018-03-06T10:11:49.874464-08:00",
-        "likes": 0,
-        "timestamp": "2018-03-06T10:11:49.874464-08:00",
-        "user": 1,
-        "comments": [],
-        "attachments": [],
-        "tags": []
-    },
-    {
         "pk": 67,
         "title": "Quadratic Formula Lecture",
         "content": [

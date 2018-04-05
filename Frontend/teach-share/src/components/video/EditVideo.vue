@@ -50,10 +50,19 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component } from "vue-property-decorator";
 import EditVideoEmbed from "./EditVideoEmbed.vue";
 import EditVideoFile from "./EditVideoFile.vue";
 import { mapGetters } from "vuex";
+
+
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
 
 @Component({
     name: "edit-video",
@@ -76,12 +85,6 @@ export default class EditVideo extends Vue {
             return "nav-item nav-link active";
         }
         return "nav-item nav-link";
-    }
-    get descriptionEmbed() {
-        return this.$store.state.video.videos[0].description;
-    }
-    get descriptionFile() {
-        return this.$store.state.video.videos[0].description;
     }
 }
 </script>

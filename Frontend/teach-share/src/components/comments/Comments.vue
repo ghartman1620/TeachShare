@@ -14,7 +14,7 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { Post } from "../../models";
 import CommentEntry from "./CommentEntry.vue";
-import { getCommentsForPost } from "../../store_modules/comments/CommentService";
+import { getCommentsForPost } from "../../store_modules/CommentService";
 
 @Component({
     name: "Comments",

@@ -21,9 +21,12 @@ def assembleContent(content, element):
     
 def fileNamesFromFileElement(element):
     fileNames = []
-    print(element)
-    for file in element['content']:
-        fileNames.append(file['name'])
+    
+    try:
+        for file in element['content']:
+            fileNames.append(file['name'])
+    except KeyError:
+        print(element)
     return fileNames
 
 def fileNamesFromImageAudioElement(element):
@@ -75,6 +78,7 @@ class PostDocument(DocType):
         # pprint(vars(instance))
         # print("files")  
         # print(files)
+
         return files
     
     def prepare_content(self, instance):
@@ -85,6 +89,7 @@ class PostDocument(DocType):
         else:
             for k, v in instance.content.items():
                 content = content + " " + v
+
         return content
 
     def get_queryset(self):
