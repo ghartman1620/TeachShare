@@ -332,9 +332,11 @@ export const clearFiles = dispatch(FileService.actions.clear_files);
 /**
  * Getter Handlers
  */
+export const filesUploadStatus = read(FileService.getters.filesUploadStatus);
 export const hasFiles = read(FileService.getters.has_files);
 export const isPastLimit = read(FileService.getters.past_limit);
 export const getFile = read(FileService.getters.get);
+export const allFilesUploadComplete = read(FileService.getters.allFilesUploadComplete);
 
 /**
  * Mutations Handlers

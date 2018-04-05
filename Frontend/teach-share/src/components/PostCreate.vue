@@ -217,10 +217,10 @@ export default class PostCreate extends Vue{
     title: string = "";
     inProgressTag: string = "";
     tags: string[] = [];
-    
+
     // getters
-    get storeElements() { 
-        return this.postState.post.elements; 
+    get storeElements() {
+        return this.postState.post.elements;
     }
     get nextStateId() {
         return this.postState.post.elements.length;
@@ -273,7 +273,6 @@ export default class PostCreate extends Vue{
             } else if (ret.status < 300) {
                 // post was successful
                 vm.$notifySuccess("Post submitted successfully!");
-                
                 vm.$router.push({
                     name: "posts",
                     params: { post_id: ret.data.pk }
@@ -305,7 +304,7 @@ export default class PostCreate extends Vue{
             routeName += "file";
         }
         var query: Dictionary<string> = {"index" : index.toString()};
-        var loc:Location = {name: routeName, query: query};
+        var loc: Location = {name: routeName, query: query};
         this.$router.push(loc);
     }
 
@@ -313,13 +312,13 @@ export default class PostCreate extends Vue{
         console.log("move element up" + index);
         if (index != 0) {
             this.swapElements([index, index - 1]);
-            //dispatch only allows one argument so we'll pass them as an array
+            // dispatch only allows one argument so we'll pass them as an array
         }
     }
     moveElementDown(index: number) {
         if (index != this.$store.state.create.post.elements.length - 1) {
             this.swapElements([index, index + 1]);
-            //dispatch only allows one argument so we'll pass them as an array
+            // dispatch only allows one argument so we'll pass them as an array
         }
     }
     removeElement(index: number) {
@@ -339,7 +338,6 @@ export default class PostCreate extends Vue{
         this.beginPost(this.getLoggedInUser);
     }
     mounted() {
-        
         console.log("mounted post create");
         console.log(this.postState);
         var vm: PostCreate = this;

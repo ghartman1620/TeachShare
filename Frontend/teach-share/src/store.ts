@@ -8,6 +8,7 @@ import PostCreateService from "./store_modules/PostCreateService";
 import UserService from "./store_modules/UserService";
 import CommentService from "./store_modules/CommentService";
 import NotificationService from "./store_modules/NotificationService";
+import { AxiosResponse } from "axios";
 
 import { RootState } from "./models";
 import { Post, Comment, User } from "./models";
@@ -35,7 +36,7 @@ export const mutations = {
     LOAD_USER: (state, data) => {
         state.user = Object.assign({}, data);
     },
-    ADD_USER: (state, user) => {
+    ADD_USER: (state, user: User) => {
         console.log("ADDUSER: ", user);
         let index = state.users.findIndex(val => val.pk === user.pk);
         console.log(index);
@@ -103,11 +104,15 @@ export const actions = {
                 .catch(err => console.error(err));
         });
     },
-    fetchUser: (state, userID) => {
-        api
-            .get(`users/${userID}/`)
-            .then(response => state.commit("ADD_USER", response.data))
-            .catch(err => console.error(err));
+    fetchUser: async (state, userID: number) => {
+        try {
+            let resp: AxiosResponse = await api.get(`users/${userID}/`);
+            state.commit("ADD_USER", resp.data);
+            return resp.data
+        } catch (err) {
+            console.log(err);
+            return err
+        }
     },
 
     /**

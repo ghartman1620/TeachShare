@@ -4,9 +4,8 @@ import User from "../user";
 import { ActionContext, Store } from "vuex";
 import {RootState} from "../models";
 
-
 // typescript 'require' workaround hack
-declare function require(name:string): any;
+declare function require(name: string): any;
 export interface UserState {
     user?: User;
 }
@@ -26,7 +25,6 @@ type UserContext = ActionContext<UserState, RootState>;
 
 var Cookie = require("tiny-cookie");
 
-
 export const actions = {
     createUser (context: UserContext, user: UserPostObject): Promise<any>  {
         return new Promise((resolve, reject) => {
@@ -40,7 +38,7 @@ export const actions = {
     setUser (context: UserContext, user: User): void  {
         context.commit("SET_USER", user);
     },
-    //potentially move browser memory accesses to some other module in the future?
+    // potentially move browser memory accesses to some other module in the future?
     logout (context: UserContext): void  {
         Cookie.remove("token");
         Cookie.remove("loggedIn");
@@ -62,11 +60,11 @@ export const actions = {
         return new Promise( (resolve, reject) => {
             api.post("get_token/", body, head).then(function(response: any){
                 console.log(response);
-                var user: User = new User(response.data.user.username, 
-                        response.data.user.pk, 
+                var user: User = new User(response.data.user.username,
+                        response.data.user.pk,
                         response.data.user.email,
-                        response.data.user.first_name, 
-                        response.data.user.last_name, 
+                        response.data.user.first_name,
+                        response.data.user.last_name,
                         response.data.body.access_token,
                         new Date(Date.now() + response.data.body.expiresIn*1000),
                         credentials.persist ? response.data.body.refresh_token : undefined);
@@ -74,7 +72,6 @@ export const actions = {
                 resolve();
 
             }).catch(function(error){
-                
                 reject(error);
             })
         });

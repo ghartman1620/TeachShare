@@ -30,15 +30,13 @@ describe("[EDIT_VIDEO_EMBED.VUE] Embed video (youtube) view component", () => {
     it("should make youtube request", () => {
         console.log(vm);
         console.log(vm.$el);
-        // getVideoInfo()
         let input = "https://www.youtube.com/watch?v=KMX1mFEmM3E"
+
         vm.getYoutubeData(input).then(function (resp) {
-            console.log("******", Object.keys(resp));
             expect(resp.status).to.equal(200);
             expect(resp.data).to.eql({etag: "", items: [{etag: "", snippet: "", statistics: ""}] });
         });
         
-        // console.log(vm.$store.state.yt.videoDetails);
         setTimeout(() => server.respond([200,
             {
                 "Content-Type": "application/json"

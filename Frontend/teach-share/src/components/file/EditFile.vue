@@ -23,10 +23,11 @@
 <script lang="ts">
 import Vue from "vue";
 
-import FileUpload from "../FileUpload";
+import FileUpload from "../FileUpload.vue";
 import { mapGetters } from "vuex";
 import { Component, Prop } from "vue-property-decorator";
-import {GenericFile} from "../../models";
+import { GenericFile } from "../../models";
+import { hasFiles, filesUploadStatus, allFilesUploadComplete } from "../../store_modules/FileService"
 import {
   State,
   Getter,
@@ -36,20 +37,28 @@ import {
 } from "vuex-class";
 
 @Component({
-	components: {FileUpload},
-	name: "edit-file",
+    components: {FileUpload},
+    name: "edit-file",
 })
-export default class EditFile extends Vue{
-	@Getter("fs/hasFiles") hasFiles;
-	@Getter("fs/allFilesUploadComplete") allFilesUploadComplete;
-	@Getter("fs/files") files;
-	@Action("addElement") addElement;
+export default class EditFile extends Vue {
 
-	submit() {
-		console.log("submitting file element");
-		console.log(this.generateJSON());
-		this.$parent.$emit("submitElement", this.generateJSON(), this.$route.query.index);
-		/*
+    @Action("addElement") addElement;
+
+    get hasFiles() {
+        return hasFiles(this.$store);
+    }
+    get files() {
+        return filesUploadStatus(this.$store);
+    }
+    get allFilesUploadComplete() {
+        return allFilesUploadComplete(this.$store);
+    }
+
+    submit() {
+        console.log("submitting file element");
+        console.log(this.generateJSON());
+        this.$parent.$emit("submitElement", this.generateJSON(), this.$route.query.index);
+        /*
 		var vm = this;
 		if (this.$route.query.index === this.$store.state.create.postElements.length) {
 			this.addElement(this.generateJSON())
@@ -62,18 +71,17 @@ export default class EditFile extends Vue{
 				element: this.generateJSON()
 			}).then(function(){
 				vm.$router.push({name: "create"});
-			
 			}
 		}
 		*/
-	}
-	generateJSON(): any {
-		return {type: "file", content: this.files.objectify()}
-	}
-	cancel(){
-		this.$router.push({ name: "create" });
-	}
-};
+    }
+    generateJSON(): any {
+        return {type: "file", content: this.files.objectify()}
+    }
+    cancel(){
+        this.$router.push({ name: "create" });
+    }
+}
 </script>
 
 

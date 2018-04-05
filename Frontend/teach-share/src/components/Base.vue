@@ -58,17 +58,15 @@ export default class Base extends Vue {
     // }
 
     mounted() {
-        let uid = document.cookie.match(new RegExp("(?:userId=(?<userid>[^;]+))"));
-        if (typeof uid !== "undefined") {
-            let id = uid as RegExpMatchArray;
-            let actualid = id["groups"]["userid"];
-            console.log("Groups: ", id["groups"]);
-            console.log("COOKIE: ", actualid, id, uid);
-            this.$store.dispatch("fetchCurrentUser", actualid)
-                    .then((resp) => {
-                        this.$log(resp);
-                        this.$store.dispatch("addUser", resp)
-            });
+        if (document.cookie !== "") {
+            let uid = document.cookie.match(new RegExp("(?:pk=(?<pk>[^;]+))"));
+            if (typeof uid !== "undefined") {
+                let id = uid as RegExpMatchArray;
+                let actualid = id["groups"]["pk"];
+                this.$store.dispatch("fetchUser", actualid).then((resp) => {
+                    this.$store.dispatch("addUser", resp);
+                });
+            }
         }
         // this.$notifySuccess("please work....");
         // this is an example of how to check an images height/width without actually mounting it on the page
