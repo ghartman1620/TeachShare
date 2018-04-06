@@ -1,12 +1,8 @@
-import api from "../api";
-import Vue from "vue";
+import Vuex, { ActionContext } from "vuex";
+
+import { IRootState } from "../models";
 import InProgressPost from "../post";
 import User from "../user";
-
-import { getStoreBuilder } from "vuex-typex"
-import Vuex, { Store, ActionContext } from "vuex"
-
-import { RootState } from "../models";
 
 // import { storeBuilder } from "../../store";
 
@@ -25,13 +21,13 @@ interface EditedElement{
     index: number;
 }
 
-type PostContext = ActionContext<PostState, RootState>;
+type PostContext = ActionContext<PostState, IRootState>;
 
 const state: PostState = {
     post: undefined,
     doneMutations: [],
     unDoneMutations: [],
-}
+};
 
 export const mutations = {
     SET_TAGS: (state: PostState, tags: string[]) => {
@@ -260,9 +256,9 @@ export const actions = {
 }
 
 const PostCreateService = {
-    state: state,
-    mutations: mutations,
-    actions: actions,
+    state,
+    mutations,
+    actions,
     getters: {
         getTags: (state: PostState) => state.post!.tags,
         getTitle: (state: PostState) => state.post!.title,

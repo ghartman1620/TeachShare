@@ -1,15 +1,16 @@
 import v4 from "uuid/v4";
-import { ActionContext, Store } from "vuex";
+import { ActionContext } from "vuex";
 import { getStoreAccessors } from "vuex-typescript";
-import { RootState, Notification, NotifyType } from "../models";
 
-export interface NotifyState {
-    pending: Notification[];
+import { INotification, IRootState } from "../models";
+
+export interface INotifyState {
+    pending: INotification[];
     max: number;
     ttl: number;
 }
 
-type NotifyContext = ActionContext<NotifyState, RootState>;
+type NotifyContext = ActionContext<INotifyState, IRootState>;
 
 const state = {
     pending: [],
@@ -18,39 +19,39 @@ const state = {
 };
 
 export const mutations = {
-    SEND: (state, notification) => {
-        let current = state.pending.findIndex(v => v == notification);
+    SEND: (ctx, notification) => {
+        const current = ctx.pending.findIndex((v) => v === notification);
         if (current === -1) {
             notification.id = v4();
-            state.pending.push(notification);
+            ctx.pending.push(notification);
         } else {
-            state.pending[current] = notification;
+            ctx.pending[current] = notification;
         }
     },
-    REMOVE: (state, notificationID) => {
-        let current = state.pending.findIndex(n => n.id === notificationID);
+    REMOVE: (ctx, notificationID) => {
+        const current = ctx.pending.findIndex((n) => n.id === notificationID);
         if (current !== -1) {
-            state.pending.splice(current, 1);
+            ctx.pending.splice(current, 1);
         }
     }
 };
 export const actions = {
-    sendNotification: (state, notification: Notification) => {
-        mutSend(state, notification);
+    sendNotification: (ctx, notification: INotification) => {
+        mutSend(ctx, notification);
     },
-    removeNotification: (state, notificationID: number) => {
-        mutRemove(state, notificationID);
+    removeNotification: (ctx, notificationID: number) => {
+        mutRemove(ctx, notificationID);
     }
 };
 
 export const getters = {
-    getAllNotifications: state => state.pending,
-    getAllSuccess: state => state.pending.filter(x => x.type === "SUCCESS")
+    getAllNotifications: (ctx) => ctx.pending,
+    getAllSuccess: (ctx) => ctx.pending.filter((x) => x.type === "SUCCESS")
 };
 
 const NotificationService = {
-    // scoped: true,
-    // strict: process.env.NODE_ENV !== 'production',
+    namespaced: true,
+    strict: process.env.NODE_ENV !== "production",
     state,
     mutations,
     actions,
@@ -62,8 +63,8 @@ export default NotificationService;
 /**
  * Type safe definitions for NotificationService
  */
-const { commit, read, dispatch } = getStoreAccessors<NotifyState, RootState>(
-    ""
+const { commit, read, dispatch } = getStoreAccessors<INotifyState, IRootState>(
+    "notify"
 );
 
 /**

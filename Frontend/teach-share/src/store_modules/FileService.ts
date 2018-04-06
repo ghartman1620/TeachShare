@@ -1,21 +1,18 @@
-import api from "../api";
-import Vue from "vue";
 import axios from "axios";
-import map from "lodash/map";
-import forEach from "lodash/forEach";
-import every from "lodash/every";
 import reduce from "lodash/reduce";
-
-import { RootState, GenericFile, ModelMap } from "../models";
+import Vue from "vue";
 import { ActionContext, Store } from "vuex";
 import { getStoreAccessors } from "vuex-typescript";
+
+import api from "../api";
+import { GenericFile, IRootState, ModelMap } from "../models";
 
 export interface FileState {
     files?: ModelMap<GenericFile>;
     limit: number;
 }
 
-type FileContext = ActionContext<FileState, RootState>;
+type FileContext = ActionContext<FileState, IRootState>;
 
 /**
  * The state for file uploads, other file operations.
@@ -316,7 +313,7 @@ export default FileService;
 /**
  * Type safe definitions for FileService
  */
-const { commit, read, dispatch } = getStoreAccessors<FileState, RootState>(
+const { commit, read, dispatch } = getStoreAccessors<FileState, IRootState>(
     "fs"
 );
 

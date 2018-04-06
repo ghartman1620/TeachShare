@@ -22,14 +22,14 @@
                 <span v-show="errors.has('embedurl')" class="help text-danger">{{ errors.first('embedurl') }}</span>
             <br>
             <transition name="fade">
-                <div v-if="ytVideoDescription || ytVideoThumbnail || ytVideoTitle" class="row">
+                <div v-if="videoDetail || ytVideoThumbnail || ytVideoTitle" class="row">
                     <!-- <div class="col-1"></div> -->
                     <div class="col">
                         <div class="media">
                             <img class="mr-3" :src="ytVideoThumbnail.url" alt="Generic placeholder image">
                             <div class="media-body">
                                 <h5 class="mt-0">{{ ytVideoTitle }}</h5>
-                                    {{ytVideoDescriptionShort}}
+                                    {{smVideoDetail}}
                             </div>
                         </div>
                     <div class="col-1"></div>
@@ -78,7 +78,14 @@ import FileUpload from "../FileUpload.vue";
 import DimensionPicker from "../DimensionPicker.vue";
 import { mapGetters } from "vuex";
 import debounce from "lodash/debounce";
-import { getVideoInfo } from "../../store_modules/YouTubeService";
+import {
+    getVideoInfo,
+    videoTitle,
+    videoDetail,
+    videoThumbnail,
+    smVideoDetail,
+    clearVideoInfo
+} from "../../store_modules/YouTubeService";
 
 var _ = require("lodash");
 
@@ -86,19 +93,17 @@ var _ = require("lodash");
     name: "edit-video-embed",
     components: { DimensionPicker },
     props: [],
-    computed: mapGetters([
-            "ytVideoDescription",
-            "ytVideoDescriptionShort",
-            "ytVideoThumbnail",
-            "ytVideoTitle",
-            "ytVideoID"
-    ])
+    // computed: mapGetters([
+    //         "ytVideoDescription",
+    //         "ytVideoDescriptionShort",
+    //         "ytVideoThumbnail",
+    //         "ytVideoTitle",
+    //         "ytVideoID"
+    // ])
 })
 export default class EditVideoEmbed extends Vue {
     ytVideoDescription!: string ;
     ytVideoID!: string;
-    ytVideoTitle!: string;
-    ytVideoThumbnail!: any;
 
     width: number = 640;
     height: number = 480;
@@ -114,12 +119,27 @@ export default class EditVideoEmbed extends Vue {
         }
     };
 
+    get ytVideoTitle(): string {
+        return videoTitle(this.$store);
+    }
+
+    get ytVideoThumbnail(): string {
+        return videoThumbnail(this.$store);
+    }
+
+    get videoDetail(): string {
+        return videoDetail(this.$store);
+    }
+
     get actualDescription() {
         if (this.includeYtData) {
-            return this.ytVideoDescription;
+            return videoDetail(this.$store);
         } else {
             return this.EmbedDescription;
         }
+    }
+    get smVideoDetail() {
+        return smVideoDetail(this.$store);
     }
 
     debounceSubmit() {
@@ -130,6 +150,7 @@ export default class EditVideoEmbed extends Vue {
         }, 400);
     }
     submit() {
+        debugger;
         if (
             this.$route.query.index ==
             this.$store.state.create.postElements.length
@@ -160,7 +181,7 @@ export default class EditVideoEmbed extends Vue {
             url: this.EmbedURL,
             height: this.height,
             width: this.width,
-            title: this.ytVideoTitle,
+            title: videoTitle(this.$store),
             thumbnail: this.ytVideoThumbnail,
             description: this.actualDescription
         };
@@ -183,7 +204,7 @@ export default class EditVideoEmbed extends Vue {
         });
     }
     destroyed() {
-        this.$store.dispatch("clearYoutubeData");
+        clearVideoInfo(this.$store);
     }
 }
 </script>

@@ -13,11 +13,6 @@ interface AudioElement extends PostElement{
     
 }
 
-
-
-
-
-
 export default class InProgressPost{
     elements: any[];
     title: string;
@@ -35,7 +30,6 @@ export default class InProgressPost{
         console.log(user);
         console.log("new post constructor");
         this.createDraft();
-        
     }
     setTags(tags: string[]): void {
         this.tags = tags;

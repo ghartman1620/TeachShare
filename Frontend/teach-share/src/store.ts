@@ -1,17 +1,15 @@
+import { AxiosResponse } from "axios";
 import Vue from "vue";
 import Vuex, { StoreOptions } from "vuex";
 
 import api from "../src/api";
+import { IRootState, Post, User } from "./models";
+import CommentService from "./store_modules/CommentService";
 import FileService from "./store_modules/FileService";
-import YouTubeService from "./store_modules/YouTubeService";
+import NotificationService from "./store_modules/NotificationService";
 import PostCreateService from "./store_modules/PostCreateService";
 import UserService from "./store_modules/UserService";
-import CommentService from "./store_modules/CommentService";
-import NotificationService from "./store_modules/NotificationService";
-import { AxiosResponse } from "axios";
-
-import { RootState } from "./models";
-import { Post, Comment, User } from "./models";
+import YouTubeService from "./store_modules/YouTubeService";
 
 Vue.use(Vuex);
 
@@ -187,7 +185,7 @@ export const getters = {
     }
 };
 
-const store: StoreOptions<RootState> = {
+const store: StoreOptions<IRootState> = {
     state: {
         user: new User(),
         users: new Array<User>(),
@@ -207,4 +205,4 @@ const store: StoreOptions<RootState> = {
     actions,
     getters
 };
-export default new Vuex.Store<RootState>(store);
+export default new Vuex.Store<IRootState>(store);

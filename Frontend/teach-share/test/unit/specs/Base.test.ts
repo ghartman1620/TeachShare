@@ -11,8 +11,8 @@ describe("[BASE.VUE] Base view component", () => {
     it("should render correct contents", () => {
         const vm = CONSTRUCT(Base);
         let re = new RegExp("([\\n]|[\\s])*", "g");
-        var val = vm.$el.querySelector(".navbar") as Element;
-        let outstring = val.textContent.replace(re, "") as string;
+        let val = vm.$el.querySelector(".navbar") as Element;
+        const outstring = val.textContent.replace(re, "") as string;
         expect(outstring).to.equal(
             "CreatePostProfileYourpostfeedYourpostsAccountdetailsLogoutSearch"
         );
