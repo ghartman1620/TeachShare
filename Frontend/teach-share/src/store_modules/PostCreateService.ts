@@ -1,5 +1,6 @@
 import Vuex, { ActionContext } from "vuex";
 
+import { getStoreAccessors } from "vuex-typescript";
 import { IRootState } from "../models";
 import InProgressPost from "../post";
 import User from "../user";
@@ -163,7 +164,7 @@ export const actions = {
     },
     redo: (context: PostContext) => {
         if (context.state.unDoneMutations.length > 0) {
-            var mut =
+            let mut =
                 context.state.unDoneMutations[
                     context.state.unDoneMutations.length - 1
                 ];
@@ -186,7 +187,7 @@ export const actions = {
         // clear order of actions from ADD_ELEMENT --> CLEAR_REDO --> saveDraft.
         context.commit("ADD_ELEMENT", element);
         context.commit("CLEAR_REDO");
-        context.dispatch("saveDraft").then(res => console.error(res));
+        context.dispatch("saveDraft").then((res) => console.error(res));
     },
     // Actions are only allowed to have one argument so iAndJ is
     // a list with index 0 as the first index to be swapped
@@ -195,7 +196,7 @@ export const actions = {
         console.log("swapElements");
         context.commit("SWAP_ELEMENTS", iAndJ);
         context.commit("CLEAR_REDO");
-        context.dispatch("saveDraft").then(res => console.error(res));
+        context.dispatch("saveDraft").then((res) => console.error(res));
     },
     removeElement: (context: PostContext, index: number) => {
         context.dispatch(
@@ -205,7 +206,7 @@ export const actions = {
         context.commit("REMOVE_ELEMENT", index);
         context.commit("CLEAR_REDO");
 
-        context.dispatch("saveDraft").then(res => console.error(res));
+        context.dispatch("saveDraft").then((res) => console.error(res));
     },
     removeAttachments: (context: PostContext, attachments) => {
         for (var i in attachments) {
@@ -223,7 +224,7 @@ export const actions = {
     editElement: (context: PostContext, editedElement: EditedElement) => {
         context.commit("EDIT_ELEMENT", editedElement);
         context.commit("CLEAR_REDO");
-        context.dispatch("saveDraft").then(res => console.error(res));
+        context.dispatch("saveDraft").then((res) => console.error(res));
     },
     saveDraft: (ctx: PostContext) => {
         ctx.commit("SAVE_DRAFT");
@@ -253,9 +254,11 @@ export const actions = {
                 });
         });*/
     },
-}
+};
 
 const PostCreateService = {
+    namespaced: true,
+    strict: process.env.NODE_ENV !== "production",
     state,
     mutations,
     actions,
@@ -275,3 +278,23 @@ const PostCreateService = {
 };
 
 export default PostCreateService;
+
+/**
+ * Type safe definitions for FileService
+ */
+const { commit, read, dispatch } = getStoreAccessors<PostState, IRootState>(
+    "create"
+);
+
+/**
+ * Action Handlers
+ */
+export const addElement = dispatch(PostCreateService.actions.addElement);
+
+/**
+ * Getter Handlers
+ */
+
+/**
+ * Mutations Handlers
+ */

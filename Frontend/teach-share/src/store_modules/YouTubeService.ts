@@ -120,7 +120,7 @@ export const getters = {
 
 // YouTubeService definition
 const YouTubeService = {
-    strict: true,
+    strict: process.env.NODE_ENV !== "production",
     namespaced: true,
     state,
     mutations,

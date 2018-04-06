@@ -86,6 +86,7 @@ import {
     smVideoDetail,
     clearVideoInfo
 } from "../../store_modules/YouTubeService";
+import { addElement } from "../../store_modules/PostCreateService";
 
 var _ = require("lodash");
 
@@ -149,13 +150,20 @@ export default class EditVideoEmbed extends Vue {
             vm.getYoutubeData();
         }, 400);
     }
-    submit() {
-        debugger;
+    async submit() {
+        // debugger;
+        console.log(this.$store.state.create.post);
         if (
             this.$route.query.index ==
-            this.$store.state.create.postElements.length
+            this.$store.state.create.post.elements.length
         ) {
-            this.$store.dispatch("addElement", this.generateEmbedJSON());
+            try {
+                const resp = await addElement(this.$store, this.generateEmbedJSON());
+                console.log(resp);
+                // this.$notifySuccess(resp);
+            } catch (err) {
+                this.$notifyDanger(err);
+            }
         } else {
             this.$store.dispatch("editElement", {
                 index: this.$route.query.index,

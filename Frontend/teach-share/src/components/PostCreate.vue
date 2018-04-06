@@ -168,6 +168,7 @@ import PostElement from "./PostElement.vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import { Component, Prop } from "vue-property-decorator";
 import {Location, Dictionary} from "vue-router/types/router.d";
+import { addElement } from "../store_modules/PostCreateService";
 function isBlank(str) {
     return !str || /^\s*$/.test(str);
 }
@@ -346,7 +347,7 @@ export default class PostCreate extends Vue{
             console.log(element);
             console.log(index);
             if(index == vm.postState.post.elements.length){
-                vm.addElement(element);
+                addElement(vm.$store, element);
             }
             else{
                 vm.editElement({element: element, index: index});
