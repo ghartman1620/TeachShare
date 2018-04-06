@@ -78,6 +78,7 @@ import FileUpload from "../FileUpload.vue";
 import DimensionPicker from "../DimensionPicker.vue";
 import { mapGetters } from "vuex";
 import debounce from "lodash/debounce";
+<<<<<<< HEAD
 import {
     getVideoInfo,
     videoTitle,
@@ -86,6 +87,9 @@ import {
     smVideoDetail,
     clearVideoInfo
 } from "../../store_modules/YouTubeService";
+=======
+import { getVideoInfo, clearVideoInfo, } from "../../store_modules/YouTubeService";
+>>>>>>> 104a62c0e7cc81b03f4953a8dac9b17d0f1a41a3
 
 var _ = require("lodash");
 

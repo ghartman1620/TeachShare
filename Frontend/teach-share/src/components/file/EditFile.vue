@@ -27,7 +27,7 @@ import FileUpload from "../FileUpload.vue";
 import { mapGetters } from "vuex";
 import { Component, Prop } from "vue-property-decorator";
 import { GenericFile } from "../../models";
-import { hasFiles, filesUploadStatus, allFilesUploadComplete } from "../../store_modules/FileService"
+import { hasFiles, filesUploadStatus, files, allFilesUploadComplete } from "../../store_modules/FileService"
 import {
   State,
   Getter,
@@ -42,14 +42,17 @@ import {
 })
 export default class EditFile extends Vue {
 
-    @Action("addElement") addElement;
+	@Action("addElement") addElement;
 
     get hasFiles() {
         return hasFiles(this.$store);
     }
     get files() {
         return filesUploadStatus(this.$store);
-    }
+	}
+	get fileMap(){
+		return files(this.$store);
+	}
     get allFilesUploadComplete() {
         return allFilesUploadComplete(this.$store);
     }
@@ -76,7 +79,7 @@ export default class EditFile extends Vue {
 		*/
     }
     generateJSON(): any {
-        return {type: "file", content: this.files.objectify()}
+        return {type: "file", content: this.fileMap.objectify()}
     }
     cancel(){
         this.$router.push({ name: "create" });

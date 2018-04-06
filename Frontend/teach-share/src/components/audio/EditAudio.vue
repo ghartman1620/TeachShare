@@ -30,6 +30,19 @@
                 <!-- Description -->
                 <textarea v-model="description" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
                 <br>
+                <div class="row">
+                    <div class="offset-3 col-6">
+                        <button @click.prevent="submit" type="submit" :disabled="!allFilesUploadComplete" class="btn btn-primary btn-block">
+                            <span v-if="!allFilesUploadComplete">Please Select Audio(s) to upload</span>
+                            <span v-else>Submit Audio</span>
+                        </button>
+                    </div>
+                    <div class="col-2">
+                        <button @click.prevent="close" type="button" class="btn btn-danger btn-block">
+                                Cancel
+                        </button>
+                    </div>
+                </div>
             </form>
         </div>
     </div>                

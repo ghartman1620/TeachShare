@@ -13,6 +13,11 @@ interface AudioElement extends PostElement{
     
 }
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 104a62c0e7cc81b03f4953a8dac9b17d0f1a41a3
 export default class InProgressPost{
     elements: any[];
     title: string;

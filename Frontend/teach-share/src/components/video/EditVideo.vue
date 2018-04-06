@@ -86,6 +86,12 @@ export default class EditVideo extends Vue {
         }
         return "nav-item nav-link";
     }
+    mounted(){
+        var vm: EditVideo = this;
+        this.$on("submitElement", function(element, index){
+            vm.$parent.$emit("submitElement", element, index);
+        });
+    }
 }
 </script>
 
