@@ -1,6 +1,6 @@
 import Vuex, { ActionContext } from "vuex";
-
 import { getStoreAccessors } from "vuex-typescript";
+
 import { IRootState } from "../models";
 import InProgressPost from "../post";
 import User from "../user";
@@ -17,7 +17,7 @@ interface PostState {
     doneMutations: Mutation[];
     unDoneMutations: Mutation[];
 }
-interface EditedElement{
+interface EditedElement {
     element: any;
     index: number;
 }
@@ -27,7 +27,7 @@ type PostContext = ActionContext<PostState, IRootState>;
 const state: PostState = {
     post: undefined,
     doneMutations: [],
-    unDoneMutations: [],
+    unDoneMutations: []
 };
 
 export const mutations = {
@@ -38,7 +38,7 @@ export const mutations = {
         state.post!.setTitle(newTitle);
     },
     REMOVE_ATTACHMENT: (state: PostState, attachment: any) => {
-        let ind = state.post!.attachments.findIndex(function (val) {
+        let ind = state.post!.attachments.findIndex(function(val) {
             return val === attachment.id;
         });
         if (ind !== -1) {
@@ -85,7 +85,7 @@ export const mutations = {
         });
         var i = iAndJ[0];
         var j = iAndJ[1];
-        state.post!.swapElements(i,j);
+        state.post!.swapElements(i, j);
     },
     // Mutations for the currently edited post data:  and postElements
     ADD_ELEMENT: (state: PostState, element: any) => {
@@ -105,7 +105,7 @@ export const mutations = {
         });
         var i = iAndJ[0];
         var j = iAndJ[1];
-        state.post!.swapElements(i,j);
+        state.post!.swapElements(i, j);
     },
     REMOVE_ELEMENT: (state: PostState, index: number) => {
         state.doneMutations.push({
@@ -133,33 +133,48 @@ export const mutations = {
     BEGIN_POST: (state: PostState, user: User) => {
         state.post = new InProgressPost(user);
     }
-}
+};
 
 export const actions = {
     beginPost: (context: PostContext, user: User) => {
-        context.commit("BEGIN_POST", user);
+        mutBeginPost(context, user);
+        // context.commit("BEGIN_POST", user);
     },
     setTags: (context: PostContext, tags: string[]) => {
-        context.commit("SET_TAGS", tags);
+        mutSetTags(context, tags);
+        // context.commit("SET_TAGS", tags);
     },
     setTitle: (context: PostContext, title: string) => {
-        context.commit("SET_TITLE", title);
+        mutSetTitle(context, title);
+        // context.commit("SET_TITLE", title);
     },
-    undo: (context: PostContext) => {
+    undo: async (context: PostContext) => {
         if (context.state.doneMutations.length > 0) {
             var mut =
                 context.state.doneMutations[
                     context.state.doneMutations.length - 1
                 ];
             if (mut.mutation === "UNDO_ADD_ELEMENT") {
-                context.dispatch(
-                    "removeAttachments",
+                removeAttachments(
+                    context,
                     context.state.post!.elements[mut.arg].content
                 );
+                // context.dispatch(
+                //     "removeAttachments",
+                //     context.state.post!.elements[mut.arg].content
+                // );
             }
-            context.commit("UNDO");
+            mutUndo(context);
+            // context.commit("UNDO");
+
+            // @TODO: can this one even be replaced!?
             context.commit(mut.mutation, mut.arg);
-            context.dispatch("saveDraft").then(res => console.error(res));
+
+            const response = await saveDraft(context).catch(err =>
+                console.error(err)
+            );
+            console.log(response);
+            // context.dispatch("saveDraft").then(res => console.error(res));
         }
     },
     redo: (context: PostContext) => {
@@ -187,7 +202,7 @@ export const actions = {
         // clear order of actions from ADD_ELEMENT --> CLEAR_REDO --> saveDraft.
         context.commit("ADD_ELEMENT", element);
         context.commit("CLEAR_REDO");
-        context.dispatch("saveDraft").then((res) => console.error(res));
+        context.dispatch("saveDraft").then(res => console.error(res));
     },
     // Actions are only allowed to have one argument so iAndJ is
     // a list with index 0 as the first index to be swapped
@@ -196,7 +211,7 @@ export const actions = {
         console.log("swapElements");
         context.commit("SWAP_ELEMENTS", iAndJ);
         context.commit("CLEAR_REDO");
-        context.dispatch("saveDraft").then((res) => console.error(res));
+        context.dispatch("saveDraft").then(res => console.error(res));
     },
     removeElement: (context: PostContext, index: number) => {
         context.dispatch(
@@ -206,7 +221,7 @@ export const actions = {
         context.commit("REMOVE_ELEMENT", index);
         context.commit("CLEAR_REDO");
 
-        context.dispatch("saveDraft").then((res) => console.error(res));
+        context.dispatch("saveDraft").then(res => console.error(res));
     },
     removeAttachments: (context: PostContext, attachments) => {
         for (var i in attachments) {
@@ -224,18 +239,21 @@ export const actions = {
     editElement: (context: PostContext, editedElement: EditedElement) => {
         context.commit("EDIT_ELEMENT", editedElement);
         context.commit("CLEAR_REDO");
-        context.dispatch("saveDraft").then((res) => console.error(res));
+        context.dispatch("saveDraft").then(res => console.error(res));
     },
     saveDraft: (ctx: PostContext) => {
         ctx.commit("SAVE_DRAFT");
     },
     createPost: (context: PostContext) => {
         return new Promise((resolve, reject) => {
-            context.state.post!.publishPost().then(function(response){
-                resolve(response);
-            }).catch(function(error) { 
-                reject(error);
-            });
+            context.state
+                .post!.publishPost()
+                .then(function(response) {
+                    resolve(response);
+                })
+                .catch(function(error) {
+                    reject(error);
+                });
         });
         /*
         return new Promise((resolve, reject) => {
@@ -253,28 +271,29 @@ export const actions = {
                     }
                 });
         });*/
-    },
+    }
 };
 
+export const getters = {
+    getTags: (state: PostState) => state.post!.tags,
+    getTitle: (state: PostState) => state.post!.title,
+    getContent: (state: PostState) => state.post!.elements,
+    getCurrentPost: (state: PostState) => state.post,
+    getCurrentPostId: (state, getters) => {
+        if (state.post !== null) {
+            return getters.getCurrentPost.pk;
+        }
+        return null;
+    },
+    postElements: (state: PostState) => state.post!.elements
+};
 const PostCreateService = {
     namespaced: true,
     strict: process.env.NODE_ENV !== "production",
     state,
     mutations,
     actions,
-    getters: {
-        getTags: (state: PostState) => state.post!.tags,
-        getTitle: (state: PostState) => state.post!.title,
-        getContent: (state: PostState) => state.post!.elements,
-        getCurrentPost: (state: PostState) => state.post,
-        getCurrentPostId: (state, getters) => {
-            if (state.post !== null) {
-                return getters.getCurrentPost.pk;
-            }
-            return null;
-        },
-        postElements: (state: PostState) => state.post!.elements,
-    }
+    getters
 };
 
 export default PostCreateService;
@@ -290,11 +309,70 @@ const { commit, read, dispatch } = getStoreAccessors<PostState, IRootState>(
  * Action Handlers
  */
 export const addElement = dispatch(PostCreateService.actions.addElement);
+export const beginPost = dispatch(PostCreateService.actions.beginPost);
+export const setTags = dispatch(PostCreateService.actions.setTags);
+export const setTitle = dispatch(PostCreateService.actions.setTitle);
+export const undo = dispatch(PostCreateService.actions.undo);
+export const redo = dispatch(PostCreateService.actions.redo);
+export const swapElements = dispatch(PostCreateService.actions.swapElements);
+export const removeElement = dispatch(PostCreateService.actions.removeElement);
+export const removeAttachments = dispatch(
+    PostCreateService.actions.removeAttachments
+);
+export const addAttachments = dispatch(
+    PostCreateService.actions.addAttachments
+);
+export const editElement = dispatch(PostCreateService.actions.editElement);
+export const saveDraft = dispatch(PostCreateService.actions.saveDraft);
+export const createPost = dispatch(PostCreateService.actions.createPost);
 
 /**
  * Getter Handlers
  */
+export const getTags = read(PostCreateService.getters.getTags);
+export const getTitle = read(PostCreateService.getters.getTitle);
+export const getContent = read(PostCreateService.getters.getContent);
+export const getCurrentPost = read(PostCreateService.getters.getCurrentPost);
+export const getCurrentPostId = read(
+    PostCreateService.getters.getCurrentPostId
+);
+export const postElements = read(PostCreateService.getters.postElements);
 
 /**
  * Mutations Handlers
+ *
+ * This also makes them really easily testable.
  */
+export const mutAddAttachment = commit(
+    PostCreateService.mutations.ADD_ATTACHMENT
+);
+export const mutAddElement = commit(PostCreateService.mutations.ADD_ELEMENT);
+export const mutBeginPost = commit(PostCreateService.mutations.BEGIN_POST);
+export const mutClearRedo = commit(PostCreateService.mutations.CLEAR_REDO);
+export const mutEditElement = commit(PostCreateService.mutations.EDIT_ELEMENT);
+export const mutRedo = commit(PostCreateService.mutations.REDO);
+export const mutRemoveAttachment = commit(
+    PostCreateService.mutations.REMOVE_ATTACHMENT
+);
+export const mutRemoveElement = commit(
+    PostCreateService.mutations.REMOVE_ELEMENT
+);
+export const mutSaveDraft = commit(PostCreateService.mutations.SAVE_DRAFT);
+export const mutSetTags = commit(PostCreateService.mutations.SET_TAGS);
+export const mutSetTitle = commit(PostCreateService.mutations.SET_TITLE);
+export const mutSwapElements = commit(
+    PostCreateService.mutations.SWAP_ELEMENTS
+);
+export const mutUndo = commit(PostCreateService.mutations.UNDO);
+export const mutUndoAddElement = commit(
+    PostCreateService.mutations.UNDO_ADD_ELEMENT
+);
+export const mutUndoEditElement = commit(
+    PostCreateService.mutations.UNDO_EDIT_ELEMENT
+);
+export const mutUndoRemoveElement = commit(
+    PostCreateService.mutations.UNDO_REMOVE_ELEMENT
+);
+export const mutUndoSwapElements = commit(
+    PostCreateService.mutations.UNDO_SWAP_ELEMENTS
+);
