@@ -95,8 +95,9 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_models_.comment.html#content" class="tsd-kind-icon">content</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_models_.comment.html#pk" class="tsd-kind-icon">pk</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_models_.comment.html#post" class="tsd-kind-icon">post</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_models_.comment.html#text" class="tsd-kind-icon">text</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_models_.comment.html#user" class="tsd-kind-icon">user</a></li>
 							</ul>
 						</section>
@@ -115,14 +116,14 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Comment<span class="tsd-signature-symbol">(</span>pk<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span>, user<span class="tsd-signature-symbol">?: </span><a href="_models_.user.html" class="tsd-signature-type">User</a>, content<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_models_.comment.html" class="tsd-signature-type">Comment</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Comment<span class="tsd-signature-symbol">(</span>pk<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span>, post<span class="tsd-signature-symbol">?: </span><a href="_models_.post.html" class="tsd-signature-type">Post</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span>, user<span class="tsd-signature-symbol">?: </span><a href="_models_.user.html" class="tsd-signature-type">User</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span>, text<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_models_.comment.html" class="tsd-signature-type">Comment</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Overrides <a href="_models_.model.html">Model</a>.<a href="_models_.model.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in models.ts:43</li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/models.ts#L70">models.ts:70</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -131,10 +132,13 @@
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> pk: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> user: <a href="_models_.user.html" class="tsd-signature-type">User</a></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> post: <a href="_models_.post.html" class="tsd-signature-type">Post</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> content: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> user: <a href="_models_.user.html" class="tsd-signature-type">User</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> text: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_models_.comment.html" class="tsd-signature-type">Comment</a></h4>
@@ -144,34 +148,44 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="content" class="tsd-anchor"></a>
-					<h3>content</h3>
-					<div class="tsd-signature tsd-kind-icon">content<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in models.ts:43</li>
-						</ul>
-					</aside>
-				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 					<a name="pk" class="tsd-anchor"></a>
-					<h3>pk</h3>
-					<div class="tsd-signature tsd-kind-icon">pk<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> pk</h3>
+					<div class="tsd-signature tsd-kind-icon">pk<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_models_.model.html">Model</a>.<a href="_models_.model.html#pk">pk</a></p>
 						<ul>
-							<li>Defined in models.ts:4</li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/models.ts#L5">models.ts:5</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="post" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> post</h3>
+					<div class="tsd-signature tsd-kind-icon">post<span class="tsd-signature-symbol">:</span> <a href="_models_.post.html" class="tsd-signature-type">Post</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/models.ts#L69">models.ts:69</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="text" class="tsd-anchor"></a>
+					<h3>text</h3>
+					<div class="tsd-signature tsd-kind-icon">text<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/models.ts#L70">models.ts:70</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="user" class="tsd-anchor"></a>
-					<h3>user</h3>
-					<div class="tsd-signature tsd-kind-icon">user<span class="tsd-signature-symbol">:</span> <a href="_models_.user.html" class="tsd-signature-type">User</a></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> user</h3>
+					<div class="tsd-signature tsd-kind-icon">user<span class="tsd-signature-symbol">:</span> <a href="_models_.user.html" class="tsd-signature-type">User</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in models.ts:42</li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/models.ts#L68">models.ts:68</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -188,7 +202,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in models.ts:54</li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/models.ts#L87">models.ts:87</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -222,6 +236,9 @@
 						<a href="../modules/_notifications_.html">"notifications"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
+						<a href="../modules/_post_.html">"post"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
 						<a href="../modules/_router_index_.html">"router/index"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
@@ -231,7 +248,7 @@
 						<a href="../modules/_store_modules_commentservice_.html">"store_<wbr>modules/<wbr>Comment<wbr>Service"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="../modules/_store_modules_imageservice_.html">"store_<wbr>modules/<wbr>Image<wbr>Service"</a>
+						<a href="../modules/_store_modules_fileservice_.html">"store_<wbr>modules/<wbr>File<wbr>Service"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="../modules/_store_modules_notificationservice_.html">"store_<wbr>modules/<wbr>Notification<wbr>Service"</a>
@@ -243,22 +260,10 @@
 						<a href="../modules/_store_modules_userservice_.html">"store_<wbr>modules/<wbr>User<wbr>Service"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="../modules/_store_modules_videoservice_.html">"store_<wbr>modules/<wbr>Video<wbr>Service"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
 						<a href="../modules/_store_modules_youtubeservice_.html">"store_<wbr>modules/<wbr>You<wbr>Tube<wbr>Service"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="../modules/_store_modules_audio_audioservice_.html">"store_<wbr>modules/audio/<wbr>Audio<wbr>Service"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_store_modules_audio_state_.html">"store_<wbr>modules/audio/state"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_store_modules_file_fileservice_.html">"store_<wbr>modules/file/<wbr>File<wbr>Service"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_store_modules_file_state_.html">"store_<wbr>modules/file/state"</a>
+						<a href="../modules/_user_.html">"user"</a>
 					</li>
 				</ul>
 			</nav>
@@ -266,6 +271,9 @@
 				<ul class="before-current">
 					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
 						<a href="../enums/_models_.fieldenum.html" class="tsd-kind-icon">Field<wbr>Enum</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
+						<a href="../enums/_models_.notifytype.html" class="tsd-kind-icon">Notify<wbr>Type</a>
 					</li>
 					<li class=" tsd-kind-class tsd-parent-kind-external-module">
 						<a href="_models_.audioelement.html" class="tsd-kind-icon">Audio<wbr>Element</a>
@@ -278,11 +286,14 @@
 							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
 								<a href="_models_.comment.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_models_.comment.html#content" class="tsd-kind-icon">content</a>
-							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 								<a href="_models_.comment.html#pk" class="tsd-kind-icon">pk</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_models_.comment.html#post" class="tsd-kind-icon">post</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_models_.comment.html#text" class="tsd-kind-icon">text</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_models_.comment.html#user" class="tsd-kind-icon">user</a>
@@ -298,7 +309,13 @@
 						<a href="_models_.fileelement.html" class="tsd-kind-icon">File<wbr>Element</a>
 					</li>
 					<li class=" tsd-kind-class tsd-parent-kind-external-module">
+						<a href="_models_.genericfile.html" class="tsd-kind-icon">Generic<wbr>File</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-external-module">
 						<a href="_models_.model.html" class="tsd-kind-icon">Model</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-has-type-parameter">
+						<a href="_models_.modelmap.html" class="tsd-kind-icon">Model<wbr>Map</a>
 					</li>
 					<li class=" tsd-kind-class tsd-parent-kind-external-module">
 						<a href="_models_.post.html" class="tsd-kind-icon">Post</a>
@@ -307,7 +324,10 @@
 						<a href="_models_.user.html" class="tsd-kind-icon">User</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="../interfaces/_models_.rootstate.html" class="tsd-kind-icon">Root<wbr>State</a>
+						<a href="../interfaces/_models_.inotification.html" class="tsd-kind-icon">INotification</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="../interfaces/_models_.irootstate.html" class="tsd-kind-icon">IRoot<wbr>State</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="../modules/_models_.html#isstring" class="tsd-kind-icon">is<wbr>String</a>

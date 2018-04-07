@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>FileElement | teach-share</title>
+	<title>INotifyState | teach-share</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,13 +56,13 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="../modules/_models_.html">&quot;models&quot;</a>
+					<a href="../modules/_store_modules_notificationservice_.html">&quot;store_modules/NotificationService&quot;</a>
 				</li>
 				<li>
-					<a href="_models_.fileelement.html">FileElement</a>
+					<a href="_store_modules_notificationservice_.inotifystate.html">INotifyState</a>
 				</li>
 			</ul>
-			<h1>Class FileElement</h1>
+			<h1>Interface INotifyState</h1>
 		</div>
 	</div>
 </header>
@@ -73,12 +73,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<a href="_models_.model.html" class="tsd-signature-type">Model</a>
-						<ul class="tsd-hierarchy">
-							<li>
-								<span class="target">FileElement</span>
-							</li>
-						</ul>
+						<span class="target">INotifyState</span>
 					</li>
 				</ul>
 			</section>
@@ -87,68 +82,45 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Constructors</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="_models_.fileelement.html#constructor" class="tsd-kind-icon">constructor</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_models_.fileelement.html#pk" class="tsd-kind-icon">pk</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_models_.fileelement.html#type" class="tsd-kind-icon">type</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_store_modules_notificationservice_.inotifystate.html#max" class="tsd-kind-icon">max</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_store_modules_notificationservice_.inotifystate.html#pending" class="tsd-kind-icon">pending</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_store_modules_notificationservice_.inotifystate.html#ttl" class="tsd-kind-icon">ttl</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Constructors</h2>
-				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-					<a name="constructor" class="tsd-anchor"></a>
-					<h3>constructor</h3>
-					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>File<wbr>Element<span class="tsd-signature-symbol">(</span>pk<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_models_.fileelement.html" class="tsd-signature-type">FileElement</a></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Overrides <a href="_models_.model.html">Model</a>.<a href="_models_.model.html#constructor">constructor</a></p>
-								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/models.ts#L56">models.ts:56</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>pk: <span class="tsd-signature-type">any</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_models_.fileelement.html" class="tsd-signature-type">FileElement</a></h4>
-						</li>
-					</ul>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-					<a name="pk" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> pk</h3>
-					<div class="tsd-signature tsd-kind-icon">pk<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="max" class="tsd-anchor"></a>
+					<h3>max</h3>
+					<div class="tsd-signature tsd-kind-icon">max<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_models_.model.html">Model</a>.<a href="_models_.model.html#pk">pk</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/models.ts#L5">models.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/NotificationService.ts#L9">store_modules/NotificationService.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="type" class="tsd-anchor"></a>
-					<h3>type</h3>
-					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../enums/_models_.fieldenum.html" class="tsd-signature-type">FieldEnum</a><span class="tsd-signature-symbol"> =&nbsp;FieldEnum.file</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="pending" class="tsd-anchor"></a>
+					<h3>pending</h3>
+					<div class="tsd-signature tsd-kind-icon">pending<span class="tsd-signature-symbol">:</span> <a href="_models_.inotification.html" class="tsd-signature-type">INotification</a><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/models.ts#L56">models.ts:56</a></li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/NotificationService.ts#L8">store_modules/NotificationService.ts:8</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="ttl" class="tsd-anchor"></a>
+					<h3>ttl</h3>
+					<div class="tsd-signature tsd-kind-icon">ttl<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/NotificationService.ts#L10">store_modules/NotificationService.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -172,7 +144,7 @@
 					<li class=" tsd-kind-external-module">
 						<a href="../modules/_main_.html">"main"</a>
 					</li>
-					<li class="current tsd-kind-external-module">
+					<li class=" tsd-kind-external-module">
 						<a href="../modules/_models_.html">"models"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
@@ -193,7 +165,7 @@
 					<li class=" tsd-kind-external-module">
 						<a href="../modules/_store_modules_fileservice_.html">"store_<wbr>modules/<wbr>File<wbr>Service"</a>
 					</li>
-					<li class=" tsd-kind-external-module">
+					<li class="current tsd-kind-external-module">
 						<a href="../modules/_store_modules_notificationservice_.html">"store_<wbr>modules/<wbr>Notification<wbr>Service"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
@@ -212,59 +184,68 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
-						<a href="../enums/_models_.fieldenum.html" class="tsd-kind-icon">Field<wbr>Enum</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
-						<a href="../enums/_models_.notifytype.html" class="tsd-kind-icon">Notify<wbr>Type</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="_models_.audioelement.html" class="tsd-kind-icon">Audio<wbr>Element</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="_models_.comment.html" class="tsd-kind-icon">Comment</a>
-					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-class tsd-parent-kind-external-module">
-						<a href="_models_.fileelement.html" class="tsd-kind-icon">File<wbr>Element</a>
+					<li class="current tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="_store_modules_notificationservice_.inotifystate.html" class="tsd-kind-icon">INotify<wbr>State</a>
 						<ul>
-							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-								<a href="_models_.fileelement.html#constructor" class="tsd-kind-icon">constructor</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_store_modules_notificationservice_.inotifystate.html#max" class="tsd-kind-icon">max</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-								<a href="_models_.fileelement.html#pk" class="tsd-kind-icon">pk</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_store_modules_notificationservice_.inotifystate.html#pending" class="tsd-kind-icon">pending</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_models_.fileelement.html#type" class="tsd-kind-icon">type</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_store_modules_notificationservice_.inotifystate.html#ttl" class="tsd-kind-icon">ttl</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="_models_.genericfile.html" class="tsd-kind-icon">Generic<wbr>File</a>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_store_modules_notificationservice_.html#notifycontext" class="tsd-kind-icon">Notify<wbr>Context</a>
 					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="_models_.model.html" class="tsd-kind-icon">Model</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_store_modules_notificationservice_.html#commit" class="tsd-kind-icon">commit</a>
 					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-has-type-parameter">
-						<a href="_models_.modelmap.html" class="tsd-kind-icon">Model<wbr>Map</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_store_modules_notificationservice_.html#dispatch" class="tsd-kind-icon">dispatch</a>
 					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="_models_.post.html" class="tsd-kind-icon">Post</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="../modules/_store_modules_notificationservice_.html#getallnotifications" class="tsd-kind-icon">get<wbr>All<wbr>Notifications</a>
 					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="_models_.user.html" class="tsd-kind-icon">User</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="../modules/_store_modules_notificationservice_.html#getallsuccess" class="tsd-kind-icon">get<wbr>All<wbr>Success</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="../interfaces/_models_.inotification.html" class="tsd-kind-icon">INotification</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="../modules/_store_modules_notificationservice_.html#mutremove" class="tsd-kind-icon">mut<wbr>Remove</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="../interfaces/_models_.irootstate.html" class="tsd-kind-icon">IRoot<wbr>State</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="../modules/_store_modules_notificationservice_.html#mutsend" class="tsd-kind-icon">mut<wbr>Send</a>
 					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_models_.html#isstring" class="tsd-kind-icon">is<wbr>String</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_store_modules_notificationservice_.html#read" class="tsd-kind-icon">read</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="../modules/_store_modules_notificationservice_.html#removenotification" class="tsd-kind-icon">remove<wbr>Notification</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="../modules/_store_modules_notificationservice_.html#sendnotification" class="tsd-kind-icon">send<wbr>Notification</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-external-module">
+						<a href="../modules/_store_modules_notificationservice_.html#notificationservice" class="tsd-kind-icon">Notification<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-external-module">
+						<a href="../modules/_store_modules_notificationservice_.html#actions-1" class="tsd-kind-icon">actions</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-external-module">
+						<a href="../modules/_store_modules_notificationservice_.html#getters-1" class="tsd-kind-icon">getters</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-external-module">
+						<a href="../modules/_store_modules_notificationservice_.html#mutations-1" class="tsd-kind-icon">mutations</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_store_modules_notificationservice_.html#state-1" class="tsd-kind-icon">state</a>
 					</li>
 				</ul>
 			</nav>

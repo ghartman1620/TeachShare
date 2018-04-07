@@ -106,13 +106,84 @@
 				<h2>Variables</h2>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
 					<a name="cookie" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> Cookie</h3>
+					<h3>Cookie</h3>
 					<div class="tsd-signature tsd-kind-icon">Cookie<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;require(&quot;tiny-cookie&quot;)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L201">router/index.ts:201</a></li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L204">router/index.ts:204</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>function verifyAndRefreshLogin() {
+							var token = Cookie.get(&quot;token&quot;);</p>
+						</div>
+						<p>// @TODO: using != causes a type cast before comparison, leading to inconsistent results
+							// consider using !== and finding the correct comparison, to avoid unknown behavior.
+							if (token != undefined) {
+							// verify token
+							(<any>Object).assign(api.defaults, {
+								headers: { authorization: &quot;Bearer &quot; + token }
+						});</p>
+						<p>return new Promise<any>((resolve, reject) =&gt; {
+								api
+								.get(&quot;/verify_token&quot;)
+								.then((response) =&gt; resolve(true))
+								.catch((err) =&gt; resolve(false));
+								});
+								} else {
+								const refresh_token: string | null = window.localStorage.getItem(&quot;refresh_token&quot;);
+								if (refresh_token != undefined) {
+								const body = {
+								grant_type: &quot;refresh_token&quot;,
+								refresh_token: refresh_token,
+								username: window.localStorage.getItem(&quot;username&quot;)
+								};
+								const head = { headers: { &quot;content-type&quot;: &quot;application/json&quot; } };
+								return new Promise((resolve, reject) =&gt; {
+								api
+								.post(&quot;/get_token&quot;, body, head)
+								.then((response) =&gt; {
+								const date = new Date();
+								date.setTime(
+								date.getTime() +
+								(response.data.body.expires_in * 1000 - 120000)
+								);
+								Cookie.set(
+								&quot;token&quot;,
+								response.data.body.access_token,
+								date.toISOString()
+								);
+								Cookie.set(&quot;loggedIn&quot;, true, date.toISOString());
+								Cookie.set(
+								&quot;userId&quot;,
+								response.data.userId,
+								date.toISOString()
+								);
+								Cookie.set(
+								&quot;username&quot;,
+								response.data.username,
+								date.toISOString()
+								);
+								window.localStorage.setItem(
+								&quot;refresh_token&quot;,
+								response.data.body.refresh_token
+								);
+								window.localStorage.setItem(
+								&quot;access_token&quot;,
+								response.data.body.access_token
+								);
+								resolve(true);
+								})
+								.catch(err =&gt; resolve(false));
+								});
+								}
+								return new Promise((resolve, reject) =&gt; {
+								resolve(false);
+								});
+								}
+						}</p>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
 					<a name="loggedoutroutes" class="tsd-anchor"></a>
@@ -120,17 +191,17 @@
 					<div class="tsd-signature tsd-kind-icon">logged<wbr>Out<wbr>Routes<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[&quot;login&quot;, &quot;register&quot;]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L203">router/index.ts:203</a></li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L260">router/index.ts:260</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
 					<a name="loginprotectedroutes" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> login<wbr>Protected<wbr>Routes</h3>
-					<div class="tsd-signature tsd-kind-icon">login<wbr>Protected<wbr>Routes<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></div>
+					<div class="tsd-signature tsd-kind-icon">login<wbr>Protected<wbr>Routes<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[&quot;create&quot;]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L202">router/index.ts:202</a></li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L259">router/index.ts:259</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -140,7 +211,7 @@
 					<div class="tsd-signature tsd-kind-icon">router<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">VueRouter</span><span class="tsd-signature-symbol"> =&nbsp;new Router({mode: &quot;history&quot;,routes: [{path: &quot;/&quot;,component: Base,children: [{ name: &quot;base&quot;, path: &quot;&quot;, component: Home },{path: &quot;/create&quot;,name: &quot;create&quot;,component: PostCreate,children: [{name: &quot;edit-text&quot;,path: &quot;text&quot;,component: EditText},{name: &quot;edit-video&quot;,path: &quot;video&quot;,component: EditVideo},{name: &quot;edit-audio&quot;,path: &quot;audio&quot;,component: EditAudio},{name: &quot;edit-image&quot;,path: &quot;image&quot;,component: EditImage},{name: &quot;edit-file&quot;,path: &quot;file&quot;,component: EditFile}]},{name: &quot;dashboard&quot;,path: &quot;/dashboard&quot;,component: PostFeed},{name: &quot;posts&quot;,path: &quot;/posts/:post_id&quot;,component: PostDetail},{path: &quot;/comments&quot;,name: &quot;Comments&quot;,component: Comments,props: {comments: [{user: 1,id: 1,content: &quot;some fake text!&quot;}]}},{path: &quot;/comments/:comment_id&quot;,name: &quot;Comment&quot;,component: CommentEntry,props: {comment: {user: 1,id: 1,content: &quot;some fake text 2!&quot;}}}]},{path: &quot;/login&quot;,name: &quot;login&quot;,component: Login},{path: &quot;/register&quot;,name: &quot;register&quot;,component: Register}]})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L42">router/index.ts:42</a></li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L45">router/index.ts:45</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -157,7 +228,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L32">router/index.ts:32</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L35">router/index.ts:35</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;*.vue&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -174,7 +245,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L30">router/index.ts:30</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L33">router/index.ts:33</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;*.vue&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -191,7 +262,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L20">router/index.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L23">router/index.ts:23</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;*.vue&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -208,7 +279,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L24">router/index.ts:24</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L27">router/index.ts:27</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;*.vue&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -225,7 +296,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L22">router/index.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L25">router/index.ts:25</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;*.vue&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -242,7 +313,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L16">router/index.ts:16</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L19">router/index.ts:19</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;*.vue&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -259,7 +330,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L18">router/index.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L21">router/index.ts:21</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;*.vue&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -276,7 +347,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L12">router/index.ts:12</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L15">router/index.ts:15</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;*.vue&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -293,7 +364,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L35">router/index.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L38">router/index.ts:38</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;*.vue&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -310,7 +381,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L14">router/index.ts:14</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L17">router/index.ts:17</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;*.vue&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -327,7 +398,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L28">router/index.ts:28</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L31">router/index.ts:31</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;*.vue&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -344,7 +415,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L26">router/index.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L29">router/index.ts:29</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;*.vue&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -361,7 +432,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L37">router/index.ts:37</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L40">router/index.ts:40</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;*.vue&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -378,7 +449,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L8">router/index.ts:8</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L11">router/index.ts:11</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -401,7 +472,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/2d0ffdf/Frontend/teach-share/src/router/index.ts#L131">router/index.ts:131</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/router/index.ts#L205">router/index.ts:205</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -434,6 +505,9 @@
 					<li class=" tsd-kind-external-module">
 						<a href="_notifications_.html">"notifications"</a>
 					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_post_.html">"post"</a>
+					</li>
 					<li class="current tsd-kind-external-module">
 						<a href="_router_index_.html">"router/index"</a>
 					</li>
@@ -444,7 +518,7 @@
 						<a href="_store_modules_commentservice_.html">"store_<wbr>modules/<wbr>Comment<wbr>Service"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_store_modules_imageservice_.html">"store_<wbr>modules/<wbr>Image<wbr>Service"</a>
+						<a href="_store_modules_fileservice_.html">"store_<wbr>modules/<wbr>File<wbr>Service"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="_store_modules_notificationservice_.html">"store_<wbr>modules/<wbr>Notification<wbr>Service"</a>
@@ -456,22 +530,10 @@
 						<a href="_store_modules_userservice_.html">"store_<wbr>modules/<wbr>User<wbr>Service"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_store_modules_videoservice_.html">"store_<wbr>modules/<wbr>Video<wbr>Service"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
 						<a href="_store_modules_youtubeservice_.html">"store_<wbr>modules/<wbr>You<wbr>Tube<wbr>Service"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_store_modules_audio_audioservice_.html">"store_<wbr>modules/audio/<wbr>Audio<wbr>Service"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_store_modules_audio_state_.html">"store_<wbr>modules/audio/state"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_store_modules_file_fileservice_.html">"store_<wbr>modules/file/<wbr>File<wbr>Service"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_store_modules_file_state_.html">"store_<wbr>modules/file/state"</a>
+						<a href="_user_.html">"user"</a>
 					</li>
 				</ul>
 			</nav>
