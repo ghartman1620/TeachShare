@@ -152,7 +152,7 @@ export default class EditVideoEmbed extends Vue {
     }
     async submit() {
         // debugger;
-        console.log(this.$store.state.create.post);
+        console.log("POST CREATE: ", this.$store.state.create);
         if (
             this.$route.query.index ==
             this.$store.state.create.post.elements.length

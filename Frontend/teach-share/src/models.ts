@@ -220,12 +220,22 @@ export class ModelMap<V> implements IterableIterator<V> {
     // returns an object representation of this modelMap's data for use in conversion to JSON
     // why is this necessary?! doesn't it do this automatically?!
     // TODO: figure out this issue.
-    public objectify(): any[] {
-        const objects: any[] = [];
-        for (const key in this.data) {
-            const obj: any = {};
-            objects.push(this.get(key));
+    // public objectify(): any[] {
+    //     const objects: any[] = [];
+    //     for (const key in this.data) {
+    //         const obj: any = {};
+    //         objects.push(this.get(key));
+    //     }
+    //     return objects;
+    // }
+    public list(): V[] {
+        const res = new Array<V>();
+        for (const k in this.data) {
+            if (typeof k !== "undefined") {
+                console.log("****", k);
+                res.push(this.get(k));
+            }
         }
-        return objects;
+        return res;
     }
 }

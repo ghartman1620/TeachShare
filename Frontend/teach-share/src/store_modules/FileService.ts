@@ -1,11 +1,14 @@
-import axios from "axios";
+import axios from "axios"
+import v4 from "uuid/v4";
 import reduce from "lodash/reduce";
 import Vue from "vue";
 import { ActionContext, Store } from "vuex";
 import { getStoreAccessors } from "vuex-typescript";
 
 import api from "../api";
-import { GenericFile, IRootState, ModelMap } from "../models";
+import { GenericFile, IRootState, ModelMap, NotifyType } from "../models";
+
+import { sendNotification } from "../store_modules/NotificationService";
 
 export interface FileState {
     files?: ModelMap<GenericFile>;
@@ -21,12 +24,6 @@ const state: FileState = {
     files: new ModelMap<GenericFile>(),
     limit: 1
 };
-
-// typescript 'require' workaround hack
-declare function require(name: string);
-
-// Load some necessary libraries
-const uuidv4 = require("uuid/v4");
 
 /**
  * Actions - file_upload, remove_file, change_limit, and clear_files.
@@ -45,7 +42,6 @@ export const upload_file = async (ctx, files: File[]) => {
     try {
         // @TODO: get type safe definition for this.
         let postid = await ctx.dispatch("saveDraft", null, { root: true });
-        console.log(postid);
     } catch (err) {
         console.log(err);
     }
@@ -59,7 +55,6 @@ export const upload_file = async (ctx, files: File[]) => {
              * @changed: ==, ===
              * Test whether or not a file is already uploaded.
              */
-            debugger;
             console.log("element", element);
             console.log("file", file);
             if (ctx.state.files.get(element).file.name === file.name) {
@@ -71,7 +66,7 @@ export const upload_file = async (ctx, files: File[]) => {
             i + ctx.state.files.length < ctx.state.limit
         ) {
             console.log(ctx.state.files);
-            let id = uuidv4();
+            let id = v4();
             let cancelToken = axios.CancelToken;
             let cancel = cancelToken.source();
             let config = {
@@ -100,14 +95,14 @@ export const upload_file = async (ctx, files: File[]) => {
                 /**
                  * make request
                  */
-                let response = await api.put(
+                const response = await api.put(
                     `upload/${file.name}?id=${id}&post=${
                         ctx.rootGetters.getCurrentPostId
                     }`,
                     file,
                     config
                 );
-                var fileResponse: GenericFile = new GenericFile(
+                const fileResponse: GenericFile = new GenericFile(
                     response.data.request_id,
                     100,
                     file,
@@ -125,20 +120,11 @@ export const upload_file = async (ctx, files: File[]) => {
                  */
                 console.log(error);
                 if (axios.isCancel(error)) {
-                    // let genFile = new GenericFile(id);
-                    mutDelete(ctx, id);
-                    // ctx.commit("DELETE", file);
+                    sendNotification(ctx, { type: NotifyType.warning, content: `Upload canceled! ${error}.` });
                 } else {
-                    // @TODO: get type-checked send-notifications
-                    ctx.dispatch(
-                        "sendNotification",
-                        { type: "danger", content: "Error uploading file!" },
-                        { root: true },
-                        null,
-                        { root: true }
-                    );
-                    console.error(error);
+                    sendNotification(ctx, { type: NotifyType.danger, content: `Error uploading file! ${error}` });
                 }
+                mutDelete(ctx, id);
             }
         }
         i++; // increment file count
@@ -146,20 +132,19 @@ export const upload_file = async (ctx, files: File[]) => {
     return { status: "complete", error: null, finished: true };
 };
 
-/**
- * create_file - creates a file. Doesn't handle uploading, just
- * creating a file itself.
- *
- * @param  {Store} ctx
- * @param  {File} file
- */
-export const create_file = (ctx, file: GenericFile) => {
-    mutCreate(ctx, file);
-};
-
 export const actions = {
-    create_file,
     upload_file,
+
+    /**
+     * create_file - creates a file. Doesn't handle uploading, just
+     * creating a file itself.
+     *
+     * @param  {Store} ctx
+     * @param  {File} file
+     */
+    create_file: (ctx, file: GenericFile) => {
+        mutCreate(ctx, file);
+    },
 
     /**
      * remove_file - removes a file, looking it up using it's primary key,
@@ -207,17 +192,16 @@ export const mutations = {
      * create_file will create a file. It will NOT replace
      * a file with the same key. Use update for that.
      *
-     * @param  {} state
+     * @param  {} ctx
      * @param  {GenericFile} data
      */
-    CREATE: (state, data: GenericFile) => {
+    CREATE: (ctx, data: GenericFile) => {
+        console.log(ctx, typeof ctx);
         if (typeof data.pk !== "undefined") {
-            if (!state.files.data.hasOwnProperty(data.pk)) {
-                Vue.set(state.files.data, data.pk, data);
-                
+            if (!ctx.files.data.hasOwnProperty(data.pk)) {
+                Vue.set(ctx.files.data, data.pk, data);
             }
         }
-        
     },
 
     /**
@@ -228,12 +212,8 @@ export const mutations = {
      * @param  {GenericFile} data
      */
     UPDATE: (state: FileState, data: GenericFile) => {
-        console.log("in update");
-        console.log(data);
         if (typeof data.pk !== "undefined") {
             Vue.set(state.files!.data, data.pk, data);
-            console.log(state.files!.get(data.pk));
-            console.log(state.files!.data);
         }
 
     },
@@ -278,39 +258,35 @@ export const mutations = {
  * Getters - used for calculating/'getting' values based on the state.
  */
 export const getters = {
-    files: state => state.files,
-    filesUploadStatus: state => state.files.data,
-    allFilesUploadComplete: state => {
-        if (state.files.length > 0) {
-            let oneHundredPercent = state.files.keys.every(
-                val => state.files.get(val).percent === 100
+    files: (ctx) => ctx.files,
+    filesUploadStatus: (ctx) => ctx.files.data,
+    allFilesUploadComplete: (ctx) => {
+        if (ctx.files.length > 0) {
+            const oneHundredPercent = ctx.files.keys.every(
+                (val) => ctx.files.get(val).percent === 100
             );
-            let hasURL = reduce(
-                state.files.keys,
+            const hasURL = reduce(
+                ctx.files.keys,
                 (res, val, key) => {
-                    console.log(res, key, val);
-                    if (state.files.get(val).url !== undefined) {
+                    if (ctx.files.get(val).url !== undefined) {
                         return true;
                     }
                     return false;
                 },
                 false
             );
-            console.log(oneHundredPercent);
-            console.log(hasURL);
             return oneHundredPercent === true && hasURL === true;
         }
         return false;
     },
-    has_files: state => {
-        return state.files.length > 0;
+    has_files: (ctx) => {
+        return ctx.files.length > 0;
     },
-    past_limit: state => {
-        return state.files.length >= state.limit;
+    past_limit: (ctx) => {
+        return ctx.files.length >= ctx.limit;
     },
-    get: state => (id: string): GenericFile => {
-        console.log("getting id: ", id);
-        return state.files.get(id);
+    get: (ctx) => (id: string): GenericFile => {
+        return ctx.files.get(id);
     }
 };
 

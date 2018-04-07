@@ -168,7 +168,7 @@ import PostElement from "./PostElement.vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import { Component, Prop } from "vue-property-decorator";
 import {Location, Dictionary} from "vue-router/types/router.d";
-import { addElement } from "../store_modules/PostCreateService";
+import { addElement, beginPost } from "../store_modules/PostCreateService";
 function isBlank(str) {
     return !str || /^\s*$/.test(str);
 }
@@ -326,7 +326,10 @@ export default class PostCreate extends Vue{
         this.deleteElement(index);
     }
     maxElementIndex() {
-        return this.postState.post.elements.length;
+        if (this.postState.post !== undefined) {
+            return this.postState.post.elements.length;
+        }
+        return 0;
     }
     undo() {
         this.storeUndo();
@@ -336,7 +339,7 @@ export default class PostCreate extends Vue{
     }
     created() {
         console.log(this.getLoggedInUser);
-        this.beginPost(this.getLoggedInUser);
+        beginPost(this.$store, this.getLoggedInUser);
     }
     mounted() {
         console.log("mounted post create");

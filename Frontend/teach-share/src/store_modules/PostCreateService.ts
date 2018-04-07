@@ -275,17 +275,36 @@ export const actions = {
 };
 
 export const getters = {
-    getTags: (state: PostState) => state.post!.tags,
-    getTitle: (state: PostState) => state.post!.title,
-    getContent: (state: PostState) => state.post!.elements,
+    getTags: (state: PostState) => { 
+        if (typeof state.post !== "undefined") {
+            return state.post!.tags;
+        }
+        return undefined;
+    },
+    getTitle: (state: PostState) => {
+        if (typeof state.post !== "undefined") {
+            return state.post!.title;
+        }
+        return undefined;
+    },
+    getContent: (state: PostState) => {
+        if (typeof state.post !== "undefined") {
+            return state.post!.elements;
+        }
+        return undefined;
+    },
     getCurrentPost: (state: PostState) => state.post,
     getCurrentPostId: (state, getters) => {
-        if (state.post !== null) {
+        if (state.post !== null && typeof getters.getCurrentPost !== "undefined") {
             return getters.getCurrentPost.pk;
         }
         return null;
     },
-    postElements: (state: PostState) => state.post!.elements
+    postElements: (state: PostState) => {
+        if (typeof state.post !== "undefined") {
+            return state.post!.elements;
+        }
+    }
 };
 const PostCreateService = {
     namespaced: true,

@@ -29,9 +29,9 @@ describe("[EDIT_VIDEO_EMBED.VUE] Embed video (youtube) view component", () => {
     it("should make youtube request", () => {
         console.log(vm);
         console.log(vm.$el);
-        let input = "https://www.youtube.com/watch?v=KMX1mFEmM3E"
+        const input = "https://www.youtube.com/watch?v=KMX1mFEmM3E"
 
-        vm.getYoutubeData(input).then(function (resp) {
+        vm.getYoutubeData(input).then((resp) => {
             expect(resp.status).to.equal(200);
             expect(resp.data).to.eql({etag: "", items: [{etag: "", snippet: "", statistics: ""}] });
         });

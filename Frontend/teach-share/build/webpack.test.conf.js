@@ -11,7 +11,7 @@ const webpackConfig = merge(baseWebpackConfig, {
   module: {
     rules: utils.styleLoaders()
   },
-  devtool: '#source-map',
+  devtool: '#eval-source-map',
   resolveLoader: {
     alias: {
       // necessary to to make lang="scss" work in test when using vue-loader's ?inject option
