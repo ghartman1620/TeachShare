@@ -1,9 +1,9 @@
 import axios, { AxiosResponse } from "axios";
+import { ActionContext, Mutation, MutationTree, Store } from "vuex";
 import { getStoreAccessors } from "vuex-typescript";
-
 import { IRootState, NotifyType } from "../models";
 
-import { sendNotification } from "./NotificationService";
+import { NotifyContext, sendNotification } from "./NotificationService";
 
 export interface IYTState {
     videoDetails: any[];
@@ -16,7 +16,7 @@ function isString(str: string | null): str is string {
 }
 
 const state = {
-    videoDetails: []
+    videoDetails: Array<any>()
 };
 
 interface IVideoURLValue {
@@ -24,6 +24,8 @@ interface IVideoURLValue {
     videoID: string;
 
 }
+
+export type YTContext = ActionContext<IYTState, IRootState>;
 
 export const defaultVideoSections = "snippet,statistics";
 
@@ -35,35 +37,34 @@ export const generateURL =
             `https://www.googleapis.com/youtube/v3/videos?id=${videoID}&key=${API_KEY}&part=${section}`
         );
         return { apiRequest: ApiURL.toString(), videoID: videoID as string };
-}
+};
 
 export const actions = {
-    getYoutubeVideoInfo: async (ctx, url: string) => {
+    getYoutubeVideoInfo: async (ctx: YTContext|Store<IRootState>, url: string) => {
         const { apiRequest, videoID } = generateURL(url);
-        console.log(apiRequest, videoID);
         if (videoID.length > 10) {
             try {
                 const resp: AxiosResponse = await axios.get(apiRequest);
-                mutSet(ctx, resp.data);
-                sendNotification(ctx, { 
+                mutSet(ctx as YTContext, resp.data);
+                sendNotification(ctx as Store<IRootState>, {
                     content: "successfully fetched youTube video data!",
                     type: NotifyType.success
                 });
                 return resp;
             } catch (err) {
-                console.error("ERR:", err);
-                sendNotification(ctx, { content: "unable to retrieve youtube video data", type: NotifyType.danger });
+                sendNotification(ctx as Store<IRootState>,
+                    { content: "unable to retrieve youtube video data", type: NotifyType.danger });
                 return err;
             }
         }
     },
-    clearYoutubeData: (ctx) => {
+    clearYoutubeData: (ctx: YTContext|Store<IRootState>) => {
         mutClear(ctx);
     }
-}
+};
 
 export const mutations = {
-    SET: (ctx, data: any) => {
+    SET: (ctx: IYTState, data: any) => {
         if (ctx.videoDetails.length === 0) {
             ctx.videoDetails.push(data);
         }
@@ -72,45 +73,45 @@ export const mutations = {
             ctx.videoDetails.push(data);
         }
     },
-    CLEAR: (ctx) => {
+    CLEAR: (ctx: IYTState) => {
         state.videoDetails = [];
     }
-}
+};
 
 export const getters = {
-    videoDescriptionSm: state => {
+    videoDescriptionSm: (ctx: IYTState, gets: IRootState): string => {
         let ending = "";
-        if (state.videoDetails.length > 0 && state.videoDetails[0].items.length > 0) {
-            if (state.videoDetails[0].items[0].snippet.description.length > 300) {
+        if (ctx.videoDetails.length > 0 && ctx.videoDetails[0].items.length > 0) {
+            if (ctx.videoDetails[0].items[0].snippet.description.length > 300) {
                 ending = "...";
             }
             return (
-                state.videoDetails[0].items[0].snippet.description.slice(0, 300) +
+                ctx.videoDetails[0].items[0].snippet.description.slice(0, 300) +
                 ending
             );
         }
-        return null;
+        return "";
     },
-    videoDescription: state => {
+    videoDescription: (ctx: IYTState, gets: IRootState): string  => {
         console.log("[YT]", state.videoDetails);
         if (state.videoDetails.length > 0 && state.videoDetails[0] && state.videoDetails[0].items.length > 0) {
             return state.videoDetails[0].items[0].snippet.description;
         }
-        return null;
+        return "";
     },
-    videoThumbnail: state => {
+    videoThumbnail: (ctx: IYTState, gets: IRootState): string  => {
         if (state.videoDetails[0] && state.videoDetails[0].items.length > 0) {
             return state.videoDetails[0].items[0].snippet.thumbnails.default;
         }
         return "";
     },
-    videoTitle: state => {
+    videoTitle: (ctx: IYTState, gets: IRootState): string  => {
         if (state.videoDetails[0] && state.videoDetails[0].items.length > 0) {
             return state.videoDetails[0].items[0].snippet.title;
         }
         return "";
     },
-    videoID: state => {
+    videoID: (ctx: IYTState, gets: IRootState): string  => {
         if (state.videoDetails[0] && state.videoDetails[0].items.length > 0) {
             return state.videoDetails[0].items[0].id;
         }
@@ -120,7 +121,7 @@ export const getters = {
 
 // YouTubeService definition
 const YouTubeService = {
-    strict: process.env.NODE_ENV !== "production",
+    strict: false, // process.env.NODE_ENV !== "production",
     namespaced: true,
     state,
     mutations,

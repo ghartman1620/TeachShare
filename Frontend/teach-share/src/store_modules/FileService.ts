@@ -9,6 +9,7 @@ import api from "../api";
 import { GenericFile, IRootState, ModelMap, NotifyType } from "../models";
 
 import { sendNotification } from "../store_modules/NotificationService";
+import { saveDraft } from './PostCreateService';
 
 export interface FileState {
     files?: ModelMap<GenericFile>;
@@ -41,7 +42,7 @@ export const upload_file = async (ctx, files: File[]) => {
     console.log(ctx, files);
     try {
         // @TODO: get type safe definition for this.
-        let postid = await ctx.dispatch("saveDraft", null, { root: true });
+        const postid = await saveDraft(ctx);
     } catch (err) {
         console.log(err);
     }
@@ -293,7 +294,7 @@ export const getters = {
 // FileService definition
 const FileService = {
     namespaced: true,
-    strict: process.env.NODE_ENV !== "production",
+    strict: false, // process.env.NODE_ENV !== "production",
     state,
     mutations,
     actions,

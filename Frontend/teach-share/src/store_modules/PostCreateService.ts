@@ -239,38 +239,18 @@ export const actions = {
     editElement: (context: PostContext, editedElement: EditedElement) => {
         context.commit("EDIT_ELEMENT", editedElement);
         context.commit("CLEAR_REDO");
-        context.dispatch("saveDraft").then(res => console.error(res));
+        saveDraft(context).then((res) => console.error(res));
     },
     saveDraft: (ctx: PostContext) => {
         ctx.commit("SAVE_DRAFT");
     },
-    createPost: (context: PostContext) => {
-        return new Promise((resolve, reject) => {
-            context.state
-                .post!.publishPost()
-                .then(function(response) {
-                    resolve(response);
-                })
-                .catch(function(error) {
-                    reject(error);
-                });
-        });
-        /*
-        return new Promise((resolve, reject) => {
-            console.log(postObj);
-            api
-                .post("posts/", postObj)
-                .then(response => resolve(response))
-                .catch(function(error) {
-                    if (error.response) {
-                        return resolve(error.response.data);
-                    } else if (error.request) {
-                        return resolve(error.request);
-                    } else {
-                        return resolve(error.message);
-                    }
-                });
-        });*/
+    createPost: async (context: PostContext) => {
+        try {
+            const post = await context.state.post!.publishPost();
+            return post;
+        } catch (err) {
+            return err;
+        }
     }
 };
 
@@ -308,7 +288,7 @@ export const getters = {
 };
 const PostCreateService = {
     namespaced: true,
-    strict: process.env.NODE_ENV !== "production",
+    strict: false, // process.env.NODE_ENV !== "production",
     state,
     mutations,
     actions,

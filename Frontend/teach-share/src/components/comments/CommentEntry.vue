@@ -64,6 +64,7 @@ import TextElement from "../text/TextElement.vue";
 import EditText from "../text/EditText.vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import { createUpdateComment } from "../../store_modules/CommentService";
+import { getUserByID } from "../../store_modules/UserService";
 import { Comment, User, Post } from "../../models";
 
 @Component({
@@ -86,7 +87,7 @@ export default class CommentEntry extends Vue {
     prevText = "";
 
     get fullUser() {
-        return this.$store.getters.getUserByID(this.user);
+        return getUserByID(this.$store)(this.user);
     }
 
     get fullUsername() {

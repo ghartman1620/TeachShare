@@ -10,7 +10,7 @@ export interface INotifyState {
     ttl: number;
 }
 
-type NotifyContext = ActionContext<INotifyState, IRootState>;
+export type NotifyContext = ActionContext<INotifyState, IRootState>;
 
 const state = {
     pending: [],
@@ -51,7 +51,7 @@ export const getters = {
 
 const NotificationService = {
     namespaced: true,
-    strict: process.env.NODE_ENV !== "production",
+    strict: false, // process.env.NODE_ENV !== "production",
     state,
     mutations,
     actions,

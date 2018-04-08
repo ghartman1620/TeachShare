@@ -36,6 +36,7 @@ export default class User {
         token?: string,
         expires?: Date,
         refreshToken?: string) {
+        console.log("*********** USER CONSTRUCTOR CALLED ***********");
 
         this.username = username || Cookie.get("username");
         this.pk = pk || Cookie.get("pk");

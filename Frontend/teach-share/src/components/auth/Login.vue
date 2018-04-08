@@ -33,8 +33,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import AuthPage from "./AuthPage";
+import AuthPage from "./AuthPage.vue";
 import { Component, Prop } from "vue-property-decorator";
+import { login } from "../../store_modules/UserService";
 import {
   State,
   Getter,
@@ -45,10 +46,10 @@ import {
 
 @Component({
     name: "login",
-    components: {AuthPage},
+    components: { AuthPage },
 })
 export default class Login extends Vue {
-    @Action("login") login;
+    // @Action("login") login;
     username: string = "";
     pw: string = "";
     persist: boolean = false;
@@ -56,11 +57,11 @@ export default class Login extends Vue {
 
     loginSubmit() {
         var vm = this;
-        this.login({username: this.username, password: this.pw, persist: this.persist})
-        .then(function() {
+        login(this.$store, {username: this.username, password: this.pw, persist: this.persist})
+        .then(() => {
             vm.$router.push({name: "create"});
         })
-        .catch(function(err){
+        .catch((err) => {
             console.log(err);
             vm.$notifyDanger("You could not login<br>" + err.response.data.error_description);
         }); 

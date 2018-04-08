@@ -2,7 +2,7 @@ import Base from "@/components/Base.vue";
 import Vue from "vue";
 import Router from "vue-router";
 
-
+import { setUser } from "../store_modules/UserService";
 import api from "../api";
 import store from "../store"; 
 import User from "../user";
@@ -210,7 +210,8 @@ function verifyAndRefreshLogin(): Promise<any> {
     else if(Cookie.get("token") != null){
         console.log("is logged in with token");
         var u: User = new User();
-        store.dispatch("setUser", u);
+        setUser(store, u);
+        // store.dispatch("setUser", u);
         return new Promise((resolve) => {resolve(true);});
     }
     else if(window.localStorage.getItem("refreshToken") !== null){
@@ -227,19 +228,20 @@ function verifyAndRefreshLogin(): Promise<any> {
             console.log(body);
             var head = { headers: { "content-type": "application/json" } };
             Object.assign(api.defaults, {});
-            api.post("get_token/", body, head).then(function(response: any) {
+            api.post("get_token/", body, head).then((response: any) => {
                 console.log(response);
                 console.log(response.data.user);
                 console.log(response.data.user.username);
-                var user: User = new User(response.data.user.username, 
-                    response.data.user.pk, 
+                var user: User = new User(response.data.user.username,
+                    response.data.user.pk,
                     response.data.user.email,
-                    response.data.user.first_name, 
-                    response.data.user.last_name, 
+                    response.data.user.first_name,
+                    response.data.user.last_name,
                     response.data.body.access_token,
-                    new Date(Date.now() + response.data.body.expiresIn*1000),
+                    new Date(Date.now() + response.data.body.expiresIn * 1000),
                     response.data.body.refresh_token);
-                store.dispatch("setUser", user);
+                setUser(store, user);
+                // store.dispatch("setUser", user);
                 resolve(true);
 
             }).catch(function(error: any) {

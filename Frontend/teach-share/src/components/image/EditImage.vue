@@ -125,7 +125,7 @@ export default class EditImage extends Vue{
             type: "image_file",
             description: this.description,
             title: this.title,
-            content: this.files.objectify(),
+            content: this.files.list(),
             width: this.width,
             height: this.height
         };

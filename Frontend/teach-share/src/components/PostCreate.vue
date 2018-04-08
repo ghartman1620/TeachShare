@@ -168,7 +168,21 @@ import PostElement from "./PostElement.vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import { Component, Prop } from "vue-property-decorator";
 import {Location, Dictionary} from "vue-router/types/router.d";
-import { addElement, beginPost } from "../store_modules/PostCreateService";
+import { 
+    addElement,
+    beginPost,
+    setTags,
+    setTitle,
+    createPost,
+    swapElements,
+    removeElement,
+    editElement,
+    undo,
+    redo
+} from "../store_modules/PostCreateService";
+import { getLoggedInUser } from "../store_modules/UserService";
+import User from "../user";
+
 function isBlank(str) {
     return !str || /^\s*$/.test(str);
 }
@@ -202,18 +216,8 @@ const bodyVisible = {
 })
 export default class PostCreate extends Vue{
     @State("create") postState;
-    @Action("setTags") setTags;
-    @Action("setTitle") setTitle;
-    @Action("createPost") createPost;
-    @Action("swapElements") swapElements;
-    @Action("removeElement") deleteElement;
-    @Action("addElement") addElement;
-    @Action("editElement") editElement;
-    @Action("storeUndo") storeUndo;
-    @Action("storeRedo") storeRedo;
-    @Action("beginPost") beginPost;
 
-    @Getter("getLoggedInUser") getLoggedInUser;
+    // @Getter("user/getLoggedInUser") getLoggedInUser;
 
     title: string = "";
     inProgressTag: string = "";
@@ -253,7 +257,7 @@ export default class PostCreate extends Vue{
     createTag(e: any) {
         if (e.keyCode === 13 && this.inProgressTag !== "") {
             this.createTagBtn();
-            this.setTags(this.postState.post.tags);
+            setTags(this.$store, this.postState.post.tags);
         }
     }
 
@@ -265,7 +269,7 @@ export default class PostCreate extends Vue{
         var vm = this;
         // dispatch createPost method in the store. This will send a
         // post request to the backend server.
-        this.createPost().then(function(ret) {
+        createPost(this.$store).then((ret) => {
             // handle the response from the server
             if (ret === undefined) {
                 vm.$notifyDanger(
@@ -312,18 +316,18 @@ export default class PostCreate extends Vue{
     moveElementUp(index: number) {
         console.log("move element up" + index);
         if (index != 0) {
-            this.swapElements([index, index - 1]);
+            swapElements(this.$store, [index, index - 1]);
             // dispatch only allows one argument so we'll pass them as an array
         }
     }
     moveElementDown(index: number) {
         if (index != this.$store.state.create.post.elements.length - 1) {
-            this.swapElements([index, index + 1]);
+            swapElements(this.$store, [index, index + 1]);
             // dispatch only allows one argument so we'll pass them as an array
         }
     }
     removeElement(index: number) {
-        this.deleteElement(index);
+        removeElement(this.$store, index);
     }
     maxElementIndex() {
         if (this.postState.post !== undefined) {
@@ -332,14 +336,14 @@ export default class PostCreate extends Vue{
         return 0;
     }
     undo() {
-        this.storeUndo();
+        undo(this.$store);
     }
     redo() {
-        this.storeRedo();
+        redo(this.$store);
     }
     created() {
-        console.log(this.getLoggedInUser);
-        beginPost(this.$store, this.getLoggedInUser);
+        console.log(getLoggedInUser(this.$store));
+        beginPost(this.$store, getLoggedInUser(this.$store) as User);
     }
     mounted() {
         console.log("mounted post create");
@@ -353,7 +357,7 @@ export default class PostCreate extends Vue{
                 addElement(vm.$store, element);
             }
             else{
-                vm.editElement({element: element, index: index});
+                editElement(vm.$store, {element: element, index: index});
             }
             vm.$router.push({name: "create"});
         })

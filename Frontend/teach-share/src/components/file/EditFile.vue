@@ -79,7 +79,7 @@ export default class EditFile extends Vue {
 		*/
     }
     generateJSON(): any {
-        return {type: "file", content: this.fileMap.objectify()}
+        return {type: "file", content: this.fileMap.list()}
     }
     cancel(){
         this.$router.push({ name: "create" });

@@ -70,11 +70,11 @@
 <div :key="post.pk" v-for="(post, index) in posts">
     <div class="card post-container-card card-shadow">
         <div class="card-body">
-            <post
+            <post-comp
                 :maxHeight="500"
-                :post="post"
+                :post="castPost(post)"
                 :index="index">
-            </post>
+            </post-comp>
         </div>
     </div>
     <br><br> 
@@ -90,8 +90,10 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { Watch, Prop } from 'vue-property-decorator'
-import Post from "./Post.vue";
+import PostComp from "./Post.vue";
 import SideBar from "./SideBar.vue";
+import { Post } from "../models";
+import { fetchAllPosts, postSearch, getPosts } from "../store_modules/PostService";
 
 interface SearchQueryString {
     term: string
@@ -104,7 +106,7 @@ interface SearchQueryString {
 
 @Component({
     name: "post-feed",
-    components: { Post, SideBar },
+    components: { PostComp, SideBar },
 })
 export default class PostFeed extends Vue {
 
@@ -147,7 +149,7 @@ export default class PostFeed extends Vue {
     ];
 
     get posts() {
-        return this.$store.getters.getPosts();
+        return getPosts(this.$store);
     }
     get keywordRules() {
         return this.excluding.length ? "" : "required";
@@ -156,7 +158,11 @@ export default class PostFeed extends Vue {
         return this.keywords.length ? "required" : ""
     }
     getPosts() {
-        this.$store.dispatch("fetchAllPosts");
+        const p = fetchAllPosts(this.$store);
+        p.then((res) => { 
+            console.log("blah...");
+            console.log("***********", res);
+        });
     }
     scroll() {
         var offset =
@@ -167,14 +173,22 @@ export default class PostFeed extends Vue {
             // this.getPosts();
         }
     }
-    reloadPosts(){
+    reloadPosts() {
         if(this.$route.query.term != undefined){
             console.log("here");
-            this.$store.dispatch("postSearch", this.$route.query);
+            postSearch(this.$store, this.$route.query);
         }
         else{
-            this.$store.dispatch("fetchAllPosts");
+            const p = fetchAllPosts(this.$store);
+            p.then((res) => { 
+                console.log("blah...");
+                console.log("***********", (res as Post));
+            });
         }
+    }
+
+    castPost(p: object): Post {
+        return p as Post;
     }
 
     advancedSearch() {

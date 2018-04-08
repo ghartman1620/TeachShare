@@ -66,6 +66,7 @@ class Term(Enum):
         else: #or
             print('returning or')
             return query1 | query2
+
 class SearchPostsView(views.APIView):
     searchIn = ['title', 'content', 'tags'] #default
     termType = Term.OR
@@ -179,7 +180,7 @@ class PostViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Post model
     """
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     filter_class = PostFilter
@@ -190,7 +191,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     filter_fields = ('post', 'text', 'user', 'timestamp')
@@ -254,8 +255,8 @@ whitelist = ['pdf','doc', 'ppt','docx', 'odt', 'xlsx', 'xls', 'xlt', 'csv', 'ods
 
 
 class FileUploadView(views.APIView):
-    #SHOULD not be commented - at time of writing frontend has issues with login (fixed on another branch but requires merge)
-    #permission_classes = (IsAuthenticated,)
+    # SHOULD not be commented - at time of writing frontend has issues with login (fixed on another branch but requires merge)
+    permission_classes = (AllowAny,)
     parser_classes = (FileUploadParser, JSONParser)
 
     def put(self, request, filename, format=None):

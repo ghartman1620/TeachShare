@@ -52,6 +52,8 @@ import Vue from "vue";
 import SearchBox from "./SearchBox.vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import { Component, Prop } from "vue-property-decorator";
+import { User } from "../models";
+import { isLoggedIn, getLoggedInUser, logout } from "../store_modules/UserService";
 import {
   State,
   Getter,
@@ -65,22 +67,17 @@ import {
     components: {SearchBox, FontAwesomeIcon},
 })
 export default class NavBar extends Vue{
-    @State("user") userState;
-    @Getter("isLoggedIn") isLoggedIn;   
-    @Getter("getLoggedInUser") user;
-    @Action("logout") logout;
+    get isLoggedIn() {
+        return isLoggedIn(this.$store);
+    }
 
+    get user() {
+        return getLoggedInUser(this.$store);
+    }
 
     logoutSubmit() {
-        this.logout();
+        logout(this.$store);
         this.$router.push({name: "login"});
-    }
-    created(){
-        console.log("created navbar");
-        console.log(this.user);
-        console.log(this.userState);
-        console.log(this.userState.user !== undefined);
-        console.log(this.isLoggedIn);
     }
 }
 </script>

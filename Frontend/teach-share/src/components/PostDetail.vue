@@ -14,6 +14,7 @@ import PostComp from "./Post.vue";
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { Post, Comment, User } from "../models";
 import { getByPost } from "../store_modules/CommentService";
+import { getPostById } from "../store_modules/PostService";
 
 @Component({
     props: [
@@ -24,19 +25,17 @@ import { getByPost } from "../store_modules/CommentService";
 export default class PostDetail extends Vue {
 
     // @TODO: fix this
-    @Prop({default: new Post()}) post!: Post;
+    @Prop({default: new Post()}) post: Post;
 
 
     get postLocal(): any {
-        return <Post>this.$store.getters.getPostById(this.$route.params.post_id);
+        return getPostById(this.$store)(this.$route.params.post_id);
     }
     get postid() {
         return this.postLocal !== undefined ? this.postLocal.pk : this.$route.params.post_id
     }
 
     getComments() {
-        // let ae = new AudioElement(10, "filename.jpg");
-
         var vm = this;
         // createUpdateComment(this.$store, )
         getByPost(this.$store, Number(this.$route.params.post_id)).then(function(res) {

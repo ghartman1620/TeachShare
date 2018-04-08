@@ -13,6 +13,7 @@
 import Vue from "vue";
 import NavBar from "./Navbar.vue";
 import Notify from "./Notify.vue";
+import { addUser, setUser, fetchUser } from "../store_modules/UserService";
 // import Image from "./image/Image";
 
 import Component from 'vue-class-component'
@@ -25,10 +26,6 @@ export default class Base extends Vue {
 
     get computedMsg() {
         return `computed ${this.queryParam}`;
-    }
-
-    test() {
-        this.$notify("info", "value");
     }
     // waitDelay(delayLength: Number|undefined, vm): void {
     //     var that = this;
@@ -63,8 +60,10 @@ export default class Base extends Vue {
             if (typeof uid !== "undefined") {
                 let id = uid as RegExpMatchArray;
                 let actualid = id["groups"]["pk"];
-                this.$store.dispatch("fetchUser", actualid).then((resp) => {
-                    this.$store.dispatch("addUser", resp);
+                let vm = this;
+                fetchUser(this.$store, actualid).then((resp) => {
+                    addUser(vm.$store, resp);
+                    setUser(vm.$store, resp);
                 });
             }
         }
@@ -92,6 +91,7 @@ export default class Base extends Vue {
 </script>
  
 <style lang="scss">
+
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 1s;
@@ -108,6 +108,7 @@ export default class Base extends Vue {
 }
 
 body {
+    z-index: 1;
     zoom: 90%;
 }
 

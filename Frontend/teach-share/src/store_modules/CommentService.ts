@@ -2,6 +2,7 @@ import Vue from "vue";
 import { ActionContext } from "vuex";
 import { getStoreAccessors } from "vuex-typescript";
 
+import { AxiosResponse } from "axios";
 import api from "../api";
 import { Comment, IRootState, ModelMap } from "../models";
 
@@ -19,7 +20,7 @@ export const actions = {
     /**
      * FetchAllComments will fetch comments.
      */
-    getAll: async ctx => {
+    getAll: async (ctx) => {
         try {
             let response = await api.get(`comments/`);
             ctx.commit("LOAD_COMMENTS", response.data);
@@ -35,16 +36,13 @@ export const actions = {
      * @param  {} ctx
      * @param  {number} postID
      */
-    getByPost: async (ctx, postID: number) => {
+    getByPost: async (ctx, postID: number): Promise<Comment[]> => {
         try {
-            let response = await api.get(`comments/?post=${postID}`);
-            console.log(response.data);
-            for (let c of response.data) {
-                console.log(c);
-                mutUpdate(ctx, c);
+            const response: AxiosResponse<Comment[]> = await api.get(`comments/?post=${postID}`);
+            for (const c of response.data) {
+                mutUpdate(ctx, c as Comment);
             }
-            // mutCreate(ctx, );
-            return response;
+            return response.data;
         } catch (err) {
             return err;
         }
@@ -53,33 +51,33 @@ export const actions = {
     /**
      * Fetch a comment with it's pk.
      */
-    getComment: (state, commentID: number) => {
-        api
-            .get(`comments/${commentID}/`)
-            .then(response => state.commit("UPDATE", response.data))
-            .catch(err => console.error(err));
+    getComment: async (ctx, commentID: number): Promise<any> => {
+        try {
+            const resp: AxiosResponse<Comment> = await api.get(`comments/${commentID}/`);
+            mutUpdate(ctx, resp.data);
+            return resp.data;
+        } catch (err) {
+            return err;
+        }
     },
-    createUpdate: async (state, comment: Comment) => {
+    createUpdate: async (ctx, comment: Comment) => {
         if (typeof comment.pk === "undefined") {
             try {
-                let response = await api.put(
+                const response = await api.put(
                     `comments/${comment.pk}/`,
                     comment
                 );
-                state.commit("CREATE", response.data);
+                mutCreate(ctx, response.data);
                 return response;
             } catch (err) {
-                console.log(err);
                 return err;
             }
         } else {
             try {
-                let response = await api.post("comments/", comment);
-                state.commit("UPDATE", response.data);
+                const response = await api.post("comments/", comment);
+                mutUpdate(ctx, response.data);
                 return response;
             } catch (err) {
-                console.log(err);
-                console.log(err.response.data);
                 return err;
             }
         }
@@ -170,7 +168,7 @@ export const getters = {
 
 const CommentService = {
     namespaced: true,
-    strict: process.env.NODE_ENV !== "production",
+    strict: false, // process.env.NODE_ENV !== "production",
     state,
     mutations,
     actions,
