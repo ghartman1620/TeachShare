@@ -1,8 +1,17 @@
 
 <template>
 <div>
-    {{inProgressPost}}
-    <div v-if="inProgressPost !== undefined" :style="getBodyStyle()">
+    <!-- @TODO (although this is more a sidebar thign i put it here for visibility) 
+    fix an issue where the scroll bar doesn't show if the bottom of the sidebar is underneath the bottom
+    of the navbar on the bottom of post create -->
+    <side-bar collapsedString="Your posts">
+        <div v-for="post in userPosts">
+            <a href="#" v-on:click.stop="editPost(post)">
+                {{post.title}}
+            </a>
+        </div>
+    </side-bar>
+    <div v-if="inProgressPost !== undefined && inProgressPost.status !== LOADING" :style="getBodyStyle()">
         <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container">
             <div class="col-8 mx-auto card-deck" id="button-bar">
 
@@ -121,8 +130,12 @@
         </div>
     </div>
     <div v-else>
+        <h1>
+            Loading post...
+        </h1>
         <font-awesome-icon icon="spinner" spin></font-awesome-icon>
     </div>
+
     <br><br><br> <!-- this is so problems don't occur with bottom of page button presses -->
     <nav class="navbar fixed-bottom navbar-light navbar-left bottom-navbar bg-light">
         <div id="bottomNavTitle" class="title" v-if="inProgressPost.title != ''">{{inProgressPost.title}}</div>
@@ -131,6 +144,13 @@
 
 
     <nav class="navbar fixed-bottom justify-content-end bg-transparent">
+        <div v-if="postStatus === SAVING">
+            Saving...
+            <font-awesome-icon icon="spinner" spin></font-awesome-icon>
+        </div>
+        <div v-else-if="postStatus === SAVED">
+            Saved!
+        </div>
         <button type="button" class="undo-button align-right btn btn-sm btn-outline-danger btn-primary-spacing" @click="undo">
             <font-awesome-icon icon="undo" fixed-width></font-awesome-icon> undo 
         </button>
@@ -167,10 +187,13 @@ import {
 import { mapState } from "vuex";
 import forEach from "lodash/forEach";
 import PostElement from "./PostElement.vue";
+import {PostStatus, InProgressPost} from "../post";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import { Component, Prop } from "vue-property-decorator";
 import {Location, Dictionary} from "vue-router/types/router.d";
+import api from "../api";
 import { addElement, editElement, beginPost, getCurrentPost, createPost, undo, redo, setTags, swapElements, removeElement } from "../store_modules/PostCreateService";
+import SideBar from "./SideBar.vue";
 
 function isBlank(str) {
     return !str || /^\s*$/.test(str);
@@ -199,20 +222,28 @@ const bodyVisible = {
     opacity: "1"
 };
 
+
 @Component({
     name: "post-create",
-    components: { PostElement, FontAwesomeIcon }
+    components: { PostElement, FontAwesomeIcon, SideBar }
 })
 export default class PostCreate extends Vue{
 
     @Getter("getLoggedInUser") getLoggedInUser;
+    
+    SAVING = PostStatus.Saving;
+    LOADING = PostStatus.Loading;
+    SAVED = PostStatus.Saved;
 
     title: string = "";
     inProgressTag: string = "";
     tags: string[] = [];
+    userPosts: any[] = [];
     
 
-
+    get postStatus(): PostStatus {
+        return getCurrentPost(this.$store)!.status;
+    }
     // getters
     get inProgressPost() {
         return getCurrentPost(this.$store);
@@ -311,6 +342,16 @@ export default class PostCreate extends Vue{
         var loc: Location = {name: routeName, query: query};
         this.$router.push(loc);
     }
+    //right now only loads one page of posts
+    //@TODO: make a distinction between making potential edits to your post and publishing those edits.
+    //as a teacher, I want to be able to draft edits to my lesson plan and see them before I publish those edits, even
+    //if my post is already published.
+    editPost(post): void {
+        console.log("EDITING POST...");
+        console.log(post);
+        window.localStorage.setItem("inProgressPost", post.pk);
+        beginPost(this.$store, this.getLoggedInUser);
+    }
 
     moveElementUp(index: number) {
         console.log("move element up" + index);
@@ -337,9 +378,24 @@ export default class PostCreate extends Vue{
     redo() {
         redo(this.$store);
     }
+    async getUserPosts(){
+        var vm: PostCreate = this;
+        //@TODO: use store and Post model for this work
+        //This is also all reloaded every time somebody reloads the page.. which is really quite no good.
+        var nextPage = 1;
+        do{
+            var response = await api.get("/posts/?user=" + this.getLoggedInUser.pk + "&page=" + nextPage.toString());
+            for(var post of response.data.results){
+                vm.userPosts.push(post);
+            }
+            nextPage++;
+        }while(response.data.next !== null);
+    }
     created() {
-        //@TODO: replace getLoggedInUser with typesafe getter from UserService.
+        console.log(this.getLoggedInUser);
         beginPost(this.$store, this.getLoggedInUser);
+        this.getUserPosts();
+        
     }
     mounted() {
         console.log("mounted post create");

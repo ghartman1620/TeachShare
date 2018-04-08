@@ -1,15 +1,15 @@
-import { ActionContext, Store } from "vuex";
 import Vue from "vue";
+import { ActionContext } from "vuex";
 import { getStoreAccessors } from "vuex-typescript";
 
-import { RootState, ModelMap, Comment } from "../models";
 import api from "../api";
+import { Comment, IRootState, ModelMap } from "../models";
 
 export interface CommentState {
     comments?: ModelMap<Comment>;
 }
 
-type CommentContext = ActionContext<CommentState, RootState>;
+type CommentContext = ActionContext<CommentState, IRootState>;
 
 const state = {
     comments: new ModelMap<Comment>()
@@ -182,7 +182,7 @@ export default CommentService;
 /**
  * Type safe definitions for CommentService
  */
-const { commit, read, dispatch } = getStoreAccessors<CommentState, RootState>(
+const { commit, read, dispatch } = getStoreAccessors<CommentState, IRootState>(
     "comment"
 );
 

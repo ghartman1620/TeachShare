@@ -67,7 +67,14 @@
 
 import { Vue } from "vue-property-decorator";
 import { mapGetters, mapActions } from "vuex";
-import { removeFile, uploadFiles, changeLimit, getFile, clearFiles } from "../store_modules/FileService"
+import { 
+    removeFile,
+    uploadFiles,
+    changeLimit,
+    getFile,
+    clearFiles,
+    filesUploadStatus
+} from "../store_modules/FileService"
 import { Dictionary} from "vue-router/types/router.d";
 import Component from 'vue-class-component';
 // import * as vuetypes from "vue-router/types/vue.d";
@@ -134,6 +141,9 @@ export default class FileUpload extends Vue {
     }
     get currentUploadedFiles() {
         return this.$store.state.fs.uploadedFiles;
+    }
+    get getFiles() {
+        return filesUploadStatus(this.$store);
     }
     getFile(id: string) {
         return getFile(this.$store)(id);

@@ -1,18 +1,17 @@
+import { expect } from "chai";
 import Vue, { VueConstructor } from "vue";
-import Base from "@/components/Base.vue";
+import Base from "../../../src/components/Base.vue";
 import router from "../../../src/router";
 import store from "../../../src/store";
-// import store from "../../../src/store";
-import { expect } from "chai";
 
 import { CONSTRUCT } from "../utils";
 
 describe("[BASE.VUE] Base view component", () => {
     it("should render correct contents", () => {
         const vm = CONSTRUCT(Base);
-        let re = new RegExp("([\\n]|[\\s])*", "g");
-        var val = vm.$el.querySelector(".navbar") as Element;
-        let outstring = val.textContent.replace(re, "") as string;
+        const re = new RegExp("([\\n]|[\\s])*", "g");
+        const val = vm.$el.querySelector(".navbar") as Element;
+        const outstring = val.textContent.replace(re, "") as string;
         expect(outstring).to.equal(
             "CreatePostProfileYourpostfeedYourpostsAccountdetailsLogoutSearch"
         );

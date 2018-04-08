@@ -1,8 +1,8 @@
-import Vue from "vue";
-import api from "../api";
+import { ActionContext } from 'vuex';
+
+import api from '../api';
+import { IRootState } from "../models";
 import User from "../user";
-import { ActionContext, Store } from "vuex";
-import {RootState} from "../models";
 
 // typescript 'require' workaround hack
 declare function require(name: string): any;
@@ -21,7 +21,7 @@ interface LoginCredentials{
     persist: boolean;
 }
 
-type UserContext = ActionContext<UserState, RootState>;
+type UserContext = ActionContext<UserState, IRootState>;
 
 var Cookie = require("tiny-cookie");
 

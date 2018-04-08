@@ -20,24 +20,25 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { NotifyType } from "../models";
+import { getAllNotifications, removeNotification } from "../store_modules/NotificationService";
+import { State } from "vuex-class";
 
 @Component({
     props: {},
     name: "notify"
 })
 export default class Notify extends Vue {
+    @State("notify") notificationState;
 
     // computed
     get getAllNotifications() {
-        return this.$store.getters.getAllNotifications;
+        return this.notificationState.pending;
     }
 
     close(note: any) {
-        console.log(note);
-        this.$store.dispatch("removeNotification", note.id)
+        removeNotification(this.$store, note.id);
     }
     convertNotifyType(val: number): string {
-        console.log("NotifyType: ", NotifyType[val]);
         return NotifyType[val];
     }
 }

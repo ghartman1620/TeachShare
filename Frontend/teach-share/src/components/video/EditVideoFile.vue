@@ -53,6 +53,7 @@ import FileUpload from "../FileUpload";
 import DimensionPicker from "../DimensionPicker";
 import { mapGetters } from "vuex";
 import { Component } from "vue-property-decorator";
+import { clearFiles } from "../../store_modules/FileService";
 
 import {
   State,
@@ -126,7 +127,7 @@ export default class EditVideoFile extends Vue{
         });
     }
     destroyed() {
-        this.$store.dispatch("removeAllVideos");
+        clearFiles(this.$store);
     }
 };
 </script>

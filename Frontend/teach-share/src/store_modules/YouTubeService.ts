@@ -1,26 +1,25 @@
-import Vue from "vue";
-import { ActionContext, Store } from "vuex";
+import axios, { AxiosResponse } from "axios";
 import { getStoreAccessors } from "vuex-typescript";
-import { RootState } from "../models";
 
-import axios, { AxiosRequestConfig, AxiosPromise, AxiosResponse } from "axios";
-import api from "../api";
+import { IRootState, NotifyType } from "../models";
 
-export interface YTState {
+import { sendNotification } from "./NotificationService";
+
+export interface IYTState {
     videoDetails: any[];
 }
 
-var API_KEY = "AIzaSyAOHmdMqDLrCvAxnbkdTabddnKRZkpqPJY";
+const API_KEY = "AIzaSyAOHmdMqDLrCvAxnbkdTabddnKRZkpqPJY";
 
-function isString(str: String | null): str is String {
-    return (<String>str) !== null;
+function isString(str: string | null): str is string {
+    return (str as string) !== null;
 }
 
 const state = {
     videoDetails: []
-}
+};
 
-interface YtURLValue {
+interface IVideoURLValue {
     apiRequest: string;
     videoID: string;
 
@@ -29,10 +28,10 @@ interface YtURLValue {
 export const defaultVideoSections = "snippet,statistics";
 
 export const generateURL =
-    function (url: string, section: string = defaultVideoSections): YtURLValue {
-        let videoURL = new URL(url);
-        let videoID = videoURL.searchParams.get("v");
-        let ApiURL = new URL(
+    (url: string, section: string = defaultVideoSections): IVideoURLValue => {
+        const videoURL = new URL(url);
+        const videoID = videoURL.searchParams.get("v");
+        const ApiURL = new URL(
             `https://www.googleapis.com/youtube/v3/videos?id=${videoID}&key=${API_KEY}&part=${section}`
         );
         return { apiRequest: ApiURL.toString(), videoID: videoID as string };
@@ -40,22 +39,25 @@ export const generateURL =
 
 export const actions = {
     getYoutubeVideoInfo: async (ctx, url: string) => {
-        console.log("url: ", url);
-        let { apiRequest, videoID } = generateURL(url);
+        const { apiRequest, videoID } = generateURL(url);
         console.log(apiRequest, videoID);
         if (videoID.length > 10) {
             try {
-                let resp: AxiosResponse = await axios.get(apiRequest);
-                console.log("ACTION:", resp);
+                const resp: AxiosResponse = await axios.get(apiRequest);
                 mutSet(ctx, resp.data);
+                sendNotification(ctx, { 
+                    content: "successfully fetched youTube video data!",
+                    type: NotifyType.success
+                });
                 return resp;
             } catch (err) {
                 console.error("ERR:", err);
+                sendNotification(ctx, { content: "unable to retrieve youtube video data", type: NotifyType.danger });
                 return err;
             }
         }
     },
-    clearYoutubeData: ctx => {
+    clearYoutubeData: (ctx) => {
         mutClear(ctx);
     }
 }
@@ -65,7 +67,7 @@ export const mutations = {
         if (ctx.videoDetails.length === 0) {
             ctx.videoDetails.push(data);
         }
-        let exists = ctx.videoDetails.find((val) => val === data);
+        const exists = ctx.videoDetails.find((val) => val === data);
         if (typeof exists === "undefined") {
             ctx.videoDetails.push(data);
         }
@@ -76,48 +78,49 @@ export const mutations = {
 }
 
 export const getters = {
-    ytVideoDescriptionShort: state => {
-        var ending = "";
-        if (state.ytVideoDetails && state.ytVideoDetails.items.length > 0) {
-            if (state.ytVideoDetails.items[0].snippet.description.length > 300) {
+    videoDescriptionSm: state => {
+        let ending = "";
+        if (state.videoDetails.length > 0 && state.videoDetails[0].items.length > 0) {
+            if (state.videoDetails[0].items[0].snippet.description.length > 300) {
                 ending = "...";
             }
             return (
-                state.ytVideoDetails.items[0].snippet.description.slice(0, 300) +
+                state.videoDetails[0].items[0].snippet.description.slice(0, 300) +
                 ending
             );
         }
         return null;
     },
-    ytVideoDescription: state => {
-        if (state.ytVideoDetails && state.ytVideoDetails.items.length > 0) {
-            return state.ytVideoDetails.items[0].snippet.description;
+    videoDescription: state => {
+        console.log("[YT]", state.videoDetails);
+        if (state.videoDetails.length > 0 && state.videoDetails[0] && state.videoDetails[0].items.length > 0) {
+            return state.videoDetails[0].items[0].snippet.description;
         }
         return null;
     },
-    ytVideoThumbnail: state => {
-        if (state.ytVideoDetails && state.ytVideoDetails.items.length > 0) {
-            return state.ytVideoDetails.items[0].snippet.thumbnails.default;
+    videoThumbnail: state => {
+        if (state.videoDetails[0] && state.videoDetails[0].items.length > 0) {
+            return state.videoDetails[0].items[0].snippet.thumbnails.default;
         }
         return "";
     },
-    ytVideoTitle: state => {
-        if (state.ytVideoDetails && state.ytVideoDetails.items.length > 0) {
-            return state.ytVideoDetails.items[0].snippet.title;
+    videoTitle: state => {
+        if (state.videoDetails[0] && state.videoDetails[0].items.length > 0) {
+            return state.videoDetails[0].items[0].snippet.title;
         }
         return "";
     },
-    ytVideoID: state => {
-        if (state.ytVideoDetails && state.ytVideoDetails.items.length > 0) {
-            return state.ytVideoDetails.items[0].id;
+    videoID: state => {
+        if (state.videoDetails[0] && state.videoDetails[0].items.length > 0) {
+            return state.videoDetails[0].items[0].id;
         }
         return "";
     }
-}
+};
 
 // YouTubeService definition
 const YouTubeService = {
-    strict: true,
+    strict: process.env.NODE_ENV !== "production",
     namespaced: true,
     state,
     mutations,
@@ -131,7 +134,7 @@ export default YouTubeService;
  * Type safe definitions for CommentService
  */
 const { commit, read, dispatch } =
-     getStoreAccessors<YTState, RootState>("yt");
+     getStoreAccessors<IYTState, IRootState>("yt");
 
 /**
  * Actions Handlers
@@ -142,11 +145,11 @@ export const clearVideoInfo = dispatch(YouTubeService.actions.clearYoutubeData);
 /**
  * Getters Handlers
  */
-export const smVideoDetail = read(YouTubeService.getters.ytVideoDescriptionShort);
-export const videoDetail = read(YouTubeService.getters.ytVideoDescription);
-export const videoThumbnail = read(YouTubeService.getters.ytVideoThumbnail);
-export const videoTitle = read(YouTubeService.getters.ytVideoTitle);
-export const videoID = read(YouTubeService.getters.ytVideoID);
+export const smVideoDetail = read(YouTubeService.getters.videoDescriptionSm);
+export const videoDetail = read(YouTubeService.getters.videoDescription);
+export const videoThumbnail = read(YouTubeService.getters.videoThumbnail);
+export const videoTitle = read(YouTubeService.getters.videoTitle);
+export const videoID = read(YouTubeService.getters.videoID);
 
 /**
  * Mutations Handlers

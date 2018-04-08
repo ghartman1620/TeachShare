@@ -1,15 +1,14 @@
+import sinon from "sinon";
 import Vue, {VueConstructor} from "vue";
 import EditVideoEmbed from "../../../src/components/video/EditVideoEmbed.vue";
 import router from "../../../src/router";
 import store from "../../../src/store";
 import { getVideoInfo } from "../../../src/store_modules/YouTubeService";
-import sinon from "sinon";
 
 // import store from "../../../src/store";
 import { expect } from "chai";
 
 import { CONSTRUCT } from "../utils";
-
 
 describe("[EDIT_VIDEO_EMBED.VUE] Embed video (youtube) view component", () => {
     let vm;
@@ -30,18 +29,18 @@ describe("[EDIT_VIDEO_EMBED.VUE] Embed video (youtube) view component", () => {
     it("should make youtube request", () => {
         console.log(vm);
         console.log(vm.$el);
-        let input = "https://www.youtube.com/watch?v=KMX1mFEmM3E"
+        const input = "https://www.youtube.com/watch?v=KMX1mFEmM3E"
 
-        vm.getYoutubeData(input).then(function (resp) {
+        vm.getYoutubeData(input).then((resp) => {
             expect(resp.status).to.equal(200);
             expect(resp.data).to.eql({etag: "", items: [{etag: "", snippet: "", statistics: ""}] });
         });
-        
+
         setTimeout(() => server.respond([200,
             {
                 "Content-Type": "application/json"
             },
-            JSON.stringify({etag: "", items: [{ etag: "", snippet: "", statistics: "" }]})]), 0);
+            JSON.stringify({etag: "", items: [{ etag: "", snippet: { thumbnails: "test" }, statistics: "" }]})]), 0);
     });
-   
+
 });

@@ -80,7 +80,6 @@ export class Comment extends Model {
         this.post = post;
         if (isString(text)) {
             this.text = text;
-            ``;
         } else {
             this.text = "";
         }
@@ -144,21 +143,19 @@ export enum NotifyType {
     "light"
 }
 
-export interface Notification {
+export interface INotification {
     id?: string;
     type: NotifyType;
     content: string;
 }
 
-export interface RootState {
+export interface IRootState {
     user: User;
     users: User[];
 
     // Post feed
     posts: Array<Post>;
 }
-
-type Dictionary = { [id: string]: any };
 
 /**
  * ModelMap is a structure for keeping track of a group of
@@ -174,13 +171,13 @@ export class ModelMap<V> implements IterableIterator<V> {
                 this._data = {};
                 return;
             }
-            for (let v of V) {
+            for (const v of V) {
                 this._data[v.pk] = v;
             }
         }
     }
-    next(): IteratorResult<V> {
-        let key = this.keys[this.counter];
+    public next(): IteratorResult<V> {
+        const key = this.keys[this.counter];
         this.counter++;
         if (this.counter <= this.length) {
             return {
@@ -195,11 +192,11 @@ export class ModelMap<V> implements IterableIterator<V> {
         };
     }
 
-    [Symbol.iterator](): IterableIterator<V> {
+    public [Symbol.iterator](): IterableIterator<V> {
         return this;
     }
 
-    has(key: string | number): boolean {
+    public has(key: string | number): boolean {
         return typeof this.data[String(key)] !== "undefined";
     }
     get keys(): string[] {
@@ -214,19 +211,31 @@ export class ModelMap<V> implements IterableIterator<V> {
     set data(value: { [pk: string]: V }) {
         this._data = value;
     }
-    set(key: string, value: V) {
+    public set(key: string, value: V) {
         this._data[key] = value;
     }
-    get(key: string | number): V {
+    public get(key: string | number): V {
         return this._data[String(key)];
     }
-    //returns an object representation of this modelMap's data for use in conversion to JSON
-    objectify(): any[] {
-        var objects: any[] = [];
-        for (let key in this.data) {
-            var obj: any = {};
-            objects.push(this.get(key));
+    // returns an object representation of this modelMap's data for use in conversion to JSON
+    // why is this necessary?! doesn't it do this automatically?!
+    // TODO: figure out this issue.
+    // public objectify(): any[] {
+    //     const objects: any[] = [];
+    //     for (const key in this.data) {
+    //         const obj: any = {};
+    //         objects.push(this.get(key));
+    //     }
+    //     return objects;
+    // }
+    public list(): V[] {
+        const res = new Array<V>();
+        for (const k in this.data) {
+            if (typeof k !== "undefined") {
+                console.log("****", k);
+                res.push(this.get(k));
+            }
         }
-        return objects;
+        return res;
     }
 }

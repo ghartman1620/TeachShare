@@ -1,12 +1,11 @@
-import api from "../api";
-import Vue from "vue";
-import InProgressPost from "../post";
+
+import { InProgressPost } from "../post";
 import User from "../user";
 
 import { getStoreBuilder } from "vuex-typex"
 import Vuex, { Store, ActionContext } from "vuex"
 
-import { RootState } from "../models";
+import { IRootState } from "../models";
 import { getStoreAccessors } from "vuex-typescript";
 
 
@@ -22,18 +21,18 @@ interface PostState {
     doneMutations: Mutation[];
     unDoneMutations: Mutation[];
 }
-interface EditedElement{
+interface EditedElement {
     element: any;
     index: number;
 }
 
-type PostContext = ActionContext<PostState, RootState>;
+type PostContext = ActionContext<PostState, IRootState>;
 
 const state: PostState = {
     post: undefined,
     doneMutations: [],
-    unDoneMutations: [],
-}
+    unDoneMutations: []
+};
 
 export const mutations = {
     SET_TAGS: (state: PostState, tags: string[]) => {
@@ -79,7 +78,7 @@ export const mutations = {
         });
         var i = iAndJ[0];
         var j = iAndJ[1];
-        state.post!.swapElements(i,j);
+        state.post!.swapElements(i, j);
     },
     // Mutations for the currently edited post data:  and postElements
     ADD_ELEMENT: (state: PostState, element: any) => {
@@ -99,7 +98,7 @@ export const mutations = {
         });
         var i = iAndJ[0];
         var j = iAndJ[1];
-        state.post!.swapElements(i,j);
+        state.post!.swapElements(i, j);
     },
     REMOVE_ELEMENT: (state: PostState, index: number) => {
         state.doneMutations.push({
@@ -127,7 +126,7 @@ export const mutations = {
     BEGIN_POST: (state: PostState, user: User) => {
         state.post = new InProgressPost(user);
     }
-}
+};
 
 export const actions = {
     beginPost: (context: PostContext, user: User) => {
@@ -136,31 +135,45 @@ export const actions = {
         // context.commit("BEGIN_POST", user);
     },
     setTags: (context: PostContext, tags: string[]) => {
-        context.commit("SET_TAGS", tags);
+        mutSetTags(context, tags);
+        // context.commit("SET_TAGS", tags);
     },
     setTitle: (context: PostContext, title: string) => {
-        context.commit("SET_TITLE", title);
+        mutSetTitle(context, title);
+        // context.commit("SET_TITLE", title);
     },
-    undo: (context: PostContext) => {
+    undo: async (context: PostContext) => {
         if (context.state.doneMutations.length > 0) {
             var mut =
                 context.state.doneMutations[
                     context.state.doneMutations.length - 1
                 ];
             if (mut.mutation === "UNDO_ADD_ELEMENT") {
-                context.dispatch(
-                    "removeAttachments",
+                removeAttachments(
+                    context,
                     context.state.post!.elements[mut.arg].content
                 );
+                // context.dispatch(
+                //     "removeAttachments",
+                //     context.state.post!.elements[mut.arg].content
+                // );
             }
-            context.commit("UNDO");
+            mutUndo(context);
+            // context.commit("UNDO");
+
+            // @TODO: can this one even be replaced!?
             context.commit(mut.mutation, mut.arg);
-            context.dispatch("saveDraft").then(res => console.error(res));
+
+            const response = await saveDraft(context).catch(err =>
+                console.error(err)
+            );
+            console.log(response);
+            // context.dispatch("saveDraft").then(res => console.error(res));
         }
     },
     redo: (context: PostContext) => {
         if (context.state.unDoneMutations.length > 0) {
-            var mut =
+            let mut =
                 context.state.unDoneMutations[
                     context.state.unDoneMutations.length - 1
                 ];
@@ -227,11 +240,14 @@ export const actions = {
     },
     createPost: (context: PostContext) => {
         return new Promise((resolve, reject) => {
-            context.state.post!.publishPost().then(function(response){
-                resolve(response);
-            }).catch(function(error) { 
-                reject(error);
-            });
+            context.state
+                .post!.publishPost()
+                .then(function(response) {
+                    resolve(response);
+                })
+                .catch(function(error) {
+                    reject(error);
+                });
         });
         /*
         return new Promise((resolve, reject) => {
@@ -249,30 +265,48 @@ export const actions = {
                     }
                 });
         });*/
-    },
-}
+    }
+};
 
+export const getters = {
+    getTags: (state: PostState) => { 
+        if (typeof state.post !== "undefined") {
+            return state.post!.tags;
+        }
+        return undefined;
+    },
+    getTitle: (state: PostState) => {
+        if (typeof state.post !== "undefined") {
+            return state.post!.title;
+        }
+        return undefined;
+    },
+    getContent: (state: PostState) => {
+        if (typeof state.post !== "undefined") {
+            return state.post!.elements;
+        }
+        return undefined;
+    },
+    getCurrentPost: (state: PostState) => state.post,
+    getCurrentPostId: (state, getters) => {
+        if (state.post !== null && typeof getters.getCurrentPost !== "undefined") {
+            return getters.getCurrentPost.pk;
+        }
+        return null;
+    },
+    postElements: (state: PostState) => {
+        if (typeof state.post !== "undefined") {
+            return state.post!.elements;
+        }
+    }
+};
 const PostCreateService = {
     namespaced: true,
-    state: state,
-    mutations: mutations,
-    actions: actions,
-    getters: {
-        getTags: (state: PostState) => state.post!.tags,
-        getTitle: (state: PostState) => state.post!.title,
-        getContent: (state: PostState) => state.post!.elements,
-        getCurrentPost: (state: PostState) => state.post,
-        getCurrentPostId: (state: PostState, getters) => {
-            console.log("in get current post id");
-            if (state.post !== null) {
-                console.log("returning a number");
-                console.log(state.post);
-                return state.post!.pk;
-            }
-            return null;
-        },
-        postElements: (state: PostState) => state.post!.elements,
-    }
+    strict: process.env.NODE_ENV !== "production",
+    state,
+    mutations,
+    actions,
+    getters
 };
 
 export default PostCreateService;
@@ -280,7 +314,7 @@ export default PostCreateService;
 /**
  * Type safe definitions for FileService
  */
-const { commit, read, dispatch } = getStoreAccessors<PostState, RootState>(
+const { commit, read, dispatch } = getStoreAccessors<PostState, IRootState>(
     "create"
 );
 
@@ -328,7 +362,6 @@ export const mutBeginPost = commit(PostCreateService.mutations.BEGIN_POST);
 export const mutClearRedo = commit(PostCreateService.mutations.CLEAR_REDO);
 export const mutEditElement = commit(PostCreateService.mutations.EDIT_ELEMENT);
 export const mutRedo = commit(PostCreateService.mutations.REDO);
-
 export const mutRemoveElement = commit(
     PostCreateService.mutations.REMOVE_ELEMENT
 );

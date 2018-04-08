@@ -3,7 +3,7 @@
     
     <b-button @click="toggleSidebarCollapse()" class="btn-secondary sidebar-btn">
         <div v-if="collapsed">
-            <font-awesome-icon icon="arrow-right"/>
+            {{collapsedString}} <font-awesome-icon icon="arrow-right"/>
         </div>
         <div v-else>
             <font-awesome-icon icon="arrow-left"/>
@@ -22,6 +22,7 @@ import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 
 export default Vue.component("side-bar", {
     components: { FontAwesomeIcon },
+    props: ["collapsedString"],
     data() {
         return {
             sidebarClasses: ["sidebar"],
@@ -56,10 +57,11 @@ export default Vue.component("side-bar", {
     -webkit-transition: all 0.1s ease-in-out;
     -moz-transition: all 0.1s ease-in-out;
     transition: all 0.1s ease-in-out;
-    overflow: scroll;
+    overflow-y: auto;
+    z-index: 3;
 }
 .sidebar.collapsed {
-    width: 40px;
+    width: auto;
     background-color: transparent;
     overflow: hidden;
 }

@@ -1,7 +1,7 @@
 <template>
 <div>
 <router-view/>
-<side-bar>
+<side-bar collapsedString="Search">
     <b-form :class="{'control' : true}" style="padding: 8px;" v-on:submit.prevent="advancedSearch()">
 
         <b-form-group label="Search for posts with:">
