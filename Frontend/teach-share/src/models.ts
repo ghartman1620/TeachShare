@@ -155,7 +155,7 @@ export interface RootState {
     users: User[];
 
     // Post feed
-    posts: Post[];
+    posts: Array<Post>;
 }
 
 type Dictionary = { [id: string]: any };

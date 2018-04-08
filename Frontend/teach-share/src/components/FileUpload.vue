@@ -140,6 +140,7 @@ export default class FileUpload extends Vue {
     }
     save(formData) {
         console.log(this);
+        console.log(formData);
         uploadFiles(this.$store, formData).then(resp => console.log("upload response: ", resp));
     }
 

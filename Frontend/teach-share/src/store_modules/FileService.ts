@@ -5,10 +5,14 @@ import map from "lodash/map";
 import forEach from "lodash/forEach";
 import every from "lodash/every";
 import reduce from "lodash/reduce";
+import store from "../store";
 
-import { RootState, GenericFile, ModelMap } from "../models";
+import { RootState, GenericFile, ModelMap, NotifyType } from "../models";
 import { ActionContext, Store } from "vuex";
 import { getStoreAccessors } from "vuex-typescript";
+import { getCurrentPostId} from "./PostCreateService";
+import {sendNotification} from "./NotificationService";
+
 
 export interface FileState {
     files?: ModelMap<GenericFile>;
@@ -43,35 +47,29 @@ const uuidv4 = require("uuid/v4");
  * @param  {Store} ctx
  * @param  {File[]} files
  */
-export const upload_file = async (ctx, files: File[]) => {
+export const upload_file = async (ctx: FileContext, files: File[]) => {
     console.log(ctx, files);
-    try {
-        // @TODO: get type safe definition for this.
-        let postid = await ctx.dispatch("saveDraft", null, { root: true });
-        console.log(postid);
-    } catch (err) {
-        console.log(err);
-    }
+    let postid = getCurrentPostId(store);
+    console.log(postid);
 
     let i: number = 0;
     files.forEach(async (file: File) => {
         let fileAlreadyUploaded = false;
 
-        ctx.state.files.keys.forEach(element => {
+        ctx.state!.files!.keys.forEach(element => {
             /**
              * @changed: ==, ===
              * Test whether or not a file is already uploaded.
              */
-            debugger;
             console.log("element", element);
             console.log("file", file);
-            if (ctx.state.files.get(element).file.name === file.name) {
+            if (ctx.state!.files!.get(element)!.file!.name === file.name) {
                 fileAlreadyUploaded = true;
             }
         });
         if (
             !fileAlreadyUploaded &&
-            i + ctx.state.files.length < ctx.state.limit
+            i + ctx.state!.files!.length < ctx.state.limit
         ) {
             console.log(ctx.state.files);
             let id = uuidv4();
@@ -105,12 +103,13 @@ export const upload_file = async (ctx, files: File[]) => {
                  */
                 let response = await api.put(
                     `upload/${file.name}?id=${id}&post=${
-                        ctx.rootGetters.getCurrentPostId
+                        postid
                     }`,
                     file,
                     config
                 );
-                var fileResponse: GenericFile = new GenericFile(
+                console.log(response);
+                const fileResponse: GenericFile = new GenericFile(
                     response.data.request_id,
                     100,
                     file,
@@ -133,12 +132,9 @@ export const upload_file = async (ctx, files: File[]) => {
                     // ctx.commit("DELETE", file);
                 } else {
                     // @TODO: get type-checked send-notifications
-                    ctx.dispatch(
-                        "sendNotification",
-                        { type: "danger", content: "Error uploading file!" },
-                        { root: true },
-                        null,
-                        { root: true }
+                    sendNotification( store, 
+                        { type: NotifyType["danger"], content: "Error uploading file!" },
+                    
                     );
                     console.error(error);
                 }

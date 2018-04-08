@@ -1,102 +1,101 @@
 
 <template>
 <div>
+    {{inProgressPost}}
+    <div v-if="inProgressPost !== undefined" :style="getBodyStyle()">
+        <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container">
+            <div class="col-8 mx-auto card-deck" id="button-bar">
 
+                <h2></h2>
+                <div class="round-button" id="text-icon">
+                    <router-link :to="{ name: 'edit-text', query: {index: this.maxElementIndex()}}">
+                        <img src="/static/text-button.png"
+                                    onmouseover="this.src='/static/text-button-hover.png'"
+                                    onmouseout="this.src='/static/text-button.png'">
+                    </router-link>
+                </div>
+                <h2></h2>
 
-<div :style="getBodyStyle()">
-    <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container">
-        <div class="col-8 mx-auto card-deck" id="button-bar">
+                <div class="round-button" id="video-icon">
+                    <router-link :to="{name: 'edit-video', query: {index: this.maxElementIndex(), videotype: 'embed'}}">
+                        <img src="/static/video-button.png"
+                                    onmouseover="this.src='/static/video-button-hover.png'"
+                                    onmouseout="this.src='/static/video-button.png'">
 
-            <h2></h2>
-            <div class="round-button" id="text-icon">
-                <router-link :to="{ name: 'edit-text', query: {index: this.maxElementIndex()}}">
-                    <img src="/static/text-button.png"
-                                onmouseover="this.src='/static/text-button-hover.png'"
-                                onmouseout="this.src='/static/text-button.png'">
-                </router-link>
-            </div>
-            <h2></h2>
+                    </router-link>
+                </div>
+                <h2></h2>
 
-            <div class="round-button" id="video-icon">
-                <router-link :to="{name: 'edit-video', query: {index: this.maxElementIndex(), videotype: 'embed'}}">
-                    <img src="/static/video-button.png"
-                                onmouseover="this.src='/static/video-button-hover.png'"
-                                onmouseout="this.src='/static/video-button.png'">
+                <div class="round-button" id="audio-icon">
+                    <router-link :to="{name: 'edit-audio', query: {index: this.maxElementIndex()}}">
+                        <img src="/static/audio-button.png"
+                                    onmouseover="this.src='/static/audio-button-hover.png'"
+                                    onmouseout="this.src='/static/audio-button.png'">
+                    </router-link>
+                </div>
+                <h2></h2>
 
-                </router-link>
-            </div>
-            <h2></h2>
+                <div class="round-button" id="image-icon">
+                    <router-link :to="{name: 'edit-image', query: {index: this.maxElementIndex()}}">
+                        <img src="/static/image-button.png" >
+                    </router-link>
+                </div>
 
-            <div class="round-button" id="audio-icon">
-                <router-link :to="{name: 'edit-audio', query: {index: this.maxElementIndex()}}">
-                    <img src="/static/audio-button.png"
-                                onmouseover="this.src='/static/audio-button-hover.png'"
-                                onmouseout="this.src='/static/audio-button.png'">
-                </router-link>
-            </div>
-            <h2></h2>
-
-            <div class="round-button" id="image-icon">
-                <router-link :to="{name: 'edit-image', query: {index: this.maxElementIndex()}}">
-                    <img src="/static/image-button.png" >
-                </router-link>
-            </div>
-
-            <div class="round-button" id="file-icon">
-                <router-link :to="{name: 'edit-file', query: {index: this.maxElementIndex()}}">
-                    <img src="/static/file-button.png"
-                                onmouseover="this.src='/static/file-button-hover.png'"
-                                onmouseout="this.src='/static/file-button.png'">
-                </router-link>
+                <div class="round-button" id="file-icon">
+                    <router-link :to="{name: 'edit-file', query: {index: this.maxElementIndex()}}">
+                        <img src="/static/file-button.png"
+                                    onmouseover="this.src='/static/file-button-hover.png'"
+                                    onmouseout="this.src='/static/file-button.png'">
+                    </router-link>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-2"></div>
-        <div class="col-8">
-            <div class="form-group">
-                <div id="title-tag-card" class="card">
-                    <br>
-                    <div class="title-container container">
-                        <div class="row">
-                            <div class="col-2">
-                                <label for="titleTextbox"><h4><strong>Title: </strong></h4></label>
-                            </div>
+        <div class="row">
+            <div class="col-2"></div>
+            <div class="col-8">
+                <div class="form-group">
+                    <div id="title-tag-card" class="card">
+                        <br>
+                        <div class="title-container container">
+                            <div class="row">
+                                <div class="col-2">
+                                    <label for="titleTextbox"><h4><strong>Title: </strong></h4></label>
+                                </div>
 
-                            <div class="col-10">
-                                <input class="form-control" type="text" v-model="postState.post.title"
-                                    placeholder="Title required" id="titleTextbox">
+                                <div class="col-10">
+                                    <input class="form-control" type="text" v-model="inProgressPost.title"
+                                        placeholder="Title required" id="titleTextbox">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="container tag-card card">
-                        <div class="row">
-                            <div class="col-2">
-                                <label for="tagTextbox"><h4><strong>Tags: </strong></h4></label>
+                        <div class="container tag-card card">
+                            <div class="row">
+                                <div class="col-2">
+                                    <label for="tagTextbox"><h4><strong>Tags: </strong></h4></label>
+                                </div>
+                                <div class="col-8">
+                                    <input class="form-control" v-model="inProgressTag" v-on:keyup="createTagEvent"
+                                        placeholder="add a topic tag" id="tagTextbox">
+                                </div>
+                                <div class="col-2">
+                                    <button @click="createTagBtn" id="create-tag-button" class="btn btn-block btn-primary">
+                                        <span>
+                                            <font-awesome-icon icon="plus"></font-awesome-icon>
+                                        </span>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="col-8">
-                                <input class="form-control" v-model="inProgressTag" v-on:keyup="createTag"
-                                    placeholder="add a topic tag" id="tagTextbox">
-                            </div>
-                            <div class="col-2">
-                                <button @click="createTagBtn" id="create-tag-button" class="btn btn-block btn-primary">
-                                    <span>
-                                        <font-awesome-icon icon="plus"></font-awesome-icon>
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                        <hr>
-                        <span id="tag-container" :key="index" v-for="(tag,index) in postState.post.tags">
-                            <span @click="removeTag(index)" class="tag-entry badge badge-dark">{{tag}} <span aria-hidden="true">&times;</span>
-                                <!-- <button id="tag-delete-button" type="button" class="btn btn-sm btn-dark" >{{"x"}}</button> -->
+                            <hr>
+                            <span id="tag-container" :key="index" v-for="(tag,index) in inProgressPost.tags">
+                                <span @click="removeTag(index)" class="tag-entry badge badge-dark">{{tag}} <span aria-hidden="true">&times;</span>
+                                    <!-- <button id="tag-delete-button" type="button" class="btn btn-sm btn-dark" >{{"x"}}</button> -->
+                                </span>
                             </span>
-                        </span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
         <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
             <div class="post-element-container">
                 <div class="card-column column">
@@ -121,9 +120,12 @@
             <br>
         </div>
     </div>
+    <div v-else>
+        <font-awesome-icon icon="spinner" spin></font-awesome-icon>
+    </div>
     <br><br><br> <!-- this is so problems don't occur with bottom of page button presses -->
     <nav class="navbar fixed-bottom navbar-light navbar-left bottom-navbar bg-light">
-        <div id="bottomNavTitle" class="title" v-if="title != ''">{{title}}</div>
+        <div id="bottomNavTitle" class="title" v-if="inProgressPost.title != ''">{{inProgressPost.title}}</div>
         <div class="title title-placeholder" v-else></div>
     </nav>
 
@@ -168,6 +170,8 @@ import PostElement from "./PostElement.vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import { Component, Prop } from "vue-property-decorator";
 import {Location, Dictionary} from "vue-router/types/router.d";
+import { addElement, editElement, beginPost, getCurrentPost, createPost, undo, redo, setTags, swapElements, removeElement } from "../store_modules/PostCreateService";
+
 function isBlank(str) {
     return !str || /^\s*$/.test(str);
 }
@@ -200,33 +204,28 @@ const bodyVisible = {
     components: { PostElement, FontAwesomeIcon }
 })
 export default class PostCreate extends Vue{
-    @State("create") postState;
-    @Action("setTags") setTags;
-    @Action("setTitle") setTitle;
-    @Action("createPost") createPost;
-    @Action("swapElements") swapElements;
-    @Action("removeElement") deleteElement;
-    @Action("addElement") addElement;
-    @Action("editElement") editElement;
-    @Action("storeUndo") storeUndo;
-    @Action("storeRedo") storeRedo;
-    @Action("beginPost") beginPost;
 
     @Getter("getLoggedInUser") getLoggedInUser;
 
     title: string = "";
     inProgressTag: string = "";
     tags: string[] = [];
+    
+
 
     // getters
+    get inProgressPost() {
+        return getCurrentPost(this.$store);
+    }
+
     get storeElements() {
-        return this.postState.post.elements;
+        return getCurrentPost(this.$store)!.elements;
     }
     get nextStateId() {
-        return this.postState.post.elements.length;
+        return getCurrentPost(this.$store)!.elements.length;
     }
     get hasTitle() {
-        return this.postState.post.title.length > 0;
+        return getCurrentPost(this.$store)!.title.length > 0;
     }
 
     // methods
@@ -247,24 +246,29 @@ export default class PostCreate extends Vue{
     }
     nop() {}
     removeTag(index: number) {
-        this.postState.post.tags.splice(index, 1);
+        this.tags.splice(index, 1);
+        setTags(this.$store, this.tags);
     }
-    createTag(e: any) {
+    createTagEvent(e: any) {
         if (e.keyCode === 13 && this.inProgressTag !== "") {
-            this.createTagBtn();
-            this.setTags(this.postState.post.tags);
+            this.createTag();
         }
     }
-
     createTagBtn() {
-        this.postState.post.tags.push(this.inProgressTag);
+        if(this.inProgressTag !== ""){
+            this.createTag();
+        }
+    }
+    createTag() {
+        this.tags.push(this.inProgressTag);
         this.inProgressTag = "";
+        setTags(this.$store, this.tags);
     }
     submitPost(event: any) {
         var vm = this;
         // dispatch createPost method in the store. This will send a
         // post request to the backend server.
-        this.createPost().then(function(ret) {
+        createPost(this.$store).then(function(ret: any) {
             // handle the response from the server
             if (ret === undefined) {
                 vm.$notifyDanger(
@@ -290,7 +294,7 @@ export default class PostCreate extends Vue{
         });
     }
     openEditor(index: number) {
-        var type = this.postState.post.elements[index].type;
+        var type = getCurrentPost(this.$store)!.elements[index].type;
         var routeName = "edit-";
         if (type === "text") {
             routeName += "text";
@@ -311,45 +315,44 @@ export default class PostCreate extends Vue{
     moveElementUp(index: number) {
         console.log("move element up" + index);
         if (index != 0) {
-            this.swapElements([index, index - 1]);
+            swapElements(this.$store, [index, index - 1]);
             // dispatch only allows one argument so we'll pass them as an array
         }
     }
     moveElementDown(index: number) {
         if (index != this.$store.state.create.post.elements.length - 1) {
-            this.swapElements([index, index + 1]);
+            swapElements(this.$store, [index, index + 1]);
             // dispatch only allows one argument so we'll pass them as an array
         }
     }
     removeElement(index: number) {
-        this.deleteElement(index);
+        removeElement(this.$store, index);
     }
     maxElementIndex() {
-        return this.postState.post.elements.length;
+        return getCurrentPost(this.$store)!.elements!.length;
     }
     undo() {
-        this.storeUndo();
+        undo(this.$store);
     }
     redo() {
-        this.storeRedo();
+        redo(this.$store);
     }
     created() {
-        console.log(this.getLoggedInUser);
-        this.beginPost(this.getLoggedInUser);
+        //@TODO: replace getLoggedInUser with typesafe getter from UserService.
+        beginPost(this.$store, this.getLoggedInUser);
     }
     mounted() {
         console.log("mounted post create");
-        console.log(this.postState);
         var vm: PostCreate = this;
         this.$on("submitElement", function(element: any, index: number){
             console.log("submitting element");
             console.log(element);
             console.log(index);
-            if(index == vm.postState.post.elements.length){
-                vm.addElement(element);
+            if(index == getCurrentPost(vm.$store)!.elements.length){
+                addElement(vm.$store, element);
             }
             else{
-                vm.editElement({element: element, index: index});
+                editElement(vm.$store, {element: element, index: index});
             }
             vm.$router.push({name: "create"});
         })

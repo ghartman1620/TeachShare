@@ -28,6 +28,7 @@ export default class PostDetail extends Vue {
 
 
     get postLocal(): any {
+        console.log(<Post>this.$store.getters.getPostById(this.$route.params.post_id));
         return <Post>this.$store.getters.getPostById(this.$route.params.post_id);
     }
     get postid() {

@@ -7,6 +7,8 @@ import { getStoreBuilder } from "vuex-typex"
 import Vuex, { Store, ActionContext } from "vuex"
 
 import { RootState } from "../models";
+import { getStoreAccessors } from "vuex-typescript";
+
 
 // import { storeBuilder } from "../../store";
 
@@ -39,17 +41,6 @@ export const mutations = {
     },
     SET_TITLE: (state: PostState, newTitle: string) => {
         state.post!.setTitle(newTitle);
-    },
-    REMOVE_ATTACHMENT: (state: PostState, attachment: any) => {
-        let ind = state.post!.attachments.findIndex(function (val) {
-            return val === attachment.id;
-        });
-        if (ind !== -1) {
-            state.post!.attachments.splice(ind, 1);
-        }
-    },
-    ADD_ATTACHMENT: (state: PostState, attachment: any) => {
-        state.post!.attachments.push(attachment.id);
     },
     UNDO: (state: PostState) => {
         state.doneMutations.pop();
@@ -140,7 +131,9 @@ export const mutations = {
 
 export const actions = {
     beginPost: (context: PostContext, user: User) => {
-        context.commit("BEGIN_POST", user);
+        context.state.post = undefined;
+        mutBeginPost(context, user);
+        // context.commit("BEGIN_POST", user);
     },
     setTags: (context: PostContext, tags: string[]) => {
         context.commit("SET_TAGS", tags);
@@ -260,6 +253,7 @@ export const actions = {
 }
 
 const PostCreateService = {
+    namespaced: true,
     state: state,
     mutations: mutations,
     actions: actions,
@@ -268,9 +262,12 @@ const PostCreateService = {
         getTitle: (state: PostState) => state.post!.title,
         getContent: (state: PostState) => state.post!.elements,
         getCurrentPost: (state: PostState) => state.post,
-        getCurrentPostId: (state, getters) => {
+        getCurrentPostId: (state: PostState, getters) => {
+            console.log("in get current post id");
             if (state.post !== null) {
-                return getters.getCurrentPost.pk;
+                console.log("returning a number");
+                console.log(state.post);
+                return state.post!.pk;
             }
             return null;
         },
@@ -279,3 +276,78 @@ const PostCreateService = {
 };
 
 export default PostCreateService;
+
+/**
+ * Type safe definitions for FileService
+ */
+const { commit, read, dispatch } = getStoreAccessors<PostState, RootState>(
+    "create"
+);
+
+/**
+ * Action Handlers
+ */
+export const addElement = dispatch(PostCreateService.actions.addElement);
+export const beginPost = dispatch(PostCreateService.actions.beginPost);
+export const setTags = dispatch(PostCreateService.actions.setTags);
+export const setTitle = dispatch(PostCreateService.actions.setTitle);
+export const undo = dispatch(PostCreateService.actions.undo);
+export const redo = dispatch(PostCreateService.actions.redo);
+export const swapElements = dispatch(PostCreateService.actions.swapElements);
+export const removeElement = dispatch(PostCreateService.actions.removeElement);
+export const removeAttachments = dispatch(
+    PostCreateService.actions.removeAttachments
+);
+export const addAttachments = dispatch(
+    PostCreateService.actions.addAttachments
+);
+export const editElement = dispatch(PostCreateService.actions.editElement);
+export const saveDraft = dispatch(PostCreateService.actions.saveDraft);
+export const createPost = dispatch(PostCreateService.actions.createPost);
+
+/**
+ * Getter Handlers
+ */
+export const getTags = read(PostCreateService.getters.getTags);
+export const getTitle = read(PostCreateService.getters.getTitle);
+export const getContent = read(PostCreateService.getters.getContent);
+export const getCurrentPost = read(PostCreateService.getters.getCurrentPost);
+export const getCurrentPostId = read(
+    PostCreateService.getters.getCurrentPostId
+);
+export const postElements = read(PostCreateService.getters.postElements);
+
+/**
+ * Mutations Handlers
+ *
+ * This also makes them really easily testable.
+ */
+
+export const mutAddElement = commit(PostCreateService.mutations.ADD_ELEMENT);
+export const mutBeginPost = commit(PostCreateService.mutations.BEGIN_POST);
+export const mutClearRedo = commit(PostCreateService.mutations.CLEAR_REDO);
+export const mutEditElement = commit(PostCreateService.mutations.EDIT_ELEMENT);
+export const mutRedo = commit(PostCreateService.mutations.REDO);
+
+export const mutRemoveElement = commit(
+    PostCreateService.mutations.REMOVE_ELEMENT
+);
+export const mutSaveDraft = commit(PostCreateService.mutations.SAVE_DRAFT);
+export const mutSetTags = commit(PostCreateService.mutations.SET_TAGS);
+export const mutSetTitle = commit(PostCreateService.mutations.SET_TITLE);
+export const mutSwapElements = commit(
+    PostCreateService.mutations.SWAP_ELEMENTS
+);
+export const mutUndo = commit(PostCreateService.mutations.UNDO);
+export const mutUndoAddElement = commit(
+    PostCreateService.mutations.UNDO_ADD_ELEMENT
+);
+export const mutUndoEditElement = commit(
+    PostCreateService.mutations.UNDO_EDIT_ELEMENT
+);
+export const mutUndoRemoveElement = commit(
+    PostCreateService.mutations.UNDO_REMOVE_ELEMENT
+);
+export const mutUndoSwapElements = commit(
+    PostCreateService.mutations.UNDO_SWAP_ELEMENTS
+);

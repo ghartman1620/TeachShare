@@ -19,17 +19,18 @@ export const mutations = {
     LOAD_ALL_POSTS: (state, data) => {
         state.posts = data;
     },
-    LOAD_POST: (state, data) => {
+    LOAD_POST: (state: RootState, data: Post) => {
         if (data !== undefined) {
-            let index = state.posts.findIndex(function(val, ind, obj) {
+            let index = state.posts.findIndex(function(val: Post, ind: number, obj: Post[]) {
                 if (val.pk === data.pk) {
-                    return true;
+                    return <boolean>true;
                 }
+                return <boolean>false;
             });
             if (index === -1) {
                 state.posts.push(data);
             } else {
-                state.posts.splice(index, data);
+                state.posts.splice(index, 1, data);
             }
         }
     },
@@ -186,6 +187,7 @@ export const getters = {
         return state.users;
     }
 };
+
 
 const store: StoreOptions<RootState> = {
     state: {

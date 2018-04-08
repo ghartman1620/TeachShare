@@ -51,6 +51,7 @@ import * as faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
 import * as faUserCircle from "@fortawesome/fontawesome-free-solid/faUserCircle";
 import * as faArrowLeft from "@fortawesome/fontawesome-free-solid/faArrowLeft";
 import * as faArrowRight from "@fortawesome/fontawesome-free-solid/faArrowRight";
+import * as faSpinner from "@fortawesome/fontawesome-free-solid/faSpinner";
 
 fontawesome.library.add(
     faPlus,
@@ -59,6 +60,7 @@ fontawesome.library.add(
     faCheck,
     faTimes,
     faEdit,
+    faSpinner,
     faUserCircle,
     faArrowLeft,
     faArrowRight

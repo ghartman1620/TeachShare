@@ -1,6 +1,8 @@
 import Vue from "vue";
 import User from "./user";
 import api from "./api";
+import {Post} from "./models";
+import store from "./store";
 interface PostElement{
     type: string;
 }
@@ -20,18 +22,26 @@ export default class InProgressPost{
     title: string;
     tags: string[];
     userPk: number;
-    attachments: any[];
     pk: number = -1; //-1 if post is not yet saved as draft
 
+    /*
+        Creates an InProgressPost for the User. If the User has data saved on the last post they edited
+        it will fill out that information, otherwise it will create a new post.
+    */ 
     constructor(user: User){
+        
+        //Create new draft
         this.elements = [];
         this.title = "";
         this.tags = [];
         this.userPk = user.pk;
-        this.attachments = [];
         console.log(user);
         console.log("new post constructor");
-        this.createDraft();
+        this.createNewDraft();
+
+
+
+
         
     }
     setTags(tags: string[]): void {
@@ -40,9 +50,7 @@ export default class InProgressPost{
     setTitle(title: string): void {
         this.title = title;
     }
-    setAttachments(attachments: any[]): void {
-        this.attachments = attachments;
-    }
+
 
     addElement(element: any): void{
         this.elements.push(element);
@@ -68,7 +76,7 @@ export default class InProgressPost{
         }
         console.log(print);
     }
-    createDraft(){
+    createNewDraft(){
         
         var post: InProgressPost = this;
         var obj = this.json(true);
@@ -86,7 +94,6 @@ export default class InProgressPost{
             likes: 0,
             comments: [],
             tags: this.tags,
-            attachments: this.attachments,
             content_type: 0,
             grade: 0,
             length: 0,
