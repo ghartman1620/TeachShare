@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { mutations } from "../../../src/store";
+import { mutations } from "../../../src/store_modules/PostService";
 
 console.log("MUTATIONS: ", Object.keys(mutations));
 const { LOAD_ALL_POSTS, LOAD_POST } = mutations;

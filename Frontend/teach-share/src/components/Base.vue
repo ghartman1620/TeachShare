@@ -15,6 +15,7 @@ import NavBar from "./Navbar.vue";
 import Notify from "./Notify.vue";
 import { addUser, setUser, fetchUser } from "../store_modules/UserService";
 // import Image from "./image/Image";
+import IDBStore from "../indexedDBStore";
 
 import Component from 'vue-class-component'
 
@@ -55,6 +56,9 @@ export default class Base extends Vue {
     // }
 
     mounted() {
+        let idbs = new IDBStore("default", 1);
+        // console.log("[IDBSTORE]: ", idbs);
+
         if (document.cookie !== "") {
             let uid = document.cookie.match(new RegExp("(?:pk=(?<pk>[^;]+))"));
             if (typeof uid !== "undefined") {
