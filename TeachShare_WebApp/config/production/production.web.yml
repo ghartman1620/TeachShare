@@ -1,0 +1,18 @@
+FROM python:3.6
+ENV PYTHONUNBUFFERED 1
+RUN mkdir /code
+WORKDIR /code
+ADD requirements.txt /code/
+
+# static files:
+# (media will be similar method)
+# ADD static/. /code/TeachShare_WebApp/static/.
+
+RUN pip install -r requirements.txt
+ADD . /code/
+
+# make it visible
+EXPOSE 8000
+
+# run it
+CMD ["./config/production/run.web.sh"]

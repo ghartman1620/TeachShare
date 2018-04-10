@@ -1,0 +1,23 @@
+# NOT CURRENTLY USED
+apiVersion: "extensions/v1beta1"
+kind: "Deployment"
+metadata:
+  name: "teach-web"
+  namespace: "default"
+  labels:
+    app: "teach-web"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "teach-web"
+  template:
+    metadata:
+      labels:
+        app: "teach-web"
+    spec:
+      containers:
+      - name: "teachshare-web"
+        image: "gcr.io/teach-share-200700/teachshare_web:v1"
+        command:
+        - "python"

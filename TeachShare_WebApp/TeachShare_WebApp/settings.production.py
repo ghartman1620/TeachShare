@@ -182,13 +182,17 @@ WSGI_APPLICATION = 'TeachShare_WebApp.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'teachshare',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'password123',
+    #     'HOST': 'db',
+    #     'PORT': '5432',
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'teachshare',
-        'USER': 'postgres',
-        'PASSWORD': 'password123',
-        'HOST': 'db',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'mydatabase',
     }
 }
 
