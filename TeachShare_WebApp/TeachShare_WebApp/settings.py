@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'django_filters',
-    'django_elasticsearch_dsl',
+    # 'django_elasticsearch_dsl',
 
     'accounts',
     'posts',
@@ -64,15 +64,15 @@ INSTALLED_APPS = [
 ElasticSearch-DSL Django settings
     - Signal Processor is temporary, will likely increase server load
 """
-ELASTICSEARCH_DSL = {
-    'default': {
-        'hosts': 'search:9200'
-    },
-}
+# ELASTICSEARCH_DSL = {
+#     'default': {
+#         'hosts': 'search:9200'
+#     },
+# }
 # TEMPORARY: will cause unneccesary load on the server but simplifies things for now.
 # ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = 'django_elasticsearch_dsl.signals.RealTimeSignalProcessor'
-ELASTICSEARCH_DSL_AUTOSYNC = False
-ELASTICSEARCH_DSL_AUTO_REFRESH = False
+# ELASTICSEARCH_DSL_AUTOSYNC = False
+# ELASTICSEARCH_DSL_AUTO_REFRESH = False
 
 """
 Django Cache Backend Settings (Redis):
@@ -182,13 +182,17 @@ WSGI_APPLICATION = 'TeachShare_WebApp.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'teachshare',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'password123',
+    #     'HOST': 'db',
+    #     'PORT': '5432',
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'teachshare',
-        'USER': 'postgres',
-        'PASSWORD': 'password123',
-        'HOST': 'db',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'mydatabase',
     }
 }
 
@@ -228,7 +232,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-STATIC_URL = '/static/'
+STATIC_URL = 'http://storage.googleapis.com/teachshare-django-static/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, '', 'static')
 
 # Media files
