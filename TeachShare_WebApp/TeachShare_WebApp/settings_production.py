@@ -25,7 +25,8 @@ SECRET_KEY = '(6dlx)23)(a%%g=8qs0b37$b+mqro=3d!i0f$mo@n4s+r*z)tt'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['testserver', '127.0.0.1', 'localhost', 'web', '35.197.62.167']
+ALLOWED_HOSTS = ['testserver', '127.0.0.1',
+                 'localhost', 'web', '35.197.62.167']
 
 
 EMAIL_USE_TLS = True
@@ -64,11 +65,11 @@ INSTALLED_APPS = [
 ElasticSearch-DSL Django settings
     - Signal Processor is temporary, will likely increase server load
 """
-ELASTICSEARCH_DSL = {
-    'default': {
-        'hosts': 'search:9200'
-    },
-}
+# ELASTICSEARCH_DSL = {
+#     'default': {
+#         'hosts': 'search:9200'
+#     },
+# }
 # TEMPORARY: will cause unneccesary load on the server but simplifies things for now.
 # ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = 'django_elasticsearch_dsl.signals.RealTimeSignalProcessor'
 ELASTICSEARCH_DSL_AUTOSYNC = False
@@ -82,7 +83,7 @@ Django Cache Backend Settings (Redis):
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://redis:6379/0',
+        'LOCATION': 'redis://10.55.254.123:6379/0',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'SERIALIZER': 'django_redis.serializers.msgpack.MSGPackSerializer',
@@ -93,8 +94,8 @@ DJANGO_REDIS_IGNORE_EXCEPTIONS = True
 
 
 # CELERY:
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_BROKER_URL = 'redis://10.55.254.123:6379/0'
+CELERY_RESULT_BACKEND = 'redis://10.55.254.123:6379/0'
 CELERY_TASK_SERIALIZER = 'msgpack'
 CELERY_ACCEPT_CONTENT = ['msgpack']
 CELERY_RESULT_SERIALIZER = 'msgpack'
@@ -177,7 +178,7 @@ WSGI_APPLICATION = 'TeachShare_WebApp.wsgi.application'
 
 # cloud db password:
 # ItOgp9BvK6jNwmEz
-# 
+#
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
