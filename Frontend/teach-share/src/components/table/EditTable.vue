@@ -2,20 +2,32 @@
 <div>
     <b-card>
         <b-form>
-            <b-form-input v-model.number="rowNum" type="number" placeholder="Enter the number of rows for the table" @change="tableResize()">
-            </b-form-input>
+            <div class="modal-body row">
+                <div class="colRowLabel col-md-3">
+                    <span><h5><strong>Number of rows:</strong></h5></span>
+                </div>
+                <div class="colRowInput">
+                    <b-form-input v-model.number="rowNum" type="number" placeholder="Enter the number of rows for the table" @change="tableResize()">
+                    </b-form-input>
+                </div>
+                <div class="colRowLabel col-md-3">
+                    <span><h5><strong>Number of columns: </strong></h5></span>
+                </div>
 
-            <b-form-input v-model.number="colNum" type="number" placeholder="Enter the number of columns for the table" @change="tableResize()">
-            </b-form-input>
-
-            <b-form-input v-model="colLabels" type="text" placeholder="Enter the names of the column labels" @change="tableCreate()">
-            </b-form-input>
-
+                <div class="colRowInput">
+                    <b-form-input v-model.number="colNum" type="number" placeholder="Enter the number of columns for the table" @change="tableResize()">
+                    </b-form-input>
+                </div>
+            </div>
+                <div>
+                <b-form-input v-model="colLabels" type="text" placeholder="Enter the names of the column labels" @change="tableCreate()">
+                </b-form-input>
+                </div>
             <b-container>
                 <b-row v-for="rows in rowNum">
-                   <b-col v-for="cols in colNum "> 
+                    <b-col v-for="cols in colNum "> 
                         <b-form-input class="tableEntry" v-model="cellIn[rows - 1] [cols - 1]" type="text" placeholder="Enter a data value or label" @change="tableCreate()">
-                       </b-form-input>
+                        </b-form-input>
                     </b-col>
                 </b-row>
             </b-container>
@@ -43,6 +55,7 @@
 
 <script>
 import Vue from "vue";
+import ChartData from "./ChartData";
 
 export default Vue.component("edit-table", {
     data() {
@@ -70,6 +83,7 @@ export default Vue.component("edit-table", {
         tableCreate(){
             this.header = new Array(this.colNum);
             this.header = this.colLabels.split(",");
+            console.log("column labels split: ", this.header);
             this.table = new Array(this.rowNum);
             for(var r = 0; r < this.rowNum; r++){
                 var obj = {};
@@ -102,8 +116,13 @@ export default Vue.component("edit-table", {
 </script>
 
 <style lang="scss" scoped>
+    .colRowLabel {
+        padding-top: 5px;
+    }
+    .colRowInput {
+        width: 60px;
+    }
     .tableEntry{
         width: 50px;
     }
 </style>
-
