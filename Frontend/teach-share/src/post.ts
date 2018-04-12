@@ -18,6 +18,12 @@ export class InProgressPost{
     /*
 
     */ 
+   
+    //@TODO: instead of dealing with window localstorage here this should accept
+    //a post model as a parameter. Then window local storage should be delt with in PostCreate.
+    //This is currently bad design - what if some module that doens't care about the state of local storage 
+    //(for example, when we go to allow users to integrate elements of another user's post into their own)
+    //wants to use InProgressPost?
     constructor(user: User){
         var inProgressPost: string | null = window.localStorage.getItem("inProgressPost");
         if(inProgressPost === null){

@@ -27,7 +27,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Notify from "../Notify";
+import Notify from "../Notify.vue";
 
 import { Component, Prop } from "vue-property-decorator";
 import {

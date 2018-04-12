@@ -235,7 +235,7 @@ export default class PostCreate extends Vue{
     LOADING = PostStatus.Loading;
     SAVED = PostStatus.Saved;
 
-    title: string = "";
+    title: string = ""; //@TODO: make changes to title a store mutation that is saved and can be undone/redone
     inProgressTag: string = "";
     tags: string[] = [];
     userPosts: any[] = [];
@@ -277,6 +277,7 @@ export default class PostCreate extends Vue{
     }
     nop() {}
     removeTag(index: number) {
+        //@TODO: make tag changes a store mutation that can be undone/redone
         this.tags.splice(index, 1);
         setTags(this.$store, this.tags);
     }
