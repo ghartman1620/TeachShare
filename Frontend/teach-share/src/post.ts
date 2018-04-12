@@ -24,59 +24,60 @@ export class InProgressPost{
     //This is currently bad design - what if some module that doens't care about the state of local storage 
     //(for example, when we go to allow users to integrate elements of another user's post into their own)
     //wants to use InProgressPost?
-    constructor(user: User){
-        var inProgressPost: string | null = window.localStorage.getItem("inProgressPost");
-        if(inProgressPost === null){
-            //Create new draft
+
+    //Theorem: I do not like JS.
+    //Proof:
+    //I like overloading. Overloading is my friend.
+    //JS does not like overloading. Overloading is JS' enemy
+    //The enemy of my friend is my enemy.
+    //Therefore, JS is my enemy. I do not like JS.
+    //QED
+
+    constructor(userid: number);
+            //every single time i go to write something in this programming language js is like 
+            //You THOUGHT you wanted to do that regular thing but you ACTUlly wanted to do this stupid thing
+            //that nobody would possibly want to do but I want to do it because i'm an obtuse bad programming language.
+            //Why does typeof return a string? who knows.
+            //Who can't typeof find out the class type of an object? The function dispatcher seems to be able to.
+            //Why doi I have to ask all these questions of the programming language and why didn't the people
+            //writing the language ask themselves this?
+            //I don't know.
+    constructor(userid: number, postid: number);
+    constructor(userid: number, postid?: number){
+        if (typeof postid !== "undefined"){ //there's a postid and a user
+            console.log("WE'RE GETTING A PREVIOUSLY EDITED POST!");
+            // we're going to get that post and populate our InProgressPost with it
+            //@TODO: use the Post model and store.ts. At the time of writing store.ts is being worked on
+            //and I don't want to use it as a dependency while its being changed.
             this.elements = [];
             this.title = "";
             this.tags = [];
-            this.userPk = user.pk;
+            this.userPk = userid;
+            var post: InProgressPost = this;
+            this.status = PostStatus.Loading;
+            this.draft = false;
+            post.pk = postid;
+            api.get("/posts/"+ postid).then(function(response){
+                console.log(response);
+                
+                post.elements = response.data.content;
+                post.title = response.data.title;
+                post.draft = response.data.draft;
+                post.tags = response.data.tags;
+                post.status = PostStatus.Saved;
+            })
+            console.log("returning from post constructor");
+        }
+        else {//there's a user, lets make a new post
+            console.log("WE'RE MAKING A NEW POST!");
+            this.elements = [];
+            this.title = "";
+            this.tags = [];
+            this.userPk = userid;
             this.status = PostStatus.Saving;
             this.draft = true;
             this.createNewDraft();
-            
         }
-        else{
-            var postid: number = parseInt(inProgressPost);
-            if(postid == NaN){ //this shouldn't happen, but if it does I suppose we can be prepared
-                this.elements = [];
-                this.title = "";
-                this.tags = [];
-                this.userPk = user.pk;
-                this.status = PostStatus.Saving;
-                this.draft = true;
-                this.createNewDraft();
-            }
-            else{
-                console.log("WE'RE GETTING A PREVIOUSLY EDITED POST!");
-                // we're going to get that post and populate our InProgressPost with it
-                //@TODO: use the Post model and store.ts. At the time of writing store.ts is being worked on
-                //and I don't want to use it as a dependency while its being changed.
-                this.elements = [];
-                this.title = "";
-                this.tags = [];
-                this.userPk = user.pk;
-                var post: InProgressPost = this;
-                this.status = PostStatus.Loading;
-                this.draft = false;
-                post.pk = postid;
-                api.get("/posts/"+ postid).then(function(response){
-                    console.log(response);
-                    
-                    post.elements = response.data.content;
-                    post.title = response.data.title;
-                    post.draft = response.data.draft;
-                    post.tags = response.data.tags;
-                    post.status = PostStatus.Saved;
-                })
-                console.log("returning from post constructor");
-            }
-        }
-
-
-
-        
     }
     setTags(tags: string[]): void {
         this.tags = tags;

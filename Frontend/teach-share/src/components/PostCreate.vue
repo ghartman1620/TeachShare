@@ -194,6 +194,7 @@ import {Location, Dictionary} from "vue-router/types/router.d";
 import api from "../api";
 import { addElement, editElement, beginPost, getCurrentPost, createPost, undo, redo, setTags, swapElements, removeElement } from "../store_modules/PostCreateService";
 import SideBar from "./SideBar.vue";
+import {User} from "../models";
 
 function isBlank(str) {
     return !str || /^\s*$/.test(str);
@@ -240,6 +241,9 @@ export default class PostCreate extends Vue{
     tags: string[] = [];
     userPosts: any[] = [];
     
+    get currentPost(): InProgressPost | undefined {
+        return getCurrentPost(this.$store);
+    }
 
     get postStatus(): PostStatus {
         return getCurrentPost(this.$store)!.status;
@@ -351,7 +355,11 @@ export default class PostCreate extends Vue{
         console.log("EDITING POST...");
         console.log(post);
         window.localStorage.setItem("inProgressPost", post.pk);
-        beginPost(this.$store, this.getLoggedInUser);
+        var user: User = <User>this.getLoggedInUser;
+        beginPost(this.$store, {
+            userid: <number>user.pk, 
+            id: <number>post.pk
+        });
     }
 
     moveElementUp(index: number) {
@@ -394,7 +402,20 @@ export default class PostCreate extends Vue{
     }
     created() {
         console.log(this.getLoggedInUser);
-        beginPost(this.$store, this.getLoggedInUser);
+        var inProgressPost = window.localStorage.getItem("inProgressPost");
+        console.log(inProgressPost);
+        if(inProgressPost == undefined){
+            beginPost(this.$store, {
+                userid: this.getLoggedInUser.pk,
+                id: undefined
+            });
+        }
+        else{
+            beginPost(this.$store, {
+                userid: this.getLoggedInUser.pk,
+                id: parseInt(<string>inProgressPost)
+            })
+        }
         this.getUserPosts();
         
     }

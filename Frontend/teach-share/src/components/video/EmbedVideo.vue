@@ -26,12 +26,10 @@
     </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from "vue";
-import { Component, Prop } from "vue-property-decorator";
 
-@Component({
-  name: "embed-video",
+export default Vue.component("embed-video", {
   props: [
     "id",
     "autoplay",
@@ -43,63 +41,57 @@ import { Component, Prop } from "vue-property-decorator";
     "playlist",
     "loop"
   ],
-})
-export default class EmbedVideo extends Vue {
-  @Prop({}) id;
-  @Prop({}) autoplay;
-  @Prop({}) width;
-  @Prop({}) height;
-  @Prop({}) controls;
-  @Prop({}) title;
-  @Prop({}) source;
-  @Prop({}) playlist;
-  @Prop({}) loop;
-  
-  textClasses: string[] = ["card-text"];
-  textShown: boolean = false;
-  cardWidth() {
-    return parseInt(this.width) + 20;
-  }
-  aspectRatioClass() {
-    var ratio = this.width / this.height;
-    // all the ratios are fudged down slightly to make the ratios match up more closely to
-    // values that are 'in-between'.
-    if (ratio >= 19 / 9) {
-      return "embed-responsive embed-responsive-21by9";
-    } else if (ratio >= 14 / 9) {
-      return "embed-responsive embed-responsive-16by9";
-    } else if (ratio >= 7 / 6) {
-      return "embed-responsive embed-responsive-4by3";
-    } else {
-      return "embed-responsive embed-responsive-1by1";
-    }
-  }
-  actualSource() {
-    var temp = this.source;
-    var url = new URL(this.source);
-    var params = url.searchParams;
-
-    let videoID = params.get("v");
-
-    if (this.playlist) {
-      params.append("playlist", this.playlist);
-    }
-    if (this.autoplay) {
-      params.append("autoplay", "1");
-    }
-    if (this.loop) {
-      params.append("loop", "1");
-    }
-    if (this.controls) {
-      if (this.controls === true) {
-        params.append("controls", "1");
+  data() {
+    return {
+      textClasses: ["card-text"],
+      textShown: false
+    };
+  },
+  computed: {
+    cardWidth: function() {
+      return parseInt(this.width) + 20;
+    },
+    aspectRatioClass: function() {
+      var ratio = this.width / this.height;
+      // all the ratios are fudged down slightly to make the ratios match up more closely to
+      // values that are 'in-between'.
+      if (ratio >= 19 / 9) {
+        return "embed-responsive embed-responsive-21by9";
+      } else if (ratio >= 14 / 9) {
+        return "embed-responsive embed-responsive-16by9";
+      } else if (ratio >= 7 / 6) {
+        return "embed-responsive embed-responsive-4by3";
       } else {
-        params.append("controls", "0");
+        return "embed-responsive embed-responsive-1by1";
       }
+    },
+    actualSource() {
+      var temp = this.source;
+      var url = new URL(this.source);
+      var params = url.searchParams;
+
+      let videoID = params.get("v");
+
+      if (this.playlist) {
+        params.append("playlist", this.playlist);
+      }
+      if (this.autoplay) {
+        params.append("autoplay", "1");
+      }
+      if (this.loop) {
+        params.append("loop", "1");
+      }
+      if (this.controls) {
+        if (this.controls === true) {
+          params.append("controls", "1");
+        } else {
+          params.append("controls", "0");
+        }
+      }
+      return `https://youtube.com/embed/${videoID}`;
     }
-    return `https://youtube.com/embed/${videoID}`;
-  }
-};
+  },
+});
 </script>
 
 <style lang="scss" scoped>

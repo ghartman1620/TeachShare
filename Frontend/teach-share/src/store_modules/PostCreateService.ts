@@ -25,6 +25,10 @@ interface EditedElement {
     element: any;
     index: number;
 }
+interface BeginPostObj {
+    userid: number;
+    id?: number;
+}
 
 type PostContext = ActionContext<PostState, IRootState>;
 
@@ -123,15 +127,20 @@ export const mutations = {
     SAVE_DRAFT: (state: PostState) => {
         state.post!.saveDraft();
     },
-    BEGIN_POST: (state: PostState, user: User) => {
-        state.post = new InProgressPost(user);
+    BEGIN_POST: (state: PostState, arg: BeginPostObj) => {
+        if(arg.id == undefined){
+            state.post = new InProgressPost(arg.userid);
+        }
+        else{
+            state.post = new InProgressPost(arg.userid, <number>arg.id);
+        }
     }
 };
 
 export const actions = {
-    beginPost: (context: PostContext, user: User) => {
+    beginPost: (context: PostContext, arg: BeginPostObj) => {
         context.state.post = undefined;
-        mutBeginPost(context, user);
+        mutBeginPost(context, arg);
         // context.commit("BEGIN_POST", user);
     },
     setTags: (context: PostContext, tags: string[]) => {
