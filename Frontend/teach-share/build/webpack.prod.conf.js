@@ -16,6 +16,7 @@ const env = process.env.NODE_ENV === 'testing'
   : require('../config/prod.env')
 
 const webpackConfig = merge(baseWebpackConfig, {
+  
   module: {
     rules: utils.styleLoaders({
       sourceMap: config.build.productionSourceMap,

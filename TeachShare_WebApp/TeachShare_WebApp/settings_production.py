@@ -183,14 +183,15 @@ WSGI_APPLICATION = 'TeachShare_WebApp.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': 'teachshare',
-    #     'USER': 'postgres',
-    #     'PASSWORD': 'password123',
-    #     'HOST': 'db',
-    #     'PORT': '5432',
-    # }
+    # this is the google cloud SQL (postgresql) store connection settings
+    #   TODO: So much...
+    'google': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'HOST': '/cloudsql/teach-share-200700:us-west1:teach-db',
+            'NAME': 'teach',
+            'USER': 'teachsharer',
+            'PASSWORD': 'thisisabadpasasword123',
+    },
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'mydatabase',
@@ -233,6 +234,17 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
+
+# This is the django cloud storage static files url
+# 
+# TODO: We need to find a way to automate:
+#   1.) Collect static files
+#   2.) Upload static files
+#    ... do the same for MEDIA files as well to allow for uploads. Would also need to
+#        fix uploads to go to the google cloud storage engine or live with /media
+#        existing in the kubernetes node and not garuanteeing persistence for
+#        long periods of time.
+# 
 STATIC_URL = 'http://storage.googleapis.com/teachshare-django-static/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, '', 'static')
 

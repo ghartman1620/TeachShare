@@ -10,18 +10,18 @@
             <h2></h2>
             <div class="round-button" id="text-icon">
                 <router-link :to="{ name: 'edit-text', query: {index: this.maxElementIndex()}}">
-                    <img src="/static/text-button.png"
-                                onmouseover="this.src='/static/text-button-hover.png'"
-                                onmouseout="this.src='/static/text-button.png'">
+                    <img src="static/text-button.png"
+                                onmouseover="this.src='static/text-button-hover.png'"
+                                onmouseout="this.src='static/text-button.png'">
                 </router-link>
             </div>
             <h2></h2>
 
             <div class="round-button" id="video-icon">
                 <router-link :to="{name: 'edit-video', query: {index: this.maxElementIndex(), videotype: 'embed'}}">
-                    <img src="/static/video-button.png"
-                                onmouseover="this.src='/static/video-button-hover.png'"
-                                onmouseout="this.src='/static/video-button.png'">
+                    <img src="static/video-button.png"
+                                onmouseover="this.src='static/video-button-hover.png'"
+                                onmouseout="this.src='static/video-button.png'">
 
                 </router-link>
             </div>
@@ -29,24 +29,24 @@
 
             <div class="round-button" id="audio-icon">
                 <router-link :to="{name: 'edit-audio', query: {index: this.maxElementIndex()}}">
-                    <img src="/static/audio-button.png"
-                                onmouseover="this.src='/static/audio-button-hover.png'"
-                                onmouseout="this.src='/static/audio-button.png'">
+                    <img src="static/audio-button.png"
+                                onmouseover="this.src='static/audio-button-hover.png'"
+                                onmouseout="this.src='static/audio-button.png'">
                 </router-link>
             </div>
             <h2></h2>
 
             <div class="round-button" id="image-icon">
                 <router-link :to="{name: 'edit-image', query: {index: this.maxElementIndex()}}">
-                    <img src="/static/image-button.png" >
+                    <img src="static/image-button.png" >
                 </router-link>
             </div>
 
             <div class="round-button" id="file-icon">
                 <router-link :to="{name: 'edit-file', query: {index: this.maxElementIndex()}}">
-                    <img src="/static/file-button.png"
-                                onmouseover="this.src='/static/file-button-hover.png'"
-                                onmouseout="this.src='/static/file-button.png'">
+                    <img src="static/file-button.png"
+                                onmouseover="this.src='static/file-button-hover.png'"
+                                onmouseout="this.src='static/file-button.png'">
                 </router-link>
             </div>
         </div>
@@ -109,10 +109,10 @@
                     <div class="justify-content-start">
                         <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
 
-                            <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
-                            <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="/static/caret-square-down.png"></button>
-                            <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button>
-                            <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="/static/edit-icon.png"></button>
+                            <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="static/caret-square-up.png"></button>
+                            <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="static/caret-square-down.png"></button>
+                            <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="static/trash-icon.png"></button>
+                            <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="static/edit-icon.png"></button>
 
                         </div>
                     </div>
