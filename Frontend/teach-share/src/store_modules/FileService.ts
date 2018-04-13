@@ -1,15 +1,14 @@
-import axios from "axios"
-import v4 from "uuid/v4";
+import axios from "axios";
 import reduce from "lodash/reduce";
+import v4 from "uuid/v4";
 import Vue from "vue";
 import { ActionContext, Store } from "vuex";
 import { getStoreAccessors } from "vuex-typescript";
 
 import api from "../api";
 import { GenericFile, IRootState, ModelMap, NotifyType } from "../models";
-
 import { sendNotification } from "../store_modules/NotificationService";
-import { saveDraft } from './PostCreateService';
+import { getCurrentPostId } from "./PostCreateService";
 
 export interface FileState {
     files?: ModelMap<GenericFile>;
@@ -40,11 +39,13 @@ const state: FileState = {
  */
 export const upload_file = async (ctx, files: File[]) => {
     console.log(ctx, files);
+    let postid = undefined;
     try {
         // @TODO: get type safe definition for this.
-        const postid = await saveDraft(ctx);
+        postid = getCurrentPostId(ctx);
     } catch (err) {
         console.log(err);
+        return err;
     }
 
     let i: number = 0;
@@ -56,8 +57,6 @@ export const upload_file = async (ctx, files: File[]) => {
              * @changed: ==, ===
              * Test whether or not a file is already uploaded.
              */
-            console.log("element", element);
-            console.log("file", file);
             if (ctx.state.files.get(element).file.name === file.name) {
                 fileAlreadyUploaded = true;
             }
@@ -83,12 +82,6 @@ export const upload_file = async (ctx, files: File[]) => {
                         url: undefined,
                         name: file.name
                     });
-                    // ctx.commit("UPDATE", {
-                    //     percent,
-                    //     file,
-                    //     pk: id,
-                    //     cancel
-                    // });
                 },
                 cancelToken: cancel.token
             };
@@ -97,9 +90,7 @@ export const upload_file = async (ctx, files: File[]) => {
                  * make request
                  */
                 const response = await api.put(
-                    `upload/${file.name}?id=${id}&post=${
-                        ctx.rootGetters.getCurrentPostId
-                    }`,
+                    `upload/${file.name}?id=${id}&post=${postid}`,
                     file,
                     config
                 );
@@ -108,12 +99,11 @@ export const upload_file = async (ctx, files: File[]) => {
                     100,
                     file,
                     undefined,
-                    response.data.url,
-                )
+                    response.data.url
+                );
                 // update the current uploaded file object
                 console.log(fileResponse);
                 mutUpdate(ctx, fileResponse);
-                // ctx.commit("UPDATE", response);
             } catch (error) {
                 /**
                  * Uh-oh! there was an error in the axios request, while
@@ -121,9 +111,15 @@ export const upload_file = async (ctx, files: File[]) => {
                  */
                 console.log(error);
                 if (axios.isCancel(error)) {
-                    sendNotification(ctx, { type: NotifyType.warning, content: `Upload canceled! ${error}.` });
+                    sendNotification(ctx, {
+                        type: NotifyType.warning,
+                        content: `Upload canceled! ${error}.`
+                    });
                 } else {
-                    sendNotification(ctx, { type: NotifyType.danger, content: `Error uploading file! ${error}` });
+                    sendNotification(ctx, {
+                        type: NotifyType.danger,
+                        content: `Error uploading file! ${error}`
+                    });
                 }
                 mutDelete(ctx, id);
             }
@@ -216,7 +212,6 @@ export const mutations = {
         if (typeof data.pk !== "undefined") {
             Vue.set(state.files!.data, data.pk, data);
         }
-
     },
 
     /**
@@ -259,12 +254,12 @@ export const mutations = {
  * Getters - used for calculating/'getting' values based on the state.
  */
 export const getters = {
-    files: (ctx) => ctx.files,
-    filesUploadStatus: (ctx) => ctx.files.data,
-    allFilesUploadComplete: (ctx) => {
+    files: ctx => ctx.files,
+    filesUploadStatus: ctx => ctx.files.data,
+    allFilesUploadComplete: ctx => {
         if (ctx.files.length > 0) {
             const oneHundredPercent = ctx.files.keys.every(
-                (val) => ctx.files.get(val).percent === 100
+                val => ctx.files.get(val).percent === 100
             );
             const hasURL = reduce(
                 ctx.files.keys,
@@ -280,13 +275,13 @@ export const getters = {
         }
         return false;
     },
-    has_files: (ctx) => {
+    has_files: ctx => {
         return ctx.files.length > 0;
     },
-    past_limit: (ctx) => {
+    past_limit: ctx => {
         return ctx.files.length >= ctx.limit;
     },
-    get: (ctx) => (id: string): GenericFile => {
+    get: ctx => (id: string): GenericFile => {
         return ctx.files.get(id);
     }
 };
@@ -326,7 +321,9 @@ export const filesUploadStatus = read(FileService.getters.filesUploadStatus);
 export const hasFiles = read(FileService.getters.has_files);
 export const isPastLimit = read(FileService.getters.past_limit);
 export const getFile = read(FileService.getters.get);
-export const allFilesUploadComplete = read(FileService.getters.allFilesUploadComplete);
+export const allFilesUploadComplete = read(
+    FileService.getters.allFilesUploadComplete
+);
 export const files = read(FileService.getters.files);
 
 /**

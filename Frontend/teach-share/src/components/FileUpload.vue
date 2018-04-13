@@ -34,7 +34,7 @@
                         class="list-group-item d-flex justify-content-between align-items-center">
                         <div class="col-5">
                             <span v-if="obj.url">
-                                <a v-bind:href="'http://127.0.0.1:8000' + obj.url">{{ obj.file.name }}</a></span>
+                                <a v-bind:href="obj.url">{{ obj.file.name }}</a></span>
                             <span v-else>{{ obj.file.name }}</span>
                             </div>
                             <div v-on: class="col">

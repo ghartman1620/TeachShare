@@ -25,8 +25,19 @@ SECRET_KEY = '(6dlx)23)(a%%g=8qs0b37$b+mqro=3d!i0f$mo@n4s+r*z)tt'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['testserver', '127.0.0.1', 'localhost', 'web', '35.197.62.167']
+ALLOWED_HOSTS = ['testserver', '127.0.0.1',
+                 'localhost', 'web', '35.197.62.167']
 
+# GOOGLE_APPLICATION_CREDENTIALS = BASE_DIR + \
+#     '/config/production/teach-share-4bd442043fa0.json'
+# os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = GOOGLE_APPLICATION_CREDENTIALS
+# f = open(GOOGLE_APPLICATION_CREDENTIALS, 'r')
+# for a in f.readlines():
+#     print(a)
+# print(BASE_DIR)
+# print(GOOGLE_APPLICATION_CREDENTIALS)
+
+IS_PRODUCTION = True
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
@@ -177,23 +188,23 @@ WSGI_APPLICATION = 'TeachShare_WebApp.wsgi.application'
 
 # cloud db password:
 # ItOgp9BvK6jNwmEz
-# 
+#
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': 'teachshare',
-    #     'USER': 'postgres',
-    #     'PASSWORD': 'password123',
-    #     'HOST': 'db',
-    #     'PORT': '5432',
-    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'mydatabase',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'teachshare',
+        'USER': 'postgres',
+        'PASSWORD': 'password123',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': 'mydatabase',
+    # }
 }
 
 
