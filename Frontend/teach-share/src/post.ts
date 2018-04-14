@@ -14,7 +14,11 @@ export class InProgressPost{
     status: PostStatus;
     draft: boolean;
     pk: number = -1; //-1 if post is not yet saved as draft
-
+    //supertags
+    grade: number;
+    contentType: number;
+    length: number;
+    subject: number;
     /*
 
     */ 
@@ -56,15 +60,29 @@ export class InProgressPost{
             var post: InProgressPost = this;
             this.status = PostStatus.Loading;
             this.draft = false;
+            this.grade = 0;
+            this.subject = 0;
+            this.contentType = 0;
+            this.length = 0;
             post.pk = postid;
             api.get("/posts/"+ postid).then(function(response){
                 console.log(response);
-                
                 post.elements = response.data.content;
                 post.title = response.data.title;
                 post.draft = response.data.draft;
                 post.tags = response.data.tags;
                 post.status = PostStatus.Saved;
+                post.grade = response.data.grade;
+                post.subject = response.data.subject;
+                console.log("subject: " + response.data.subject);
+                //response: #days hh:mm:ss
+                console.log(response.data.length);
+                post.length = parseInt(response.data.length.substring(response.data.length.length-2))/60
+                            + parseInt(response.data.length.substring(response.data.length.length-5, response.data.length.length-3))
+                            + Math.floor(parseInt(response.data.length.substring(response.data.length.length-8, response.data.length.length-6))*60)
+
+                console.log(post.length);
+                post.contentType = response.data.content_type;
             })
             console.log("returning from post constructor");
         }
@@ -76,6 +94,10 @@ export class InProgressPost{
             this.userPk = userid;
             this.status = PostStatus.Saving;
             this.draft = true;
+            this.grade = 0;
+            this.subject = 0;
+            this.contentType = 0;
+            this.length = 0;
             this.createNewDraft();
         }
     }
@@ -85,6 +107,19 @@ export class InProgressPost{
     setTitle(title: string): void {
         this.title = title;
     }
+    setGrade(grade: number): void {
+        this.grade = grade;
+    }
+    setContentType(contentType: number): void {
+        this.contentType = contentType;
+    }
+    setSubject(subject: number): void {
+        this.subject = subject;
+    }
+    setLength(length: number): void {
+        this.length = length;
+    }
+    
 
 
     addElement(element: any): void{
@@ -133,10 +168,11 @@ export class InProgressPost{
             likes: 0,
             comments: [],
             tags: this.tags,
-            content_type: 0,
-            grade: 0,
-            length: 0,
+            content_type: this.contentType,
+            grade: this.grade,
+            length: `00:${this.length}:00`,
             draft: this.draft,
+            subject: this.subject,
         }
     }
     
@@ -145,6 +181,7 @@ export class InProgressPost{
         this.status = PostStatus.Saving;
         api.put("posts/" + this.pk + "/", this.json()).then(function(response){
             console.log("DRAFT SAVED!");
+            console.log(response);
             post.status = PostStatus.Saved;
         })
     }

@@ -20,6 +20,7 @@ export interface FileState {
 }
 
 type FileContext = ActionContext<FileState, IRootState>;
+import {PostContext} from "./PostCreateService";
 
 /**
  * The state for file uploads, other file operations.
@@ -41,11 +42,10 @@ const state: FileState = {
  * @param  {Store} ctx
  * @param  {File[]} files
  */
-export const upload_file = async (ctx: FileContext, files: File[]) => {
-    console.log(ctx, files);
-    let postid = getCurrentPostId(store);
+export const upload_file = async (context: FileContext | PostContext, files: File[]) => {
+    let postid = getCurrentPostId(<PostContext>context);
     console.log(postid);
-
+    let ctx: FileContext = <FileContext>context;
     let i: number = 0;
     files.forEach(async (file: File) => {
         let fileAlreadyUploaded = false;

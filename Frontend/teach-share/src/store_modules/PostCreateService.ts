@@ -30,7 +30,7 @@ interface BeginPostObj {
     id?: number;
 }
 
-type PostContext = ActionContext<PostState, IRootState>;
+export type PostContext = ActionContext<PostState, IRootState>;
 
 const state: PostState = {
     post: undefined,
@@ -134,7 +134,21 @@ export const mutations = {
         else{
             state.post = new InProgressPost(arg.userid, <number>arg.id);
         }
-    }
+    },
+    SET_GRADE: (state: PostState, grade: number) => {
+        state.post!.setGrade(grade);
+    },
+    SET_CONTENT_TYPE: (state: PostState, contentType: number) => {
+        state.post!.setContentType(contentType);
+    },
+    SET_SUBJECT: (state: PostState, subject: number) => {
+        state.post!.setSubject(subject);
+    },
+    SET_LENGTH: (state: PostState, length: number) => {
+        state.post!.setLength(length);
+    },
+
+
 };
 
 export const actions = {
@@ -274,7 +288,24 @@ export const actions = {
                     }
                 });
         });*/
+    },
+    setGrade: (context: PostContext, grade: number) => {
+        context.commit("SET_GRADE", grade);
+        context.dispatch("saveDraft");
+    },
+    setContentType: (context: PostContext, contentType: number) => {
+        context.commit("SET_CONTENT_TYPE", contentType);
+        context.dispatch("saveDraft");
+    },
+    setSubject: (context: PostContext, subject: number) => {
+        context.commit("SET_SUBJECT", subject);
+        context.dispatch("saveDraft");
+    },
+    setLength: (context: PostContext, length: number) => {
+        context.commit("SET_LENGTH", length);
+        context.dispatch("saveDraft");
     }
+    
 };
 
 export const getters = {
@@ -307,7 +338,7 @@ export const getters = {
         if (typeof state.post !== "undefined") {
             return state.post!.elements;
         }
-    }
+    },
 };
 const PostCreateService = {
     namespaced: true,
@@ -330,6 +361,7 @@ const { commit, read, dispatch } = getStoreAccessors<PostState, IRootState>(
 /**
  * Action Handlers
  */
+
 export const addElement = dispatch(PostCreateService.actions.addElement);
 export const beginPost = dispatch(PostCreateService.actions.beginPost);
 export const setTags = dispatch(PostCreateService.actions.setTags);
@@ -341,6 +373,11 @@ export const removeElement = dispatch(PostCreateService.actions.removeElement);
 export const removeAttachments = dispatch(
     PostCreateService.actions.removeAttachments
 );
+export const setGrade = dispatch(PostCreateService.actions.setGrade);
+export const setLength = dispatch(PostCreateService.actions.setLength);
+export const setContentType = dispatch(PostCreateService.actions.setContentType);
+export const setSubject = dispatch(PostCreateService.actions.setSubject);
+
 export const addAttachments = dispatch(
     PostCreateService.actions.addAttachments
 );

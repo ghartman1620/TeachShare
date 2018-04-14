@@ -1,6 +1,7 @@
 
 <template>
 <div>
+    {{currentPost}}
     <!-- @TODO (although this is more a sidebar thign i put it here for visibility) 
     fix an issue where the scroll bar doesn't show if the bottom of the sidebar is underneath the bottom
     of the navbar on the bottom of post create -->
@@ -59,11 +60,12 @@
                 </div>
             </div>
         </div>
+        
         <div class="row">
             <div class="col-2"></div>
             <div class="col-8">
                 <div class="form-group">
-                    <div id="title-tag-card" class="card">
+                    <div class="title-tag-card card">
                         <br>
                         <div class="title-container container">
                             <div class="row">
@@ -105,6 +107,30 @@
                 </div>
             </div>
         </div>
+        <b-row>
+            <b-card class="title-tag-card">
+                <b-form>
+                    <b-form-group label="Grade level of lesson">
+                        <b-form-select v-model="currentPost.grade" :options="gradeOptions" class="mb-3" />
+                    </b-form-group>
+                    <b-form-group 
+                        label="Length of the lesson"
+                        description="Approximately how long, in minutes, will your lesson take?">
+                        <b-form-input v-model="currentPost.length"
+                            type="number"/>
+                    </b-form-group>
+                    <b-form-group
+                        label="Subject area of your lesson">
+                        <b-form-select v-model="currentPost.subject" :options="subjectOptions" class="mb-3" />
+                    </b-form-group>
+                    <b-form-group
+                        label="Content type of your lesson">
+                        <b-form-select v-model="currentPost.contentType" :options="contentTypeOptions" class="mb-3" />
+                    </b-form-group>
+                    <b-button variant="primary" @click="saveDraft">Save Tag Changes</b-button>
+                </b-form>
+            </b-card>
+        </b-row>
         <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
             <div class="post-element-container">
                 <div class="card-column column">
@@ -164,11 +190,11 @@
 
 
 <div :style="getEditorStyle()">
-  <div class="row">
-    <div class="col-12">
-      <router-view/>
+    <div class="row">
+        <div class="col-12">
+            <router-view/>
+        </div>
     </div>
-  </div>
 </div>
 
 </div>
@@ -192,7 +218,22 @@ import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import { Component, Prop } from "vue-property-decorator";
 import {Location, Dictionary} from "vue-router/types/router.d";
 import api from "../api";
-import { addElement, editElement, beginPost, getCurrentPost, createPost, undo, redo, setTags, swapElements, removeElement } from "../store_modules/PostCreateService";
+import { addElement, 
+    editElement, 
+    setGrade,
+    beginPost, 
+    getCurrentPost, 
+    createPost, 
+    undo, 
+    redo, 
+    setTags, 
+    swapElements, 
+    removeElement,
+    setSubject, 
+    setContentType, 
+    setLength,
+    saveDraft 
+} from "../store_modules/PostCreateService";
 import SideBar from "./SideBar.vue";
 import {User} from "../models";
 
@@ -224,6 +265,7 @@ const bodyVisible = {
 };
 
 
+
 @Component({
     name: "post-create",
     components: { PostElement, FontAwesomeIcon, SideBar }
@@ -240,6 +282,47 @@ export default class PostCreate extends Vue{
     inProgressTag: string = "";
     tags: string[] = [];
     userPosts: any[] = [];
+    gradeOptions: any = [
+        { value: 0, text: "Preschool"},
+        { value: 1, text: "Kintergarden"},
+        { value: 2, text: "First Grade"},
+        { value: 3, text: "Second Grade"},
+        { value: 4, text: "Third Grade"},
+        { value: 5, text: "Fourth Grade"},
+        { value: 6, text: "Fifth Grade"},
+        { value: 7, text: "Sixth Grade"},
+        { value: 8, text: "Seventh Grade"},
+        { value: 9, text: "Eighth Grade"},
+        { value: 10, text: "Ninth Grade"},
+        { value: 11, text: "Tenth Grade"},
+        { value: 12, text: "Eleventh Grade"},
+        { value: 13, text: "Twelfth Grade"},
+           
+    ];
+    subjectOptions: any = [
+        {value: 0, text: 'Math'},
+        {value: 1, text: 'English Language Arts'},
+        {value: 2, text: 'Physical Sciences'},
+        {value: 3, text: 'Life Sciences'},
+        {value: 4, text: 'Earth and Space Sciences'},
+        {value: 5, text: 'Engineering, Technology, and the Applications of Science'},
+    ]
+    contentTypeOptions: any = [
+        {value: 0, text: 'Game'},
+        {value: 1, text: 'Lab'},
+        {value: 2, text: 'Lecture'},
+    ]
+
+    //these aren't ever saved into InProgressPost, they're here for the purpose
+    //of loading in a post's current info when you load up a post.
+    length: number = 0;
+    contentType: number = 0;
+    subject: number = 0;
+    grade: number = 0;
+
+
+
+
     
     get currentPost(): InProgressPost | undefined {
         return getCurrentPost(this.$store);
@@ -263,7 +346,23 @@ export default class PostCreate extends Vue{
         return getCurrentPost(this.$store)!.title.length > 0;
     }
 
-    // methods
+    saveDraft() {
+        saveDraft(this.$store);
+    }
+    changeGrade(grade: number) {
+        console.log(grade);
+        setGrade(this.$store, grade);
+    }
+    changeSubject(subject: number) {
+        console.log(subject);
+        setSubject(this.$store, subject);
+    }
+    changeContentType(contentType: number){
+        setContentType(this.$store, contentType);
+    }
+    changeLength(length: string) {
+        setLength(this.$store, parseInt(length));
+    }
     getEditorStyle() {
         this.$log(this.$route.name !== "create");
         if (this.$route.name !== "create") {
@@ -525,7 +624,7 @@ $card-color: #96e6b3;
     background: #1a3c68;
 }
 
-#title-tag-card {
+.title-tag-card {
     background-color: $title-tag-card-background;
     margin-top: 2rem;
     border: none;

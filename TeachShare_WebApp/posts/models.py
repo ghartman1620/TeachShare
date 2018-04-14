@@ -9,21 +9,39 @@ from uuid import uuid4
 import os
 
 
-class Subject(models.Model):
-    name = models.CharField(max_length=80)
 
 
 class Post(models.Model):
     GRADES = (
         (0, 'Preschool'),
         (1, 'Kindergarten'),
-        (2, 'First Grade')
+        (2, 'First Grade'),
+        (3, 'Second Grade'),
+        (4, 'Third Grade'),
+        (5, 'Fourth Grade'),
+        (6, 'Fifth Grade'),
+        (7, 'Sixth Grade'),
+        (8, 'Seventh Grade'),
+        (9, 'Eighth Grade'),
+        (10, 'Ninth Grade'),
+        (11, 'Tenth Grade'),
+        (12, 'Eleventh Grade'),
+        (13, 'Twelfth Grade'),
     )
 
     CONTENT_TYPE = (
         (0, 'Game'),
         (1, 'Lab'),
         (2, 'Lecture')
+    )
+
+    SUBJECTS = (
+        (0, 'Math'),
+        (1, 'English Language Arts'),
+        (2, 'Physical Sciences'),
+        (3, 'Life Sciences'),
+        (4, 'Earth and Space Sciences'),
+        (5, 'Engineering, Technology, and the Applications of Science'),
     )
 
     user = models.ForeignKey(
@@ -35,11 +53,10 @@ class Post(models.Model):
     draft = models.BooleanField(default=True)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
     tags = JSONField()
-    grade = models.IntegerField(choices=GRADES)
-    subject = models.ForeignKey(
-        Subject, on_delete=models.DO_NOTHING, null=True)
+    grade = models.IntegerField(choices=GRADES, default=0)
+    subject = models.IntegerField(choices=SUBJECTS, default=0)
     length = models.DurationField()
-    content_type = models.IntegerField(choices=CONTENT_TYPE)
+    content_type = models.IntegerField(choices=CONTENT_TYPE,default=0)
 
 
 class Comment(models.Model):

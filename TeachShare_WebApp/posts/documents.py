@@ -1,7 +1,7 @@
 from django_elasticsearch_dsl import DocType, Index, fields
 
 from .models import Post
-
+from math import floor
 # Name of the Elasticsearch index
 post = Index('posts')
 # See Elasticsearch Indices API reference for available settings
@@ -53,6 +53,14 @@ class PostDocument(DocType):
     # likes = fields.IntegerField()
     timestamp = fields.DateField()
     id = fields.IntegerField()
+
+    grade = fields.IntegerField()
+    content_type = fields.IntegerField()
+    subject = fields.IntegerField()
+    length = fields.IntegerField()
+
+    def prepare_length(self, instance):
+        return floor(instance.length.days*1440) + floor(instance.length.seconds/60)
     '''
     def prepare_tags(self, instance):
         tags = ""
