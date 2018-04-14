@@ -91,6 +91,9 @@ Vue.use(FormCheckbox);
 
 Vue.use(Badge);
 
+import VueDraggableResizable from 'vue-draggable-resizable'
+Vue.component('vue-draggable-resizable', VueDraggableResizable)
+
 // This is frustrating. We are 'suppose' to be able to create *.d.ts files for types such as this
 // but it only seems to work when I put it here. This is mostly just for plugins I think, though.
 import _Vue from "vue";

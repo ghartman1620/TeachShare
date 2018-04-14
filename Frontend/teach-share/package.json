@@ -28,6 +28,7 @@
         "vee-validate": "^2.0.3",
         "vue": "^2.5.16",
         "vue-cookie": "^1.1.4",
+        "vue-draggable-resizable": "^1.7.1",
         "vue-moment": "^3.2.0",
         "vue-quill-editor": "^3.0.5",
         "vue-router": "^3.0.1",

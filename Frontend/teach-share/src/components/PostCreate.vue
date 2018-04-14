@@ -97,29 +97,31 @@
             </div>
         </div>
     </div>
-        <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
-            <div class="post-element-container">
-                <div class="card-column column">
-                    <div class="col-12 container">
-                        <div class="post-element card">
-                            <post-element :element="element" :index="index"></post-element>
+        <vue-draggable-resizable :w="600" :h="100" v-on:dragging="onDrag" v-on:resizing="onResize" :parent="false">
+            <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
+                <div class="post-element-container">
+                    <div class="card-column column">
+                        <div class="col-12 container">
+                            <div class="post-element card">
+                                <post-element :element="element" :index="index"></post-element>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="justify-content-start">
-                        <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
+                        <div class="justify-content-start">
+                            <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
 
-                            <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="static/caret-square-up.png"></button>
-                            <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="static/caret-square-down.png"></button>
-                            <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="static/trash-icon.png"></button>
-                            <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="static/edit-icon.png"></button>
+                                <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="static/caret-square-up.png"></button>
+                                <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="static/caret-square-down.png"></button>
+                                <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="static/trash-icon.png"></button>
+                                <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="static/edit-icon.png"></button>
 
+                            </div>
                         </div>
                     </div>
                 </div>
+                <br>
             </div>
-            <br>
-        </div>
+        </vue-draggable-resizable>
     </div>
     <br><br><br> <!-- this is so problems don't occur with bottom of page button presses -->
     <nav class="navbar fixed-bottom navbar-light navbar-left bottom-navbar bg-light">
@@ -155,20 +157,14 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  State,
-  Getter,
-  Action,
-  Mutation,
-  namespace
-} from "vuex-class";
+import { State, Getter, Action, Mutation, namespace } from "vuex-class";
 import { mapState } from "vuex";
 import forEach from "lodash/forEach";
 import PostElement from "./PostElement.vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import { Component, Prop } from "vue-property-decorator";
-import {Location, Dictionary} from "vue-router/types/router.d";
-import { 
+import { Location, Dictionary } from "vue-router/types/router.d";
+import {
     addElement,
     beginPost,
     setTags,
@@ -214,7 +210,7 @@ const bodyVisible = {
     name: "post-create",
     components: { PostElement, FontAwesomeIcon }
 })
-export default class PostCreate extends Vue{
+export default class PostCreate extends Vue {
     @State("create") postState;
 
     // @Getter("user/getLoggedInUser") getLoggedInUser;
@@ -269,12 +265,10 @@ export default class PostCreate extends Vue{
         var vm = this;
         // dispatch createPost method in the store. This will send a
         // post request to the backend server.
-        createPost(this.$store).then((ret) => {
+        createPost(this.$store).then(ret => {
             // handle the response from the server
             if (ret === undefined) {
-                vm.$notifyDanger(
-                    "There was a problem submitting your post."
-                );
+                vm.$notifyDanger("There was a problem submitting your post.");
             } else if (ret.status < 300) {
                 // post was successful
                 vm.$notifySuccess("Post submitted successfully!");
@@ -308,8 +302,8 @@ export default class PostCreate extends Vue{
         } else {
             routeName += "file";
         }
-        var query: Dictionary<string> = {"index" : index.toString()};
-        var loc: Location = {name: routeName, query: query};
+        var query: Dictionary<string> = { index: index.toString() };
+        var loc: Location = { name: routeName, query: query };
         this.$router.push(loc);
     }
 
@@ -349,20 +343,19 @@ export default class PostCreate extends Vue{
         console.log("mounted post create");
         console.log(this.postState);
         var vm: PostCreate = this;
-        this.$on("submitElement", function(element: any, index: number){
+        this.$on("submitElement", function(element: any, index: number) {
             console.log("submitting element");
             console.log(element);
             console.log(index);
-            if(index == vm.postState.post.elements.length){
+            if (index == vm.postState.post.elements.length) {
                 addElement(vm.$store, element);
+            } else {
+                editElement(vm.$store, { element: element, index: index });
             }
-            else{
-                editElement(vm.$store, {element: element, index: index});
-            }
-            vm.$router.push({name: "create"});
-        })
+            vm.$router.push({ name: "create" });
+        });
     }
-};
+}
 </script>
 
 
