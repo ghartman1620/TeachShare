@@ -49,6 +49,12 @@
                                 onmouseout="this.src='/static/file-button.png'">
                 </router-link>
             </div>
+
+            <div class="round-button" id="table-icon">
+                <router-link :to="{name: 'edit-table', query: {index: this.maxElementIndex()}}">
+                    Edit Table Element
+                </router-link>
+            </div>
         </div>
     </div>
     <div class="row">

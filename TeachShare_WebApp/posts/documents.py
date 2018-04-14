@@ -63,7 +63,7 @@ class PostDocument(DocType):
     def prepare_filenames(self, instance):
         files = []
         for element in instance.content:
-            if element['type'] != 'text':
+            if element['type'] != 'text' and element['type'] != 'table':
                 #This is code golf speak for call a certain function and append it to our files list
                 files.extend({
                     'image_file' : fileNamesFromImageAudioElement,

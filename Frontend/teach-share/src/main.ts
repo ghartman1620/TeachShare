@@ -32,7 +32,7 @@ import {
     FormSelect,
     FormTextarea,
     FormCheckbox,
-
+    Table,
     Badge,
     Jumbotron
 
@@ -88,7 +88,7 @@ Vue.use(FormRadio);
 Vue.use(FormSelect);
 Vue.use(FormTextarea);
 Vue.use(FormCheckbox);
-
+Vue.use(Table);
 Vue.use(Badge);
 
 // This is frustrating. We are 'suppose' to be able to create *.d.ts files for types such as this
