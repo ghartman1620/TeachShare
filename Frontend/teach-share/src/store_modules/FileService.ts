@@ -38,7 +38,6 @@ const state: FileState = {
  * @param  {File[]} files
  */
 export const upload_file = async (ctx, files: File[]) => {
-    console.log(ctx, files);
     let postid = undefined;
     try {
         // @TODO: get type safe definition for this.
