@@ -25,6 +25,8 @@ SECRET_KEY = '(6dlx)23)(a%%g=8qs0b37$b+mqro=3d!i0f$mo@n4s+r*z)tt'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+IS_PRODUCTION = True
+
 ALLOWED_HOSTS = ['testserver', '127.0.0.1',
                  'localhost', 'web', '35.197.62.167']
 
@@ -185,17 +187,17 @@ WSGI_APPLICATION = 'TeachShare_WebApp.wsgi.application'
 DATABASES = {
     # this is the google cloud SQL (postgresql) store connection settings
     #   TODO: So much...
-    'google': {
+    'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'HOST': '/cloudsql/teach-share-200700:us-west1:teach-db',
             'NAME': 'teach',
             'USER': 'teachsharer',
             'PASSWORD': 'thisisabadpasasword123',
     },
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'mydatabase',
-    }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': 'mydatabase',
+    # }
 }
 
 

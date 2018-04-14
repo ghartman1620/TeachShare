@@ -1,0 +1,7 @@
+images:
+  - gcr.io/teach-share-200700/teachshare_web
+  - gcr.io/teach-share-200700/teachshare_task
+
+version:
+  latest
+

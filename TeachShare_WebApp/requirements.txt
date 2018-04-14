@@ -1,5 +1,6 @@
 aioredis==1.0.0
 amqp==2.2.2
+argcomplete==1.9.4
 asgiref==2.2.0
 astroid==1.6.1
 async-timeout==2.0.0
@@ -70,6 +71,7 @@ simplejson==3.13.2
 six==1.11.0
 social-auth-app-django==2.1.0
 social-auth-core==1.6.0
+termcolor==1.1.0
 text-unidecode==1.2
 traitlets==4.3.2
 Twisted==17.9.0

@@ -28,16 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['testserver', '127.0.0.1',
                  'localhost', 'web', '35.197.62.167']
 
-# GOOGLE_APPLICATION_CREDENTIALS = BASE_DIR + \
-#     '/config/production/teach-share-4bd442043fa0.json'
-# os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = GOOGLE_APPLICATION_CREDENTIALS
-# f = open(GOOGLE_APPLICATION_CREDENTIALS, 'r')
-# for a in f.readlines():
-#     print(a)
-# print(BASE_DIR)
-# print(GOOGLE_APPLICATION_CREDENTIALS)
-
-IS_PRODUCTION = True
+IS_PRODUCTION = False
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'

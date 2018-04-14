@@ -14,5 +14,11 @@ ADD . /code/
 # make it visible
 EXPOSE 8000
 
+# this variable get's passed to the build command
+ARG settings_module
+
+# set environment variables
+ENV DJANGO_SETTINGS_MODULE=${settings_module}
+
 # run it
 CMD ["./config/production/run.task.sh"]
