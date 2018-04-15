@@ -8,6 +8,25 @@ from rest_framework import serializers
 from posts.models import Post, Comment, Attachment
 from accounts.serializers import UserSerializer
 
+class DynamicFieldsSerializer(serializers.ModelSerializer):
+    """ `Dynamic` Field Serializer -
+            Returns only the fields given by the 'fields' query parameter
+            or all in the case of the fields query parameter being missing.
+    """
+    def __init__(self, *args, **kwargs):
+        super(DynamicFieldsSerializer, self).__init__(*args, **kwargs)
+        request = self.context.get('request')
+        print(request)
+        fields = None
+        if request:
+            fields = request.query_params.get('fields', None)
+            if fields:
+                fields = fields.split(',')
+                allowed = set(fields)
+                existing = set(self.fields.keys())
+                for field_name in existing - allowed:
+                    self.fields.pop(field_name)
+
 
 class CommentSerializer(serializers.ModelSerializer):
     # user = UserSerializer(required=True)

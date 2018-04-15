@@ -21,12 +21,8 @@ class Deploy(object):
         cprint('Initializing deployment...', 'green')
 
         self.load_config()
-        for j in self.config['images']:
+        for j in self.config['deployments']:
             print(j)
-
-        self.images = [a + (':%s' % self.config['version'])
-                       for a in self.config['images']]
-        print(self.images)
 
         parser = argparse.ArgumentParser(description='Build teach-share Django backend for Google Cloud production environment.', usage='''deploy <command> [<args>]
         
@@ -51,6 +47,10 @@ class Deploy(object):
         args = parser.parse_args(sys.argv[2:])
         print('Running command test, --test=%s' % args.test)
 
+    def all(self):
+        self.build()
+        self.push()
+
     def build(self):
         parser = argparse.ArgumentParser(description='build backend assets')
         parser.add_argument('--settings')
@@ -70,13 +70,14 @@ class Deploy(object):
         # images = ['gcr.io/teach-share-200700/teachshare_web', 'gcr.io/teach-share-200700/teachshare_task']
         cprint('Building docker images...', 'blue', attrs=['bold'])
 
-        for i in self.images:
-            build_result = self.build_docker_image(i, settings_path)
+        for k, val in self.config['deployments'].items():
+            cprint('Building: %s' % k, color='yellow')
+            build_result = self.build_docker_image(val['url']+':{}'.format(val['version']), settings_path, val['dockerfile'])
             if build_result.returncode != 0:
                 raise DockerCommandError(
                     build_result.args, build_result.stderr)
             else:
-                cprint('Finished building docker image: %s' % i, 'green')
+                cprint('Finished building docker image: %s' % k, 'green')
         cprint('Finished building all images!', color='green',
                attrs=['bold', 'reverse', 'blink'])
 
@@ -98,13 +99,14 @@ class Deploy(object):
         print()
         cprint('Building docker images...', 'blue', attrs=['bold'])
 
-        for i in self.images:
-            build_result = self.push_docker_image(i)
+        for k, val in self.config['deployments'].items():
+            cprint('Uploading: {}'.format(k), color='yellow')
+            build_result = self.push_docker_image(val['url']+':{}'.format(val['version']))
             if build_result.returncode != 0:
                 raise DockerCommandError(
                     build_result.args, build_result.stderr)
             else:
-                cprint('Finished pushing docker image: %s' % i, 'green')
+                cprint('Finished pushing docker image: %s' % k, 'green')
         cprint('Finished pushing all images!', color='green',
                attrs=['bold', 'reverse', 'blink'])
 
@@ -113,13 +115,13 @@ class Deploy(object):
             self.config = yaml.load(ymlfile)
         print(self.config)
 
-    def build_docker_image(self, image_name, settings='TeachShare_WebApp.settings'):
+    def build_docker_image(self, image_name, settings='TeachShare_WebApp.settings', dockerfile='config/production/production.web.yml'):
         s = 'settings_module={}'.format(settings)
         print('******************')
         print(s)
         print('******************')
-        result = subprocess.run(['docker', 'build', '--build-arg',
-                                 'settings_module=%s' % s, '-t', image_name, '.'])
+        result = subprocess.run(['docker', 'build', '-f', dockerfile, '--build-arg',
+                                 s, '-t', image_name, '.'])
         cprint(result, 'blue')
         return result
 

@@ -28,7 +28,7 @@ DEBUG = True
 IS_PRODUCTION = True
 
 ALLOWED_HOSTS = ['testserver', '127.0.0.1',
-                 'localhost', 'web', '35.197.62.167']
+                 'localhost', 'web', '35.185.199.36']
 
 
 EMAIL_USE_TLS = True
@@ -189,10 +189,16 @@ DATABASES = {
     #   TODO: So much...
     'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'HOST': '/cloudsql/teach-share-200700:us-west1:teach-db',
             'NAME': 'teach',
-            'USER': 'teachsharer',
-            'PASSWORD': 'thisisabadpasasword123',
+            'USER': os.getenv('DATABASE_USER'),
+            'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+            'HOST': '127.0.0.1',
+            'PORT': '5432',
+            # 'ENGINE': 'django.db.backends.postgresql',
+            # 'HOST': '/cloudsql/teach-share-200700:us-west1:teach-db',
+            # 'NAME': 'teach',
+            # 'USER': 'teachsharer',
+            # 'PASSWORD': 'thisisabadpasasword123',
     },
     # 'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',

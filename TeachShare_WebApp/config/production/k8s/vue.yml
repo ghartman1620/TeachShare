@@ -1,0 +1,61 @@
+apiVersion: v1
+items:
+- apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+    creationTimestamp: 2018-04-11T23:58:20Z
+    generation: 2
+    labels:
+      app: frontend
+    name: frontend
+    namespace: default
+    resourceVersion: "709"
+    selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/frontend
+    uid: 36589f41-3de4-11e8-b69d-42010a8a0fd3
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: frontend
+    strategy:
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 1
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: frontend
+      spec:
+        containers:
+        - image: gcr.io/teach-share-200700/frontserve:latest
+          imagePullPolicy: Always
+          name: frontserve
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: 2018-04-11T23:58:25Z
+      lastUpdateTime: 2018-04-11T23:58:25Z
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
