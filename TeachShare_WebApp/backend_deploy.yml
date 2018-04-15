@@ -5,3 +5,5 @@ images:
 version:
   latest
 
+settings:
+  TeachShare_WebApp.settings_production
