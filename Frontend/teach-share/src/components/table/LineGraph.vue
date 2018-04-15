@@ -1,66 +1,93 @@
 <script>
-  //Importing Line class from the vue-chartjs wrapper
-  import {Line} from 'vue-chartjs'
-  //Exporting this so it can be used in other components
-  export default {
-      extends: Line, 
-      props: {
-          userLabel: {
-              type: String,
-              required: true
-          },
-          userData: {
-              type: Array,
-              required: true
-          },
-      },
-
-    data () {
-      return {
-        datacollection: {
-        //Data to be represented on x-axis
-          labels: ["hey","you"], 
-          datasets: [
-            {
-              label: this.userLabel,
-              backgroundColor: '#f87979',
-              pointBackgroundColor: 'white',
-              borderWidth: 1,
-              pointBorderColor: '#249EBF',
-              //Data to be represented on y-axis
-              data: [1,2]
-            }
-          ]
+    var datacollection = {};
+    //Importing Line class from the vue-chartjs wrapper
+    import {Line} from 'vue-chartjs'
+    //Exporting this so it can be used in other components
+    export default {
+        extends: Line, 
+        props: {
+            userLabel: {
+                type: String,
+                required: true
+            },
+            userData: {
+                type: Array,
+                required: true
+            },
         },
-        //Chart.js options that controls the appearance of the chart
-        options: {
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: true
-              },
-              gridLines: {
-                display: true
-              }
-            }],
-            xAxes: [ {
-              gridLines: {
-                display: false
-              }
-            }]
-          },
-          legend: {
-            display: true
-          },
-          responsive: true,
-          maintainAspectRatio: false
+
+        data () {
+            return {
+                datacollection,
+                // datacollection: {
+                // //Data to be represented on x-axis
+                //     labels: ["one","two","three"],
+                //     datasets: [
+                //         {
+                //             label: this.userLabel,
+                //             backgroundColor: '#f87979',
+                //             pointBackgroundColor: 'white',
+                //             borderWidth: 1,
+                //             pointBorderColor: '#249EBF',
+                //             //Data to be represented on y-axis
+                //             // data: Object.values(this.userData[0])
+                //             data: [1,3,4],
+                //         }
+                //     ]
+                // },
+                //Chart.js options that controls the appearance of the chart
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                            beginAtZero: true
+                            },
+                            gridLines: {
+                            display: true
+                            }
+                        }],
+                        xAxes: [ {
+                            gridLines: {
+                            display: false
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: true
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            }
+        },
+        mounted () {
+            datacollection.labels = Object.keys(this.userData[0]);
+            datacollection.datasets = [];
+            var backgroundColors = ['#f87979','grey','#ffa500','#ffaf31','black','#008040','purple','#990000','#00ff80','#007399'];
+            var colorCount = backgroundColors.length - 1;
+            //iterate over however many datasets
+            for (var i = 0; i < this.userData.length; i++) {
+                var randomIndex = Math.floor(Math.random()*colorCount);
+                datacollection.datasets.push(
+                        {
+                            label: "",
+                            backgroundColor: backgroundColors[randomIndex],
+                            fill: false,
+                            pointBackgroundColor: backgroundColors[randomIndex],
+                            borderWidth: 10,
+                            pointBorderColor: backgroundColors[randomIndex],
+                            //Data to be represented on y-axis
+                            data: Object.values(this.userData[i])
+                        }
+
+                );
+                backgroundColors.splice(randomIndex,1);
+                console.log("Random index, color number and bgcolor array: ", randomIndex, colorCount, backgroundColors);
+                colorCount--;
+            };
+
+            //renderChart function renders the chart with the datacollection and options object.
+            this.renderChart(datacollection, this.options);
         }
-      }
-    },
-    mounted () {
-    //renderChart function renders the chart with the datacollection and options object.
-      this.renderChart(this.datacollection, this.options)
-      console.log("LineGraph userData: ", Object.values(this.userData))
     }
-  }
 </script>

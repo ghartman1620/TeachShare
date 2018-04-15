@@ -2,6 +2,7 @@
     <body>
         <b-table striped hover :items="element.content"> </b-table>
         <chart v-bind:userData=this.element.content userLabel='money'></chart>
+
     </body>
 </template>
 
@@ -9,7 +10,7 @@
 import Vue from "vue";
 import BootstrapVue from "bootstrap-vue";
 import ChartData from "./ChartData";
-
+Vue.use(BootstrapVue)
 export default Vue.component("table-element", {
     props: {
         element: {
@@ -19,6 +20,7 @@ export default Vue.component("table-element", {
     },
     components: {
         ChartData,
+        BootstrapVue
     },
     mounted () {
         var con = this.element.content;
