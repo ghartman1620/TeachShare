@@ -1,10 +1,14 @@
 <script>
     var datacollection = {};
     //Importing Line class from the vue-chartjs wrapper
+
     import {Line} from 'vue-chartjs'
+    import BootstrapVue from 'bootstrap-vue'
+    import Vue from 'vue'
+    Vue.use(BootstrapVue);
     //Exporting this so it can be used in other components
     export default {
-        extends: Line, 
+        extends: Line,
         props: {
             userLabel: {
                 type: String,
@@ -19,22 +23,6 @@
         data () {
             return {
                 datacollection,
-                // datacollection: {
-                // //Data to be represented on x-axis
-                //     labels: ["one","two","three"],
-                //     datasets: [
-                //         {
-                //             label: this.userLabel,
-                //             backgroundColor: '#f87979',
-                //             pointBackgroundColor: 'white',
-                //             borderWidth: 1,
-                //             pointBorderColor: '#249EBF',
-                //             //Data to be represented on y-axis
-                //             // data: Object.values(this.userData[0])
-                //             data: [1,3,4],
-                //         }
-                //     ]
-                // },
                 //Chart.js options that controls the appearance of the chart
                 options: {
                     scales: {
@@ -60,6 +48,9 @@
                 }
             }
         },
+        components: {
+            BootstrapVue
+        },
         mounted () {
             datacollection.labels = Object.keys(this.userData[0]);
             datacollection.datasets = [];
@@ -74,7 +65,8 @@
                             backgroundColor: backgroundColors[randomIndex],
                             fill: false,
                             pointBackgroundColor: backgroundColors[randomIndex],
-                            borderWidth: 10,
+                            borderWidth: 5,
+                            borderColor: backgroundColors[randomIndex],
                             pointBorderColor: backgroundColors[randomIndex],
                             //Data to be represented on y-axis
                             data: Object.values(this.userData[i])

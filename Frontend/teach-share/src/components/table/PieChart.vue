@@ -4,10 +4,10 @@
     import Vue from 'vue'
     import {Pie} from 'vue-chartjs'
     import BootstrapVue from 'bootstrap-vue'
-    Vue.use(BootstrapVue)
+    Vue.use(BootstrapVue);
     //Exporting this so it can be used in other components
     export default {
-            extends: Pie, 
+            extends: Pie,
             props: {
                     userLabel: {
                         type: String,
@@ -42,14 +42,14 @@
                         var temp = array[i];
                         array[i] = array[j];
                         array[j] = temp;
-                    } 
+                    }
                 };
 
                 datacollection.labels = Object.keys(this.userData[0]);
                 datacollection.datasets = [];
                 var backgroundColors = ['#f87979','grey','#ffa500','black','#008040','purple','#990000','#00ff80','#007399'];
                 shuffleArray(backgroundColors);
-        
+
                 //iterate over however many datasets we have
 
                 for (var i = 0; i < this.userData.length; i++) {
@@ -67,7 +67,6 @@
                 };
 
                 this.renderChart(this.datacollection, this.options);
-                console.log("ChartRender mounted");
                 console.log("user label:  ", this.userLabel);
                 console.log("userData:  ", this.userData);
                 console.log("bar graph labels: ", Object.keys(this.userData));

@@ -10,7 +10,8 @@
 import Vue from "vue";
 import BootstrapVue from "bootstrap-vue";
 import ChartData from "./ChartData";
-Vue.use(BootstrapVue)
+Vue.use(BootstrapVue);
+
 export default Vue.component("table-element", {
     props: {
         element: {
