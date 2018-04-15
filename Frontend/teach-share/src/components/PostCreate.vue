@@ -2,7 +2,7 @@
 <template>
 <div>
 <div :style="getBodyStyle()">
-    <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container">
+    <div class="col-sm-12 col-lg-10 col-md-12 card card-outline-danger container icon-card-container">
         <div class="col-8 mx-auto card-deck" id="button-bar">
 
             <h2></h2>
@@ -50,7 +50,9 @@
 
             <div class="round-button" id="table-icon">
                 <router-link :to="{name: 'edit-table', query: {index: this.maxElementIndex()}}">
-                    Edit Table Element
+                    <img src="/static/table-button.png"
+                                onmouseover="this.src='/static/table-button-hover.png'"
+                                onmouseout="this.src='/static/table-button.png'">
                 </router-link>
             </div>
         </div>
@@ -339,7 +341,6 @@ export default {
 };
 </script>
 
-
 <style lang="scss" scoped>
 $background-color: #e5ffee;
 $title-tag-card-background: darken(#bececa, 5%);
@@ -379,7 +380,7 @@ $card-color: #96e6b3;
 }
 
 #button-bar {
-    min-width: 580px;
+    min-width: 665px;
     max-height: 240px;
     padding-top: 8px;
     padding-bottom: 8px;
