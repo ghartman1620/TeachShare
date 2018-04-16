@@ -7,6 +7,7 @@ from termcolor import colored, cprint
 import subprocess
 import yaml
 from shutil import copy
+from pprint import pprint
 
 
 class DockerCommandError(Exception):
@@ -19,6 +20,7 @@ class Deploy(object):
 
     def __init__(self):
         cprint('Initializing deployment...', 'green')
+        self.deployments = {}
 
         self.load_config()
         for j in self.config['deployments']:
@@ -52,6 +54,12 @@ class Deploy(object):
         self.push()
 
     def build(self):
+        """
+            Build command for deploying to production.
+                Args:
+                    --settings $settings_file_for_django
+        """
+
         parser = argparse.ArgumentParser(description='build backend assets')
         parser.add_argument('--settings')
         args = parser.parse_args(sys.argv[2:])
@@ -63,6 +71,13 @@ class Deploy(object):
             settings_path = args.settings
             settings_resp = args.settings
 
+        # check the current state for the deployments
+        cprint('Checking the deployments current state...', color='yellow')
+
+        for dep in self.config['deployments']:
+            print('Checking deployment: %s' % dep)
+            self.get_deployment_status(dep)
+
         cprint('Running build command, settings=%s' % settings_resp, 'blue')
         print()
         print('\t--> Settings file: "%s"' % settings_path)
@@ -72,7 +87,8 @@ class Deploy(object):
 
         for k, val in self.config['deployments'].items():
             cprint('Building: %s' % k, color='yellow')
-            build_result = self.build_docker_image(val['url']+':{}'.format(val['version']), settings_path, val['dockerfile'])
+            build_result = self.build_docker_image(
+                val['url']+':{}'.format(val['version']), settings_path, val['dockerfile'])
             if build_result.returncode != 0:
                 raise DockerCommandError(
                     build_result.args, build_result.stderr)
@@ -101,7 +117,8 @@ class Deploy(object):
 
         for k, val in self.config['deployments'].items():
             cprint('Uploading: {}'.format(k), color='yellow')
-            build_result = self.push_docker_image(val['url']+':{}'.format(val['version']))
+            build_result = self.push_docker_image(
+                val['url']+':{}'.format(val['version']))
             if build_result.returncode != 0:
                 raise DockerCommandError(
                     build_result.args, build_result.stderr)
@@ -150,12 +167,25 @@ class Deploy(object):
             yaml.dump(self.deployment, deployment_file)
 
         # write to configuration file
-        self.config['deployments']['web']['version'] = new_version
+        self.config['deployments']['api-production']['version'] = new_version
         self.config['deployments']['task']['version'] = new_version
         with open('backend_deploy.yml', 'w') as ymlfile:
             yaml.dump(self.config, ymlfile)
 
         return self.deployed_image
+
+    # kubectl get deployment api-production -o yaml
+    def get_deployment_status(self, deployment_name='api-production'):
+        result = subprocess.check_output(['kubectl', 'get', 'deployment',
+                                          deployment_name, '-o', 'yaml'])
+        status = yaml.load(result)
+        pprint(status)
+        print(status['spec']['template']['spec']['containers'][0]['image'])
+
+        # set instance variables
+        self.current_image = status['spec']['template']['spec']['containers'][0]['image']
+        self.deployments[deployment_name] = status
+
 
 if __name__ == '__main__':
     try:

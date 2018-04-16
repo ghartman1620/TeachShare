@@ -1,6 +1,6 @@
 deployments:
-  task: {dockerfile: config/production/production.task.yml, url: gcr.io/teach-share-200700/teachshare_task,
+  api-production: {dockerfile: config/production/production.web.yml, url: gcr.io/teach-share-200700/teachshare_web,
     version: 1.0.2}
-  web: {dockerfile: config/production/production.web.yml, url: gcr.io/teach-share-200700/teachshare_web,
+  task: {dockerfile: config/production/production.task.yml, url: gcr.io/teach-share-200700/teachshare_task,
     version: 1.0.2}
 settings: TeachShare_WebApp.settings_production
