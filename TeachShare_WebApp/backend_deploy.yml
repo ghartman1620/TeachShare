@@ -1,12 +1,6 @@
 deployments:
-  web:
-    url: gcr.io/teach-share-200700/teachshare_web
-    dockerfile: config/production/production.web.yml
-    version: 1.0.1
-  task:
-    url: gcr.io/teach-share-200700/teachshare_task
-    dockerfile: config/production/production.task.yml
-    version: 1.0.1
-
-settings:
-  TeachShare_WebApp.settings_production
+  task: {dockerfile: config/production/production.task.yml, url: gcr.io/teach-share-200700/teachshare_task,
+    version: 1.0.2}
+  web: {dockerfile: config/production/production.web.yml, url: gcr.io/teach-share-200700/teachshare_web,
+    version: 1.0.2}
+settings: TeachShare_WebApp.settings_production

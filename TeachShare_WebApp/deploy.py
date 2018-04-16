@@ -114,6 +114,7 @@ class Deploy(object):
         with open('backend_deploy.yml', 'r') as ymlfile:
             self.config = yaml.load(ymlfile)
         print(self.config)
+        self.load_deployment('config/production/k8s/web/api-deployment.yml')
 
     def build_docker_image(self, image_name, settings='TeachShare_WebApp.settings', dockerfile='config/production/production.web.yml'):
         s = 'settings_module={}'.format(settings)
@@ -130,6 +131,31 @@ class Deploy(object):
         cprint(result, 'blue')
         return result
 
+    def load_deployment(self, filename):
+        with open(filename, 'r') as deployment_file:
+            self.deployment = yaml.load(deployment_file)
+        self.deployed_image = self.deployment['spec']['template']['spec']['containers'][0]['image']
+        print(self.deployed_image)
+        self.update_deployment_version('1.0.2', filename)
+
+    def update_deployment_version(self, new_version, filename):
+        print(self.deployed_image, new_version)
+        split_version = self.deployed_image.split(':')
+        self.deployed_image = split_version[0] + ':{}'.format(new_version)
+        print(self.deployed_image)
+
+        # write to actual deployment
+        self.deployment['spec']['template']['spec']['containers'][0]['image'] = self.deployed_image
+        with open(filename, 'w') as deployment_file:
+            yaml.dump(self.deployment, deployment_file)
+
+        # write to configuration file
+        self.config['deployments']['web']['version'] = new_version
+        self.config['deployments']['task']['version'] = new_version
+        with open('backend_deploy.yml', 'w') as ymlfile:
+            yaml.dump(self.config, ymlfile)
+
+        return self.deployed_image
 
 if __name__ == '__main__':
     try:
