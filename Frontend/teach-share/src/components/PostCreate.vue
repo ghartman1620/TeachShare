@@ -1,7 +1,6 @@
 
 <template>
 <div>
-    {{currentPost}}
     <!-- @TODO (although this is more a sidebar thign i put it here for visibility) 
     fix an issue where the scroll bar doesn't show if the bottom of the sidebar is underneath the bottom
     of the navbar on the bottom of post create -->
@@ -12,154 +11,158 @@
             </a>
         </div>
     </side-bar>
-    <div v-if="inProgressPost !== undefined && inProgressPost.status !== LOADING" :style="getBodyStyle()">
-        <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container">
-            <div class="col-8 mx-auto card-deck" id="button-bar">
+    {{currentPage}}
+    {{currentPage===2}}
+    <div v-if="currentPage===1">
+        <div v-if="inProgressPost !== undefined && inProgressPost.status !== LOADING" :style="getBodyStyle()">
+            <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container">
+                <div class="col-8 mx-auto card-deck" id="button-bar">
 
-                <h2></h2>
-                <div class="round-button" id="text-icon">
-                    <router-link :to="{ name: 'edit-text', query: {index: this.maxElementIndex()}}">
-                        <img src="/static/text-button.png"
-                                    onmouseover="this.src='/static/text-button-hover.png'"
-                                    onmouseout="this.src='/static/text-button.png'">
-                    </router-link>
-                </div>
-                <h2></h2>
+                    <h2></h2>
+                    <div class="round-button" id="text-icon">
+                        <router-link :to="{ name: 'edit-text', query: {index: this.maxElementIndex()}}">
+                            <img src="/static/text-button.png"
+                                        onmouseover="this.src='/static/text-button-hover.png'"
+                                        onmouseout="this.src='/static/text-button.png'">
+                        </router-link>
+                    </div>
+                    <h2></h2>
 
-                <div class="round-button" id="video-icon">
-                    <router-link :to="{name: 'edit-video', query: {index: this.maxElementIndex(), videotype: 'embed'}}">
-                        <img src="/static/video-button.png"
-                                    onmouseover="this.src='/static/video-button-hover.png'"
-                                    onmouseout="this.src='/static/video-button.png'">
+                    <div class="round-button" id="video-icon">
+                        <router-link :to="{name: 'edit-video', query: {index: this.maxElementIndex(), videotype: 'embed'}}">
+                            <img src="/static/video-button.png"
+                                        onmouseover="this.src='/static/video-button-hover.png'"
+                                        onmouseout="this.src='/static/video-button.png'">
 
-                    </router-link>
-                </div>
-                <h2></h2>
+                        </router-link>
+                    </div>
+                    <h2></h2>
 
-                <div class="round-button" id="audio-icon">
-                    <router-link :to="{name: 'edit-audio', query: {index: this.maxElementIndex()}}">
-                        <img src="/static/audio-button.png"
-                                    onmouseover="this.src='/static/audio-button-hover.png'"
-                                    onmouseout="this.src='/static/audio-button.png'">
-                    </router-link>
-                </div>
-                <h2></h2>
+                    <div class="round-button" id="audio-icon">
+                        <router-link :to="{name: 'edit-audio', query: {index: this.maxElementIndex()}}">
+                            <img src="/static/audio-button.png"
+                                        onmouseover="this.src='/static/audio-button-hover.png'"
+                                        onmouseout="this.src='/static/audio-button.png'">
+                        </router-link>
+                    </div>
+                    <h2></h2>
 
-                <div class="round-button" id="image-icon">
-                    <router-link :to="{name: 'edit-image', query: {index: this.maxElementIndex()}}">
-                        <img src="/static/image-button.png" >
-                    </router-link>
-                </div>
+                    <div class="round-button" id="image-icon">
+                        <router-link :to="{name: 'edit-image', query: {index: this.maxElementIndex()}}">
+                            <img src="/static/image-button.png" >
+                        </router-link>
+                    </div>
 
-                <div class="round-button" id="file-icon">
-                    <router-link :to="{name: 'edit-file', query: {index: this.maxElementIndex()}}">
-                        <img src="/static/file-button.png"
-                                    onmouseover="this.src='/static/file-button-hover.png'"
-                                    onmouseout="this.src='/static/file-button.png'">
-                    </router-link>
+                    <div class="round-button" id="file-icon">
+                        <router-link :to="{name: 'edit-file', query: {index: this.maxElementIndex()}}">
+                            <img src="/static/file-button.png"
+                                        onmouseover="this.src='/static/file-button-hover.png'"
+                                        onmouseout="this.src='/static/file-button.png'">
+                        </router-link>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="row">
-            <div class="col-2"></div>
-            <div class="col-8">
-                <div class="form-group">
-                    <div class="title-tag-card card">
-                        <br>
-                        <div class="title-container container">
-                            <div class="row">
-                                <div class="col-2">
-                                    <label for="titleTextbox"><h4><strong>Title: </strong></h4></label>
-                                </div>
+            
+            <div class="row">
+                <div class="col-2"></div>
+                <div class="col-8">
+                    <div class="form-group">
+                        <div class="title-tag-card card">
+                            <br>
+                            <div class="title-container container">
+                                <div class="row">
+                                    <div class="col-2">
+                                        <label for="titleTextbox"><h4><strong>Title: </strong></h4></label>
+                                    </div>
 
-                                <div class="col-10">
-                                    <input class="form-control" type="text" v-model="inProgressPost.title"
-                                        placeholder="Title required" id="titleTextbox">
+                                    <div class="col-10">
+                                        <input class="form-control" type="text" v-model="inProgressPost.title"
+                                            placeholder="Title required" id="titleTextbox">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="container tag-card card">
-                            <div class="row">
-                                <div class="col-2">
-                                    <label for="tagTextbox"><h4><strong>Tags: </strong></h4></label>
+                            <div class="container tag-card card">
+                                <div class="row">
+                                    <div class="col-2">
+                                        <label for="tagTextbox"><h4><strong>Tags: </strong></h4></label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input class="form-control" v-model="inProgressTag" v-on:keyup="createTagEvent"
+                                            placeholder="add a topic tag" id="tagTextbox">
+                                    </div>
+                                    <div class="col-2">
+                                        <button @click="createTagBtn" id="create-tag-button" class="btn btn-block btn-primary">
+                                            <span>
+                                                <font-awesome-icon icon="plus"></font-awesome-icon>
+                                            </span>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="col-8">
-                                    <input class="form-control" v-model="inProgressTag" v-on:keyup="createTagEvent"
-                                        placeholder="add a topic tag" id="tagTextbox">
-                                </div>
-                                <div class="col-2">
-                                    <button @click="createTagBtn" id="create-tag-button" class="btn btn-block btn-primary">
-                                        <span>
-                                            <font-awesome-icon icon="plus"></font-awesome-icon>
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>
-                            <hr>
-                            <span id="tag-container" :key="index" v-for="(tag,index) in inProgressPost.tags">
-                                <span @click="removeTag(index)" class="tag-entry badge badge-dark">{{tag}} <span aria-hidden="true">&times;</span>
-                                    <!-- <button id="tag-delete-button" type="button" class="btn btn-sm btn-dark" >{{"x"}}</button> -->
+                                <hr>
+                                <span id="tag-container" :key="index" v-for="(tag,index) in inProgressPost.tags">
+                                    <span @click="removeTag(index)" class="tag-entry badge badge-dark">{{tag}} <span aria-hidden="true">&times;</span>
+                                        <!-- <button id="tag-delete-button" type="button" class="btn btn-sm btn-dark" >{{"x"}}</button> -->
+                                    </span>
                                 </span>
-                            </span>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
+                <div class="post-element-container">
+                    <div class="card-column column">
+                        <div class="col-12 container">
+                            <div class="post-element card">
+                                <post-element :element="element" :index="index"></post-element>
+                            </div>
+                        </div>
+
+                        <div class="justify-content-start">
+                            <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
+
+                                <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
+                                <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="/static/caret-square-down.png"></button>
+                                <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button>
+                                <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="/static/edit-icon.png"></button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
             </div>
         </div>
-        <b-row>
-            <b-card class="title-tag-card">
-                <b-form>
-                    <b-form-group label="Grade level of lesson">
-                        <b-form-select v-model="currentPost.grade" :options="gradeOptions" class="mb-3" />
-                    </b-form-group>
-                    <b-form-group 
-                        label="Length of the lesson"
-                        description="Approximately how long, in minutes, will your lesson take?">
-                        <b-form-input v-model="currentPost.length"
-                            type="number"/>
-                    </b-form-group>
-                    <b-form-group
-                        label="Subject area of your lesson">
-                        <b-form-select v-model="currentPost.subject" :options="subjectOptions" class="mb-3" />
-                    </b-form-group>
-                    <b-form-group
-                        label="Content type of your lesson">
-                        <b-form-select v-model="currentPost.contentType" :options="contentTypeOptions" class="mb-3" />
-                    </b-form-group>
-                    <b-button variant="primary" @click="saveDraft">Save Tag Changes</b-button>
-                </b-form>
-            </b-card>
-        </b-row>
-        <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
-            <div class="post-element-container">
-                <div class="card-column column">
-                    <div class="col-12 container">
-                        <div class="post-element card">
-                            <post-element :element="element" :index="index"></post-element>
-                        </div>
-                    </div>
-
-                    <div class="justify-content-start">
-                        <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
-
-                            <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
-                            <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="/static/caret-square-down.png"></button>
-                            <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button>
-                            <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="/static/edit-icon.png"></button>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <br>
+        <div v-else>
+            <h1>
+                Loading post...
+            </h1>
+            <font-awesome-icon icon="spinner" spin></font-awesome-icon>
         </div>
     </div>
-    <div v-else>
-        <h1>
-            Loading post...
-        </h1>
-        <font-awesome-icon icon="spinner" spin></font-awesome-icon>
+    <div v-else-if="currentPage===2">
+        <b-card class="title-tag-card">
+            <b-form>
+                <b-form-group label="Grade level of lesson">
+                    <b-form-select v-model="currentPost.grade" :options="gradeOptions" class="mb-3" />
+                </b-form-group>
+                <b-form-group 
+                    label="Length of the lesson"
+                    description="Approximately how long, in minutes, will your lesson take?">
+                    <b-form-input v-model="currentPost.length"
+                        type="number"/>
+                </b-form-group>
+                <b-form-group
+                    label="Subject area of your lesson">
+                    <b-form-select v-model="currentPost.subject" :options="subjectOptions" class="mb-3" />
+                </b-form-group>
+                <b-form-group
+                    label="Content type of your lesson">
+                    <b-form-select v-model="currentPost.contentType" :options="contentTypeOptions" class="mb-3" />
+                </b-form-group>
+                <b-button variant="primary" @click="saveDraft">Save Tag Changes</b-button>
+            </b-form>
+        </b-card>
     </div>
 
     <br><br><br> <!-- this is so problems don't occur with bottom of page button presses -->
@@ -177,6 +180,9 @@
         <div v-else-if="postStatus === SAVED">
             Saved!
         </div>
+        <b-pagination size="md" :per-page="10" v-model="currentPage">
+
+        </b-pagination>
         <button type="button" class="undo-button align-right btn btn-sm btn-outline-danger btn-primary-spacing" @click="undo">
             <font-awesome-icon icon="undo" fixed-width></font-awesome-icon> undo 
         </button>
@@ -306,12 +312,15 @@ export default class PostCreate extends Vue{
         {value: 3, text: 'Life Sciences'},
         {value: 4, text: 'Earth and Space Sciences'},
         {value: 5, text: 'Engineering, Technology, and the Applications of Science'},
+        {value: 6, text: 'Other (elaborate in tags!)'},
     ]
     contentTypeOptions: any = [
         {value: 0, text: 'Game'},
         {value: 1, text: 'Lab'},
         {value: 2, text: 'Lecture'},
     ]
+
+    currentPage: number = 0;
 
     //these aren't ever saved into InProgressPost, they're here for the purpose
     //of loading in a post's current info when you load up a post.

@@ -32,7 +32,7 @@ import {
     FormSelect,
     FormTextarea,
     FormCheckbox,
-
+    Pagination,
     Badge,
     Jumbotron
 
@@ -90,6 +90,8 @@ Vue.use(FormRadio);
 Vue.use(FormSelect);
 Vue.use(FormTextarea);
 Vue.use(FormCheckbox);
+
+Vue.use(Pagination);
 
 Vue.use(Badge);
 

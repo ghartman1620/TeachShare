@@ -9,6 +9,8 @@ from uuid import uuid4
 import os
 
 
+class Standard(models.Model):
+    
 
 
 class Post(models.Model):
