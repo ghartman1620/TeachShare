@@ -44,14 +44,21 @@ class Deploy(object):
         getattr(self, self.args.command)()
 
     def test(self):
-        parser = argparse.ArgumentParser(description='a test command')
-        parser.add_argument('--test', action='store_true')
-        args = parser.parse_args(sys.argv[2:])
-        print('Running command test, --test=%s' % args.test)
+        test = 'gcr.io/teach-share-200700/teachshare_web:1.0.2'
+        self.parse_deployment_image(test)
+
+        # parser = argparse.ArgumentParser(description='a test command')
+        # parser.add_argument('--test', action='store_true')
+        # args = parser.parse_args(sys.argv[2:])
+        # print('Running command test, --test=%s' % args.test)
 
     def all(self):
         self.build()
         self.push()
+        self.update()
+
+    def update(self):
+        cprint('Updating Kubernetes cluster.', color='blue', attrs=['bold'])
 
     def build(self):
         """
@@ -77,6 +84,11 @@ class Deploy(object):
         for dep in self.config['deployments']:
             print('Checking deployment: %s' % dep)
             self.get_deployment_status(dep)
+            image = self.deployments[dep]['spec']['template']['spec']['containers'][0]['image']
+            new_version = self.parse_deployment_image(image)
+            print(new_version)
+            self.update_deployment_version(
+                dep, new_version, self.config['deployments'][dep]['file'])
 
         cprint('Running build command, settings=%s' % settings_resp, 'blue')
         print()
@@ -131,7 +143,7 @@ class Deploy(object):
         with open('backend_deploy.yml', 'r') as ymlfile:
             self.config = yaml.load(ymlfile)
         print(self.config)
-        self.load_deployment('config/production/k8s/web/api-deployment.yml')
+        # self.load_deployment('config/production/k8s/web/api-deployment.yml')
 
     def build_docker_image(self, image_name, settings='TeachShare_WebApp.settings', dockerfile='config/production/production.web.yml'):
         s = 'settings_module={}'.format(settings)
@@ -148,31 +160,32 @@ class Deploy(object):
         cprint(result, 'blue')
         return result
 
-    def load_deployment(self, filename):
-        with open(filename, 'r') as deployment_file:
-            self.deployment = yaml.load(deployment_file)
-        self.deployed_image = self.deployment['spec']['template']['spec']['containers'][0]['image']
-        print(self.deployed_image)
-        self.update_deployment_version('1.0.2', filename)
+    # def load_deployment(self, filename):
+    #     with open(filename, 'r') as deployment_file:
+    #         self.deployment = yaml.load(deployment_file)
+    #     self.deployed_image = self.deployment['spec']['template']['spec']['containers'][0]['image']
+    #     print(self.deployed_image)
+        # FIXME: fix it
+        # self.update_deployment_version('1.0.1', filename)
 
-    def update_deployment_version(self, new_version, filename):
-        print(self.deployed_image, new_version)
-        split_version = self.deployed_image.split(':')
-        self.deployed_image = split_version[0] + ':{}'.format(new_version)
-        print(self.deployed_image)
+    def update_deployment_version(self, name, new_version, filename):
+        # print(self.deployed_image, new_version)
+        # split_version = self.deployed_image.split(':')
+        # self.deployed_image = split_version[0] + ':{}'.format(new_version)
+        # print(self.deployed_image)
 
         # write to actual deployment
-        self.deployment['spec']['template']['spec']['containers'][0]['image'] = self.deployed_image
+        self.deployments[name]['spec']['template']['spec']['containers'][0]['image'] = new_version
         with open(filename, 'w') as deployment_file:
-            yaml.dump(self.deployment, deployment_file)
+            yaml.dump(self.deployments[name], deployment_file)
 
         # write to configuration file
-        self.config['deployments']['api-production']['version'] = new_version
-        self.config['deployments']['task']['version'] = new_version
+        self.config['deployments']['api-production']['version'] = new_version.split(':')[
+            1]
+        self.config['deployments']['celery-task']['version'] = new_version.split(':')[
+            1]
         with open('backend_deploy.yml', 'w') as ymlfile:
             yaml.dump(self.config, ymlfile)
-
-        return self.deployed_image
 
     # kubectl get deployment api-production -o yaml
     def get_deployment_status(self, deployment_name='api-production'):
@@ -183,8 +196,30 @@ class Deploy(object):
         print(status['spec']['template']['spec']['containers'][0]['image'])
 
         # set instance variables
-        self.current_image = status['spec']['template']['spec']['containers'][0]['image']
+        # self.current_image = status['spec']['template']['spec']['containers'][0]['image']
         self.deployments[deployment_name] = status
+        print(self.deployments)
+
+    def parse_deployment_image(self, image):
+        result = image.split(':')[1]
+        result = int(result.split('.')[2])
+        arr = [a for a in image.split(':')[1].split('.')]
+        arr[2] = str(result+1)
+        out = image.split(':')[0] + ':' + '.'.join(arr)
+        print(out)
+        return out
+
+    def create(self):
+        parser = argparse.ArgumentParser(
+            description='create a Kubernetes deployment')
+        parser.add_argument('-f')
+        args = parser.parse_args(sys.argv[2:])
+        print(args)
+
+    # kubectl create -f config/production/k8s/celery-task.yml
+    def create_deployment(self, filepath):
+        result = subprocess.run(['kubectl', 'create', '-f', filepath])
+        print(result)
 
 
 if __name__ == '__main__':
