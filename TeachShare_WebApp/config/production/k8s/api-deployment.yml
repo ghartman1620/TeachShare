@@ -1,16 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations: {deployment.kubernetes.io/revision: '2', kubernetes.io/change-cause: kubectl
-      edit deployment/api-production}
-  creationTimestamp: 2018-04-15 06:46:06
-  generation: 2
   labels: {app: api}
   name: api-production
   namespace: default
-  resourceVersion: '15234'
-  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/api-production
-  uid: ac8d116e-4078-11e8-be31-42010a8a0192
 spec:
   replicas: 2
   selector:
@@ -63,13 +56,4 @@ spec:
         name: ssl-certs
       - emptyDir: {}
         name: cloudsql
-status:
-  availableReplicas: 2
-  conditions:
-  - {lastTransitionTime: !!timestamp '2018-04-15 06:46:07', lastUpdateTime: !!timestamp '2018-04-15
-      06:46:07', message: Deployment has minimum availability., reason: MinimumReplicasAvailable,
-    status: 'True', type: Available}
-  observedGeneration: 2
-  readyReplicas: 2
-  replicas: 2
-  updatedReplicas: 2
+status: {}

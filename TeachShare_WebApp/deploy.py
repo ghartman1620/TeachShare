@@ -59,6 +59,11 @@ class Deploy(object):
 
     def update(self):
         cprint('Updating Kubernetes cluster.', color='blue', attrs=['bold'])
+        for deployment in self.config['deployments']:
+            print(deployment)
+
+    def update_k8s(self):
+        result = subprocess.run([''])
 
     def build(self):
         """
@@ -147,9 +152,6 @@ class Deploy(object):
 
     def build_docker_image(self, image_name, settings='TeachShare_WebApp.settings', dockerfile='config/production/production.web.yml'):
         s = 'settings_module={}'.format(settings)
-        print('******************')
-        print(s)
-        print('******************')
         result = subprocess.run(['docker', 'build', '-f', dockerfile, '--build-arg',
                                  s, '-t', image_name, '.'])
         cprint(result, 'blue')
@@ -160,30 +162,11 @@ class Deploy(object):
         cprint(result, 'blue')
         return result
 
-    # def load_deployment(self, filename):
-    #     with open(filename, 'r') as deployment_file:
-    #         self.deployment = yaml.load(deployment_file)
-    #     self.deployed_image = self.deployment['spec']['template']['spec']['containers'][0]['image']
-    #     print(self.deployed_image)
-        # FIXME: fix it
-        # self.update_deployment_version('1.0.1', filename)
-
     def update_deployment_version(self, name, new_version, filename):
-        # print(self.deployed_image, new_version)
-        # split_version = self.deployed_image.split(':')
-        # self.deployed_image = split_version[0] + ':{}'.format(new_version)
-        # print(self.deployed_image)
-
-        # write to actual deployment
-        self.deployments[name]['spec']['template']['spec']['containers'][0]['image'] = new_version
-        with open(filename, 'w') as deployment_file:
-            yaml.dump(self.deployments[name], deployment_file)
+        self.edit_image_version(name, self.config[name]['name'], new_version)
+        self.config['deployments'][name]['version'] = new_version.split(':')[1]
 
         # write to configuration file
-        self.config['deployments']['api-production']['version'] = new_version.split(':')[
-            1]
-        self.config['deployments']['celery-task']['version'] = new_version.split(':')[
-            1]
         with open('backend_deploy.yml', 'w') as ymlfile:
             yaml.dump(self.config, ymlfile)
 
@@ -200,26 +183,53 @@ class Deploy(object):
         self.deployments[deployment_name] = status
         print(self.deployments)
 
-    def parse_deployment_image(self, image):
+    @staticmethod
+    def parse_deployment_image(image):
         result = image.split(':')[1]
         result = int(result.split('.')[2])
         arr = [a for a in image.split(':')[1].split('.')]
         arr[2] = str(result+1)
         out = image.split(':')[0] + ':' + '.'.join(arr)
-        print(out)
         return out
+
+    def edit(self):
+        self.edit_image_version('api-production', 'api',
+                                'gcr.io/teach-share-200700/teachshare_web:1.0.2')
+
+    @staticmethod
+    def edit_image_version(deployment, container, image):
+        depl = 'deployment/{deployment_name}'.format(
+            deployment_name=deployment)
+        edited = '{container_name}={image_link}'.format(
+            container_name=container, image_link=image)
+        res = subprocess.run(['kubectl', 'set', 'image', depl, edited])
+        if res.returncode == 0:
+            cprint('Successfully updated container image!', color='green')
+        else:
+            cprint('There was an error with your image update.', color='red')
+            print(res.stderr)
 
     def create(self):
         parser = argparse.ArgumentParser(
             description='create a Kubernetes deployment')
-        parser.add_argument('-f')
+        parser.add_argument('-f', help='the file to use')
         args = parser.parse_args(sys.argv[2:])
         print(args)
+        if self.create_deployment(args.f):
+            cprint('Successfully created deployment!', color='yellow')
+        else:
+            cprint('There was an error creating the deployment!!', color='red')
 
     # kubectl create -f config/production/k8s/celery-task.yml
-    def create_deployment(self, filepath):
-        result = subprocess.run(['kubectl', 'create', '-f', filepath])
+
+    @staticmethod
+    def create_deployment(filepath):
+        result = subprocess.run(
+            ['kubectl', 'create', '-f', filepath, '--record'], subprocess.PIPE)
         print(result)
+        if result.returncode == 0:
+            return True
+        return False
 
 
 if __name__ == '__main__':
