@@ -16,6 +16,8 @@ const Home = () =>
     import ( /* webpackChunkName: "home" */ "../components/HomePage.vue");
 const PostCreate = () =>
     import ( /* webpackChunkName: "post-create" */ "../components/PostCreate.vue");
+const DragAndDrop = () =>
+    import ("../components/DragAndDrop.vue");
 const EditText = () =>
     import ( /* webpackChunkName: "edit-text" */ "../components/text/EditText.vue");
 const EditVideo = () =>
@@ -34,7 +36,6 @@ const Comments = () =>
     import ( /* webpackChunkName: "comments" */ "../components/comments/Comments.vue");
 const CommentEntry = () =>
     import ( /* webpackChunkName: "comments" */ "../components/comments/CommentEntry.vue");
-
 const Login = () =>
     import ( /* webpackChunkName: "login" */ "../components/auth/Login.vue");
 const Register = () =>
@@ -84,6 +85,11 @@ const router = new Router({
                     name: "dashboard",
                     path: "/dashboard",
                     component: PostFeed
+                },
+                {
+                    name: "dragndrop",
+                    path: "/dragndrop",
+                    component: DragAndDrop
                 },
                 {
                     name: "posts",
