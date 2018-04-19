@@ -8,7 +8,7 @@ import subprocess
 import yaml
 from shutil import copy
 from pprint import pprint
-
+import os
 
 class DockerCommandError(Exception):
     def __init__(self, cmd, message):
@@ -164,6 +164,7 @@ class Deploy(object):
 
     def update_deployment_version(self, name, new_version, filename):
         self.edit_image_version(name, self.config[name]['name'], new_version)
+        print(self.config['deployments'], name)
         self.config['deployments'][name]['version'] = new_version.split(':')[1]
 
         # write to configuration file
@@ -231,6 +232,13 @@ class Deploy(object):
             return True
         return False
 
+    @staticmethod
+    def build_frontend():
+        original_path = os.path.dirname(os.path.realpath(__file__))
+        os.chdir('../Frontend/teach-share')
+        result = subprocess.run(['npm', 'run', 'build', 'production'], subprocess.PIPE)
+        print(result.stdout)
+        
 
 if __name__ == '__main__':
     try:

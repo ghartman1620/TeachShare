@@ -17,7 +17,6 @@ spec:
       labels: {app: frontend, type: deployment}
     spec:
       containers:
-	// is this the right image?
         - image: gcr.io/teach-share-200700/frontserve:latest
           imagePullPolicy: Always
           name: frontserve
