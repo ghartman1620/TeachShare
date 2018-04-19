@@ -278,13 +278,15 @@ class FileUploadView(views.APIView):
     # SHOULD not be commented - at time of writing frontend has issues with login (fixed on another branch but requires merge)
     permission_classes = (AllowAny,)
     parser_classes = (FileUploadParser, JSONParser)
-    storage_client = google.cloud.storage.Client(
-        'teach-share-200700')  # .from_service_account_json(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
-    # 'AIzaSyCgvEvHSGGIuhU6sV5Qb85gSKvBx5ZRzKQ')
-    bucket_name = 'teachshare-media'
-    bucket = storage_client.get_bucket(bucket_name)
-    print(bucket)
-    print(check_production())
+
+    if check_production():
+        storage_client = google.cloud.storage.Client(
+            'teach-share-200700')  # .from_service_account_json(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
+        # 'AIzaSyCgvEvHSGGIuhU6sV5Qb85gSKvBx5ZRzKQ')
+        bucket_name = 'teachshare-media'
+        bucket = storage_client.get_bucket(bucket_name)
+        print(bucket)
+        print(check_production())
 
     def put(self, request, filename, format=None):
         post_id = request.query_params['post']

@@ -1,0 +1,15 @@
+https://goalbookapp.com/toolkit/api/search/*?grades%5B%5D=K&grades%5B%5D=Pre-K&grades%5B%5D=1&grades%5B%5D=2&grades%5B%5D=3&grades%5B%5D=4&grades%5B%5D=5&grades%5B%5D=6&grades%5B%5D=7&grades%5B%5D=8&grades%5B%5D=9&grades%5B%5D=10&grades%5B%5D=11&grades%5B%5D=12&subjects%5B%5D=Reading&user_type=default&new_search=true
+https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Writing&user_type=default&new_search=true
+https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Math&user_type=default&new_search=true
+https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Behavior+%26+SEL&user_type=default&new_search=true
+https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Pre-Kindergarten&user_type=default&new_search=true
+https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=English+Learners&user_type=default&new_search=true
+https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Autism&user_type=default&new_search=true
+https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Speech+%26+Language&user_type=default&new_search=true
+https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Success+Skills&user_type=default&new_search=true
+https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Blind%2FVisual+Impairment&user_type=default&new_search=true
+https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Adapted+Physical+Education&user_type=default&new_search=true
+https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Deaf%2FHard+of+Hearing&user_type=default&new_search=true
+https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Occupational+Therapy&user_type=default&new_search=true
+https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Alt+Academic+%26+Life+Skills&user_type=default&new_search=true
+https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Transition&user_type=default&new_search=true
