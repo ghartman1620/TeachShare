@@ -1,6 +1,6 @@
 deployments:
   api-production: {dockerfile: config/production/production.web.yml, file: config/production/k8s/api-deployment.yml,
-    url: gcr.io/teach-share-200700/teachshare_web, version: 1.0.2}
+    url: gcr.io/teach-share-200700/teachshare_web, version: 1.0.2, name: api}
   celery-task: {dockerfile: config/production/production.task.yml, file: config/production/k8s/celery-task.yml,
-    url: gcr.io/teach-share-200700/teachshare_task, version: 1.0.2}
+    url: gcr.io/teach-share-200700/teachshare_task, version: 1.0.2, name: task}
 settings: TeachShare_WebApp.settings_production

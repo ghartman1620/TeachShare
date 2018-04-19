@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels: {app: frontend}
+  name: frontend
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: frontend}
+  strategy:
+    rollingUpdate: {maxSurge: 1, maxUnavailable: 2}
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels: {app: frontend, type: deployment}
+    spec:
+      containers:
+	// is this the right image?
+        - image: gcr.io/teach-share-200700/frontserve:latest
+          imagePullPolicy: Always
+          name: frontserve
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+status: {} 
