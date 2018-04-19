@@ -11735,237 +11735,6 @@
         },
         {
             "adaptation_strategies": [
-                "9e4d12ac-d798-4a00-ac26-7b19e964096b",
-                "9dd2f4d7-8e66-4231-bb0c-de8678d962b7",
-                "dfd901a1-c9a8-4e2b-8fe1-267579d909ae",
-                "c879d159-e4a0-4e38-a243-0df30b19c442",
-                "15cf0ff9-574d-4a23-93bf-a21e16d435be",
-                "128f853a-a8ec-452d-97d8-d3b6a6a51545",
-                "c37b57c1-483a-4c2b-971f-afc8cce1e616",
-                "44a33aeb-e5e1-497c-9812-7baad54a5312",
-                "3738b30e-1d0d-4ea4-87e2-19e7606daddc",
-                "5c58c104-a506-4f85-9795-540a7821f503"
-            ],
-            "author_id": "b05d3e25-6b67-4c89-adbe-38d43bc3ae76",
-            "ca_eld_standard_codes": [],
-            "coach_standard_codes": [],
-            "created_at": "2014-12-08 23:15:42Z",
-            "demo": false,
-            "dlm_ee_codes": [],
-            "goal_text": "By (date), when given in a high-demand task (e.g. learning a new skill), (name) will remain calm by using at least  (1) [[calming strategies|calming strategy]] (e.g. [[belly breathing|belly breaths]], [[6-second pause|short break]]), while refraining from maladaptive behaviors (e.g. yelling, hitting, throwing objects), for a duration of (15) minutes, in (4 of 5) high-demand tasks.",
-            "grades": [
-                "K",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5"
-            ],
-            "ils_sel_standard_codes": [],
-            "ncsc_ccc_codes": [],
-            "ny_prek_standard_codes": [],
-            "objectives": [
-                {
-                    "_id": "55c1633f645c28c84c00000c",
-                    "created_at": "2015-08-05 01:13:35Z",
-                    "level": "Mild",
-                    "text": "By (date), when given in a high-demand task (e.g. learning a new skill) and given a [[visual cueing|visual cue]] (e.g. Teacher mimes the action of belly breathing), (name) will remain calm by using at least  (1) [[calming strategies|calming strategy]] (e.g. [[belly breathing|belly breaths]], [[6-second pause|short break]]), while refraining from maladaptive behaviors (e.g. yelling, hitting, throwing objects), for a duration of (15) minutes, in (4 of 5) high-demand tasks.",
-                    "updated_at": "2015-08-05 01:13:35Z",
-                    "updated_time": 1438737215637,
-                    "uuid": "056233a1-ed18-44cd-9bd7-b406a94794f3"
-                },
-                {
-                    "_id": "55c1633f645c28c84c00000d",
-                    "created_at": "2015-08-05 01:13:35Z",
-                    "level": "Moderate",
-                    "text": "By (date), immediately after reading a [[social narratives|social narrative]] of what to do when feeling overwhelmed, when given in a high-demand task (e.g. learning a new skill) and given a [[visual cueing|visual cue]] (e.g. Teacher mimes the action of belly breathing), (name) will remain calm by using at least  (1) [[calming strategies|calming strategy]] (e.g. [[belly breathing|belly breaths]], [[6-second pause|short break]]), while refraining from maladaptive behaviors (e.g. yelling, hitting, throwing objects), for a duration of (10) minutes, in (3 of 4) high-demand tasks.",
-                    "updated_at": "2015-08-05 01:13:35Z",
-                    "updated_time": 1438737215638,
-                    "uuid": "6584b76e-588f-48ae-b020-b04ab851bd96"
-                },
-                {
-                    "_id": "55c1633f645c28c84c00000e",
-                    "created_at": "2015-08-05 01:13:35Z",
-                    "level": "Intense",
-                    "text": "By (date), immediately after watching a [[video|video]] of what to do when feeling overwhelmed, when given in a high-demand task (e.g. learning a new skill) and given a [[visual cueing|visual cue]] (e.g. Teacher mimes the action of belly breathing), (name) will remain calm by using at least (1) [[calming strategies|calming strategy]] (e.g. [[belly breathing|belly breaths]], [[6-second pause|short break]]) in a [[calming space|calming space]] (e.g. Teacher guides the classroom to a calming location inside or outside of the classroom), while refraining from maladaptive behaviors (e.g. yelling, hitting, throwing objects), for a duration of (5) minutes, in (2 of 3) high-demand tasks.",
-                    "updated_at": "2015-08-05 01:13:35Z",
-                    "updated_time": 1438737215638,
-                    "uuid": "e76a2221-951d-4f63-ae25-731d5560d9ab"
-                }
-            ],
-            "published": true,
-            "score": 0.5,
-            "slug": "cope-with-frustration",
-            "standard_codes": [],
-            "subject": "Autism",
-            "subject_domains": [
-                "Emotional Regulation"
-            ],
-            "teks_standard_codes": [],
-            "title": "Cope With Frustration",
-            "udl_adaptations": [
-                {
-                    "_id": "55c161d8645c28504b000006",
-                    "created_at": "2015-08-05 01:07:36Z",
-                    "text": "The teacher can customize the way that information being taught to the student is displayed. For example, the teacher can [[modeling behaviors|model]] how to use a variety of [[calming strategies|calming strategies]], use [[video|video models]], use [[social narratives|social narratives]], or use [[alternate texts|graphic novels]]. Using a variety of ways to display information gives the student repetition to learn the content and keeps learning innovative and interesting.",
-                    "udl_standard_checkpoint_ref": "UDL I 1.1",
-                    "udl_standard_long_ref": "UDL I 1.1 Provide Multiple Means of Representation: Offer ways of customizing the display of information",
-                    "udl_standard_short_ref": "UDL I 1.1 Offer ways of customizing the display of information",
-                    "updated_at": "2015-08-05 01:13:35Z",
-                    "updated_time": 1438737215649,
-                    "uuid": "60185e95-8613-42e6-a46b-2138ae093ad8"
-                },
-                {
-                    "_id": "55c16292645c28164d000008",
-                    "created_at": "2015-08-05 01:10:42Z",
-                    "text": "In order to maximize learning for all students, the teacher can allow the student to respond in a variety of ways. For example, for a non-verbal student, who appears to be feeling frustrated due to a task, the teacher can give the option to point from a [[multiple choice|choice]] of (2) [[calming strategies|calming strategies]], since he/she may not understand the teacher asking \"What strategy will you use?\" or be able to respond using intelligible speech or using more than 1-2 words. Another consideration is that the task itself may be too challenging for the student, which may be triggering the student's frustration. In this case, the teacher will need to consider reducing the number of demands to allow the student to be successful at completing the task.",
-                    "udl_standard_checkpoint_ref": "UDL II 4.1",
-                    "udl_standard_long_ref": "UDL II 4.1 Provide Multiple Means of Action and Expression: Vary the methods for response and navigation",
-                    "udl_standard_short_ref": "UDL II 4.1 Vary the methods for response and navigation",
-                    "updated_at": "2015-08-05 01:13:35Z",
-                    "updated_time": 1438737215651,
-                    "uuid": "fb0eebee-c9a6-4b0f-9531-8389bd6aac67"
-                },
-                {
-                    "_id": "55c1631a645c28c84c000005",
-                    "created_at": "2015-08-05 01:12:58Z",
-                    "text": "The teacher can facilitate coping skills by making them part of the student's [[visual task schedule|daily schedule]]. This takes away some of the stigma and negative attention built into practicing some [[calming strategies|calming strategies]], as well as, integrates universal learning, where all students can learn useful coping strategies. Most students feel frustrated or overwhelmed at some point in their academic career and learning these strategies would be beneficial for all students either in the near future and later in the more distant future.",
-                    "udl_standard_checkpoint_ref": "UDL III 9.2",
-                    "udl_standard_long_ref": "UDL III 9.2 Provide Multiple Means of Engagement: Facilitate personal coping skills and strategies",
-                    "udl_standard_short_ref": "UDL III 9.2 Facilitate personal coping skills and strategies",
-                    "updated_at": "2015-08-05 01:13:35Z",
-                    "updated_time": 1438737215652,
-                    "uuid": "216a173c-917d-46a3-b92a-9070245e3792"
-                }
-            ],
-            "updated_at": "2015-08-05 01:13:35Z",
-            "updated_time": 1438737215655,
-            "uuid": "53646553-fdb7-4acf-aab5-e4f2963311f7",
-            "wida_2007_standard_codes": []
-        },
-        {
-            "adaptation_strategies": [
-                "d82473e0-606e-4470-8ee0-f7bda6e5766d",
-                "5c58c104-a506-4f85-9795-540a7821f503",
-                "7f2e7a09-a96b-4447-965c-b43d88e66970",
-                "8ce153db-a210-4317-9ed8-4d7a6ce4f75c",
-                "c37b57c1-483a-4c2b-971f-afc8cce1e616",
-                "3738b30e-1d0d-4ea4-87e2-19e7606daddc",
-                "b8cbcc73-5349-49f0-9a6b-eada91fe4d4b"
-            ],
-            "assessment_items": {},
-            "author_id": "830985cd-5486-4bc8-8c0c-9d97d31a93ef",
-            "ca_eld_standard_codes": [],
-            "cape_standard_codes": [],
-            "coach_standard_codes": [],
-            "created_at": "2015-01-21 22:37:52Z",
-            "demo": false,
-            "dlm_ee_codes": [],
-            "goal_text": "By (date), when asked a routine verbal question (e.g. Teacher asks \"What would you like to eat?\") by an unfamiliar school staff member (e.g. lunch personnel) and given (3) verbal response options (e.g. Teacher says \"Do you want the pizza, apple, or taco?\"), (name) will verbally respond by stating (1) choice in a complete sentence (e.g. Student says \"I\u2019ll have the pizza\") within (20) seconds of the adult's question, in (4 out of 5) conversations with an unfamiliar adult.",
-            "grades": [
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "11",
-                "12"
-            ],
-            "ils_sel_standard_codes": [
-                "ILS-SEL.1B.6-8.b",
-                "ILS-SEL.1C.9-10.a",
-                "ILS-SEL.1B.11-12.a"
-            ],
-            "ncsc_ccc_codes": [],
-            "ny_prek_standard_codes": [],
-            "objectives": [
-                {
-                    "_id": "5a690e263b447801b3a21d13",
-                    "created_at": "2018-01-24 22:52:22Z",
-                    "example_text": null,
-                    "level": "Mild",
-                    "text": "By (date), when asked a routine, verbal question (e.g. Teacher asks \"What would you like to eat?\") by an unfamiliar school staff member (e.g. lunch personnel) and given (3) verbal response options (e.g. Teacher says \"Do you want the pizza, apple, or taco?\"), (name) will verbally respond by stating (1) choice in a complete sentence (e.g. Student says \"I\u2019ll have the pizza\") using a [[sentence starters|sentence starter]] (e.g. Teacher says \"I want the ...\"), within (20) seconds of the adult's question, in (4 out of 5) conversations with an unfamiliar adult.",
-                    "title": null,
-                    "updated_at": "2018-01-24 22:52:22Z",
-                    "updated_time": 1516834342977,
-                    "uuid": "f7481d73-e5d1-4af1-83b6-14dd76d66f6c"
-                },
-                {
-                    "_id": "5a690e263b447801b3a21d14",
-                    "created_at": "2018-01-24 22:52:22Z",
-                    "example_text": null,
-                    "level": "Moderate",
-                    "text": "By (date), immediately after watching a [[modeling behaviors|teacher model]] of how to make a choice, when asked a routine, verbal question (e.g. Teacher asks \"Do you want pizza or a taco?\") by an unfamiliar school staff member (e.g. lunch personnel) and presented with (2) object [[multiple choice|choices]] (e.g. Teacher holds up pizza and taco in front of the student), (name) will select (1) choice by pointing to the object, within (30) seconds of the adult's question, in (3 out of 4) choice-making interactions with an unfamiliar adult.",
-                    "title": null,
-                    "updated_at": "2018-01-24 22:52:22Z",
-                    "updated_time": 1516834342977,
-                    "uuid": "97ed4df7-73b8-42ca-b120-ceef2e50dfe5"
-                },
-                {
-                    "_id": "5a690e263b447801b3a21d15",
-                    "created_at": "2018-01-24 22:52:22Z",
-                    "example_text": null,
-                    "level": "Intense",
-                    "text": "By (date), during [[social role play| role play]], when asked a routine, verbal question (e.g. Teacher asks \"Do you want pizza or a taco?\") by an unfamiliar school staff member (e.g. lunch personnel) and presented with (2) object [[multiple choice|choices]] (e.g. Teacher holds up pizza and taco in front of the student), (name) will select (1) choice by pointing to the object, within (30) seconds of the adult's question, in (3 out of 4) choice-making interactions with an unfamiliar adult.",
-                    "title": null,
-                    "updated_at": "2018-01-24 22:52:22Z",
-                    "updated_time": 1516834342978,
-                    "uuid": "1956824f-8377-4623-bcd6-43f6becc3b6f"
-                }
-            ],
-            "published": true,
-            "score": 0.9,
-            "slug": "choice-making-with-an-unfamiliar-adult",
-            "standard_codes": [],
-            "subject": "Autism",
-            "subject_domains": [
-                "Self-Advocacy"
-            ],
-            "super_page": false,
-            "teks_standard_codes": [],
-            "title": "Choice-Making With An Unfamiliar Adult",
-            "udl_adaptations": [
-                {
-                    "_id": "54cfefa5645c28bd6500079b",
-                    "created_at": "2015-02-02 21:44:05Z",
-                    "text": "The teacher can offer differentiation when providing examples of expected and unexpected behaviors for the variety of situations our students will encounter in when making a choice in the school cafeteria.  [[video|Video modeling]] using a teacher, peer, or the student as actors will explicitly display the implicit rules of the school cafeteria.  To ensure success offer a display of information that meets the need and interest of the student.  Consider auditory, visual, and kinesthetic methods of communication to maximize success within the new environment.",
-                    "udl_standard_checkpoint_ref": "UDL I 1.1",
-                    "udl_standard_long_ref": "UDL I 1.1 Provide Multiple Means of Representation: Offer ways of customizing the display of information",
-                    "udl_standard_short_ref": "UDL I 1.1 Offer ways of customizing the display of information",
-                    "updated_at": "2018-01-24 22:52:23Z",
-                    "updated_time": 1516834343071,
-                    "uuid": "bc1051a9-247e-4534-a431-e7d8287a9a7f"
-                },
-                {
-                    "_id": "54cfefc6645c28cd690006ad",
-                    "created_at": "2015-02-02 21:44:38Z",
-                    "text": "Students use hi-tech devices (e.g. tablets with Proloqu2go or DynoVox) or low-tech systems (e.g. [[sentence starters|sentence frames]] and [[picture choices|picture icons]]) to overcome barriers in communication within a classroom.  Continue to challenge students in other school settings, like the school cafeteria, by providing support and instruction on how to use tools and assistive technologies to overcome barriers in participation with peers and other school staff members.  For example, provide students with pre-recorded messages and sentence frames to support learning.  As student objectives are met, scaffold the prompts thus fostering the growing independence with familiar and unfamiliar communicative partners.",
-                    "udl_standard_checkpoint_ref": "UDL II 4.2",
-                    "udl_standard_long_ref": "UDL II 4.2 Provide Multiple Means of Action and Expression: Optimize access to tools and assistive technologies",
-                    "udl_standard_short_ref": "UDL II 4.2 Optimize access to tools and assistive technologies",
-                    "updated_at": "2018-01-24 22:52:23Z",
-                    "updated_time": 1516834343080,
-                    "uuid": "b858b3ab-ec6e-4564-b489-d58faac98325"
-                },
-                {
-                    "_id": "54cfefdb645c28bd650007a3",
-                    "created_at": "2015-02-02 21:44:59Z",
-                    "text": "Differentiate the degree and difficulty of the goal for the student.  Allow the student to explore the cafeteria when it is empty and quiet.  Further allow the student to meet and learn about the staff members he or she might encounter when making a choice for lunch.  Continue to emphasize the process and create a flexible [[visual task schedule|task-analysis]] for each objective leading up to the goal of ordering in the school cafeteria.  Vary the degrees of acceptable performance toward the goal as the student\u2019s anxiety may increase depending on the day and part of the task to be mastered.",
-                    "udl_standard_checkpoint_ref": "UDL III 8.2",
-                    "udl_standard_long_ref": "UDL III 8.2 Provide Multiple Means of Engagement: Vary demands and resources to optimize challenge",
-                    "udl_standard_short_ref": "UDL III 8.2 Vary demands and resources to optimize challenge",
-                    "updated_at": "2018-01-24 22:52:23Z",
-                    "updated_time": 1516834343089,
-                    "uuid": "38daf2ce-f7ad-488a-a34a-665204ef5fe9"
-                }
-            ],
-            "updated_at": "2018-01-24 22:52:23Z",
-            "updated_time": 1516834343103,
-            "uuid": "e504ad28-8c59-42e0-a7f4-aa206d47b4ab",
-            "wida_2007_standard_codes": []
-        },
-        {
-            "adaptation_strategies": [
                 "290a50f5-2b68-41a0-b78f-ff074f5dec77",
                 "1edef095-3678-4450-ac3f-fd7142d90074",
                 "f7313fa2-06ee-481a-9dd1-c4deec26bdd6",
@@ -12298,6 +12067,116 @@
             "updated_at": "2014-12-09 00:41:20Z",
             "updated_time": 1418085680335,
             "uuid": "d42a0eb4-962a-4cfd-b574-488da01b72bd",
+            "wida_2007_standard_codes": []
+        },
+        {
+            "adaptation_strategies": [
+                "9e4d12ac-d798-4a00-ac26-7b19e964096b",
+                "9dd2f4d7-8e66-4231-bb0c-de8678d962b7",
+                "dfd901a1-c9a8-4e2b-8fe1-267579d909ae",
+                "c879d159-e4a0-4e38-a243-0df30b19c442",
+                "15cf0ff9-574d-4a23-93bf-a21e16d435be",
+                "128f853a-a8ec-452d-97d8-d3b6a6a51545",
+                "c37b57c1-483a-4c2b-971f-afc8cce1e616",
+                "44a33aeb-e5e1-497c-9812-7baad54a5312",
+                "3738b30e-1d0d-4ea4-87e2-19e7606daddc",
+                "5c58c104-a506-4f85-9795-540a7821f503"
+            ],
+            "author_id": "b05d3e25-6b67-4c89-adbe-38d43bc3ae76",
+            "ca_eld_standard_codes": [],
+            "coach_standard_codes": [],
+            "created_at": "2014-12-08 23:15:42Z",
+            "demo": false,
+            "dlm_ee_codes": [],
+            "goal_text": "By (date), when given in a high-demand task (e.g. learning a new skill), (name) will remain calm by using at least  (1) [[calming strategies|calming strategy]] (e.g. [[belly breathing|belly breaths]], [[6-second pause|short break]]), while refraining from maladaptive behaviors (e.g. yelling, hitting, throwing objects), for a duration of (15) minutes, in (4 of 5) high-demand tasks.",
+            "grades": [
+                "K",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5"
+            ],
+            "ils_sel_standard_codes": [],
+            "ncsc_ccc_codes": [],
+            "ny_prek_standard_codes": [],
+            "objectives": [
+                {
+                    "_id": "55c1633f645c28c84c00000c",
+                    "created_at": "2015-08-05 01:13:35Z",
+                    "level": "Mild",
+                    "text": "By (date), when given in a high-demand task (e.g. learning a new skill) and given a [[visual cueing|visual cue]] (e.g. Teacher mimes the action of belly breathing), (name) will remain calm by using at least  (1) [[calming strategies|calming strategy]] (e.g. [[belly breathing|belly breaths]], [[6-second pause|short break]]), while refraining from maladaptive behaviors (e.g. yelling, hitting, throwing objects), for a duration of (15) minutes, in (4 of 5) high-demand tasks.",
+                    "updated_at": "2015-08-05 01:13:35Z",
+                    "updated_time": 1438737215637,
+                    "uuid": "056233a1-ed18-44cd-9bd7-b406a94794f3"
+                },
+                {
+                    "_id": "55c1633f645c28c84c00000d",
+                    "created_at": "2015-08-05 01:13:35Z",
+                    "level": "Moderate",
+                    "text": "By (date), immediately after reading a [[social narratives|social narrative]] of what to do when feeling overwhelmed, when given in a high-demand task (e.g. learning a new skill) and given a [[visual cueing|visual cue]] (e.g. Teacher mimes the action of belly breathing), (name) will remain calm by using at least  (1) [[calming strategies|calming strategy]] (e.g. [[belly breathing|belly breaths]], [[6-second pause|short break]]), while refraining from maladaptive behaviors (e.g. yelling, hitting, throwing objects), for a duration of (10) minutes, in (3 of 4) high-demand tasks.",
+                    "updated_at": "2015-08-05 01:13:35Z",
+                    "updated_time": 1438737215638,
+                    "uuid": "6584b76e-588f-48ae-b020-b04ab851bd96"
+                },
+                {
+                    "_id": "55c1633f645c28c84c00000e",
+                    "created_at": "2015-08-05 01:13:35Z",
+                    "level": "Intense",
+                    "text": "By (date), immediately after watching a [[video|video]] of what to do when feeling overwhelmed, when given in a high-demand task (e.g. learning a new skill) and given a [[visual cueing|visual cue]] (e.g. Teacher mimes the action of belly breathing), (name) will remain calm by using at least (1) [[calming strategies|calming strategy]] (e.g. [[belly breathing|belly breaths]], [[6-second pause|short break]]) in a [[calming space|calming space]] (e.g. Teacher guides the classroom to a calming location inside or outside of the classroom), while refraining from maladaptive behaviors (e.g. yelling, hitting, throwing objects), for a duration of (5) minutes, in (2 of 3) high-demand tasks.",
+                    "updated_at": "2015-08-05 01:13:35Z",
+                    "updated_time": 1438737215638,
+                    "uuid": "e76a2221-951d-4f63-ae25-731d5560d9ab"
+                }
+            ],
+            "published": true,
+            "score": 0.5,
+            "slug": "cope-with-frustration",
+            "standard_codes": [],
+            "subject": "Autism",
+            "subject_domains": [
+                "Emotional Regulation"
+            ],
+            "teks_standard_codes": [],
+            "title": "Cope With Frustration",
+            "udl_adaptations": [
+                {
+                    "_id": "55c161d8645c28504b000006",
+                    "created_at": "2015-08-05 01:07:36Z",
+                    "text": "The teacher can customize the way that information being taught to the student is displayed. For example, the teacher can [[modeling behaviors|model]] how to use a variety of [[calming strategies|calming strategies]], use [[video|video models]], use [[social narratives|social narratives]], or use [[alternate texts|graphic novels]]. Using a variety of ways to display information gives the student repetition to learn the content and keeps learning innovative and interesting.",
+                    "udl_standard_checkpoint_ref": "UDL I 1.1",
+                    "udl_standard_long_ref": "UDL I 1.1 Provide Multiple Means of Representation: Offer ways of customizing the display of information",
+                    "udl_standard_short_ref": "UDL I 1.1 Offer ways of customizing the display of information",
+                    "updated_at": "2015-08-05 01:13:35Z",
+                    "updated_time": 1438737215649,
+                    "uuid": "60185e95-8613-42e6-a46b-2138ae093ad8"
+                },
+                {
+                    "_id": "55c16292645c28164d000008",
+                    "created_at": "2015-08-05 01:10:42Z",
+                    "text": "In order to maximize learning for all students, the teacher can allow the student to respond in a variety of ways. For example, for a non-verbal student, who appears to be feeling frustrated due to a task, the teacher can give the option to point from a [[multiple choice|choice]] of (2) [[calming strategies|calming strategies]], since he/she may not understand the teacher asking \"What strategy will you use?\" or be able to respond using intelligible speech or using more than 1-2 words. Another consideration is that the task itself may be too challenging for the student, which may be triggering the student's frustration. In this case, the teacher will need to consider reducing the number of demands to allow the student to be successful at completing the task.",
+                    "udl_standard_checkpoint_ref": "UDL II 4.1",
+                    "udl_standard_long_ref": "UDL II 4.1 Provide Multiple Means of Action and Expression: Vary the methods for response and navigation",
+                    "udl_standard_short_ref": "UDL II 4.1 Vary the methods for response and navigation",
+                    "updated_at": "2015-08-05 01:13:35Z",
+                    "updated_time": 1438737215651,
+                    "uuid": "fb0eebee-c9a6-4b0f-9531-8389bd6aac67"
+                },
+                {
+                    "_id": "55c1631a645c28c84c000005",
+                    "created_at": "2015-08-05 01:12:58Z",
+                    "text": "The teacher can facilitate coping skills by making them part of the student's [[visual task schedule|daily schedule]]. This takes away some of the stigma and negative attention built into practicing some [[calming strategies|calming strategies]], as well as, integrates universal learning, where all students can learn useful coping strategies. Most students feel frustrated or overwhelmed at some point in their academic career and learning these strategies would be beneficial for all students either in the near future and later in the more distant future.",
+                    "udl_standard_checkpoint_ref": "UDL III 9.2",
+                    "udl_standard_long_ref": "UDL III 9.2 Provide Multiple Means of Engagement: Facilitate personal coping skills and strategies",
+                    "udl_standard_short_ref": "UDL III 9.2 Facilitate personal coping skills and strategies",
+                    "updated_at": "2015-08-05 01:13:35Z",
+                    "updated_time": 1438737215652,
+                    "uuid": "216a173c-917d-46a3-b92a-9070245e3792"
+                }
+            ],
+            "updated_at": "2015-08-05 01:13:35Z",
+            "updated_time": 1438737215655,
+            "uuid": "53646553-fdb7-4acf-aab5-e4f2963311f7",
             "wida_2007_standard_codes": []
         },
         {
@@ -14718,6 +14597,701 @@
         },
         {
             "adaptation_strategies": [
+                "d82473e0-606e-4470-8ee0-f7bda6e5766d",
+                "5c58c104-a506-4f85-9795-540a7821f503",
+                "7f2e7a09-a96b-4447-965c-b43d88e66970",
+                "8ce153db-a210-4317-9ed8-4d7a6ce4f75c",
+                "c37b57c1-483a-4c2b-971f-afc8cce1e616",
+                "3738b30e-1d0d-4ea4-87e2-19e7606daddc",
+                "b8cbcc73-5349-49f0-9a6b-eada91fe4d4b"
+            ],
+            "assessment_items": {},
+            "author_id": "830985cd-5486-4bc8-8c0c-9d97d31a93ef",
+            "ca_eld_standard_codes": [],
+            "cape_standard_codes": [],
+            "coach_standard_codes": [],
+            "created_at": "2015-01-21 22:37:52Z",
+            "demo": false,
+            "dlm_ee_codes": [],
+            "goal_text": "By (date), when asked a routine verbal question (e.g. Teacher asks \"What would you like to eat?\") by an unfamiliar school staff member (e.g. lunch personnel) and given (3) verbal response options (e.g. Teacher says \"Do you want the pizza, apple, or taco?\"), (name) will verbally respond by stating (1) choice in a complete sentence (e.g. Student says \"I\u2019ll have the pizza\") within (20) seconds of the adult's question, in (4 out of 5) conversations with an unfamiliar adult.",
+            "grades": [
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12"
+            ],
+            "ils_sel_standard_codes": [
+                "ILS-SEL.1B.6-8.b",
+                "ILS-SEL.1C.9-10.a",
+                "ILS-SEL.1B.11-12.a"
+            ],
+            "ncsc_ccc_codes": [],
+            "ny_prek_standard_codes": [],
+            "objectives": [
+                {
+                    "_id": "5a690e263b447801b3a21d13",
+                    "created_at": "2018-01-24 22:52:22Z",
+                    "example_text": null,
+                    "level": "Mild",
+                    "text": "By (date), when asked a routine, verbal question (e.g. Teacher asks \"What would you like to eat?\") by an unfamiliar school staff member (e.g. lunch personnel) and given (3) verbal response options (e.g. Teacher says \"Do you want the pizza, apple, or taco?\"), (name) will verbally respond by stating (1) choice in a complete sentence (e.g. Student says \"I\u2019ll have the pizza\") using a [[sentence starters|sentence starter]] (e.g. Teacher says \"I want the ...\"), within (20) seconds of the adult's question, in (4 out of 5) conversations with an unfamiliar adult.",
+                    "title": null,
+                    "updated_at": "2018-01-24 22:52:22Z",
+                    "updated_time": 1516834342977,
+                    "uuid": "f7481d73-e5d1-4af1-83b6-14dd76d66f6c"
+                },
+                {
+                    "_id": "5a690e263b447801b3a21d14",
+                    "created_at": "2018-01-24 22:52:22Z",
+                    "example_text": null,
+                    "level": "Moderate",
+                    "text": "By (date), immediately after watching a [[modeling behaviors|teacher model]] of how to make a choice, when asked a routine, verbal question (e.g. Teacher asks \"Do you want pizza or a taco?\") by an unfamiliar school staff member (e.g. lunch personnel) and presented with (2) object [[multiple choice|choices]] (e.g. Teacher holds up pizza and taco in front of the student), (name) will select (1) choice by pointing to the object, within (30) seconds of the adult's question, in (3 out of 4) choice-making interactions with an unfamiliar adult.",
+                    "title": null,
+                    "updated_at": "2018-01-24 22:52:22Z",
+                    "updated_time": 1516834342977,
+                    "uuid": "97ed4df7-73b8-42ca-b120-ceef2e50dfe5"
+                },
+                {
+                    "_id": "5a690e263b447801b3a21d15",
+                    "created_at": "2018-01-24 22:52:22Z",
+                    "example_text": null,
+                    "level": "Intense",
+                    "text": "By (date), during [[social role play| role play]], when asked a routine, verbal question (e.g. Teacher asks \"Do you want pizza or a taco?\") by an unfamiliar school staff member (e.g. lunch personnel) and presented with (2) object [[multiple choice|choices]] (e.g. Teacher holds up pizza and taco in front of the student), (name) will select (1) choice by pointing to the object, within (30) seconds of the adult's question, in (3 out of 4) choice-making interactions with an unfamiliar adult.",
+                    "title": null,
+                    "updated_at": "2018-01-24 22:52:22Z",
+                    "updated_time": 1516834342978,
+                    "uuid": "1956824f-8377-4623-bcd6-43f6becc3b6f"
+                }
+            ],
+            "published": true,
+            "score": 0.9,
+            "slug": "choice-making-with-an-unfamiliar-adult",
+            "standard_codes": [],
+            "subject": "Autism",
+            "subject_domains": [
+                "Self-Advocacy"
+            ],
+            "super_page": false,
+            "teks_standard_codes": [],
+            "title": "Choice-Making With An Unfamiliar Adult",
+            "udl_adaptations": [
+                {
+                    "_id": "54cfefa5645c28bd6500079b",
+                    "created_at": "2015-02-02 21:44:05Z",
+                    "text": "The teacher can offer differentiation when providing examples of expected and unexpected behaviors for the variety of situations our students will encounter in when making a choice in the school cafeteria.  [[video|Video modeling]] using a teacher, peer, or the student as actors will explicitly display the implicit rules of the school cafeteria.  To ensure success offer a display of information that meets the need and interest of the student.  Consider auditory, visual, and kinesthetic methods of communication to maximize success within the new environment.",
+                    "udl_standard_checkpoint_ref": "UDL I 1.1",
+                    "udl_standard_long_ref": "UDL I 1.1 Provide Multiple Means of Representation: Offer ways of customizing the display of information",
+                    "udl_standard_short_ref": "UDL I 1.1 Offer ways of customizing the display of information",
+                    "updated_at": "2018-01-24 22:52:23Z",
+                    "updated_time": 1516834343071,
+                    "uuid": "bc1051a9-247e-4534-a431-e7d8287a9a7f"
+                },
+                {
+                    "_id": "54cfefc6645c28cd690006ad",
+                    "created_at": "2015-02-02 21:44:38Z",
+                    "text": "Students use hi-tech devices (e.g. tablets with Proloqu2go or DynoVox) or low-tech systems (e.g. [[sentence starters|sentence frames]] and [[picture choices|picture icons]]) to overcome barriers in communication within a classroom.  Continue to challenge students in other school settings, like the school cafeteria, by providing support and instruction on how to use tools and assistive technologies to overcome barriers in participation with peers and other school staff members.  For example, provide students with pre-recorded messages and sentence frames to support learning.  As student objectives are met, scaffold the prompts thus fostering the growing independence with familiar and unfamiliar communicative partners.",
+                    "udl_standard_checkpoint_ref": "UDL II 4.2",
+                    "udl_standard_long_ref": "UDL II 4.2 Provide Multiple Means of Action and Expression: Optimize access to tools and assistive technologies",
+                    "udl_standard_short_ref": "UDL II 4.2 Optimize access to tools and assistive technologies",
+                    "updated_at": "2018-01-24 22:52:23Z",
+                    "updated_time": 1516834343080,
+                    "uuid": "b858b3ab-ec6e-4564-b489-d58faac98325"
+                },
+                {
+                    "_id": "54cfefdb645c28bd650007a3",
+                    "created_at": "2015-02-02 21:44:59Z",
+                    "text": "Differentiate the degree and difficulty of the goal for the student.  Allow the student to explore the cafeteria when it is empty and quiet.  Further allow the student to meet and learn about the staff members he or she might encounter when making a choice for lunch.  Continue to emphasize the process and create a flexible [[visual task schedule|task-analysis]] for each objective leading up to the goal of ordering in the school cafeteria.  Vary the degrees of acceptable performance toward the goal as the student\u2019s anxiety may increase depending on the day and part of the task to be mastered.",
+                    "udl_standard_checkpoint_ref": "UDL III 8.2",
+                    "udl_standard_long_ref": "UDL III 8.2 Provide Multiple Means of Engagement: Vary demands and resources to optimize challenge",
+                    "udl_standard_short_ref": "UDL III 8.2 Vary demands and resources to optimize challenge",
+                    "updated_at": "2018-01-24 22:52:23Z",
+                    "updated_time": 1516834343089,
+                    "uuid": "38daf2ce-f7ad-488a-a34a-665204ef5fe9"
+                }
+            ],
+            "updated_at": "2018-01-24 22:52:23Z",
+            "updated_time": 1516834343103,
+            "uuid": "e504ad28-8c59-42e0-a7f4-aa206d47b4ab",
+            "wida_2007_standard_codes": []
+        },
+        {
+            "adaptation_strategies": [
+                "128f853a-a8ec-452d-97d8-d3b6a6a51545",
+                "9e4d12ac-d798-4a00-ac26-7b19e964096b",
+                "9dd2f4d7-8e66-4231-bb0c-de8678d962b7",
+                "dfd901a1-c9a8-4e2b-8fe1-267579d909ae",
+                "49231dbe-a1f2-4c4a-81c9-b6d1202ec317",
+                "5a50393b-c205-4512-b0f0-a7d9def24924"
+            ],
+            "author_id": "1b400165-7fdf-4fac-a3f8-0a09f10031ec",
+            "ca_eld_standard_codes": [],
+            "coach_standard_codes": [],
+            "copied_from": "508cad82-abc0-43b5-9df4-1fab1673e160",
+            "created_at": "2015-02-18 05:44:01Z",
+            "demo": false,
+            "dlm_ee_codes": [],
+            "goal_text": "By (date), after breaking a school rule (e.g. no pushing other students) and provided with a [[visual cueing|visual cue]] (e.g. Teacher gestures to count using fingers) to use (1) [[calming strategies|self-control strategy]] (e.g. [[6-second pause|counting]]), when receiving disciplinary action from an authority figure (e.g. principal, teacher, instructional assistant) at school (e.g. recess, classroom, office), (name) will verbally accept why he/she is being disciplined to the relevant authority figure (e.g. Student says \u201cI am in the office because I pushed X\u201d) while avoiding the use of maladaptive behavior (e.g. shouting, running away, ignoring the speaker) in (3 of 3) disciplinary actions from an adult.",
+            "grades": [
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12"
+            ],
+            "ils_sel_standard_codes": [],
+            "instruction_text": null,
+            "measurement_text": null,
+            "modification_text": null,
+            "ncsc_ccc_codes": [],
+            "ny_prek_standard_codes": [],
+            "objectives": [
+                {
+                    "_id": "55a862d5645c28af78000004",
+                    "created_at": "2015-07-17 02:05:09Z",
+                    "level": "Mild",
+                    "text": "By (date), after breaking a school rule (e.g. no pushing other students) and provided with a [[visual cueing|visual cue]] (e.g. Teacher gestures to count using fingers) to use (2) [[calming strategies|self-control strategy]] (e.g. [[6-second pause|counting]], deep [[belly breathing|belly breaths]]), when receiving disciplinary action from an authority figure (e.g. principal, teacher, IA) at school (e.g. recess, classroom, office), (name) will verbally accept why he/she is being disciplined to the relevant authority figure (student says \u201cI am in the office because I pushed X\u201d) while avoiding the use of maladaptive behavior (e.g. shouting, running away, ignoring the speaker) in (3 of 3) disciplinary actions from an adult.",
+                    "updated_at": "2015-07-17 02:05:09Z",
+                    "updated_time": 1437098709100,
+                    "uuid": "442e3702-1f2c-4b4e-a5f5-b97f47a47446"
+                },
+                {
+                    "_id": "55a862d5645c28af78000005",
+                    "created_at": "2015-07-17 02:05:09Z",
+                    "level": "Moderate",
+                    "text": "By (date), after breaking a school rule (e.g. no pushing other students) and provided with a [[visual cueing|visual cue]] (e.g. Teacher gestures to count using fingers) to use (2) [[calming strategies|self-control strategy]] (e.g. [[6-second pause|counting]], deep [[belly breathing|belly breaths]]) and [[i-messages|i-messages]] to share his/her feelings (e.g. \u201cI feel mad because\u2026\u201d), when receiving disciplinary action from an authority figure (e.g. principal, teacher, IA) at school (e.g. recess, classroom, office), (name) will verbally accept why he/she is being disciplined to the relevant authority figure (e.g. Student says \u201cI am in the office because I pushed X\u201d) while avoiding the use of maladaptive behavior (e.g. shouting, running away, ignoring the speaker) in (2 of 3) disciplinary actions from an adult.",
+                    "updated_at": "2015-07-17 02:05:09Z",
+                    "updated_time": 1437098709101,
+                    "uuid": "d190834d-c541-40b3-9310-6efeeef42011"
+                },
+                {
+                    "_id": "55a862d5645c28af78000006",
+                    "created_at": "2015-07-17 02:05:09Z",
+                    "level": "Intense",
+                    "text": "By (date), after breaking a school rule (e.g. no pushing other students) and provided with a [[visual cueing|visual cue]] (e.g. Teacher gestures to count using fingers) to use (2) [[calming strategies|self-control strategy]] (e.g. [[6-second pause|counting]], deep [[belly breathing|belly breaths]]) and [[i-messages|i-messages]] to share his/her feelings (e.g. Student says \u201cI feel mad because\u2026\u201d), when receiving disciplinary action from an authority figure (e.g. principal, teacher, IA) at school (e.g. recess, classroom, office), (name) will demonstrate acceptance of his/her consequences by quietly listening to the authority figure, while demonstrating no more than (1) maladaptive behavior (e.g. shouting, running away, ignoring the speaker) in (2 of 3) disciplinary actions from an adult.",
+                    "updated_at": "2015-07-17 02:05:09Z",
+                    "updated_time": 1437098709101,
+                    "uuid": "ea67d108-9b68-4686-acbe-dcba4e57ad64"
+                }
+            ],
+            "parent_text": null,
+            "published": true,
+            "score": 0.9,
+            "slug": "respond-to-discipline-from-an-adult",
+            "standard_codes": [],
+            "subject": "Autism",
+            "subject_domains": [
+                "Emotional Regulation"
+            ],
+            "tags": null,
+            "teks_standard_codes": [],
+            "title": "Respond To Discipline From An Adult",
+            "udl_adaptations": [
+                {
+                    "_id": "54e426a1645c285f54000026",
+                    "created_at": "2014-03-14 19:24:57Z",
+                    "text": "Being prompted by the teacher can support students in the activation of their background knowledge. A student may learn a [[Calming Strategies| self-control strategy]] in a classroom setting but be unable to implement that strategy during an authentic interaction during which the student is agitated. The teacher can provide the student with a prompt reminding him or her of a strategy to use in the situation.",
+                    "udl_standard_checkpoint_ref": "UDL I 3.1",
+                    "udl_standard_long_ref": "UDL I 3.1 Provide Multiple Means of Representation: Activate or supply background knowledge",
+                    "udl_standard_short_ref": "UDL I 3.1 Activate or supply background knowledge",
+                    "updated_at": "2015-07-17 02:05:09Z",
+                    "updated_time": 1437098709113,
+                    "uuid": "77d35ece-0f69-4aca-a6b3-9ec36a9681e0"
+                },
+                {
+                    "_id": "54e426a1645c285f54000027",
+                    "created_at": "2014-03-14 19:25:15Z",
+                    "text": "Students may have a difficult time verbally expressing their emotions when feeling frustrated or agitated. Teachers can provide students with an alternative method of communicating [[visual cueing|visual communication]] or pointing to an [[ emotions chart | emotion chart ]] to allow the student with an additional strategy for communication. A non-verbal strategy for communicating anger may support  a student in managing his/her behavior when feeling agitated.",
+                    "udl_standard_checkpoint_ref": "UDL II 4.1",
+                    "udl_standard_long_ref": "UDL II 4.1 Provide Multiple Means of Action and Expression: Vary the methods for response and navigation",
+                    "udl_standard_short_ref": "UDL II 4.1 Vary the methods for response and navigation",
+                    "updated_at": "2015-07-17 02:05:09Z",
+                    "updated_time": 1437098709114,
+                    "uuid": "43b37bcd-f4b4-4209-8e25-44fd3a16f681"
+                },
+                {
+                    "_id": "54e426a1645c285f54000028",
+                    "created_at": "2014-03-14 19:25:30Z",
+                    "text": "By providing students with a choice between (2) or more [[Calming Strategies| self-control strategies]], teachers can increase student engagement in the learning process. Offering students choices within the instructional setting (especially while agitated) can increase the student's ownership of the activity and provide the student with an increased sense of accomplishment and independence.",
+                    "udl_standard_checkpoint_ref": "UDL III 7.1",
+                    "udl_standard_long_ref": "UDL III 7.1 Provide Multiple Means of Engagement: Optimize individual choice and autonomy",
+                    "udl_standard_short_ref": "UDL III 7.1 Optimize individual choice and autonomy",
+                    "updated_at": "2015-07-17 02:05:09Z",
+                    "updated_time": 1437098709116,
+                    "uuid": "99946daf-088e-4115-a17a-722593fd82c8"
+                }
+            ],
+            "updated_at": "2015-07-17 02:05:09Z",
+            "updated_time": 1437098709119,
+            "uuid": "15b1b6fe-e0a5-4639-9e95-1e58fe101b01",
+            "wida_2007_standard_codes": []
+        },
+        {
+            "adaptation_strategies": [
+                "8ce153db-a210-4317-9ed8-4d7a6ce4f75c",
+                "49231dbe-a1f2-4c4a-81c9-b6d1202ec317",
+                "be7bd060-33b8-4507-8611-0a4a267d4852",
+                "d82473e0-606e-4470-8ee0-f7bda6e5766d",
+                "1e94ca89-17dd-44a3-9e52-b1ba7f6d83da",
+                "c37b57c1-483a-4c2b-971f-afc8cce1e616",
+                "c879d159-e4a0-4e38-a243-0df30b19c442"
+            ],
+            "author_id": "07c55d89-8eb4-4eb5-a4ee-2f8a678faeda",
+            "ca_eld_standard_codes": [],
+            "coach_standard_codes": [],
+            "copied_from": "09e172bf-80b7-460b-ae59-a45edfc17fc5",
+            "created_at": "2015-02-26 18:56:37Z",
+            "demo": false,
+            "dlm_ee_codes": [],
+            "goal_text": "By (date), when [[social role play| role-playing]] a disagreement with another student at school, (name) will demonstrate attentive listen (e.g. make eye contact, sitting up, turning his/her body towards the other student) while his/her peer shares their feelings regarding the situation, and then verbally express his/her own feelings using [[I-messages|I-messages]] (e.g. \"I think..\". \"I feel...\"), while refraining from negative behaviors (e.g. yelling, making inappropriate comments, making noises, leaving the room) for (3 out of 3) peer role-played disagreements.\n\n\"I Feel...\" Statements: Students make \"I Feel...\" Statements about how he/she feels, an indication of the conditions under which he/she feels that way, and why the conditions caused his/her emotions. For example, \"I feel\u2026 (State the emotion) when you\u2026.(describe the behavior or conditions) because\u2026 (explain why the behavior or conditions caused these feelings).",
+            "grades": [
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12"
+            ],
+            "ils_sel_standard_codes": [],
+            "instruction_text": null,
+            "measurement_text": null,
+            "modification_text": null,
+            "ncsc_ccc_codes": [],
+            "ny_prek_standard_codes": [],
+            "objectives": [
+                {
+                    "_id": "55b165a2645c281742000003",
+                    "created_at": "2015-07-23 22:07:29Z",
+                    "level": "Mild",
+                    "text": "By (date), when [[social role play| role-playing]] a disagreement with another student at school, (name) will demonstrate attentive listen (e.g. make eye contact, sitting up, turning his/her body towards the other student) while his/her peer shares their feelings regarding the situation, and then verbally express his/her own feelings using [[I-messages|I-messages]] (e.g. \"I think..\". \"I feel...\"), provided with [[sentence starters|sentence starters]] (see examples below), while refraining from negative behaviors (e.g. yelling, making inappropriate comments, making noises, leaving the room) for (3 out of 3) peer role-played disagreements.",
+                    "updated_at": "2015-07-23 22:07:29Z",
+                    "updated_time": 1437689249999,
+                    "uuid": "65f61ed4-59a0-4534-ac66-4407f14d99eb"
+                },
+                {
+                    "_id": "55b165a2645c281742000004",
+                    "created_at": "2015-07-23 22:07:29Z",
+                    "level": "Moderate",
+                    "text": "By (date), when [[social role play| role-playing]] a disagreement with another student at school, (name) will demonstrate attentive listen (e.g. make eye contact, sitting up, turning his/her body towards the other student) while his/her peer shares their feelings regarding the situation, and then verbally express his/her own feelings using [[I-messages|I-messages]] (e.g. \"I think..\". \"I feel...\") in a [[interactive writing|pre-written script]], while refraining from negative behaviors (e.g. yelling, making inappropriate comments, making noises, leaving the room) for (2 out of 3) peer role-played disagreements.",
+                    "updated_at": "2015-07-23 22:07:29Z",
+                    "updated_time": 1437689250000,
+                    "uuid": "c6b9348b-df5e-4c31-a656-50b0988cf2c4"
+                },
+                {
+                    "_id": "55b165a2645c281742000005",
+                    "created_at": "2015-07-23 22:07:29Z",
+                    "level": "Intense",
+                    "text": "By (date), when [[social role play| role-playing]] a disagreement with another student at school with a preferred, [[peer buddies|peer buddy]] , (name) will demonstrate attentive listen (e.g. make eye contact, sitting up, turning his/her body towards the other student) while his/her peer shares their feelings regarding the situation, and then verbally express his/her own feelings using [[I-messages|I-messages]] (e.g. \"I think..\". \"I feel...\") in a [[interactive writing|pre-written script]], while refraining from negative behaviors (e.g. yelling, making inappropriate comments, making noises, leaving the room) for (2 out of 3) peer role-played disagreements.",
+                    "updated_at": "2015-07-23 22:07:29Z",
+                    "updated_time": 1437689250000,
+                    "uuid": "5c99a8ee-55b0-4c66-8540-d5a694cc0bd6"
+                }
+            ],
+            "parent_text": null,
+            "published": true,
+            "score": 0.9,
+            "slug": "express-feelings-during-conflict",
+            "standard_codes": [],
+            "subject": "Autism",
+            "subject_domains": [
+                "Social Communication"
+            ],
+            "tags": null,
+            "teks_standard_codes": [],
+            "title": "Express Feelings During Conflict",
+            "udl_adaptations": [
+                {
+                    "_id": "54ef6c65645c28ca5700047d",
+                    "created_at": "2014-03-10 16:59:44Z",
+                    "text": "Providing time for students to develop and [[social role play|practice]] conflict resolution skills with a [[peer buddies|peer buddy]] can help increase student engagement.  It is important that the teacher and student communicate openly about specific peers that the student feels comfortable practicing role play with, so that the teacher can honor those requests, when possible. In addition, the teacher must ensure that the peer who works with the student is also open to participating in role play and understands its purpose. The teacher may even need to train the peer how to communicate and interact with the student to avoid any challenges (e.g. Teacher lets the peer buddy know not to touch the student's hands because he is very sensitive to physical touch on his/her hands).",
+                    "udl_standard_checkpoint_ref": "UDL III 8.3",
+                    "udl_standard_long_ref": "UDL III 8.3 Provide Multiple Means of Engagement: Foster collaboration and communication",
+                    "udl_standard_short_ref": "UDL III 8.3 Foster collaboration and communication",
+                    "updated_at": "2015-07-23 22:07:30Z",
+                    "updated_time": 1437689250012,
+                    "uuid": "c61a66e5-88e2-4f47-9c22-44eb93d884fe"
+                },
+                {
+                    "_id": "54ef6c65645c28ca5700047e",
+                    "created_at": "2014-03-10 17:01:14Z",
+                    "text": "Since not all students learn the same way, it is essential for teachers to use a variety of methods for communication with students. For example, the teacher can teacher social skills for dealing with peer conflict by using [[social narratives|social narratives]], [[video|video modeling]], or [[social role play|role playing]] to engage students and maximize their ability to learn information, as well as to express themselves.",
+                    "udl_standard_checkpoint_ref": "UDL II 5.1",
+                    "udl_standard_long_ref": "UDL II 5.1 Provide Multiple Means of Action and Expression: Use multiple media for communication",
+                    "udl_standard_short_ref": "UDL II 5.1 Use multiple media for communication",
+                    "updated_at": "2015-07-23 22:07:30Z",
+                    "updated_time": 1437689250013,
+                    "uuid": "2cf999c5-bbbe-48e2-b040-9b9e20b11d56"
+                },
+                {
+                    "_id": "54ef6c65645c28ca5700047f",
+                    "created_at": "2014-03-10 17:03:44Z",
+                    "text": "Giving students who need extra support the opportunity to [[social role play|practice]] conflict resolution skills one-on-one with the teacher or in a small group helps them access the target skills, while receiving frequent prompts and immediate feedback to shape their social behaviors.",
+                    "udl_standard_checkpoint_ref": "UDL I 3.1",
+                    "udl_standard_long_ref": "UDL I 3.1 Provide Multiple Means of Representation: Activate or supply background knowledge",
+                    "udl_standard_short_ref": "UDL I 3.1 Activate or supply background knowledge",
+                    "updated_at": "2015-07-23 22:07:30Z",
+                    "updated_time": 1437689250015,
+                    "uuid": "11f8841e-6b2c-4f25-8b98-93b5a5ad68ff"
+                }
+            ],
+            "updated_at": "2015-07-23 22:07:30Z",
+            "updated_time": 1437689250019,
+            "uuid": "df5a57c2-cf8f-46d5-a73a-1e67f9c76301",
+            "wida_2007_standard_codes": []
+        },
+        {
+            "adaptation_strategies": [
+                "ec76bd00-a57a-427d-9100-f05192b59566",
+                "8ce153db-a210-4317-9ed8-4d7a6ce4f75c",
+                "7740d691-5f46-4ffa-ac39-2482a92e7857",
+                "7f2e7a09-a96b-4447-965c-b43d88e66970",
+                "c879d159-e4a0-4e38-a243-0df30b19c442",
+                "c37b57c1-483a-4c2b-971f-afc8cce1e616",
+                "128f853a-a8ec-452d-97d8-d3b6a6a51545",
+                "8b868a21-cf4c-482c-9e66-bbe00edcfda2",
+                "1e94ca89-17dd-44a3-9e52-b1ba7f6d83da"
+            ],
+            "author_id": "1b400165-7fdf-4fac-a3f8-0a09f10031ec",
+            "ca_eld_standard_codes": [],
+            "coach_standard_codes": [],
+            "copied_from": "86e2c9ae-6f23-44fb-b8b6-a919f3ce4330",
+            "created_at": "2015-02-26 22:12:31Z",
+            "demo": false,
+            "dlm_ee_codes": [],
+            "goal_text": "By (date), when joining a peer's conversation on a non-academic topic (e.g. sports, personal lives, hobbies/interests), (name) will verbally engage in the conversation by asking at least (1) on-topic question (e.g. Student asks \"How do you feel about...?\") and sharing at least (1) on-topic comment (e.g. Student says \"That is interesting.\"), over the duration of a (10) minute conversation, in (4 of 5) peer-conversation opportunities.",
+            "grades": [
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12"
+            ],
+            "ils_sel_standard_codes": [],
+            "instruction_text": null,
+            "measurement_text": null,
+            "modification_text": null,
+            "ncsc_ccc_codes": [],
+            "ny_prek_standard_codes": [],
+            "objectives": [
+                {
+                    "_id": "55bad046645c28b554000003",
+                    "created_at": "2015-07-31 01:32:54Z",
+                    "level": "Mild",
+                    "text": "By (date), immediatley after [[ preteaching | preteaching ]] of examples of on-topic questions and comments, when joining a peer's conversation on a non-academic topic (e.g. sports, personal lives, hobbies/interests), (name) will verbally engage in the conversation by asking at least (1) on-topic question (e.g. Student asks \"How do you feel about...?\") and sharing at least (1) on-topic comment (e.g. Student says \"That is interesting.\"), over the duration of a (10) minute conversation, in (4 of 5) peer-conversation opportunities.",
+                    "updated_at": "2015-07-31 01:32:54Z",
+                    "updated_time": 1438306374755,
+                    "uuid": "bf64ebb3-f9b3-4302-ab05-8e81637c2f55"
+                },
+                {
+                    "_id": "55bad046645c28b554000004",
+                    "created_at": "2015-07-31 01:32:54Z",
+                    "level": "Moderate",
+                    "text": "By (date), immediatley after [[ preteaching | preteaching ]] and reviewing a [[social narratives|social narrative]] of examples of on-topic questions and comments, when joining a conversation with a preferred [[peer buddies|peer]] on a non-academic topic (e.g. sports, personal lives, hobbies/interests), (name) will verbally engage in the conversation by asking at least (1) on-topic question (e.g. Student asks \"How do you feel about...?\") and sharing at least (1) on-topic comment (e.g. Student says \"That is interesting.\"), over the duration of a (10) minute conversation, in (3 of 4) peer-conversation opportunities.",
+                    "updated_at": "2015-07-31 01:32:54Z",
+                    "updated_time": 1438306374755,
+                    "uuid": "1ae6b023-e166-4883-b343-8f69f8097306"
+                },
+                {
+                    "_id": "55bad046645c28b554000005",
+                    "created_at": "2015-07-31 01:32:54Z",
+                    "level": "Intense",
+                    "text": "By (date), immediatley after watching a [[ video | video model ]] of examples of on-topic questions and comments, when [[social role play|role-playing]] a conversation with a preferred [[peer buddies|peer]], (name) will verbally engage in the conversation by asking at least (1) on-topic question (e.g. Student asks \"How do you feel about...?\") and sharing at least (1) on-topic comment (e.g. Student says \"That is interesting.\"), provided with no more than (2) [[visual cueing | visual cues]] (e.g. Teacher gestures to ask his/her peer a question), over the duration of a (10) minute conversation, in (3 of 4) peer-conversation opportunities.",
+                    "updated_at": "2015-07-31 01:32:54Z",
+                    "updated_time": 1438306374756,
+                    "uuid": "8a2ef479-23ad-42aa-ac95-f92cd6bf9b6f"
+                }
+            ],
+            "parent_text": null,
+            "published": true,
+            "score": 0.9,
+            "slug": "stay-on-topic-during-conversations",
+            "standard_codes": [],
+            "subject": "Autism",
+            "subject_domains": [
+                "Social Communication"
+            ],
+            "tags": null,
+            "teks_standard_codes": [],
+            "title": "Stay On-Topic During Conversations",
+            "udl_adaptations": [
+                {
+                    "_id": "54ef9a4f645c2839510007ad",
+                    "created_at": "2013-12-18 01:32:39Z",
+                    "text": "For many students, it may be helpful for them to be pretaught examples of on-topic comments and questions (e.g. \"that is interesting\") before being expected to use them instead of assuming the student has such background knowledge. A teacher can [[ Preteaching | preteach ]] these strategies by verbally stating them, making a written list or modeling them for the class.",
+                    "udl_standard_checkpoint_ref": "UDL I 3.1",
+                    "udl_standard_long_ref": "UDL I 3.1 Provide Multiple Means of Representation: Activate or supply background knowledge",
+                    "udl_standard_short_ref": "UDL I 3.1 Activate or supply background knowledge",
+                    "updated_at": "2015-07-31 01:32:54Z",
+                    "updated_time": 1438306374768,
+                    "uuid": "618e7ee8-808e-4fbe-9f69-5973f9e5a86b"
+                },
+                {
+                    "_id": "54ef9a4f645c2839510007ae",
+                    "created_at": "2013-12-18 01:50:53Z",
+                    "text": "Students may have a difficult time initially practicing newly-acquired social skills in a real-world social interaction and will be supported by being given an opportunity to first use [[ Social Role Play | role play ]] to practice these skills. This strategy provides the students with opportunities to practice the skills in a controlled environment and receive feedback from peers and teachers. Role play can be particularly useful for students who need to build confidence in using new skills.",
+                    "udl_standard_checkpoint_ref": "UDL III 8.3",
+                    "udl_standard_long_ref": "UDL III 8.3 Provide Multiple Means of Engagement: Foster collaboration and communication",
+                    "udl_standard_short_ref": "UDL III 8.3 Foster collaboration and communication",
+                    "updated_at": "2015-07-31 01:32:54Z",
+                    "updated_time": 1438306374770,
+                    "uuid": "ff09a5d1-3ecb-45c7-939d-20c324c0f180"
+                },
+                {
+                    "_id": "54ef9a4f645c2839510007af",
+                    "created_at": "2013-12-18 01:54:39Z",
+                    "text": "Students learning a new conversational skill may benefit from the use of [[ social supports | social scripts ]] to remind the student how make an on-topic comment during conversation. In addition, social supports increase the opportunities for students to learn and practice essential social skills. Social scripts are useful tools for providing effective practice of a social skill and extensive practice is necessary to make the skill more concrete for the learner.",
+                    "udl_standard_checkpoint_ref": "UDL II 6.2",
+                    "udl_standard_long_ref": "UDL II 6.2 Provide Multiple Means of Action and Expression: Support planning and strategy development",
+                    "udl_standard_short_ref": "UDL II 6.2 Support planning and strategy development",
+                    "updated_at": "2015-07-31 01:32:54Z",
+                    "updated_time": 1438306374771,
+                    "uuid": "2ca70fdd-bdf6-464c-8b88-ecb24e05c06e"
+                }
+            ],
+            "updated_at": "2015-07-31 01:32:54Z",
+            "updated_time": 1438306374775,
+            "uuid": "fac43321-0076-4d9b-ae70-e438d66df0db",
+            "wida_2007_standard_codes": []
+        },
+        {
+            "adaptation_strategies": [
+                "ec76bd00-a57a-427d-9100-f05192b59566",
+                "c879d159-e4a0-4e38-a243-0df30b19c442",
+                "8ce153db-a210-4317-9ed8-4d7a6ce4f75c",
+                "a4060dc2-76ef-43d9-922d-a234239e2710",
+                "7f2e7a09-a96b-4447-965c-b43d88e66970",
+                "f97aabc0-6981-46c9-a138-7b1aac44cc07",
+                "d82473e0-606e-4470-8ee0-f7bda6e5766d",
+                "1e94ca89-17dd-44a3-9e52-b1ba7f6d83da",
+                "be7bd060-33b8-4507-8611-0a4a267d4852"
+            ],
+            "author_id": "1b400165-7fdf-4fac-a3f8-0a09f10031ec",
+            "ca_eld_standard_codes": [],
+            "coach_standard_codes": [],
+            "copied_from": "c3fc2c57-5be6-4a57-ae0b-cbe2b5981190",
+            "created_at": "2015-02-27 00:28:50Z",
+            "demo": false,
+            "dlm_ee_codes": [],
+            "goal_text": "By (date), when participating in an [[guided peer discussions|teacher guided conversation]] with peers on a personal topic (e.g. challenge in the home, death, argument), during a (10-minute) conversation, (name) will demonstrate at least (2) verbal expressions of empathy (e.g. \"I understand...\", \"What you're saying is...\"), while refraining from making any negative statements in (4 of 5) student conversations.",
+            "grades": [
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12"
+            ],
+            "ils_sel_standard_codes": [],
+            "instruction_text": null,
+            "measurement_text": null,
+            "modification_text": null,
+            "ncsc_ccc_codes": [],
+            "ny_prek_standard_codes": [],
+            "objectives": [
+                {
+                    "_id": "55bbb8f8645c28d250000029",
+                    "created_at": "2015-07-31 18:05:44Z",
+                    "level": "Mild",
+                    "text": "By (date), immediately after watching a [[modeling behaviors|teacher model]] of at least (5) examples of expressions of empathy, when participating in an [[guided peer discussions|teacher guided conversation]] with peers on a personal topic (e.g. challenge in the home, death, argument), during a (10-minute) conversation, (name) will demonstrate at least (2) verbal expressions of empathy (e.g. \"I understand...\", \"What you're saying is...\"), while refraining from making any negative statements in (4 of 5) student conversations.",
+                    "updated_at": "2015-07-31 18:05:44Z",
+                    "updated_time": 1438365944310,
+                    "uuid": "aafb12ae-2571-4ce8-827f-3e6edd07b067"
+                },
+                {
+                    "_id": "55bbb8f8645c28d25000002a",
+                    "created_at": "2015-07-31 18:05:44Z",
+                    "level": "Moderate",
+                    "text": "By (date), immediately after watching a [[modeling behaviors|teacher model]] of at least (5) examples of expressions of empathy, when participating in an [[guided peer discussions|teacher guided conversation]] with peers on a personal topic (e.g. challenge in the home, death, argument), during a (10-minute) conversation, (name) will demonstrate at least (1) verbal expressions of empathy (e.g. \"I understand...\"), provided with a [[sentence starters|sentence starter]] (e.g. Teacher says \"I understand you felt...\"), while refraining from making any negative statements in (3 of 4) student conversations.",
+                    "updated_at": "2015-07-31 18:05:44Z",
+                    "updated_time": 1438365944310,
+                    "uuid": "eca0cbb8-87a4-44d8-838e-4d4d73e07c1a"
+                },
+                {
+                    "_id": "55bbb8f8645c28d25000002b",
+                    "created_at": "2015-07-31 18:05:44Z",
+                    "level": "Intense",
+                    "text": "By (date), immediately after watching a [[modeling behaviors|teacher model]] of at least (5) examples of expressions of empathy, when participating in a [[social role play|role-playing]] with a [[peer buddies|peer]] on a personal topic (e.g. challenge in the home, death, argument), during a (10-minute) conversation, (name) will demonstrate at least (1) verbal expressions of empathy (e.g. \"I understand...\"), provided with a [[interactive writing|pre-made script]] (e.g. Teacher writes script in collaboration with the student), while refraining from making any negative statements in (3 of 4) student conversations.",
+                    "updated_at": "2015-07-31 18:05:44Z",
+                    "updated_time": 1438365944311,
+                    "uuid": "ec8b5d6f-7273-421a-9b0f-68cf372712f5"
+                }
+            ],
+            "parent_text": null,
+            "published": true,
+            "score": 0.9,
+            "slug": "demonstrate-empathy-towards-peers",
+            "standard_codes": [],
+            "subject": "Autism",
+            "subject_domains": [
+                "Social Communication"
+            ],
+            "tags": null,
+            "teks_standard_codes": [],
+            "title": "Demonstrate Empathy Towards Peers",
+            "udl_adaptations": [
+                {
+                    "_id": "54efba42645c28f830000057",
+                    "created_at": "2014-01-08 22:30:23Z",
+                    "text": "Using [[ social narratives | social narratives ]] can help students master the skill of expressing empathy by providing them with examples of empathetic responses in social situations. In addition, social supports increase the opportunities for students to learn and practice essential social skills. Social narratives are useful tools for providing effective practice of a social skill and extensive practice is necessary to make the skill more concrete for the learner.",
+                    "udl_standard_checkpoint_ref": "UDL I 2.5",
+                    "udl_standard_long_ref": "UDL I 2.5 Provide Multiple Means of Representation: Illustrate through multiple media",
+                    "udl_standard_short_ref": "UDL I 2.5 Illustrate through multiple media",
+                    "updated_at": "2015-07-31 18:05:44Z",
+                    "updated_time": 1438365944321,
+                    "uuid": "8fa1dca5-8d3e-4137-a0a3-0a28598f189c"
+                },
+                {
+                    "_id": "54efba42645c28f830000058",
+                    "created_at": "2014-01-08 22:32:13Z",
+                    "text": "For students with severe needs, it can be useful to provide them with multiple scaffolds in building mastery toward using the skill of expressing empathy. Utilizing scaffolds allows teachers to support the student in building fluency in the examples of expressing empathy. Teachers can have students first master a skill through multiple practice opportunities during [[ social role play | role play ]] in a controlled classroom setting before expecting the student to use the skill in an authentic social interaction.",
+                    "udl_standard_checkpoint_ref": "UDL II 5.3",
+                    "udl_standard_long_ref": "UDL II 5.3 Provide Multiple Means of Action and Expression: Build fluencies with graduated levels of support for practice and performance",
+                    "udl_standard_short_ref": "UDL II 5.3 Build fluencies with graduated levels of support for practice and performance",
+                    "updated_at": "2015-07-31 18:05:44Z",
+                    "updated_time": 1438365944323,
+                    "uuid": "14e3cb0a-dd75-4f2c-bbb4-16474e775eed"
+                },
+                {
+                    "_id": "54efba42645c28f830000059",
+                    "created_at": "2014-01-08 22:35:32Z",
+                    "text": "Students may experience increased engagement in a learning activity when they are [[ Peer supports | interacting with a peer ]] as opposed to an adult (e.g. teacher). Teachers can encourage peer cooperation and support by having students practice the skill of expressing empathy by role-playing with a peer.",
+                    "udl_standard_checkpoint_ref": "UDL III 8.3",
+                    "udl_standard_long_ref": "UDL III 8.3 Provide Multiple Means of Engagement: Foster collaboration and communication",
+                    "udl_standard_short_ref": "UDL III 8.3 Foster collaboration and communication",
+                    "updated_at": "2015-07-31 18:05:44Z",
+                    "updated_time": 1438365944324,
+                    "uuid": "b6bd6eb5-b14c-47a6-a61b-e47af492c5ff"
+                }
+            ],
+            "updated_at": "2015-07-31 18:05:44Z",
+            "updated_time": 1438365944327,
+            "uuid": "3fa0b4e3-042e-4cb0-b033-304e37cf554a",
+            "wida_2007_standard_codes": []
+        },
+        {
+            "adaptation_strategies": [
+                "ec76bd00-a57a-427d-9100-f05192b59566",
+                "8ce153db-a210-4317-9ed8-4d7a6ce4f75c",
+                "7a0a5f7a-83b0-4e95-a40b-5dd432a7a1b1",
+                "7f2e7a09-a96b-4447-965c-b43d88e66970",
+                "128f853a-a8ec-452d-97d8-d3b6a6a51545",
+                "d82473e0-606e-4470-8ee0-f7bda6e5766d",
+                "c37b57c1-483a-4c2b-971f-afc8cce1e616",
+                "ac8a2d1a-84a1-422c-91a6-d93c02fbd21e"
+            ],
+            "author_id": "1b400165-7fdf-4fac-a3f8-0a09f10031ec",
+            "ca_eld_standard_codes": [],
+            "coach_standard_codes": [],
+            "copied_from": "ea053da8-9b27-40aa-a335-4cf50e99e3f1",
+            "created_at": "2015-02-27 00:31:11Z",
+            "demo": false,
+            "dlm_ee_codes": [],
+            "goal_text": "By (date), when participating in an in-class academic group project (e.g. small-group work, partner work) with peers, during a (15-minute) activity, (name) will give (3) statements of encouragement to a peer (e.g. Student says \"That's a good idea\" or \"Good job!\"), while withholding negative comments (e.g. Student says \u201cThat\u2019s a dumb idea\u201d or \u201cYou are doing it wrong!\u201d) in (4 out of 5) group-work opportunities.",
+            "grades": [
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12"
+            ],
+            "ils_sel_standard_codes": [],
+            "instruction_text": null,
+            "measurement_text": null,
+            "modification_text": null,
+            "ncsc_ccc_codes": [],
+            "ny_prek_standard_codes": [],
+            "objectives": [
+                {
+                    "_id": "55bada71645c28385600000e",
+                    "created_at": "2015-07-31 02:16:17Z",
+                    "level": "Mild",
+                    "text": "By (date), immediately after a [[ preteaching | preteaching ]] of examples of statements of encouragement, when participating in an in-class academic group project (e.g. small-group work, partner work) with peers, during a (15-minute) activity, (name) will give (3) statements of encouragement to a peer (e.g. Student says \"That's a good idea\" or \"Good job!\"), while withholding negative comments (e.g. Student says \u201cThat\u2019s a dumb idea\u201d or \u201cYou are doing it wrong!\u201d) in (4 out of 5) group-work opportunities.",
+                    "updated_at": "2015-07-31 02:16:17Z",
+                    "updated_time": 1438308977731,
+                    "uuid": "2ea259da-21b1-469a-9bbf-52f05dcfa03b"
+                },
+                {
+                    "_id": "55bada71645c28385600000f",
+                    "created_at": "2015-07-31 02:16:17Z",
+                    "level": "Moderate",
+                    "text": "By (date), immediately after a [[ preteaching | preteaching ]] of examples of statements of encouragement, when participating in an in-class academic group project (e.g. small-group work, partner work) with peers, during a (30-minute) activity, (name) will give (2) statements of encouragement to a peer (e.g. Student says \"That's a good idea\" or \"Good job!\"), provided with [[sentence starters|sentence starters]] (e.g. Teacher says \"Good...\"), while withholding negative comments (e.g. Student says \u201cThat\u2019s a dumb idea\u201d or \u201cYou are doing it wrong!\u201d) in (3 out of 4) group-work opportunities.",
+                    "updated_at": "2015-07-31 02:16:17Z",
+                    "updated_time": 1438308977732,
+                    "uuid": "af523b12-da0f-44ac-8dc6-6e9379076c2d"
+                },
+                {
+                    "_id": "55bada71645c283856000010",
+                    "created_at": "2015-07-31 02:16:17Z",
+                    "level": "Intense",
+                    "text": "By (date), immediately after watching a [[ video| video model ]] of examples of statements of encouragement, when [[social role play|role-playing]] an in-class academic group project (e.g. small-group work, partner work) with peers, during a (30-minute) activity, (name) will give (1) statement of encouragement to a peer (e.g. Student says \"Good job!\"), provided with a pre-made [[reference materials|script]], while withholding negative comments (e.g. Student says \u201cThat\u2019s a dumb idea\u201d or \u201cYou are doing it wrong!\u201d) in (3 out of 4) group-work role-playing opportunities.",
+                    "updated_at": "2015-07-31 02:16:17Z",
+                    "updated_time": 1438308977732,
+                    "uuid": "1e5c63b6-b320-4562-878f-5a6c8e52596d"
+                }
+            ],
+            "parent_text": null,
+            "published": true,
+            "score": 0.9,
+            "slug": "making-positive-comments-during-peer-conversations",
+            "standard_codes": [],
+            "subject": "Autism",
+            "subject_domains": [
+                "Social Communication"
+            ],
+            "tags": null,
+            "teks_standard_codes": [],
+            "title": "Making Positive Comments During Peer Conversations",
+            "udl_adaptations": [
+                {
+                    "_id": "54efbacf645c28f830000066",
+                    "created_at": "2014-01-07 23:02:55Z",
+                    "text": "It may be helpful for students to prelearn multiple examples of encouraging statements (e.g. \"that is a good idea, \"that is interesting\", \"awesome!\") before being expected to use the statements in an authentic social interaction. A teacher can [[ Preteaching | preteach ]] examples of encouraging statements in multiple ways (e.g. making flashcards, making a written list or [[modeling behaviors|modeling]] them for the class).",
+                    "udl_standard_checkpoint_ref": "UDL I 3.3",
+                    "udl_standard_long_ref": "UDL I 3.3 Provide Multiple Means of Representation: Guide information processing, visualization, and manipulation",
+                    "udl_standard_short_ref": "UDL I 3.3 Guide information processing, visualization, and manipulation",
+                    "updated_at": "2015-07-31 02:16:17Z",
+                    "updated_time": 1438308977743,
+                    "uuid": "69eb3a72-a6b8-44d2-a6d1-e4bd9769334b"
+                },
+                {
+                    "_id": "54efbacf645c28f830000067",
+                    "created_at": "2014-01-07 23:06:03Z",
+                    "text": "For students with severe needs, it can be useful to provide them with multiple scaffolds in building mastery toward a skill. Utilizing scaffolds allows teachers to support the student in building fluency in the skill. Teachers can have students first master a skill through multiple practice opportunities during [[ social role play | peer-to-peer role play ]] in a controlled classroom setting before expecting the student to use the skill in an authentic social interaction.",
+                    "udl_standard_checkpoint_ref": "UDL II 5.3",
+                    "udl_standard_long_ref": "UDL II 5.3 Provide Multiple Means of Action and Expression: Build fluencies with graduated levels of support for practice and performance",
+                    "udl_standard_short_ref": "UDL II 5.3 Build fluencies with graduated levels of support for practice and performance",
+                    "updated_at": "2015-07-31 02:16:17Z",
+                    "updated_time": 1438308977744,
+                    "uuid": "d4e1e71c-8d18-4c8e-8a5a-81d695c8e3c1"
+                },
+                {
+                    "_id": "54efbacf645c28f830000068",
+                    "created_at": "2014-01-07 23:11:31Z",
+                    "text": "If a student is having significant difficulty building fluency in the skill of making encouraging statements, the teacher can provide the opportunity for peer-to-peer mentorship by guiding [[ social role play | role play ]] activities. This strategy provides students with opportunities to practice the skills in a controlled environment and receive feedback from peers and teachers. Role-play can be particularly useful for students who need to build confidence in using new skills.",
+                    "udl_standard_checkpoint_ref": "UDL III 8.3",
+                    "udl_standard_long_ref": "UDL III 8.3 Provide Multiple Means of Engagement: Foster collaboration and communication",
+                    "udl_standard_short_ref": "UDL III 8.3 Foster collaboration and communication",
+                    "updated_at": "2015-07-31 02:16:17Z",
+                    "updated_time": 1438308977746,
+                    "uuid": "fac5843c-5558-42dc-a2f3-5e5dc8a74454"
+                }
+            ],
+            "updated_at": "2015-07-31 02:16:17Z",
+            "updated_time": 1438308977749,
+            "uuid": "dd304979-7779-47c7-a88b-ca401137097c",
+            "wida_2007_standard_codes": []
+        },
+        {
+            "adaptation_strategies": [
                 "8a459052-746c-4230-8427-c4d87d02c321",
                 "9e4d12ac-d798-4a00-ac26-7b19e964096b",
                 "1edef095-3678-4450-ac3f-fd7142d90074",
@@ -15883,580 +16457,6 @@
             "updated_at": "2017-08-01 22:27:00Z",
             "updated_time": 1501626420649,
             "uuid": "25ec9c48-0e1c-470e-96b8-86bb8b44df91",
-            "wida_2007_standard_codes": []
-        },
-        {
-            "adaptation_strategies": [
-                "128f853a-a8ec-452d-97d8-d3b6a6a51545",
-                "9e4d12ac-d798-4a00-ac26-7b19e964096b",
-                "9dd2f4d7-8e66-4231-bb0c-de8678d962b7",
-                "dfd901a1-c9a8-4e2b-8fe1-267579d909ae",
-                "49231dbe-a1f2-4c4a-81c9-b6d1202ec317",
-                "5a50393b-c205-4512-b0f0-a7d9def24924"
-            ],
-            "author_id": "1b400165-7fdf-4fac-a3f8-0a09f10031ec",
-            "ca_eld_standard_codes": [],
-            "coach_standard_codes": [],
-            "copied_from": "508cad82-abc0-43b5-9df4-1fab1673e160",
-            "created_at": "2015-02-18 05:44:01Z",
-            "demo": false,
-            "dlm_ee_codes": [],
-            "goal_text": "By (date), after breaking a school rule (e.g. no pushing other students) and provided with a [[visual cueing|visual cue]] (e.g. Teacher gestures to count using fingers) to use (1) [[calming strategies|self-control strategy]] (e.g. [[6-second pause|counting]]), when receiving disciplinary action from an authority figure (e.g. principal, teacher, instructional assistant) at school (e.g. recess, classroom, office), (name) will verbally accept why he/she is being disciplined to the relevant authority figure (e.g. Student says \u201cI am in the office because I pushed X\u201d) while avoiding the use of maladaptive behavior (e.g. shouting, running away, ignoring the speaker) in (3 of 3) disciplinary actions from an adult.",
-            "grades": [
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "11",
-                "12"
-            ],
-            "ils_sel_standard_codes": [],
-            "instruction_text": null,
-            "measurement_text": null,
-            "modification_text": null,
-            "ncsc_ccc_codes": [],
-            "ny_prek_standard_codes": [],
-            "objectives": [
-                {
-                    "_id": "55a862d5645c28af78000004",
-                    "created_at": "2015-07-17 02:05:09Z",
-                    "level": "Mild",
-                    "text": "By (date), after breaking a school rule (e.g. no pushing other students) and provided with a [[visual cueing|visual cue]] (e.g. Teacher gestures to count using fingers) to use (2) [[calming strategies|self-control strategy]] (e.g. [[6-second pause|counting]], deep [[belly breathing|belly breaths]]), when receiving disciplinary action from an authority figure (e.g. principal, teacher, IA) at school (e.g. recess, classroom, office), (name) will verbally accept why he/she is being disciplined to the relevant authority figure (student says \u201cI am in the office because I pushed X\u201d) while avoiding the use of maladaptive behavior (e.g. shouting, running away, ignoring the speaker) in (3 of 3) disciplinary actions from an adult.",
-                    "updated_at": "2015-07-17 02:05:09Z",
-                    "updated_time": 1437098709100,
-                    "uuid": "442e3702-1f2c-4b4e-a5f5-b97f47a47446"
-                },
-                {
-                    "_id": "55a862d5645c28af78000005",
-                    "created_at": "2015-07-17 02:05:09Z",
-                    "level": "Moderate",
-                    "text": "By (date), after breaking a school rule (e.g. no pushing other students) and provided with a [[visual cueing|visual cue]] (e.g. Teacher gestures to count using fingers) to use (2) [[calming strategies|self-control strategy]] (e.g. [[6-second pause|counting]], deep [[belly breathing|belly breaths]]) and [[i-messages|i-messages]] to share his/her feelings (e.g. \u201cI feel mad because\u2026\u201d), when receiving disciplinary action from an authority figure (e.g. principal, teacher, IA) at school (e.g. recess, classroom, office), (name) will verbally accept why he/she is being disciplined to the relevant authority figure (e.g. Student says \u201cI am in the office because I pushed X\u201d) while avoiding the use of maladaptive behavior (e.g. shouting, running away, ignoring the speaker) in (2 of 3) disciplinary actions from an adult.",
-                    "updated_at": "2015-07-17 02:05:09Z",
-                    "updated_time": 1437098709101,
-                    "uuid": "d190834d-c541-40b3-9310-6efeeef42011"
-                },
-                {
-                    "_id": "55a862d5645c28af78000006",
-                    "created_at": "2015-07-17 02:05:09Z",
-                    "level": "Intense",
-                    "text": "By (date), after breaking a school rule (e.g. no pushing other students) and provided with a [[visual cueing|visual cue]] (e.g. Teacher gestures to count using fingers) to use (2) [[calming strategies|self-control strategy]] (e.g. [[6-second pause|counting]], deep [[belly breathing|belly breaths]]) and [[i-messages|i-messages]] to share his/her feelings (e.g. Student says \u201cI feel mad because\u2026\u201d), when receiving disciplinary action from an authority figure (e.g. principal, teacher, IA) at school (e.g. recess, classroom, office), (name) will demonstrate acceptance of his/her consequences by quietly listening to the authority figure, while demonstrating no more than (1) maladaptive behavior (e.g. shouting, running away, ignoring the speaker) in (2 of 3) disciplinary actions from an adult.",
-                    "updated_at": "2015-07-17 02:05:09Z",
-                    "updated_time": 1437098709101,
-                    "uuid": "ea67d108-9b68-4686-acbe-dcba4e57ad64"
-                }
-            ],
-            "parent_text": null,
-            "published": true,
-            "score": 0.9,
-            "slug": "respond-to-discipline-from-an-adult",
-            "standard_codes": [],
-            "subject": "Autism",
-            "subject_domains": [
-                "Emotional Regulation"
-            ],
-            "tags": null,
-            "teks_standard_codes": [],
-            "title": "Respond To Discipline From An Adult",
-            "udl_adaptations": [
-                {
-                    "_id": "54e426a1645c285f54000026",
-                    "created_at": "2014-03-14 19:24:57Z",
-                    "text": "Being prompted by the teacher can support students in the activation of their background knowledge. A student may learn a [[Calming Strategies| self-control strategy]] in a classroom setting but be unable to implement that strategy during an authentic interaction during which the student is agitated. The teacher can provide the student with a prompt reminding him or her of a strategy to use in the situation.",
-                    "udl_standard_checkpoint_ref": "UDL I 3.1",
-                    "udl_standard_long_ref": "UDL I 3.1 Provide Multiple Means of Representation: Activate or supply background knowledge",
-                    "udl_standard_short_ref": "UDL I 3.1 Activate or supply background knowledge",
-                    "updated_at": "2015-07-17 02:05:09Z",
-                    "updated_time": 1437098709113,
-                    "uuid": "77d35ece-0f69-4aca-a6b3-9ec36a9681e0"
-                },
-                {
-                    "_id": "54e426a1645c285f54000027",
-                    "created_at": "2014-03-14 19:25:15Z",
-                    "text": "Students may have a difficult time verbally expressing their emotions when feeling frustrated or agitated. Teachers can provide students with an alternative method of communicating [[visual cueing|visual communication]] or pointing to an [[ emotions chart | emotion chart ]] to allow the student with an additional strategy for communication. A non-verbal strategy for communicating anger may support  a student in managing his/her behavior when feeling agitated.",
-                    "udl_standard_checkpoint_ref": "UDL II 4.1",
-                    "udl_standard_long_ref": "UDL II 4.1 Provide Multiple Means of Action and Expression: Vary the methods for response and navigation",
-                    "udl_standard_short_ref": "UDL II 4.1 Vary the methods for response and navigation",
-                    "updated_at": "2015-07-17 02:05:09Z",
-                    "updated_time": 1437098709114,
-                    "uuid": "43b37bcd-f4b4-4209-8e25-44fd3a16f681"
-                },
-                {
-                    "_id": "54e426a1645c285f54000028",
-                    "created_at": "2014-03-14 19:25:30Z",
-                    "text": "By providing students with a choice between (2) or more [[Calming Strategies| self-control strategies]], teachers can increase student engagement in the learning process. Offering students choices within the instructional setting (especially while agitated) can increase the student's ownership of the activity and provide the student with an increased sense of accomplishment and independence.",
-                    "udl_standard_checkpoint_ref": "UDL III 7.1",
-                    "udl_standard_long_ref": "UDL III 7.1 Provide Multiple Means of Engagement: Optimize individual choice and autonomy",
-                    "udl_standard_short_ref": "UDL III 7.1 Optimize individual choice and autonomy",
-                    "updated_at": "2015-07-17 02:05:09Z",
-                    "updated_time": 1437098709116,
-                    "uuid": "99946daf-088e-4115-a17a-722593fd82c8"
-                }
-            ],
-            "updated_at": "2015-07-17 02:05:09Z",
-            "updated_time": 1437098709119,
-            "uuid": "15b1b6fe-e0a5-4639-9e95-1e58fe101b01",
-            "wida_2007_standard_codes": []
-        },
-        {
-            "adaptation_strategies": [
-                "8ce153db-a210-4317-9ed8-4d7a6ce4f75c",
-                "49231dbe-a1f2-4c4a-81c9-b6d1202ec317",
-                "be7bd060-33b8-4507-8611-0a4a267d4852",
-                "d82473e0-606e-4470-8ee0-f7bda6e5766d",
-                "1e94ca89-17dd-44a3-9e52-b1ba7f6d83da",
-                "c37b57c1-483a-4c2b-971f-afc8cce1e616",
-                "c879d159-e4a0-4e38-a243-0df30b19c442"
-            ],
-            "author_id": "07c55d89-8eb4-4eb5-a4ee-2f8a678faeda",
-            "ca_eld_standard_codes": [],
-            "coach_standard_codes": [],
-            "copied_from": "09e172bf-80b7-460b-ae59-a45edfc17fc5",
-            "created_at": "2015-02-26 18:56:37Z",
-            "demo": false,
-            "dlm_ee_codes": [],
-            "goal_text": "By (date), when [[social role play| role-playing]] a disagreement with another student at school, (name) will demonstrate attentive listen (e.g. make eye contact, sitting up, turning his/her body towards the other student) while his/her peer shares their feelings regarding the situation, and then verbally express his/her own feelings using [[I-messages|I-messages]] (e.g. \"I think..\". \"I feel...\"), while refraining from negative behaviors (e.g. yelling, making inappropriate comments, making noises, leaving the room) for (3 out of 3) peer role-played disagreements.\n\n\"I Feel...\" Statements: Students make \"I Feel...\" Statements about how he/she feels, an indication of the conditions under which he/she feels that way, and why the conditions caused his/her emotions. For example, \"I feel\u2026 (State the emotion) when you\u2026.(describe the behavior or conditions) because\u2026 (explain why the behavior or conditions caused these feelings).",
-            "grades": [
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "11",
-                "12"
-            ],
-            "ils_sel_standard_codes": [],
-            "instruction_text": null,
-            "measurement_text": null,
-            "modification_text": null,
-            "ncsc_ccc_codes": [],
-            "ny_prek_standard_codes": [],
-            "objectives": [
-                {
-                    "_id": "55b165a2645c281742000003",
-                    "created_at": "2015-07-23 22:07:29Z",
-                    "level": "Mild",
-                    "text": "By (date), when [[social role play| role-playing]] a disagreement with another student at school, (name) will demonstrate attentive listen (e.g. make eye contact, sitting up, turning his/her body towards the other student) while his/her peer shares their feelings regarding the situation, and then verbally express his/her own feelings using [[I-messages|I-messages]] (e.g. \"I think..\". \"I feel...\"), provided with [[sentence starters|sentence starters]] (see examples below), while refraining from negative behaviors (e.g. yelling, making inappropriate comments, making noises, leaving the room) for (3 out of 3) peer role-played disagreements.",
-                    "updated_at": "2015-07-23 22:07:29Z",
-                    "updated_time": 1437689249999,
-                    "uuid": "65f61ed4-59a0-4534-ac66-4407f14d99eb"
-                },
-                {
-                    "_id": "55b165a2645c281742000004",
-                    "created_at": "2015-07-23 22:07:29Z",
-                    "level": "Moderate",
-                    "text": "By (date), when [[social role play| role-playing]] a disagreement with another student at school, (name) will demonstrate attentive listen (e.g. make eye contact, sitting up, turning his/her body towards the other student) while his/her peer shares their feelings regarding the situation, and then verbally express his/her own feelings using [[I-messages|I-messages]] (e.g. \"I think..\". \"I feel...\") in a [[interactive writing|pre-written script]], while refraining from negative behaviors (e.g. yelling, making inappropriate comments, making noises, leaving the room) for (2 out of 3) peer role-played disagreements.",
-                    "updated_at": "2015-07-23 22:07:29Z",
-                    "updated_time": 1437689250000,
-                    "uuid": "c6b9348b-df5e-4c31-a656-50b0988cf2c4"
-                },
-                {
-                    "_id": "55b165a2645c281742000005",
-                    "created_at": "2015-07-23 22:07:29Z",
-                    "level": "Intense",
-                    "text": "By (date), when [[social role play| role-playing]] a disagreement with another student at school with a preferred, [[peer buddies|peer buddy]] , (name) will demonstrate attentive listen (e.g. make eye contact, sitting up, turning his/her body towards the other student) while his/her peer shares their feelings regarding the situation, and then verbally express his/her own feelings using [[I-messages|I-messages]] (e.g. \"I think..\". \"I feel...\") in a [[interactive writing|pre-written script]], while refraining from negative behaviors (e.g. yelling, making inappropriate comments, making noises, leaving the room) for (2 out of 3) peer role-played disagreements.",
-                    "updated_at": "2015-07-23 22:07:29Z",
-                    "updated_time": 1437689250000,
-                    "uuid": "5c99a8ee-55b0-4c66-8540-d5a694cc0bd6"
-                }
-            ],
-            "parent_text": null,
-            "published": true,
-            "score": 0.9,
-            "slug": "express-feelings-during-conflict",
-            "standard_codes": [],
-            "subject": "Autism",
-            "subject_domains": [
-                "Social Communication"
-            ],
-            "tags": null,
-            "teks_standard_codes": [],
-            "title": "Express Feelings During Conflict",
-            "udl_adaptations": [
-                {
-                    "_id": "54ef6c65645c28ca5700047d",
-                    "created_at": "2014-03-10 16:59:44Z",
-                    "text": "Providing time for students to develop and [[social role play|practice]] conflict resolution skills with a [[peer buddies|peer buddy]] can help increase student engagement.  It is important that the teacher and student communicate openly about specific peers that the student feels comfortable practicing role play with, so that the teacher can honor those requests, when possible. In addition, the teacher must ensure that the peer who works with the student is also open to participating in role play and understands its purpose. The teacher may even need to train the peer how to communicate and interact with the student to avoid any challenges (e.g. Teacher lets the peer buddy know not to touch the student's hands because he is very sensitive to physical touch on his/her hands).",
-                    "udl_standard_checkpoint_ref": "UDL III 8.3",
-                    "udl_standard_long_ref": "UDL III 8.3 Provide Multiple Means of Engagement: Foster collaboration and communication",
-                    "udl_standard_short_ref": "UDL III 8.3 Foster collaboration and communication",
-                    "updated_at": "2015-07-23 22:07:30Z",
-                    "updated_time": 1437689250012,
-                    "uuid": "c61a66e5-88e2-4f47-9c22-44eb93d884fe"
-                },
-                {
-                    "_id": "54ef6c65645c28ca5700047e",
-                    "created_at": "2014-03-10 17:01:14Z",
-                    "text": "Since not all students learn the same way, it is essential for teachers to use a variety of methods for communication with students. For example, the teacher can teacher social skills for dealing with peer conflict by using [[social narratives|social narratives]], [[video|video modeling]], or [[social role play|role playing]] to engage students and maximize their ability to learn information, as well as to express themselves.",
-                    "udl_standard_checkpoint_ref": "UDL II 5.1",
-                    "udl_standard_long_ref": "UDL II 5.1 Provide Multiple Means of Action and Expression: Use multiple media for communication",
-                    "udl_standard_short_ref": "UDL II 5.1 Use multiple media for communication",
-                    "updated_at": "2015-07-23 22:07:30Z",
-                    "updated_time": 1437689250013,
-                    "uuid": "2cf999c5-bbbe-48e2-b040-9b9e20b11d56"
-                },
-                {
-                    "_id": "54ef6c65645c28ca5700047f",
-                    "created_at": "2014-03-10 17:03:44Z",
-                    "text": "Giving students who need extra support the opportunity to [[social role play|practice]] conflict resolution skills one-on-one with the teacher or in a small group helps them access the target skills, while receiving frequent prompts and immediate feedback to shape their social behaviors.",
-                    "udl_standard_checkpoint_ref": "UDL I 3.1",
-                    "udl_standard_long_ref": "UDL I 3.1 Provide Multiple Means of Representation: Activate or supply background knowledge",
-                    "udl_standard_short_ref": "UDL I 3.1 Activate or supply background knowledge",
-                    "updated_at": "2015-07-23 22:07:30Z",
-                    "updated_time": 1437689250015,
-                    "uuid": "11f8841e-6b2c-4f25-8b98-93b5a5ad68ff"
-                }
-            ],
-            "updated_at": "2015-07-23 22:07:30Z",
-            "updated_time": 1437689250019,
-            "uuid": "df5a57c2-cf8f-46d5-a73a-1e67f9c76301",
-            "wida_2007_standard_codes": []
-        },
-        {
-            "adaptation_strategies": [
-                "ec76bd00-a57a-427d-9100-f05192b59566",
-                "8ce153db-a210-4317-9ed8-4d7a6ce4f75c",
-                "7740d691-5f46-4ffa-ac39-2482a92e7857",
-                "7f2e7a09-a96b-4447-965c-b43d88e66970",
-                "c879d159-e4a0-4e38-a243-0df30b19c442",
-                "c37b57c1-483a-4c2b-971f-afc8cce1e616",
-                "128f853a-a8ec-452d-97d8-d3b6a6a51545",
-                "8b868a21-cf4c-482c-9e66-bbe00edcfda2",
-                "1e94ca89-17dd-44a3-9e52-b1ba7f6d83da"
-            ],
-            "author_id": "1b400165-7fdf-4fac-a3f8-0a09f10031ec",
-            "ca_eld_standard_codes": [],
-            "coach_standard_codes": [],
-            "copied_from": "86e2c9ae-6f23-44fb-b8b6-a919f3ce4330",
-            "created_at": "2015-02-26 22:12:31Z",
-            "demo": false,
-            "dlm_ee_codes": [],
-            "goal_text": "By (date), when joining a peer's conversation on a non-academic topic (e.g. sports, personal lives, hobbies/interests), (name) will verbally engage in the conversation by asking at least (1) on-topic question (e.g. Student asks \"How do you feel about...?\") and sharing at least (1) on-topic comment (e.g. Student says \"That is interesting.\"), over the duration of a (10) minute conversation, in (4 of 5) peer-conversation opportunities.",
-            "grades": [
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "11",
-                "12"
-            ],
-            "ils_sel_standard_codes": [],
-            "instruction_text": null,
-            "measurement_text": null,
-            "modification_text": null,
-            "ncsc_ccc_codes": [],
-            "ny_prek_standard_codes": [],
-            "objectives": [
-                {
-                    "_id": "55bad046645c28b554000003",
-                    "created_at": "2015-07-31 01:32:54Z",
-                    "level": "Mild",
-                    "text": "By (date), immediatley after [[ preteaching | preteaching ]] of examples of on-topic questions and comments, when joining a peer's conversation on a non-academic topic (e.g. sports, personal lives, hobbies/interests), (name) will verbally engage in the conversation by asking at least (1) on-topic question (e.g. Student asks \"How do you feel about...?\") and sharing at least (1) on-topic comment (e.g. Student says \"That is interesting.\"), over the duration of a (10) minute conversation, in (4 of 5) peer-conversation opportunities.",
-                    "updated_at": "2015-07-31 01:32:54Z",
-                    "updated_time": 1438306374755,
-                    "uuid": "bf64ebb3-f9b3-4302-ab05-8e81637c2f55"
-                },
-                {
-                    "_id": "55bad046645c28b554000004",
-                    "created_at": "2015-07-31 01:32:54Z",
-                    "level": "Moderate",
-                    "text": "By (date), immediatley after [[ preteaching | preteaching ]] and reviewing a [[social narratives|social narrative]] of examples of on-topic questions and comments, when joining a conversation with a preferred [[peer buddies|peer]] on a non-academic topic (e.g. sports, personal lives, hobbies/interests), (name) will verbally engage in the conversation by asking at least (1) on-topic question (e.g. Student asks \"How do you feel about...?\") and sharing at least (1) on-topic comment (e.g. Student says \"That is interesting.\"), over the duration of a (10) minute conversation, in (3 of 4) peer-conversation opportunities.",
-                    "updated_at": "2015-07-31 01:32:54Z",
-                    "updated_time": 1438306374755,
-                    "uuid": "1ae6b023-e166-4883-b343-8f69f8097306"
-                },
-                {
-                    "_id": "55bad046645c28b554000005",
-                    "created_at": "2015-07-31 01:32:54Z",
-                    "level": "Intense",
-                    "text": "By (date), immediatley after watching a [[ video | video model ]] of examples of on-topic questions and comments, when [[social role play|role-playing]] a conversation with a preferred [[peer buddies|peer]], (name) will verbally engage in the conversation by asking at least (1) on-topic question (e.g. Student asks \"How do you feel about...?\") and sharing at least (1) on-topic comment (e.g. Student says \"That is interesting.\"), provided with no more than (2) [[visual cueing | visual cues]] (e.g. Teacher gestures to ask his/her peer a question), over the duration of a (10) minute conversation, in (3 of 4) peer-conversation opportunities.",
-                    "updated_at": "2015-07-31 01:32:54Z",
-                    "updated_time": 1438306374756,
-                    "uuid": "8a2ef479-23ad-42aa-ac95-f92cd6bf9b6f"
-                }
-            ],
-            "parent_text": null,
-            "published": true,
-            "score": 0.9,
-            "slug": "stay-on-topic-during-conversations",
-            "standard_codes": [],
-            "subject": "Autism",
-            "subject_domains": [
-                "Social Communication"
-            ],
-            "tags": null,
-            "teks_standard_codes": [],
-            "title": "Stay On-Topic During Conversations",
-            "udl_adaptations": [
-                {
-                    "_id": "54ef9a4f645c2839510007ad",
-                    "created_at": "2013-12-18 01:32:39Z",
-                    "text": "For many students, it may be helpful for them to be pretaught examples of on-topic comments and questions (e.g. \"that is interesting\") before being expected to use them instead of assuming the student has such background knowledge. A teacher can [[ Preteaching | preteach ]] these strategies by verbally stating them, making a written list or modeling them for the class.",
-                    "udl_standard_checkpoint_ref": "UDL I 3.1",
-                    "udl_standard_long_ref": "UDL I 3.1 Provide Multiple Means of Representation: Activate or supply background knowledge",
-                    "udl_standard_short_ref": "UDL I 3.1 Activate or supply background knowledge",
-                    "updated_at": "2015-07-31 01:32:54Z",
-                    "updated_time": 1438306374768,
-                    "uuid": "618e7ee8-808e-4fbe-9f69-5973f9e5a86b"
-                },
-                {
-                    "_id": "54ef9a4f645c2839510007ae",
-                    "created_at": "2013-12-18 01:50:53Z",
-                    "text": "Students may have a difficult time initially practicing newly-acquired social skills in a real-world social interaction and will be supported by being given an opportunity to first use [[ Social Role Play | role play ]] to practice these skills. This strategy provides the students with opportunities to practice the skills in a controlled environment and receive feedback from peers and teachers. Role play can be particularly useful for students who need to build confidence in using new skills.",
-                    "udl_standard_checkpoint_ref": "UDL III 8.3",
-                    "udl_standard_long_ref": "UDL III 8.3 Provide Multiple Means of Engagement: Foster collaboration and communication",
-                    "udl_standard_short_ref": "UDL III 8.3 Foster collaboration and communication",
-                    "updated_at": "2015-07-31 01:32:54Z",
-                    "updated_time": 1438306374770,
-                    "uuid": "ff09a5d1-3ecb-45c7-939d-20c324c0f180"
-                },
-                {
-                    "_id": "54ef9a4f645c2839510007af",
-                    "created_at": "2013-12-18 01:54:39Z",
-                    "text": "Students learning a new conversational skill may benefit from the use of [[ social supports | social scripts ]] to remind the student how make an on-topic comment during conversation. In addition, social supports increase the opportunities for students to learn and practice essential social skills. Social scripts are useful tools for providing effective practice of a social skill and extensive practice is necessary to make the skill more concrete for the learner.",
-                    "udl_standard_checkpoint_ref": "UDL II 6.2",
-                    "udl_standard_long_ref": "UDL II 6.2 Provide Multiple Means of Action and Expression: Support planning and strategy development",
-                    "udl_standard_short_ref": "UDL II 6.2 Support planning and strategy development",
-                    "updated_at": "2015-07-31 01:32:54Z",
-                    "updated_time": 1438306374771,
-                    "uuid": "2ca70fdd-bdf6-464c-8b88-ecb24e05c06e"
-                }
-            ],
-            "updated_at": "2015-07-31 01:32:54Z",
-            "updated_time": 1438306374775,
-            "uuid": "fac43321-0076-4d9b-ae70-e438d66df0db",
-            "wida_2007_standard_codes": []
-        },
-        {
-            "adaptation_strategies": [
-                "ec76bd00-a57a-427d-9100-f05192b59566",
-                "c879d159-e4a0-4e38-a243-0df30b19c442",
-                "8ce153db-a210-4317-9ed8-4d7a6ce4f75c",
-                "a4060dc2-76ef-43d9-922d-a234239e2710",
-                "7f2e7a09-a96b-4447-965c-b43d88e66970",
-                "f97aabc0-6981-46c9-a138-7b1aac44cc07",
-                "d82473e0-606e-4470-8ee0-f7bda6e5766d",
-                "1e94ca89-17dd-44a3-9e52-b1ba7f6d83da",
-                "be7bd060-33b8-4507-8611-0a4a267d4852"
-            ],
-            "author_id": "1b400165-7fdf-4fac-a3f8-0a09f10031ec",
-            "ca_eld_standard_codes": [],
-            "coach_standard_codes": [],
-            "copied_from": "c3fc2c57-5be6-4a57-ae0b-cbe2b5981190",
-            "created_at": "2015-02-27 00:28:50Z",
-            "demo": false,
-            "dlm_ee_codes": [],
-            "goal_text": "By (date), when participating in an [[guided peer discussions|teacher guided conversation]] with peers on a personal topic (e.g. challenge in the home, death, argument), during a (10-minute) conversation, (name) will demonstrate at least (2) verbal expressions of empathy (e.g. \"I understand...\", \"What you're saying is...\"), while refraining from making any negative statements in (4 of 5) student conversations.",
-            "grades": [
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "11",
-                "12"
-            ],
-            "ils_sel_standard_codes": [],
-            "instruction_text": null,
-            "measurement_text": null,
-            "modification_text": null,
-            "ncsc_ccc_codes": [],
-            "ny_prek_standard_codes": [],
-            "objectives": [
-                {
-                    "_id": "55bbb8f8645c28d250000029",
-                    "created_at": "2015-07-31 18:05:44Z",
-                    "level": "Mild",
-                    "text": "By (date), immediately after watching a [[modeling behaviors|teacher model]] of at least (5) examples of expressions of empathy, when participating in an [[guided peer discussions|teacher guided conversation]] with peers on a personal topic (e.g. challenge in the home, death, argument), during a (10-minute) conversation, (name) will demonstrate at least (2) verbal expressions of empathy (e.g. \"I understand...\", \"What you're saying is...\"), while refraining from making any negative statements in (4 of 5) student conversations.",
-                    "updated_at": "2015-07-31 18:05:44Z",
-                    "updated_time": 1438365944310,
-                    "uuid": "aafb12ae-2571-4ce8-827f-3e6edd07b067"
-                },
-                {
-                    "_id": "55bbb8f8645c28d25000002a",
-                    "created_at": "2015-07-31 18:05:44Z",
-                    "level": "Moderate",
-                    "text": "By (date), immediately after watching a [[modeling behaviors|teacher model]] of at least (5) examples of expressions of empathy, when participating in an [[guided peer discussions|teacher guided conversation]] with peers on a personal topic (e.g. challenge in the home, death, argument), during a (10-minute) conversation, (name) will demonstrate at least (1) verbal expressions of empathy (e.g. \"I understand...\"), provided with a [[sentence starters|sentence starter]] (e.g. Teacher says \"I understand you felt...\"), while refraining from making any negative statements in (3 of 4) student conversations.",
-                    "updated_at": "2015-07-31 18:05:44Z",
-                    "updated_time": 1438365944310,
-                    "uuid": "eca0cbb8-87a4-44d8-838e-4d4d73e07c1a"
-                },
-                {
-                    "_id": "55bbb8f8645c28d25000002b",
-                    "created_at": "2015-07-31 18:05:44Z",
-                    "level": "Intense",
-                    "text": "By (date), immediately after watching a [[modeling behaviors|teacher model]] of at least (5) examples of expressions of empathy, when participating in a [[social role play|role-playing]] with a [[peer buddies|peer]] on a personal topic (e.g. challenge in the home, death, argument), during a (10-minute) conversation, (name) will demonstrate at least (1) verbal expressions of empathy (e.g. \"I understand...\"), provided with a [[interactive writing|pre-made script]] (e.g. Teacher writes script in collaboration with the student), while refraining from making any negative statements in (3 of 4) student conversations.",
-                    "updated_at": "2015-07-31 18:05:44Z",
-                    "updated_time": 1438365944311,
-                    "uuid": "ec8b5d6f-7273-421a-9b0f-68cf372712f5"
-                }
-            ],
-            "parent_text": null,
-            "published": true,
-            "score": 0.9,
-            "slug": "demonstrate-empathy-towards-peers",
-            "standard_codes": [],
-            "subject": "Autism",
-            "subject_domains": [
-                "Social Communication"
-            ],
-            "tags": null,
-            "teks_standard_codes": [],
-            "title": "Demonstrate Empathy Towards Peers",
-            "udl_adaptations": [
-                {
-                    "_id": "54efba42645c28f830000057",
-                    "created_at": "2014-01-08 22:30:23Z",
-                    "text": "Using [[ social narratives | social narratives ]] can help students master the skill of expressing empathy by providing them with examples of empathetic responses in social situations. In addition, social supports increase the opportunities for students to learn and practice essential social skills. Social narratives are useful tools for providing effective practice of a social skill and extensive practice is necessary to make the skill more concrete for the learner.",
-                    "udl_standard_checkpoint_ref": "UDL I 2.5",
-                    "udl_standard_long_ref": "UDL I 2.5 Provide Multiple Means of Representation: Illustrate through multiple media",
-                    "udl_standard_short_ref": "UDL I 2.5 Illustrate through multiple media",
-                    "updated_at": "2015-07-31 18:05:44Z",
-                    "updated_time": 1438365944321,
-                    "uuid": "8fa1dca5-8d3e-4137-a0a3-0a28598f189c"
-                },
-                {
-                    "_id": "54efba42645c28f830000058",
-                    "created_at": "2014-01-08 22:32:13Z",
-                    "text": "For students with severe needs, it can be useful to provide them with multiple scaffolds in building mastery toward using the skill of expressing empathy. Utilizing scaffolds allows teachers to support the student in building fluency in the examples of expressing empathy. Teachers can have students first master a skill through multiple practice opportunities during [[ social role play | role play ]] in a controlled classroom setting before expecting the student to use the skill in an authentic social interaction.",
-                    "udl_standard_checkpoint_ref": "UDL II 5.3",
-                    "udl_standard_long_ref": "UDL II 5.3 Provide Multiple Means of Action and Expression: Build fluencies with graduated levels of support for practice and performance",
-                    "udl_standard_short_ref": "UDL II 5.3 Build fluencies with graduated levels of support for practice and performance",
-                    "updated_at": "2015-07-31 18:05:44Z",
-                    "updated_time": 1438365944323,
-                    "uuid": "14e3cb0a-dd75-4f2c-bbb4-16474e775eed"
-                },
-                {
-                    "_id": "54efba42645c28f830000059",
-                    "created_at": "2014-01-08 22:35:32Z",
-                    "text": "Students may experience increased engagement in a learning activity when they are [[ Peer supports | interacting with a peer ]] as opposed to an adult (e.g. teacher). Teachers can encourage peer cooperation and support by having students practice the skill of expressing empathy by role-playing with a peer.",
-                    "udl_standard_checkpoint_ref": "UDL III 8.3",
-                    "udl_standard_long_ref": "UDL III 8.3 Provide Multiple Means of Engagement: Foster collaboration and communication",
-                    "udl_standard_short_ref": "UDL III 8.3 Foster collaboration and communication",
-                    "updated_at": "2015-07-31 18:05:44Z",
-                    "updated_time": 1438365944324,
-                    "uuid": "b6bd6eb5-b14c-47a6-a61b-e47af492c5ff"
-                }
-            ],
-            "updated_at": "2015-07-31 18:05:44Z",
-            "updated_time": 1438365944327,
-            "uuid": "3fa0b4e3-042e-4cb0-b033-304e37cf554a",
-            "wida_2007_standard_codes": []
-        },
-        {
-            "adaptation_strategies": [
-                "ec76bd00-a57a-427d-9100-f05192b59566",
-                "8ce153db-a210-4317-9ed8-4d7a6ce4f75c",
-                "7a0a5f7a-83b0-4e95-a40b-5dd432a7a1b1",
-                "7f2e7a09-a96b-4447-965c-b43d88e66970",
-                "128f853a-a8ec-452d-97d8-d3b6a6a51545",
-                "d82473e0-606e-4470-8ee0-f7bda6e5766d",
-                "c37b57c1-483a-4c2b-971f-afc8cce1e616",
-                "ac8a2d1a-84a1-422c-91a6-d93c02fbd21e"
-            ],
-            "author_id": "1b400165-7fdf-4fac-a3f8-0a09f10031ec",
-            "ca_eld_standard_codes": [],
-            "coach_standard_codes": [],
-            "copied_from": "ea053da8-9b27-40aa-a335-4cf50e99e3f1",
-            "created_at": "2015-02-27 00:31:11Z",
-            "demo": false,
-            "dlm_ee_codes": [],
-            "goal_text": "By (date), when participating in an in-class academic group project (e.g. small-group work, partner work) with peers, during a (15-minute) activity, (name) will give (3) statements of encouragement to a peer (e.g. Student says \"That's a good idea\" or \"Good job!\"), while withholding negative comments (e.g. Student says \u201cThat\u2019s a dumb idea\u201d or \u201cYou are doing it wrong!\u201d) in (4 out of 5) group-work opportunities.",
-            "grades": [
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "11",
-                "12"
-            ],
-            "ils_sel_standard_codes": [],
-            "instruction_text": null,
-            "measurement_text": null,
-            "modification_text": null,
-            "ncsc_ccc_codes": [],
-            "ny_prek_standard_codes": [],
-            "objectives": [
-                {
-                    "_id": "55bada71645c28385600000e",
-                    "created_at": "2015-07-31 02:16:17Z",
-                    "level": "Mild",
-                    "text": "By (date), immediately after a [[ preteaching | preteaching ]] of examples of statements of encouragement, when participating in an in-class academic group project (e.g. small-group work, partner work) with peers, during a (15-minute) activity, (name) will give (3) statements of encouragement to a peer (e.g. Student says \"That's a good idea\" or \"Good job!\"), while withholding negative comments (e.g. Student says \u201cThat\u2019s a dumb idea\u201d or \u201cYou are doing it wrong!\u201d) in (4 out of 5) group-work opportunities.",
-                    "updated_at": "2015-07-31 02:16:17Z",
-                    "updated_time": 1438308977731,
-                    "uuid": "2ea259da-21b1-469a-9bbf-52f05dcfa03b"
-                },
-                {
-                    "_id": "55bada71645c28385600000f",
-                    "created_at": "2015-07-31 02:16:17Z",
-                    "level": "Moderate",
-                    "text": "By (date), immediately after a [[ preteaching | preteaching ]] of examples of statements of encouragement, when participating in an in-class academic group project (e.g. small-group work, partner work) with peers, during a (30-minute) activity, (name) will give (2) statements of encouragement to a peer (e.g. Student says \"That's a good idea\" or \"Good job!\"), provided with [[sentence starters|sentence starters]] (e.g. Teacher says \"Good...\"), while withholding negative comments (e.g. Student says \u201cThat\u2019s a dumb idea\u201d or \u201cYou are doing it wrong!\u201d) in (3 out of 4) group-work opportunities.",
-                    "updated_at": "2015-07-31 02:16:17Z",
-                    "updated_time": 1438308977732,
-                    "uuid": "af523b12-da0f-44ac-8dc6-6e9379076c2d"
-                },
-                {
-                    "_id": "55bada71645c283856000010",
-                    "created_at": "2015-07-31 02:16:17Z",
-                    "level": "Intense",
-                    "text": "By (date), immediately after watching a [[ video| video model ]] of examples of statements of encouragement, when [[social role play|role-playing]] an in-class academic group project (e.g. small-group work, partner work) with peers, during a (30-minute) activity, (name) will give (1) statement of encouragement to a peer (e.g. Student says \"Good job!\"), provided with a pre-made [[reference materials|script]], while withholding negative comments (e.g. Student says \u201cThat\u2019s a dumb idea\u201d or \u201cYou are doing it wrong!\u201d) in (3 out of 4) group-work role-playing opportunities.",
-                    "updated_at": "2015-07-31 02:16:17Z",
-                    "updated_time": 1438308977732,
-                    "uuid": "1e5c63b6-b320-4562-878f-5a6c8e52596d"
-                }
-            ],
-            "parent_text": null,
-            "published": true,
-            "score": 0.9,
-            "slug": "making-positive-comments-during-peer-conversations",
-            "standard_codes": [],
-            "subject": "Autism",
-            "subject_domains": [
-                "Social Communication"
-            ],
-            "tags": null,
-            "teks_standard_codes": [],
-            "title": "Making Positive Comments During Peer Conversations",
-            "udl_adaptations": [
-                {
-                    "_id": "54efbacf645c28f830000066",
-                    "created_at": "2014-01-07 23:02:55Z",
-                    "text": "It may be helpful for students to prelearn multiple examples of encouraging statements (e.g. \"that is a good idea, \"that is interesting\", \"awesome!\") before being expected to use the statements in an authentic social interaction. A teacher can [[ Preteaching | preteach ]] examples of encouraging statements in multiple ways (e.g. making flashcards, making a written list or [[modeling behaviors|modeling]] them for the class).",
-                    "udl_standard_checkpoint_ref": "UDL I 3.3",
-                    "udl_standard_long_ref": "UDL I 3.3 Provide Multiple Means of Representation: Guide information processing, visualization, and manipulation",
-                    "udl_standard_short_ref": "UDL I 3.3 Guide information processing, visualization, and manipulation",
-                    "updated_at": "2015-07-31 02:16:17Z",
-                    "updated_time": 1438308977743,
-                    "uuid": "69eb3a72-a6b8-44d2-a6d1-e4bd9769334b"
-                },
-                {
-                    "_id": "54efbacf645c28f830000067",
-                    "created_at": "2014-01-07 23:06:03Z",
-                    "text": "For students with severe needs, it can be useful to provide them with multiple scaffolds in building mastery toward a skill. Utilizing scaffolds allows teachers to support the student in building fluency in the skill. Teachers can have students first master a skill through multiple practice opportunities during [[ social role play | peer-to-peer role play ]] in a controlled classroom setting before expecting the student to use the skill in an authentic social interaction.",
-                    "udl_standard_checkpoint_ref": "UDL II 5.3",
-                    "udl_standard_long_ref": "UDL II 5.3 Provide Multiple Means of Action and Expression: Build fluencies with graduated levels of support for practice and performance",
-                    "udl_standard_short_ref": "UDL II 5.3 Build fluencies with graduated levels of support for practice and performance",
-                    "updated_at": "2015-07-31 02:16:17Z",
-                    "updated_time": 1438308977744,
-                    "uuid": "d4e1e71c-8d18-4c8e-8a5a-81d695c8e3c1"
-                },
-                {
-                    "_id": "54efbacf645c28f830000068",
-                    "created_at": "2014-01-07 23:11:31Z",
-                    "text": "If a student is having significant difficulty building fluency in the skill of making encouraging statements, the teacher can provide the opportunity for peer-to-peer mentorship by guiding [[ social role play | role play ]] activities. This strategy provides students with opportunities to practice the skills in a controlled environment and receive feedback from peers and teachers. Role-play can be particularly useful for students who need to build confidence in using new skills.",
-                    "udl_standard_checkpoint_ref": "UDL III 8.3",
-                    "udl_standard_long_ref": "UDL III 8.3 Provide Multiple Means of Engagement: Foster collaboration and communication",
-                    "udl_standard_short_ref": "UDL III 8.3 Foster collaboration and communication",
-                    "updated_at": "2015-07-31 02:16:17Z",
-                    "updated_time": 1438308977746,
-                    "uuid": "fac5843c-5558-42dc-a2f3-5e5dc8a74454"
-                }
-            ],
-            "updated_at": "2015-07-31 02:16:17Z",
-            "updated_time": 1438308977749,
-            "uuid": "dd304979-7779-47c7-a88b-ca401137097c",
             "wida_2007_standard_codes": []
         }
     ]

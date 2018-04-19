@@ -3,6 +3,24 @@ import asyncio
 import random
 import requests
 
+urls = [
+    'https://goalbookapp.com/toolkit/api/search/*?grades%5B%5D=K&grades%5B%5D=Pre-K&grades%5B%5D=1&grades%5B%5D=2&grades%5B%5D=3&grades%5B%5D=4&grades%5B%5D=5&grades%5B%5D=6&grades%5B%5D=7&grades%5B%5D=8&grades%5B%5D=9&grades%5B%5D=10&grades%5B%5D=11&grades%5B%5D=12&subjects%5B%5D=Reading&user_type=default&new_search=true',
+    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Writing&user_type=default&new_search=true',
+    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Math&user_type=default&new_search=true',
+    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Behavior+%26+SEL&user_type=default&new_search=true',
+    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Pre-Kindergarten&user_type=default&new_search=true',
+    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=English+Learners&user_type=default&new_search=true',
+    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Autism&user_type=default&new_search=true',
+    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Speech+%26+Language&user_type=default&new_search=true',
+    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Success+Skills&user_type=default&new_search=true',
+    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Blind%2FVisual+Impairment&user_type=default&new_search=true',
+    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Adapted+Physical+Education&user_type=default&new_search=true',
+    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Deaf%2FHard+of+Hearing&user_type=default&new_search=true',
+    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Occupational+Therapy&user_type=default&new_search=true',
+    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Alt+Academic+%26+Life+Skills&user_type=default&new_search=true',
+    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Transition&user_type=default&new_search=true',
+]
+
 async def do_some_work(x):
     print("Waiting " + str(x))
     await asyncio.sleep(x)
@@ -65,34 +83,50 @@ async def consume(queue):
         query = parse.urlsplit(item).query
         params = parse.parse_qs(query)
 
-        panda_data = pd.DataFrame(out['goals'], columns=[x for x in out['goals'][0].keys()])
-        panda_data.to_csv('{}.csv'.format(''.join(params['subjects[]'])))
-        print(panda_data)
-        # print(params)
-        # print(out.keys)
-        print('{}'.format(''.join(params['subjects[]']) + ': ' + str(len(out['goals']))))
-        with open('goalbook-{}.json'.format(''.join(params['subjects[]'])), 'w') as f:
-            f.write(json.dumps(out, sort_keys=True, indent=4))
+        panda_data = pd.DataFrame(out['goals'], columns=[x for x in out['goals'][0].keys() if x in keep_fields])
+        for index, row in panda_data.iterrows():
+            # print(index, row)
+            if 'assessment_items' in row:
+                print(row)
+                # assessment_url = 'https://goalbookapp.com/pathways/api/v1/items/{}?denormalized=1'.format()
+                # future1 = loop.run_in_executor(None, requests.get, item)
+                # resp = await future1
+                # assessment_results = resp.json()
+                # print(assessment_results.keys())
+        # print(panda_data.keys())
+        # if 'assessment_items' in panda_data:
+        #     ass_item = panda_data[['assessment_items']]
+        #     print(ass_item)
+        #     assessment_url = 'https://goalbookapp.com/pathways/api/v1/items/{}?denormalized=1'.format()
+        #     future1 = loop.run_in_executor(None, requests.get, item)
+        #     resp = await future1
+        #     assessment_results = resp.json()
+        #     print(assessment_results.keys())
+
+        print()
+
+        # qs = (params['subjects[]'])
+        # qs = qs[0].replace('/', '')
+        # qs = parse.quote_plus(qs)
+        # print(qs)
+
+
+
+       
+
+        
+        # panda_data.to_csv('{}.csv'.format(qs))
+
+        # fname = '{}'.format(qs)
+        # print(fname + ': ' + str(len(out['goals'])))
+        # with open('goalbook-{}.json'.format(fname), 'w') as f:
+        #     f.write(json.dumps(out, sort_keys=True, indent=4))
         
 'https://goalbookapp.com/pathways/api/v1/items/bffa4784-6dc2-4a58-6116-80ddf32984e5?denormalized=1'
 
-urls = [
-    'https://goalbookapp.com/toolkit/api/search/*?grades%5B%5D=K&grades%5B%5D=Pre-K&grades%5B%5D=1&grades%5B%5D=2&grades%5B%5D=3&grades%5B%5D=4&grades%5B%5D=5&grades%5B%5D=6&grades%5B%5D=7&grades%5B%5D=8&grades%5B%5D=9&grades%5B%5D=10&grades%5B%5D=11&grades%5B%5D=12&subjects%5B%5D=Reading&user_type=default&new_search=true',
-    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Writing&user_type=default&new_search=true',
-    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Math&user_type=default&new_search=true',
-    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Behavior+%26+SEL&user_type=default&new_search=true',
-    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Pre-Kindergarten&user_type=default&new_search=true',
-    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=English+Learners&user_type=default&new_search=true',
-    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Autism&user_type=default&new_search=true',
-    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Speech+%26+Language&user_type=default&new_search=true',
-    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Success+Skills&user_type=default&new_search=true',
-    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Blind%2FVisual+Impairment&user_type=default&new_search=true',
-    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Adapted+Physical+Education&user_type=default&new_search=true',
-    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Deaf%2FHard+of+Hearing&user_type=default&new_search=true',
-    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Occupational+Therapy&user_type=default&new_search=true',
-    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Alt+Academic+%26+Life+Skills&user_type=default&new_search=true',
-    'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Transition&user_type=default&new_search=true',
-]
+
+
+
 
 loop = asyncio.get_event_loop()
 queue = asyncio.Queue(loop=loop)

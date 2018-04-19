@@ -11965,199 +11965,368 @@
         },
         {
             "adaptation_strategies": [
-                "8ce153db-a210-4317-9ed8-4d7a6ce4f75c",
-                "3ef55d5f-d901-49fc-8d0c-e3e57e3c3559",
-                "2ab7aa22-876b-48ba-8cb9-f6008c315649",
-                "a4060dc2-76ef-43d9-922d-a234239e2710",
-                "7f2e7a09-a96b-4447-965c-b43d88e66970",
-                "d82473e0-606e-4470-8ee0-f7bda6e5766d"
+                "5a50393b-c205-4512-b0f0-a7d9def24924",
+                "c879d159-e4a0-4e38-a243-0df30b19c442"
             ],
-            "author_id": "1b400165-7fdf-4fac-a3f8-0a09f10031ec",
+            "author_id": "8bb937fe-e273-11e1-bae1-12313f061927",
             "ca_eld_standard_codes": [],
-            "created_at": "2013-10-21 23:11:07Z",
-            "goal_text": "By (date), when given a multi-day assignment to be completed outside of the classroom (e.g. research project, essay-writing assignment), (name) will demonstrate use of at least (1) [[goal setting|goal-achievement strategy]] (e.g. [[contracts|commitment letter-writing]], goal-sharing, [[peer supports|peer progress reporting]]), for (5 of 5) multi-day assignment opportunities.\n\nCommitment Letter Description\n     A letter in which a student states a goal(s), how it will be achieved, by what date, etc. A commitment letter serves as a concrete pledge to work toward goal completion.",
+            "coach_standard_codes": [],
+            "created_at": "2013-09-13 06:42:27Z",
+            "demo": false,
+            "dlm_ee_codes": [],
+            "goal_text": "By (date), when verbally asked to demonstrate each of the four basic emotions (i.e. happy, angry, sad, afraid), (name) will correctly demonstrate the emotion through facial expression and body language (e.g. frowning and shaking a fist for angry) for (3 of 4) trials.",
             "grades": [
-                "9",
-                "10"
+                "K",
+                "Pre-K",
+                "1",
+                "2"
             ],
             "ils_sel_standard_codes": [
-                "ILS-SEL.1C.9-10.b"
+                "ILS-SEL.1A.K-2.a"
             ],
+            "ncsc_ccc_codes": [],
             "ny_prek_standard_codes": [],
             "objectives": [
                 {
-                    "_id": "5381eceab79b0bac3100001c",
-                    "created_at": "2014-05-25 13:15:22Z",
+                    "_id": "55515ab6645c28532200009a",
+                    "created_at": "2015-05-12 01:43:18Z",
                     "level": "Mild",
-                    "text": "By (date), after [[modeling behaviors|teacher-modeling]] of at least (2) goal-achievement strategies (e.g. providing students with examples of [[contracts|commitment letters]], teacher-to-student [[social role play | role-playing ]] of goal-sharing), when given a multi-day assignment to be completed outside of the classroom (e.g. research project, essay-writing assignment), (name) will demonstrate use of at least (1) goal-achievement strategy (e.g. commitment letter writing, goal-sharing, peer progress reporting), for (4 of 5) multi-day assignment opportunities.",
-                    "updated_at": "2014-05-25 13:15:22Z",
-                    "updated_time": 1401023722120,
-                    "uuid": "c7d52871-d6c8-44f9-9295-9a5f888c4d75"
+                    "text": "By (date), when provided access to an [[ Emotions Chart | emotions chart ]] and verbally asked to demonstrate each of the four basic emotions (i.e. happy, angry, sad, afraid), (name) will correctly demonstrate the emotion through facial expression and body language (e.g. frowning and shaking a fist for angry) for (3 of 4) trials.",
+                    "updated_at": "2015-05-12 01:43:18Z",
+                    "updated_time": 1431394998414,
+                    "uuid": "3371d9c4-edcb-43a5-91aa-d71347d6fa51"
                 },
                 {
-                    "_id": "5381eceab79b0bac3100001d",
-                    "created_at": "2014-05-25 13:15:22Z",
+                    "_id": "55515ab6645c28532200009b",
+                    "created_at": "2015-05-12 01:43:18Z",
                     "level": "Moderate",
-                    "text": "By (date), after [[modeling behaviors|teacher-modeling]] and student practice of the goal-achievement strategy of verbal goal-sharing (e.g. teacher makes a verbal goal-sharing statement such as \"I will finish my assignment by the end of 5th period\" and student repeats the statement back to the teacher), when given an assignment/task to be completed by the end of the school day (e.g. academic assignment or social skill task), (name) will make a verbal goal-sharing statement to the teacher for (4 of 5) goal-sharing opportunities.",
-                    "updated_at": "2014-05-25 13:15:22Z",
-                    "updated_time": 1401023722121,
-                    "uuid": "144b27b0-6605-4e8c-b190-6ff3e31c4ee2"
+                    "text": "By (date), when provided access to an [[ Emotions Chart | emotions chart ]] and verbally asked to demonstrate each of the four basic emotions (i.e. happy, angry, sad, afraid), (name) will correctly demonstrate the emotion through facial expression and body language (e.g. frowning and shaking a fist for angry) for (3 of 4) trials.",
+                    "updated_at": "2015-05-12 01:43:18Z",
+                    "updated_time": 1431394998414,
+                    "uuid": "67a86332-04ed-4f79-861a-a8f75491ac14"
                 },
                 {
-                    "_id": "5381eceab79b0bac3100001e",
-                    "created_at": "2014-05-25 13:15:22Z",
+                    "_id": "55515ab6645c28532200009c",
+                    "created_at": "2015-05-12 01:43:18Z",
                     "level": "Intense",
-                    "text": "By (date), after [[modeling behaviors|teacher-modeling]] of examples of progress reporting statements (e.g. \"I'm halfway done\" or \"I'm on the right track\") and teacher-to-student [[social role play | role-playing ]] of peer progress reporting, when given an assignment to be completed by the end of class time, (name) will verbally make (2) peer progress reporting statements, for (4 of 5) in-class assignment opportunities.",
-                    "updated_at": "2014-05-25 13:15:22Z",
-                    "updated_time": 1401023722121,
-                    "uuid": "6865da67-3100-42be-922b-5f891167bb5f"
+                    "text": "By (date), when a teacher models one of the four basic emotions (i.e. happy, angry, sad, afraid) through facial expression and body language, (name) will point to the correct emotion as represented on an [[ Emotions Chart | emotions chart ]] for (3 of 4) trials.",
+                    "updated_at": "2015-05-12 01:43:18Z",
+                    "updated_time": 1431394998415,
+                    "uuid": "ef52faf4-c77d-45f5-aba1-4fcb3105aba9"
                 }
             ],
             "published": true,
+            "score": 0,
+            "slug": "demonstrate-range-of-emotions",
+            "standard_codes": [],
+            "subject": "Behavior & SEL",
+            "subject_domains": [
+                "Social Awareness"
+            ],
+            "teks_standard_codes": [],
+            "title": "Demonstrate Range of Emotions",
+            "udl_adaptations": [
+                {
+                    "_id": "5232b874b79b0bdb5300000c",
+                    "created_at": "2013-09-13 07:02:12Z",
+                    "text": "Letting students use an emotions chart as a reference can be a visual reminder and prompt of the facial expression and body language associated with each emotion.",
+                    "udl_standard_checkpoint_ref": "UDL I 2.5",
+                    "udl_standard_long_ref": "UDL I 2.5 Provide Multiple Means of Representation: Illustrate through multiple media",
+                    "udl_standard_short_ref": "UDL I 2.5 Illustrate through multiple media",
+                    "updated_at": "2015-05-12 01:43:18Z",
+                    "updated_time": 1431394998433,
+                    "uuid": "4dc59fd4-788f-4692-9767-db52ea2f33c9"
+                },
+                {
+                    "_id": "5232b905b79b0bdb53000010",
+                    "created_at": "2013-09-13 07:04:37Z",
+                    "text": "Students who might lack the fine and gross motor coordination can represent emotions through picture icons that represent the emotion that they feel.",
+                    "udl_standard_checkpoint_ref": "UDL II 5.2",
+                    "udl_standard_long_ref": "UDL II 5.2 Provide Multiple Means of Action and Expression: Use multiple tools for construction and composition",
+                    "udl_standard_short_ref": "UDL II 5.2 Use multiple tools for construction and composition",
+                    "updated_at": "2015-05-12 01:43:18Z",
+                    "updated_time": 1431394998435,
+                    "uuid": "2f976d3a-c718-4fb0-9972-22c15bfc495d"
+                },
+                {
+                    "_id": "5232b97eb79b0bdb53000017",
+                    "created_at": "2013-09-13 07:06:38Z",
+                    "text": "Some students might feel shy in acting out an emotion in front of other students.  The teacher can have the student perform the task in a one-on-one setting.",
+                    "udl_standard_checkpoint_ref": "UDL III 7.3",
+                    "udl_standard_long_ref": "UDL III 7.3 Provide Multiple Means of Engagement: Minimize threats and distractions",
+                    "udl_standard_short_ref": "UDL III 7.3 Minimize threats and distractions",
+                    "updated_at": "2015-05-12 01:43:18Z",
+                    "updated_time": 1431394998436,
+                    "uuid": "5e563e12-b952-458a-a619-22ef1fc8b303"
+                },
+                {
+                    "_id": "5232be0cb79b0b5d5b000006",
+                    "created_at": "2013-09-13 07:26:04Z",
+                    "text": "In order to help the student understand each emotion, a [[ Social Narratives | social narrative ]] can be developed that describes the emotion (e.g. \"happy\") and an example real life scenario that helps the student imagine the emotion (e.g. going to Disneyland).",
+                    "udl_standard_checkpoint_ref": "UDL I 3.4",
+                    "udl_standard_long_ref": "UDL I 3.4 Provide Multiple Means of Representation: Maximize transfer and generalization",
+                    "udl_standard_short_ref": "UDL I 3.4 Maximize transfer and generalization",
+                    "updated_at": "2015-05-12 01:43:18Z",
+                    "updated_time": 1431394998438,
+                    "uuid": "43371c17-ba15-4adf-86ed-fdf57bf934b6"
+                }
+            ],
+            "updated_at": "2015-05-12 01:43:18Z",
+            "updated_time": 1431394998442,
+            "uuid": "bb18718d-50a3-4b68-84a0-f9a9e2147370",
+            "wida_2007_standard_codes": []
+        },
+        {
+            "adaptation_strategies": [
+                "290a50f5-2b68-41a0-b78f-ff074f5dec77",
+                "128f853a-a8ec-452d-97d8-d3b6a6a51545",
+                "9c986e37-291b-4602-b419-32bab87aa78e",
+                "f0335aae-d72a-4956-a6bc-89e6ca4b2859",
+                "8b868a21-cf4c-482c-9e66-bbe00edcfda2",
+                "1edef095-3678-4450-ac3f-fd7142d90074",
+                "b6b37ce4-836b-4acb-98c8-6fa030bea1a2"
+            ],
+            "author_id": "1b400165-7fdf-4fac-a3f8-0a09f10031ec",
+            "ca_eld_standard_codes": [],
+            "coach_standard_codes": [],
+            "created_at": "2012-12-04 04:33:30Z",
+            "demo": false,
+            "dlm_ee_codes": [],
+            "goal_text": "By (date), when the teacher gives a direction, (name) will follow the direction and/or ask for clarification within (10) seconds, for (4 out of 5) teacher directions.\n\n*Example direction:*<br>\n\u201cPlease take out a highlighter, a pen, and your notes from yesterday, and then put all other materials into your backpack.\"",
+            "grades": [
+                "6",
+                "7",
+                "8"
+            ],
+            "ils_sel_standard_codes": [],
+            "instruction_text": "*Teacher can use a positive reward system, where the student receives a token (button, marble, sticker) each time they comply with an adult's request.\n*At the end of the day, the teacher and student can review the number of tokens earned.\n*If the student has earned a predesignated amount of tokens, they receive an award (lunch with the teacher, 2 minutes extra recess, free time, etc.).",
+            "measurement_text": "*Teacher can track the student's ability/willingness to comply using the daily chart.\n*Teacher can check-in with the student to review their progress at different times of day (i.e. morning, prior to lunch, at end of day).\n*Teacher and student can review the amount of tokens earned at the end of the day and discuss progress.",
+            "modification_text": "<p><span style=\"text-decoration: underline;\">UDL I Provide Multiple Means of Representation</span></p>\n<p><span style=\"text-decoration: underline;\">UDL II Provide Multiple Means of Action &amp; Expression</span></p>\n<p><span style=\"text-decoration: underline;\">UDL III Provide Multiple Means of Engagement</span></p>",
+            "ncsc_ccc_codes": [],
+            "ny_prek_standard_codes": [],
+            "objectives": [
+                {
+                    "_id": "58a72a3121cb990ec43d15c0",
+                    "created_at": "2017-02-17 16:52:01Z",
+                    "level": "Mild",
+                    "text": "By (date), when the teacher gives and [[repeat the directions|repeats]] a direction, (name) will follow the direction and/or ask for clarification within (10) seconds, for (4 out of 5) teacher directions.",
+                    "updated_at": "2017-02-17 16:52:01Z",
+                    "updated_time": 1487350321788,
+                    "uuid": "0bd8a443-eb23-4aa2-9236-73ab092a6191"
+                },
+                {
+                    "_id": "58a72a3121cb990ec43d15c1",
+                    "created_at": "2017-02-17 16:52:01Z",
+                    "level": "Moderate",
+                    "text": "By (date), when the teacher gives a direction and [[check in/check out|checks]] for understanding and necessary materials, (name) will receive (1) [[verbal prompting|verbal]] or [[visual cueing|visual]] reminder cue from the teacher, and follow the direction and/or ask for clarification within (10) seconds, for (4 out of 5) teacher directions.",
+                    "updated_at": "2017-02-17 16:52:01Z",
+                    "updated_time": 1487350321788,
+                    "uuid": "9485509c-58d6-424f-aaef-5889e886d7bd"
+                },
+                {
+                    "_id": "58a72a3121cb990ec43d15c2",
+                    "created_at": "2017-02-17 16:52:01Z",
+                    "level": "Intense",
+                    "text": "By (date), during a [[preferred topic or text|preferred]] task, after the teacher gives a direction, [[check in/check out|checks]] for understanding and necessary materials, and sets a [[timer|timer]] for the desired completion time, (name) will receive [[graduated guidance|1:1 guidance]] from the teacher to follow the direction within the time frame shown on the timer, for (4 out of 5) teacher directions.",
+                    "updated_at": "2017-02-17 16:52:01Z",
+                    "updated_time": 1487350321789,
+                    "uuid": "90630c64-62ea-485a-85f1-fd37ee1aa92c"
+                }
+            ],
+            "parent_text": "In one year, when given a request from an adult, you will comply.",
+            "published": true,
+            "resources": [
+                {
+                    "_id": "50be99408c3f9c741d000002",
+                    "category_code": "Assessment",
+                    "created_at": "2012-12-05 00:45:51Z",
+                    "description": "",
+                    "scribd_doc_access_key": "key-106zix04v5mmgrb5kyl8",
+                    "scribd_doc_download_url": "http://documents.scribd.com.s3.amazonaws.com/docs/34pfipok741yuvxt.docx?t=1354563629",
+                    "scribd_doc_id": "115354359",
+                    "scribd_doc_thumbnail_url": "http://imgv2-3.scribdassets.com/img/word_document/115354359/111x142/9d0348b8c4/1354563918",
+                    "title": "Compliance Tracking",
+                    "type_code": "Worksheet",
+                    "updated_at": "2012-12-05 00:45:51Z",
+                    "updated_time": 1354668351372,
+                    "url": "http://documents.scribd.com.s3.amazonaws.com/docs/34pfipok741yuvxt.docx?t=1354563629",
+                    "uuid": "ee69954b-ea3e-430a-8b5f-65e7a681f04f"
+                }
+            ],
             "score": 0.5,
-            "slug": "demonstrate-use-of-goal-achievement-strategies",
+            "slug": "compliance",
             "standard_codes": [],
             "subject": "Behavior & SEL",
             "subject_domains": [
                 "Responsible Decision Making"
             ],
-            "title": "Demonstrate Use of Goal Achievement Strategies",
+            "teks_standard_codes": [],
+            "title": "Compliance",
             "udl_adaptations": [
                 {
-                    "_id": "5265b785b79b0bc91600000f",
-                    "created_at": "2013-10-21 23:23:49Z",
-                    "text": "It may be helpful for students to observe [[modeling behaviors|modeled]] examples of [[peer supports| peer progress reporting]] statements rather than be given a written list. A teacher can model or act them out for the class or have another student model them. Seeing modeled examples of progress reporting statements provides the students with the ability to more easily generalize the skill to an authentic interaction.",
-                    "udl_standard_checkpoint_ref": "UDL I 3.4",
-                    "udl_standard_long_ref": "UDL I 3.4 Provide Multiple Means of Representation: Maximize transfer and generalization",
-                    "udl_standard_short_ref": "UDL I 3.4 Maximize transfer and generalization",
-                    "updated_at": "2014-05-25 13:15:22Z",
-                    "updated_time": 1401023722137,
-                    "uuid": "1204ba4a-e07e-47f0-8806-113cf44ed6b5"
+                    "_id": "53dd6a47b79b0bd60e00000a",
+                    "created_at": "2014-08-02 22:46:31Z",
+                    "text": "Direct students in relation to [[preferred topic or text|preferred]] classroom activities (e.g. computer time, journaling, math games). This gives them the opportunity to practice compliance while participating in activities they enjoy, which will allow teachers to build on student success. Start with directions that relate to these preferred activities, and then work to generalize the skill by incorporating directions related to less preferred tasks.",
+                    "udl_standard_checkpoint_ref": "UDL III 7.1",
+                    "udl_standard_long_ref": "UDL III 7.1 Provide Multiple Means of Engagement: Optimize individual choice and autonomy",
+                    "udl_standard_short_ref": "UDL III 7.1 Optimize individual choice and autonomy",
+                    "updated_at": "2017-02-17 16:52:01Z",
+                    "updated_time": 1487350321903,
+                    "uuid": "24a7c5f1-94ed-4932-ba26-5864d2c612e2"
                 },
                 {
-                    "_id": "5265b86db79b0b0a1400001b",
-                    "created_at": "2013-10-21 23:27:41Z",
-                    "text": "In order to help students make use of a newly acquired skill, templates can be useful tools for guiding students in utilizing a newly learned skill. Providing a student with a template that includes prompts or [[sentence starters|sentence starters]] to remind the student how to write a [[contracts|commitment letter]] provides the student with the ability to practice the skill with more independence. For example: a commitment letter template provides the student with prompts to complete (\"My goal is _______\", \"I need to complete my goal by (date)\")",
-                    "udl_standard_checkpoint_ref": "UDL II 5.2",
-                    "udl_standard_long_ref": "UDL II 5.2 Provide Multiple Means of Action and Expression: Use multiple tools for construction and composition",
-                    "udl_standard_short_ref": "UDL II 5.2 Use multiple tools for construction and composition",
-                    "updated_at": "2014-05-25 13:15:22Z",
-                    "updated_time": 1401023722140,
-                    "uuid": "f27d5ce8-4931-4085-b19f-266a53b527b2"
+                    "_id": "53dd6ba0b79b0bf910000004",
+                    "created_at": "2014-08-02 22:52:16Z",
+                    "text": "[[Repeat the directions|Repeat the directions]] (more than once, if necessary) to help students hear and process \"what to do.\" This repetition can take many forms. For example, the teacher can:<br>\n\u2022 Ask students to independently read written task directions, then read them aloud together as a class.<br>\n\u2022 Verbally give and repeat task directions.<br>\n\u2022 Ask individual students to repeat the task directions for the class.<br>\n\u2022 Provide [[visual task schedule|visual]] task directions, then describe them verbally.",
+                    "udl_standard_checkpoint_ref": "UDL I 3.3",
+                    "udl_standard_long_ref": "UDL I 3.3 Provide Multiple Means of Representation: Guide information processing, visualization, and manipulation",
+                    "udl_standard_short_ref": "UDL I 3.3 Guide information processing, visualization, and manipulation",
+                    "updated_at": "2017-02-17 16:52:01Z",
+                    "updated_time": 1487350321907,
+                    "uuid": "b80af3a0-aac5-47b8-8efc-0539f3849253"
                 },
                 {
-                    "_id": "5265babfb79b0b7c19000004",
-                    "created_at": "2013-10-21 23:37:35Z",
-                    "text": "For students with severe needs, it can be useful to provide them with multiple scaffolds in building mastery of [[peer supports|peer progress reporting]]. Utilizing scaffolds allows teachers to support the student in building fluency in progress reporting statements. Teachers can have students first learn progress reporting statements through multiple practice opportunities during [[ social role play | role-play ]] in a controlled classroom setting before expecting the student to use the skill in an authentic social interaction.",
-                    "udl_standard_checkpoint_ref": "UDL III 8.4",
-                    "udl_standard_long_ref": "UDL III 8.4 Provide Multiple Means of Engagement: Increase mastery-oriented feedback",
-                    "udl_standard_short_ref": "UDL III 8.4 Increase mastery-oriented feedback",
-                    "updated_at": "2014-05-25 13:15:22Z",
-                    "updated_time": 1401023722142,
-                    "uuid": "0fbae2d9-73e1-440c-a399-3218a676689c"
+                    "_id": "53dd6cdcb79b0bf91000000e",
+                    "created_at": "2014-08-02 22:57:32Z",
+                    "text": "[[Graduated guidance|Work 1:1]] with a student who requires intensive support to follow a direction. When possible, guide the student through the action with the least intrusive prompt possible. Some ways to individually guide students through tasks include:<br> \u2022Physical hand-over-hand guidance (e.g. to take out class materials). <br> \u2022Verbal prompts (e.g. to remind a student to begin reading). <br>\u2022Pointing to the next step on a visual task schedule (e.g. illustrated steps of a science experiment).",
+                    "udl_standard_checkpoint_ref": "UDL II 5.3",
+                    "udl_standard_long_ref": "UDL II 5.3 Provide Multiple Means of Action and Expression: Build fluencies with graduated levels of support for practice and performance",
+                    "udl_standard_short_ref": "UDL II 5.3 Build fluencies with graduated levels of support for practice and performance",
+                    "updated_at": "2017-02-17 16:52:01Z",
+                    "updated_time": 1487350321910,
+                    "uuid": "2c5ce3f2-f470-47fa-b2d5-97145d39e774"
                 }
             ],
-            "updated_at": "2014-05-25 13:15:22Z",
-            "updated_time": 1401023722146,
-            "uuid": "b7c5eadd-002a-4a34-88d5-85dbddaefe72",
+            "updated_at": "2017-02-17 16:52:01Z",
+            "updated_time": 1487350321939,
+            "uuid": "7efd3551-d114-42cd-a8c1-7cee1098548e",
             "wida_2007_standard_codes": []
         },
         {
             "adaptation_strategies": [
-                "ec76bd00-a57a-427d-9100-f05192b59566",
-                "8ce153db-a210-4317-9ed8-4d7a6ce4f75c",
-                "7f2e7a09-a96b-4447-965c-b43d88e66970",
-                "128f853a-a8ec-452d-97d8-d3b6a6a51545"
+                "290a50f5-2b68-41a0-b78f-ff074f5dec77",
+                "128f853a-a8ec-452d-97d8-d3b6a6a51545",
+                "9c986e37-291b-4602-b419-32bab87aa78e",
+                "2037c086-e5ba-430c-a946-72bfe7e5e54f",
+                "1edef095-3678-4450-ac3f-fd7142d90074",
+                "ae868a75-3d9f-42b5-94b8-3a215e548a89"
             ],
             "author_id": "1b400165-7fdf-4fac-a3f8-0a09f10031ec",
             "ca_eld_standard_codes": [],
-            "created_at": "2013-11-17 23:06:01Z",
-            "goal_text": "By (date), when verbally responding to an opposing opinion expressed by a peer during conversation on a non-academic topic (e.g. sports, personal lives, hobbies/interests), (name) will exhibit (3) non-confrontational communication skills: remaining seated, waiting for the speaker to complete their thought before responding and expressing disagreement by sharing his/her own opinion without using negative personal statements or profane language (e.g. \"I disagree with you because ________\") in (5 of 5) opportunities.",
+            "coach_standard_codes": [],
+            "created_at": "2012-12-04 04:33:30Z",
+            "demo": true,
+            "dlm_ee_codes": [],
+            "goal_text": "By (date), given task directions, (name) will start the task and/or ask for clarification within (1 minute), and remain on-task until completion, for (4 out of 5) school-based tasks.",
             "grades": [
-                "9",
-                "10"
+                "6",
+                "7",
+                "8"
             ],
             "ils_sel_standard_codes": [
-                "ILS-SEL.2A.9-10.b"
+                "ILS-SEL.1C.6-8.a"
             ],
-            "instruction_text": "",
+            "instruction_text": "*Teacher can review with the student expectations for how long it should take the student to initiate common tasks in the classroom.\n*Teacher can use a timer to see how long the student currently takes to initiate everyday tasks.\n*Teacher can review potential road blocks to initiation of tasks (i.e. confused, does not understand directions, distracted) and discuss what the student can do if they encounter these situations.",
+            "measurement_text": "*Teacher can track how long it takes the student to engage in a task using a timer or watch.\n*Teacher can also list how long it should take the student to engage in the task.\n*Teacher can monitor how many prompts are required for the student to initiate in the requested task.",
+            "modification_text": "<p><span style=\"text-decoration: underline;\">UDL I Provide Multiple Means of Representation</span></p>\n<p><span style=\"text-decoration: underline;\">UDL II Provide Multiple Means of Action &amp; Expression</span></p>\n<p><span style=\"text-decoration: underline;\">UDL III Provide Multiple Means of Engagement</span></p>",
+            "ncsc_ccc_codes": [],
             "ny_prek_standard_codes": [],
             "objectives": [
                 {
-                    "_id": "537f9ef2b79b0b0e08000032",
-                    "created_at": "2014-05-23 19:18:10Z",
+                    "_id": "58a5053421cb990050d264dd",
+                    "created_at": "2017-02-16 01:49:40Z",
                     "level": "Mild",
-                    "text": "By (date), when verbally responding to an opposing opinion expressed by a peer during conversation on a non-academic topic (e.g. sports, personal lives, hobbies/interests), with no more than (2) [[visual cueing|nonverbal cueing prompts]] (e.g. hand signals, eye contact) given by the teacher, (name) will exhibit (3) non-confrontational communication skills: remaining seated, avoiding interrupting the speaker and using appropriate language (e.g. avoiding negative statements and profane language) in (4 of 5) opportunities.",
-                    "updated_at": "2014-05-23 19:18:10Z",
-                    "updated_time": 1400872690806,
-                    "uuid": "87cc596e-47b9-41de-9714-9de5249252c5"
+                    "text": "By (date), given task directions, (name) will start the task and/or ask for clarification within (1 minute), and remain on-task until completion, with no more than (2) [[verbal prompting|verbal]] or [[visual cueing|visual]] cues from the teacher, for (4 out of 5) school-based tasks.",
+                    "updated_at": "2017-02-16 01:49:40Z",
+                    "updated_time": 1487209780626,
+                    "uuid": "bd27436a-f4fc-40b3-8ee9-f4929bfb5a36"
                 },
                 {
-                    "_id": "537f9ef2b79b0b0e08000033",
-                    "created_at": "2014-05-23 19:18:10Z",
+                    "_id": "58a5053421cb990050d264de",
+                    "created_at": "2017-02-16 01:49:40Z",
                     "level": "Moderate",
-                    "text": "By (date), after [[ modeling behaviors | teacher modeling ]] of (3) non-confrontational communication skills: remaining seated, avoiding interrupting the speaker and using appropriate language (e.g. avoid negative statements and profane language), when verbally responding to an opposing opinion expressed by a peer during conversation on a non-academic topic (e.g. sports, personal lives, hobbies/interests), with no more than (4) [[visual cueing|nonverbal cueing prompts]] (e.g. hand signals, eye contact) given by the teacher, (name) will exhibit (3) non-confrontational communication skills: remaining seated, avoiding interrupting the speaker and using appropriate language in (4 of 5) opportunities.",
-                    "updated_at": "2014-05-23 19:18:10Z",
-                    "updated_time": 1400872690806,
-                    "uuid": "d5c9011a-9768-4192-9d8c-7fc41cb9bc85"
+                    "text": "By (date), given task directions, after the teacher [[check in/check out|checks]] for understanding and/or necessary materials, (name) will start the task and/or ask for clarification within (1 minute), and remain on-task until completion, with no more than (2) [[verbal prompting|verbal]] or [[visual cueing|visual]] cues from the teacher, for (4 out of 5) school-based tasks.",
+                    "updated_at": "2017-02-16 01:49:40Z",
+                    "updated_time": 1487209780626,
+                    "uuid": "e0cef597-3c60-44f9-bc7c-06b63d16c2c0"
                 },
                 {
-                    "_id": "537f9ef2b79b0b0e08000034",
-                    "created_at": "2014-05-23 19:18:10Z",
+                    "_id": "58a5053421cb990050d264df",
+                    "created_at": "2017-02-16 01:49:40Z",
                     "level": "Intense",
-                    "text": "By (date), after [[ modeling behaviors | teacher modeling ]] and teacher-student [[ Social Role Play | role play ]] of the non-confrontational communication skill of maintaining an appropriate vocal volume when responding to a peer expressing an opposing opinion during conversation on a non-academic topic (e.g. sports, personal lives, hobbies/interests), with no more that (4) [[visual cueing|nonverbal cueing prompts]] (e.g. volume thermometer, hand signals) given by the teacher, (name) will maintain a low vocal volume when responding to a peer expressing an opposing opinion in (4 of 5) opportunities.",
-                    "updated_at": "2014-05-23 19:18:10Z",
-                    "updated_time": 1400872690807,
-                    "uuid": "1c462ccf-590b-46d8-bede-049b3dc09838"
+                    "text": "By (date), given directions for the [[modified assignment|first step]] of a familiar task, after the teacher [[check in/check out|checks]] for understanding and/or required materials, (name) will start the first step of the task within (1 minute), and remain on-task until the first step is complete, with [[graduated guidance|1:1 guidance]] from the teacher or a [[peer tutoring|peer]], for (4 out of 5) school-based tasks.",
+                    "updated_at": "2017-02-16 01:49:40Z",
+                    "updated_time": 1487209780626,
+                    "uuid": "f6deee1e-8e7f-4d74-9e0c-682dfaeb5af8"
                 }
             ],
+            "parent_text": "In one year, when given a task to complete, you will begin to engage in the task within the time expected.",
             "published": true,
-            "score": 0.5,
-            "slug": "self-control-while-communicating-with-peers",
+            "resources": [
+                {
+                    "_id": "50be99b08c3f9c6c1d000004",
+                    "category_code": "Assessment",
+                    "created_at": "2012-12-05 00:47:43Z",
+                    "description": "",
+                    "scribd_doc_access_key": "key-1wj0zlsrni32jwmqmfxm",
+                    "scribd_doc_download_url": "http://documents.scribd.com.s3.amazonaws.com/docs/250romihxc1yyv42.docx?t=1354668509",
+                    "scribd_doc_id": "115532280",
+                    "scribd_doc_thumbnail_url": "http://imgv2-3.scribdassets.com/img/word_document/115532280/111x142/d200060cd5/1354668510",
+                    "title": "Initiation of Task",
+                    "type_code": "Document",
+                    "updated_at": "2012-12-05 00:47:43Z",
+                    "updated_time": 1354668463524,
+                    "url": "http://documents.scribd.com.s3.amazonaws.com/docs/250romihxc1yyv42.docx?t=1354668509",
+                    "uuid": "95fc6e96-1e01-49e7-b533-85db576dd64e"
+                }
+            ],
+            "score": 0,
+            "slug": "task-initiation",
             "standard_codes": [],
             "subject": "Behavior & SEL",
             "subject_domains": [
                 "Self-Management"
             ],
-            "title": "Self-Control While Communicating With Peers",
+            "teks_standard_codes": [],
+            "title": "Task Initiation",
             "udl_adaptations": [
                 {
-                    "_id": "52afbb70b79b0b8379000012",
-                    "created_at": "2013-12-17 02:48:16Z",
-                    "text": "It may be helpful for students to observe examples of non-confrontational communication strategies rather than be given explanations or descriptions. A teacher can [[ Preteaching | preteach ]] these strategies by [[modeling behaviors|modeling]] them for the class. It may also be helpful for the teacher to demonstrate a non-example of the strategy as well. For example, if demonstrating expression of a differing opinion, the teacher can demonstrate the strategy by using the desired language (\"I disagree because _______\") as well as the non-example of responding with a personal attack (\"You just don't care about people\").",
-                    "udl_standard_checkpoint_ref": "UDL I 3.1",
-                    "udl_standard_long_ref": "UDL I 3.1 Provide Multiple Means of Representation: Activate or supply background knowledge",
-                    "udl_standard_short_ref": "UDL I 3.1 Activate or supply background knowledge",
-                    "updated_at": "2014-05-23 19:18:10Z",
-                    "updated_time": 1400872690824,
-                    "uuid": "30899e82-342b-41c5-9adc-232cfb00969f"
+                    "_id": "53e260e7b79b0bb818000008",
+                    "created_at": "2014-08-06 17:07:51Z",
+                    "text": "[[Repeat the directions|Repeat the directions]] (more than once, if necessary) to help students hear and process \"what to do.\" This repetition can take many forms. For example, the teacher can:<br>\n\u2022 Ask students to independently read written task directions, then read them aloud together as a class.<br>\n\u2022 Verbally give and repeat task directions.<br>\n\u2022 Ask individual students to repeat the task directions for the class.<br>\n\u2022 Provide [[visual task schedule|visual]] task directions, then describe them verbally.",
+                    "udl_standard_checkpoint_ref": "UDL I 3.3",
+                    "udl_standard_long_ref": "UDL I 3.3 Provide Multiple Means of Representation: Guide information processing, visualization, and manipulation",
+                    "udl_standard_short_ref": "UDL I 3.3 Guide information processing, visualization, and manipulation",
+                    "updated_at": "2017-02-16 01:49:40Z",
+                    "updated_time": 1487209780679,
+                    "uuid": "ee645759-6d92-4a9f-b627-873ab0bc8a0b"
                 },
                 {
-                    "_id": "52afbcafb79b0b8379000018",
-                    "created_at": "2013-12-17 02:53:35Z",
-                    "text": "Since it can be difficult to predict and control situations in which a student will find themselves expressing a difference of opinion with a peer, it can be difficult for the teacher to intervene with verbal prompts to support the student in responding to the conflict positively. Using [[visual cueing|nonverbal prompts]] such has hand-gestures can help teachers intervene more effectively and discreetly. These prompts serve as a visual reminder of how to respond to a conflicting opinion.",
-                    "udl_standard_checkpoint_ref": "UDL II 6.2",
-                    "udl_standard_long_ref": "UDL II 6.2 Provide Multiple Means of Action and Expression: Support planning and strategy development",
-                    "udl_standard_short_ref": "UDL II 6.2 Support planning and strategy development",
-                    "updated_at": "2014-05-23 19:18:10Z",
-                    "updated_time": 1400872690827,
-                    "uuid": "32ca6c62-6b8f-4770-98e4-ff9644d9b84a"
+                    "_id": "53e26118b79b0bb81800000c",
+                    "created_at": "2014-08-06 17:08:40Z",
+                    "text": "[[Graduated guidance|Work 1:1]] with a student who requires intensive support to promptly start and finish an academic task. When possible, guide the student through the task with the least intrusive prompt possible. Some ways to individually guide students through tasks include:<br> \u2022Physical hand-over-hand guidance (e.g. to use math manipulatives at a workstation). <br> \u2022Verbal prompts (e.g. to remind a student of forgotten steps such as necessary materials or skipped questions). <br>\u2022Pointing to the next step on a visual task schedule (e.g. illustrated steps of a science experiment).",
+                    "udl_standard_checkpoint_ref": "UDL II 5.3",
+                    "udl_standard_long_ref": "UDL II 5.3 Provide Multiple Means of Action and Expression: Build fluencies with graduated levels of support for practice and performance",
+                    "udl_standard_short_ref": "UDL II 5.3 Build fluencies with graduated levels of support for practice and performance",
+                    "updated_at": "2017-02-16 01:49:40Z",
+                    "updated_time": 1487209780682,
+                    "uuid": "022d49ba-6190-4296-8c6c-3dfa417c9ee5"
                 },
                 {
-                    "_id": "52afbde8b79b0b277c000014",
-                    "created_at": "2013-12-17 02:58:48Z",
-                    "text": "[[ Social Role Play | Social role play ]] provides students with the opportunity to practice non-confrontational strategies in a more protected and controlled environment before they have to use the strategy in a real-world scenario. Role play can be particularly useful for students to practice resolving conflict in a controlled environment as oftentimes, the anger or frustration a student might feel during an authentic conflict interferes with the student's ability to use the newly-learned communication strategies.",
+                    "_id": "53e2614ab79b0bb818000010",
+                    "created_at": "2014-08-06 17:09:30Z",
+                    "text": "[[Check in/Check out|Check that students understand]] the steps of a task before asking them to work. Although this goal requires students to interact with a familiar task, it is a best practice to double check that they know \"what to do.\" For example, before instructing students to start and complete a gallery walk, ask them to verbally break down what exactly that entails (e.g. stand up, push in chair, walk to assigned station with graphic organizer in hand, etc.). As students describe each facet of the task initiation process, chart their answers to serve as a visual reference. Charting the steps will also help the students who don't immediately recall the steps necessary to begin.",
                     "udl_standard_checkpoint_ref": "UDL III 8.3",
                     "udl_standard_long_ref": "UDL III 8.3 Provide Multiple Means of Engagement: Foster collaboration and communication",
                     "udl_standard_short_ref": "UDL III 8.3 Foster collaboration and communication",
-                    "updated_at": "2014-05-23 19:18:10Z",
-                    "updated_time": 1400872690830,
-                    "uuid": "5aa9e80e-bc24-4764-b6cf-d6da0d6bbf4e"
+                    "updated_at": "2017-02-16 01:49:40Z",
+                    "updated_time": 1487209780685,
+                    "uuid": "3e1bf44d-c8a9-4d4b-922e-ff7a15caac75"
                 }
             ],
-            "updated_at": "2014-05-23 19:18:10Z",
-            "updated_time": 1400872690835,
-            "uuid": "42ebdbe2-01f8-4007-9bff-19cd855889c7",
+            "updated_at": "2017-02-16 01:49:40Z",
+            "updated_time": 1487209780693,
+            "uuid": "df17ac91-afb3-49b6-a851-2690abcd084c",
             "wida_2007_standard_codes": []
         },
         {
@@ -13540,368 +13709,199 @@
         },
         {
             "adaptation_strategies": [
-                "5a50393b-c205-4512-b0f0-a7d9def24924",
-                "c879d159-e4a0-4e38-a243-0df30b19c442"
-            ],
-            "author_id": "8bb937fe-e273-11e1-bae1-12313f061927",
-            "ca_eld_standard_codes": [],
-            "coach_standard_codes": [],
-            "created_at": "2013-09-13 06:42:27Z",
-            "demo": false,
-            "dlm_ee_codes": [],
-            "goal_text": "By (date), when verbally asked to demonstrate each of the four basic emotions (i.e. happy, angry, sad, afraid), (name) will correctly demonstrate the emotion through facial expression and body language (e.g. frowning and shaking a fist for angry) for (3 of 4) trials.",
-            "grades": [
-                "K",
-                "Pre-K",
-                "1",
-                "2"
-            ],
-            "ils_sel_standard_codes": [
-                "ILS-SEL.1A.K-2.a"
-            ],
-            "ncsc_ccc_codes": [],
-            "ny_prek_standard_codes": [],
-            "objectives": [
-                {
-                    "_id": "55515ab6645c28532200009a",
-                    "created_at": "2015-05-12 01:43:18Z",
-                    "level": "Mild",
-                    "text": "By (date), when provided access to an [[ Emotions Chart | emotions chart ]] and verbally asked to demonstrate each of the four basic emotions (i.e. happy, angry, sad, afraid), (name) will correctly demonstrate the emotion through facial expression and body language (e.g. frowning and shaking a fist for angry) for (3 of 4) trials.",
-                    "updated_at": "2015-05-12 01:43:18Z",
-                    "updated_time": 1431394998414,
-                    "uuid": "3371d9c4-edcb-43a5-91aa-d71347d6fa51"
-                },
-                {
-                    "_id": "55515ab6645c28532200009b",
-                    "created_at": "2015-05-12 01:43:18Z",
-                    "level": "Moderate",
-                    "text": "By (date), when provided access to an [[ Emotions Chart | emotions chart ]] and verbally asked to demonstrate each of the four basic emotions (i.e. happy, angry, sad, afraid), (name) will correctly demonstrate the emotion through facial expression and body language (e.g. frowning and shaking a fist for angry) for (3 of 4) trials.",
-                    "updated_at": "2015-05-12 01:43:18Z",
-                    "updated_time": 1431394998414,
-                    "uuid": "67a86332-04ed-4f79-861a-a8f75491ac14"
-                },
-                {
-                    "_id": "55515ab6645c28532200009c",
-                    "created_at": "2015-05-12 01:43:18Z",
-                    "level": "Intense",
-                    "text": "By (date), when a teacher models one of the four basic emotions (i.e. happy, angry, sad, afraid) through facial expression and body language, (name) will point to the correct emotion as represented on an [[ Emotions Chart | emotions chart ]] for (3 of 4) trials.",
-                    "updated_at": "2015-05-12 01:43:18Z",
-                    "updated_time": 1431394998415,
-                    "uuid": "ef52faf4-c77d-45f5-aba1-4fcb3105aba9"
-                }
-            ],
-            "published": true,
-            "score": 0,
-            "slug": "demonstrate-range-of-emotions",
-            "standard_codes": [],
-            "subject": "Behavior & SEL",
-            "subject_domains": [
-                "Social Awareness"
-            ],
-            "teks_standard_codes": [],
-            "title": "Demonstrate Range of Emotions",
-            "udl_adaptations": [
-                {
-                    "_id": "5232b874b79b0bdb5300000c",
-                    "created_at": "2013-09-13 07:02:12Z",
-                    "text": "Letting students use an emotions chart as a reference can be a visual reminder and prompt of the facial expression and body language associated with each emotion.",
-                    "udl_standard_checkpoint_ref": "UDL I 2.5",
-                    "udl_standard_long_ref": "UDL I 2.5 Provide Multiple Means of Representation: Illustrate through multiple media",
-                    "udl_standard_short_ref": "UDL I 2.5 Illustrate through multiple media",
-                    "updated_at": "2015-05-12 01:43:18Z",
-                    "updated_time": 1431394998433,
-                    "uuid": "4dc59fd4-788f-4692-9767-db52ea2f33c9"
-                },
-                {
-                    "_id": "5232b905b79b0bdb53000010",
-                    "created_at": "2013-09-13 07:04:37Z",
-                    "text": "Students who might lack the fine and gross motor coordination can represent emotions through picture icons that represent the emotion that they feel.",
-                    "udl_standard_checkpoint_ref": "UDL II 5.2",
-                    "udl_standard_long_ref": "UDL II 5.2 Provide Multiple Means of Action and Expression: Use multiple tools for construction and composition",
-                    "udl_standard_short_ref": "UDL II 5.2 Use multiple tools for construction and composition",
-                    "updated_at": "2015-05-12 01:43:18Z",
-                    "updated_time": 1431394998435,
-                    "uuid": "2f976d3a-c718-4fb0-9972-22c15bfc495d"
-                },
-                {
-                    "_id": "5232b97eb79b0bdb53000017",
-                    "created_at": "2013-09-13 07:06:38Z",
-                    "text": "Some students might feel shy in acting out an emotion in front of other students.  The teacher can have the student perform the task in a one-on-one setting.",
-                    "udl_standard_checkpoint_ref": "UDL III 7.3",
-                    "udl_standard_long_ref": "UDL III 7.3 Provide Multiple Means of Engagement: Minimize threats and distractions",
-                    "udl_standard_short_ref": "UDL III 7.3 Minimize threats and distractions",
-                    "updated_at": "2015-05-12 01:43:18Z",
-                    "updated_time": 1431394998436,
-                    "uuid": "5e563e12-b952-458a-a619-22ef1fc8b303"
-                },
-                {
-                    "_id": "5232be0cb79b0b5d5b000006",
-                    "created_at": "2013-09-13 07:26:04Z",
-                    "text": "In order to help the student understand each emotion, a [[ Social Narratives | social narrative ]] can be developed that describes the emotion (e.g. \"happy\") and an example real life scenario that helps the student imagine the emotion (e.g. going to Disneyland).",
-                    "udl_standard_checkpoint_ref": "UDL I 3.4",
-                    "udl_standard_long_ref": "UDL I 3.4 Provide Multiple Means of Representation: Maximize transfer and generalization",
-                    "udl_standard_short_ref": "UDL I 3.4 Maximize transfer and generalization",
-                    "updated_at": "2015-05-12 01:43:18Z",
-                    "updated_time": 1431394998438,
-                    "uuid": "43371c17-ba15-4adf-86ed-fdf57bf934b6"
-                }
-            ],
-            "updated_at": "2015-05-12 01:43:18Z",
-            "updated_time": 1431394998442,
-            "uuid": "bb18718d-50a3-4b68-84a0-f9a9e2147370",
-            "wida_2007_standard_codes": []
-        },
-        {
-            "adaptation_strategies": [
-                "290a50f5-2b68-41a0-b78f-ff074f5dec77",
-                "128f853a-a8ec-452d-97d8-d3b6a6a51545",
-                "9c986e37-291b-4602-b419-32bab87aa78e",
-                "f0335aae-d72a-4956-a6bc-89e6ca4b2859",
-                "8b868a21-cf4c-482c-9e66-bbe00edcfda2",
-                "1edef095-3678-4450-ac3f-fd7142d90074",
-                "b6b37ce4-836b-4acb-98c8-6fa030bea1a2"
+                "8ce153db-a210-4317-9ed8-4d7a6ce4f75c",
+                "3ef55d5f-d901-49fc-8d0c-e3e57e3c3559",
+                "2ab7aa22-876b-48ba-8cb9-f6008c315649",
+                "a4060dc2-76ef-43d9-922d-a234239e2710",
+                "7f2e7a09-a96b-4447-965c-b43d88e66970",
+                "d82473e0-606e-4470-8ee0-f7bda6e5766d"
             ],
             "author_id": "1b400165-7fdf-4fac-a3f8-0a09f10031ec",
             "ca_eld_standard_codes": [],
-            "coach_standard_codes": [],
-            "created_at": "2012-12-04 04:33:30Z",
-            "demo": false,
-            "dlm_ee_codes": [],
-            "goal_text": "By (date), when the teacher gives a direction, (name) will follow the direction and/or ask for clarification within (10) seconds, for (4 out of 5) teacher directions.\n\n*Example direction:*<br>\n\u201cPlease take out a highlighter, a pen, and your notes from yesterday, and then put all other materials into your backpack.\"",
+            "created_at": "2013-10-21 23:11:07Z",
+            "goal_text": "By (date), when given a multi-day assignment to be completed outside of the classroom (e.g. research project, essay-writing assignment), (name) will demonstrate use of at least (1) [[goal setting|goal-achievement strategy]] (e.g. [[contracts|commitment letter-writing]], goal-sharing, [[peer supports|peer progress reporting]]), for (5 of 5) multi-day assignment opportunities.\n\nCommitment Letter Description\n     A letter in which a student states a goal(s), how it will be achieved, by what date, etc. A commitment letter serves as a concrete pledge to work toward goal completion.",
             "grades": [
-                "6",
-                "7",
-                "8"
+                "9",
+                "10"
             ],
-            "ils_sel_standard_codes": [],
-            "instruction_text": "*Teacher can use a positive reward system, where the student receives a token (button, marble, sticker) each time they comply with an adult's request.\n*At the end of the day, the teacher and student can review the number of tokens earned.\n*If the student has earned a predesignated amount of tokens, they receive an award (lunch with the teacher, 2 minutes extra recess, free time, etc.).",
-            "measurement_text": "*Teacher can track the student's ability/willingness to comply using the daily chart.\n*Teacher can check-in with the student to review their progress at different times of day (i.e. morning, prior to lunch, at end of day).\n*Teacher and student can review the amount of tokens earned at the end of the day and discuss progress.",
-            "modification_text": "<p><span style=\"text-decoration: underline;\">UDL I Provide Multiple Means of Representation</span></p>\n<p><span style=\"text-decoration: underline;\">UDL II Provide Multiple Means of Action &amp; Expression</span></p>\n<p><span style=\"text-decoration: underline;\">UDL III Provide Multiple Means of Engagement</span></p>",
-            "ncsc_ccc_codes": [],
+            "ils_sel_standard_codes": [
+                "ILS-SEL.1C.9-10.b"
+            ],
             "ny_prek_standard_codes": [],
             "objectives": [
                 {
-                    "_id": "58a72a3121cb990ec43d15c0",
-                    "created_at": "2017-02-17 16:52:01Z",
+                    "_id": "5381eceab79b0bac3100001c",
+                    "created_at": "2014-05-25 13:15:22Z",
                     "level": "Mild",
-                    "text": "By (date), when the teacher gives and [[repeat the directions|repeats]] a direction, (name) will follow the direction and/or ask for clarification within (10) seconds, for (4 out of 5) teacher directions.",
-                    "updated_at": "2017-02-17 16:52:01Z",
-                    "updated_time": 1487350321788,
-                    "uuid": "0bd8a443-eb23-4aa2-9236-73ab092a6191"
+                    "text": "By (date), after [[modeling behaviors|teacher-modeling]] of at least (2) goal-achievement strategies (e.g. providing students with examples of [[contracts|commitment letters]], teacher-to-student [[social role play | role-playing ]] of goal-sharing), when given a multi-day assignment to be completed outside of the classroom (e.g. research project, essay-writing assignment), (name) will demonstrate use of at least (1) goal-achievement strategy (e.g. commitment letter writing, goal-sharing, peer progress reporting), for (4 of 5) multi-day assignment opportunities.",
+                    "updated_at": "2014-05-25 13:15:22Z",
+                    "updated_time": 1401023722120,
+                    "uuid": "c7d52871-d6c8-44f9-9295-9a5f888c4d75"
                 },
                 {
-                    "_id": "58a72a3121cb990ec43d15c1",
-                    "created_at": "2017-02-17 16:52:01Z",
+                    "_id": "5381eceab79b0bac3100001d",
+                    "created_at": "2014-05-25 13:15:22Z",
                     "level": "Moderate",
-                    "text": "By (date), when the teacher gives a direction and [[check in/check out|checks]] for understanding and necessary materials, (name) will receive (1) [[verbal prompting|verbal]] or [[visual cueing|visual]] reminder cue from the teacher, and follow the direction and/or ask for clarification within (10) seconds, for (4 out of 5) teacher directions.",
-                    "updated_at": "2017-02-17 16:52:01Z",
-                    "updated_time": 1487350321788,
-                    "uuid": "9485509c-58d6-424f-aaef-5889e886d7bd"
+                    "text": "By (date), after [[modeling behaviors|teacher-modeling]] and student practice of the goal-achievement strategy of verbal goal-sharing (e.g. teacher makes a verbal goal-sharing statement such as \"I will finish my assignment by the end of 5th period\" and student repeats the statement back to the teacher), when given an assignment/task to be completed by the end of the school day (e.g. academic assignment or social skill task), (name) will make a verbal goal-sharing statement to the teacher for (4 of 5) goal-sharing opportunities.",
+                    "updated_at": "2014-05-25 13:15:22Z",
+                    "updated_time": 1401023722121,
+                    "uuid": "144b27b0-6605-4e8c-b190-6ff3e31c4ee2"
                 },
                 {
-                    "_id": "58a72a3121cb990ec43d15c2",
-                    "created_at": "2017-02-17 16:52:01Z",
+                    "_id": "5381eceab79b0bac3100001e",
+                    "created_at": "2014-05-25 13:15:22Z",
                     "level": "Intense",
-                    "text": "By (date), during a [[preferred topic or text|preferred]] task, after the teacher gives a direction, [[check in/check out|checks]] for understanding and necessary materials, and sets a [[timer|timer]] for the desired completion time, (name) will receive [[graduated guidance|1:1 guidance]] from the teacher to follow the direction within the time frame shown on the timer, for (4 out of 5) teacher directions.",
-                    "updated_at": "2017-02-17 16:52:01Z",
-                    "updated_time": 1487350321789,
-                    "uuid": "90630c64-62ea-485a-85f1-fd37ee1aa92c"
+                    "text": "By (date), after [[modeling behaviors|teacher-modeling]] of examples of progress reporting statements (e.g. \"I'm halfway done\" or \"I'm on the right track\") and teacher-to-student [[social role play | role-playing ]] of peer progress reporting, when given an assignment to be completed by the end of class time, (name) will verbally make (2) peer progress reporting statements, for (4 of 5) in-class assignment opportunities.",
+                    "updated_at": "2014-05-25 13:15:22Z",
+                    "updated_time": 1401023722121,
+                    "uuid": "6865da67-3100-42be-922b-5f891167bb5f"
                 }
             ],
-            "parent_text": "In one year, when given a request from an adult, you will comply.",
             "published": true,
-            "resources": [
-                {
-                    "_id": "50be99408c3f9c741d000002",
-                    "category_code": "Assessment",
-                    "created_at": "2012-12-05 00:45:51Z",
-                    "description": "",
-                    "scribd_doc_access_key": "key-106zix04v5mmgrb5kyl8",
-                    "scribd_doc_download_url": "http://documents.scribd.com.s3.amazonaws.com/docs/34pfipok741yuvxt.docx?t=1354563629",
-                    "scribd_doc_id": "115354359",
-                    "scribd_doc_thumbnail_url": "http://imgv2-3.scribdassets.com/img/word_document/115354359/111x142/9d0348b8c4/1354563918",
-                    "title": "Compliance Tracking",
-                    "type_code": "Worksheet",
-                    "updated_at": "2012-12-05 00:45:51Z",
-                    "updated_time": 1354668351372,
-                    "url": "http://documents.scribd.com.s3.amazonaws.com/docs/34pfipok741yuvxt.docx?t=1354563629",
-                    "uuid": "ee69954b-ea3e-430a-8b5f-65e7a681f04f"
-                }
-            ],
             "score": 0.5,
-            "slug": "compliance",
+            "slug": "demonstrate-use-of-goal-achievement-strategies",
             "standard_codes": [],
             "subject": "Behavior & SEL",
             "subject_domains": [
                 "Responsible Decision Making"
             ],
-            "teks_standard_codes": [],
-            "title": "Compliance",
+            "title": "Demonstrate Use of Goal Achievement Strategies",
             "udl_adaptations": [
                 {
-                    "_id": "53dd6a47b79b0bd60e00000a",
-                    "created_at": "2014-08-02 22:46:31Z",
-                    "text": "Direct students in relation to [[preferred topic or text|preferred]] classroom activities (e.g. computer time, journaling, math games). This gives them the opportunity to practice compliance while participating in activities they enjoy, which will allow teachers to build on student success. Start with directions that relate to these preferred activities, and then work to generalize the skill by incorporating directions related to less preferred tasks.",
-                    "udl_standard_checkpoint_ref": "UDL III 7.1",
-                    "udl_standard_long_ref": "UDL III 7.1 Provide Multiple Means of Engagement: Optimize individual choice and autonomy",
-                    "udl_standard_short_ref": "UDL III 7.1 Optimize individual choice and autonomy",
-                    "updated_at": "2017-02-17 16:52:01Z",
-                    "updated_time": 1487350321903,
-                    "uuid": "24a7c5f1-94ed-4932-ba26-5864d2c612e2"
+                    "_id": "5265b785b79b0bc91600000f",
+                    "created_at": "2013-10-21 23:23:49Z",
+                    "text": "It may be helpful for students to observe [[modeling behaviors|modeled]] examples of [[peer supports| peer progress reporting]] statements rather than be given a written list. A teacher can model or act them out for the class or have another student model them. Seeing modeled examples of progress reporting statements provides the students with the ability to more easily generalize the skill to an authentic interaction.",
+                    "udl_standard_checkpoint_ref": "UDL I 3.4",
+                    "udl_standard_long_ref": "UDL I 3.4 Provide Multiple Means of Representation: Maximize transfer and generalization",
+                    "udl_standard_short_ref": "UDL I 3.4 Maximize transfer and generalization",
+                    "updated_at": "2014-05-25 13:15:22Z",
+                    "updated_time": 1401023722137,
+                    "uuid": "1204ba4a-e07e-47f0-8806-113cf44ed6b5"
                 },
                 {
-                    "_id": "53dd6ba0b79b0bf910000004",
-                    "created_at": "2014-08-02 22:52:16Z",
-                    "text": "[[Repeat the directions|Repeat the directions]] (more than once, if necessary) to help students hear and process \"what to do.\" This repetition can take many forms. For example, the teacher can:<br>\n\u2022 Ask students to independently read written task directions, then read them aloud together as a class.<br>\n\u2022 Verbally give and repeat task directions.<br>\n\u2022 Ask individual students to repeat the task directions for the class.<br>\n\u2022 Provide [[visual task schedule|visual]] task directions, then describe them verbally.",
-                    "udl_standard_checkpoint_ref": "UDL I 3.3",
-                    "udl_standard_long_ref": "UDL I 3.3 Provide Multiple Means of Representation: Guide information processing, visualization, and manipulation",
-                    "udl_standard_short_ref": "UDL I 3.3 Guide information processing, visualization, and manipulation",
-                    "updated_at": "2017-02-17 16:52:01Z",
-                    "updated_time": 1487350321907,
-                    "uuid": "b80af3a0-aac5-47b8-8efc-0539f3849253"
+                    "_id": "5265b86db79b0b0a1400001b",
+                    "created_at": "2013-10-21 23:27:41Z",
+                    "text": "In order to help students make use of a newly acquired skill, templates can be useful tools for guiding students in utilizing a newly learned skill. Providing a student with a template that includes prompts or [[sentence starters|sentence starters]] to remind the student how to write a [[contracts|commitment letter]] provides the student with the ability to practice the skill with more independence. For example: a commitment letter template provides the student with prompts to complete (\"My goal is _______\", \"I need to complete my goal by (date)\")",
+                    "udl_standard_checkpoint_ref": "UDL II 5.2",
+                    "udl_standard_long_ref": "UDL II 5.2 Provide Multiple Means of Action and Expression: Use multiple tools for construction and composition",
+                    "udl_standard_short_ref": "UDL II 5.2 Use multiple tools for construction and composition",
+                    "updated_at": "2014-05-25 13:15:22Z",
+                    "updated_time": 1401023722140,
+                    "uuid": "f27d5ce8-4931-4085-b19f-266a53b527b2"
                 },
                 {
-                    "_id": "53dd6cdcb79b0bf91000000e",
-                    "created_at": "2014-08-02 22:57:32Z",
-                    "text": "[[Graduated guidance|Work 1:1]] with a student who requires intensive support to follow a direction. When possible, guide the student through the action with the least intrusive prompt possible. Some ways to individually guide students through tasks include:<br> \u2022Physical hand-over-hand guidance (e.g. to take out class materials). <br> \u2022Verbal prompts (e.g. to remind a student to begin reading). <br>\u2022Pointing to the next step on a visual task schedule (e.g. illustrated steps of a science experiment).",
-                    "udl_standard_checkpoint_ref": "UDL II 5.3",
-                    "udl_standard_long_ref": "UDL II 5.3 Provide Multiple Means of Action and Expression: Build fluencies with graduated levels of support for practice and performance",
-                    "udl_standard_short_ref": "UDL II 5.3 Build fluencies with graduated levels of support for practice and performance",
-                    "updated_at": "2017-02-17 16:52:01Z",
-                    "updated_time": 1487350321910,
-                    "uuid": "2c5ce3f2-f470-47fa-b2d5-97145d39e774"
+                    "_id": "5265babfb79b0b7c19000004",
+                    "created_at": "2013-10-21 23:37:35Z",
+                    "text": "For students with severe needs, it can be useful to provide them with multiple scaffolds in building mastery of [[peer supports|peer progress reporting]]. Utilizing scaffolds allows teachers to support the student in building fluency in progress reporting statements. Teachers can have students first learn progress reporting statements through multiple practice opportunities during [[ social role play | role-play ]] in a controlled classroom setting before expecting the student to use the skill in an authentic social interaction.",
+                    "udl_standard_checkpoint_ref": "UDL III 8.4",
+                    "udl_standard_long_ref": "UDL III 8.4 Provide Multiple Means of Engagement: Increase mastery-oriented feedback",
+                    "udl_standard_short_ref": "UDL III 8.4 Increase mastery-oriented feedback",
+                    "updated_at": "2014-05-25 13:15:22Z",
+                    "updated_time": 1401023722142,
+                    "uuid": "0fbae2d9-73e1-440c-a399-3218a676689c"
                 }
             ],
-            "updated_at": "2017-02-17 16:52:01Z",
-            "updated_time": 1487350321939,
-            "uuid": "7efd3551-d114-42cd-a8c1-7cee1098548e",
+            "updated_at": "2014-05-25 13:15:22Z",
+            "updated_time": 1401023722146,
+            "uuid": "b7c5eadd-002a-4a34-88d5-85dbddaefe72",
             "wida_2007_standard_codes": []
         },
         {
             "adaptation_strategies": [
-                "290a50f5-2b68-41a0-b78f-ff074f5dec77",
-                "128f853a-a8ec-452d-97d8-d3b6a6a51545",
-                "9c986e37-291b-4602-b419-32bab87aa78e",
-                "2037c086-e5ba-430c-a946-72bfe7e5e54f",
-                "1edef095-3678-4450-ac3f-fd7142d90074",
-                "ae868a75-3d9f-42b5-94b8-3a215e548a89"
+                "ec76bd00-a57a-427d-9100-f05192b59566",
+                "8ce153db-a210-4317-9ed8-4d7a6ce4f75c",
+                "7f2e7a09-a96b-4447-965c-b43d88e66970",
+                "128f853a-a8ec-452d-97d8-d3b6a6a51545"
             ],
             "author_id": "1b400165-7fdf-4fac-a3f8-0a09f10031ec",
             "ca_eld_standard_codes": [],
-            "coach_standard_codes": [],
-            "created_at": "2012-12-04 04:33:30Z",
-            "demo": true,
-            "dlm_ee_codes": [],
-            "goal_text": "By (date), given task directions, (name) will start the task and/or ask for clarification within (1 minute), and remain on-task until completion, for (4 out of 5) school-based tasks.",
+            "created_at": "2013-11-17 23:06:01Z",
+            "goal_text": "By (date), when verbally responding to an opposing opinion expressed by a peer during conversation on a non-academic topic (e.g. sports, personal lives, hobbies/interests), (name) will exhibit (3) non-confrontational communication skills: remaining seated, waiting for the speaker to complete their thought before responding and expressing disagreement by sharing his/her own opinion without using negative personal statements or profane language (e.g. \"I disagree with you because ________\") in (5 of 5) opportunities.",
             "grades": [
-                "6",
-                "7",
-                "8"
+                "9",
+                "10"
             ],
             "ils_sel_standard_codes": [
-                "ILS-SEL.1C.6-8.a"
+                "ILS-SEL.2A.9-10.b"
             ],
-            "instruction_text": "*Teacher can review with the student expectations for how long it should take the student to initiate common tasks in the classroom.\n*Teacher can use a timer to see how long the student currently takes to initiate everyday tasks.\n*Teacher can review potential road blocks to initiation of tasks (i.e. confused, does not understand directions, distracted) and discuss what the student can do if they encounter these situations.",
-            "measurement_text": "*Teacher can track how long it takes the student to engage in a task using a timer or watch.\n*Teacher can also list how long it should take the student to engage in the task.\n*Teacher can monitor how many prompts are required for the student to initiate in the requested task.",
-            "modification_text": "<p><span style=\"text-decoration: underline;\">UDL I Provide Multiple Means of Representation</span></p>\n<p><span style=\"text-decoration: underline;\">UDL II Provide Multiple Means of Action &amp; Expression</span></p>\n<p><span style=\"text-decoration: underline;\">UDL III Provide Multiple Means of Engagement</span></p>",
-            "ncsc_ccc_codes": [],
+            "instruction_text": "",
             "ny_prek_standard_codes": [],
             "objectives": [
                 {
-                    "_id": "58a5053421cb990050d264dd",
-                    "created_at": "2017-02-16 01:49:40Z",
+                    "_id": "537f9ef2b79b0b0e08000032",
+                    "created_at": "2014-05-23 19:18:10Z",
                     "level": "Mild",
-                    "text": "By (date), given task directions, (name) will start the task and/or ask for clarification within (1 minute), and remain on-task until completion, with no more than (2) [[verbal prompting|verbal]] or [[visual cueing|visual]] cues from the teacher, for (4 out of 5) school-based tasks.",
-                    "updated_at": "2017-02-16 01:49:40Z",
-                    "updated_time": 1487209780626,
-                    "uuid": "bd27436a-f4fc-40b3-8ee9-f4929bfb5a36"
+                    "text": "By (date), when verbally responding to an opposing opinion expressed by a peer during conversation on a non-academic topic (e.g. sports, personal lives, hobbies/interests), with no more than (2) [[visual cueing|nonverbal cueing prompts]] (e.g. hand signals, eye contact) given by the teacher, (name) will exhibit (3) non-confrontational communication skills: remaining seated, avoiding interrupting the speaker and using appropriate language (e.g. avoiding negative statements and profane language) in (4 of 5) opportunities.",
+                    "updated_at": "2014-05-23 19:18:10Z",
+                    "updated_time": 1400872690806,
+                    "uuid": "87cc596e-47b9-41de-9714-9de5249252c5"
                 },
                 {
-                    "_id": "58a5053421cb990050d264de",
-                    "created_at": "2017-02-16 01:49:40Z",
+                    "_id": "537f9ef2b79b0b0e08000033",
+                    "created_at": "2014-05-23 19:18:10Z",
                     "level": "Moderate",
-                    "text": "By (date), given task directions, after the teacher [[check in/check out|checks]] for understanding and/or necessary materials, (name) will start the task and/or ask for clarification within (1 minute), and remain on-task until completion, with no more than (2) [[verbal prompting|verbal]] or [[visual cueing|visual]] cues from the teacher, for (4 out of 5) school-based tasks.",
-                    "updated_at": "2017-02-16 01:49:40Z",
-                    "updated_time": 1487209780626,
-                    "uuid": "e0cef597-3c60-44f9-bc7c-06b63d16c2c0"
+                    "text": "By (date), after [[ modeling behaviors | teacher modeling ]] of (3) non-confrontational communication skills: remaining seated, avoiding interrupting the speaker and using appropriate language (e.g. avoid negative statements and profane language), when verbally responding to an opposing opinion expressed by a peer during conversation on a non-academic topic (e.g. sports, personal lives, hobbies/interests), with no more than (4) [[visual cueing|nonverbal cueing prompts]] (e.g. hand signals, eye contact) given by the teacher, (name) will exhibit (3) non-confrontational communication skills: remaining seated, avoiding interrupting the speaker and using appropriate language in (4 of 5) opportunities.",
+                    "updated_at": "2014-05-23 19:18:10Z",
+                    "updated_time": 1400872690806,
+                    "uuid": "d5c9011a-9768-4192-9d8c-7fc41cb9bc85"
                 },
                 {
-                    "_id": "58a5053421cb990050d264df",
-                    "created_at": "2017-02-16 01:49:40Z",
+                    "_id": "537f9ef2b79b0b0e08000034",
+                    "created_at": "2014-05-23 19:18:10Z",
                     "level": "Intense",
-                    "text": "By (date), given directions for the [[modified assignment|first step]] of a familiar task, after the teacher [[check in/check out|checks]] for understanding and/or required materials, (name) will start the first step of the task within (1 minute), and remain on-task until the first step is complete, with [[graduated guidance|1:1 guidance]] from the teacher or a [[peer tutoring|peer]], for (4 out of 5) school-based tasks.",
-                    "updated_at": "2017-02-16 01:49:40Z",
-                    "updated_time": 1487209780626,
-                    "uuid": "f6deee1e-8e7f-4d74-9e0c-682dfaeb5af8"
+                    "text": "By (date), after [[ modeling behaviors | teacher modeling ]] and teacher-student [[ Social Role Play | role play ]] of the non-confrontational communication skill of maintaining an appropriate vocal volume when responding to a peer expressing an opposing opinion during conversation on a non-academic topic (e.g. sports, personal lives, hobbies/interests), with no more that (4) [[visual cueing|nonverbal cueing prompts]] (e.g. volume thermometer, hand signals) given by the teacher, (name) will maintain a low vocal volume when responding to a peer expressing an opposing opinion in (4 of 5) opportunities.",
+                    "updated_at": "2014-05-23 19:18:10Z",
+                    "updated_time": 1400872690807,
+                    "uuid": "1c462ccf-590b-46d8-bede-049b3dc09838"
                 }
             ],
-            "parent_text": "In one year, when given a task to complete, you will begin to engage in the task within the time expected.",
             "published": true,
-            "resources": [
-                {
-                    "_id": "50be99b08c3f9c6c1d000004",
-                    "category_code": "Assessment",
-                    "created_at": "2012-12-05 00:47:43Z",
-                    "description": "",
-                    "scribd_doc_access_key": "key-1wj0zlsrni32jwmqmfxm",
-                    "scribd_doc_download_url": "http://documents.scribd.com.s3.amazonaws.com/docs/250romihxc1yyv42.docx?t=1354668509",
-                    "scribd_doc_id": "115532280",
-                    "scribd_doc_thumbnail_url": "http://imgv2-3.scribdassets.com/img/word_document/115532280/111x142/d200060cd5/1354668510",
-                    "title": "Initiation of Task",
-                    "type_code": "Document",
-                    "updated_at": "2012-12-05 00:47:43Z",
-                    "updated_time": 1354668463524,
-                    "url": "http://documents.scribd.com.s3.amazonaws.com/docs/250romihxc1yyv42.docx?t=1354668509",
-                    "uuid": "95fc6e96-1e01-49e7-b533-85db576dd64e"
-                }
-            ],
-            "score": 0,
-            "slug": "task-initiation",
+            "score": 0.5,
+            "slug": "self-control-while-communicating-with-peers",
             "standard_codes": [],
             "subject": "Behavior & SEL",
             "subject_domains": [
                 "Self-Management"
             ],
-            "teks_standard_codes": [],
-            "title": "Task Initiation",
+            "title": "Self-Control While Communicating With Peers",
             "udl_adaptations": [
                 {
-                    "_id": "53e260e7b79b0bb818000008",
-                    "created_at": "2014-08-06 17:07:51Z",
-                    "text": "[[Repeat the directions|Repeat the directions]] (more than once, if necessary) to help students hear and process \"what to do.\" This repetition can take many forms. For example, the teacher can:<br>\n\u2022 Ask students to independently read written task directions, then read them aloud together as a class.<br>\n\u2022 Verbally give and repeat task directions.<br>\n\u2022 Ask individual students to repeat the task directions for the class.<br>\n\u2022 Provide [[visual task schedule|visual]] task directions, then describe them verbally.",
-                    "udl_standard_checkpoint_ref": "UDL I 3.3",
-                    "udl_standard_long_ref": "UDL I 3.3 Provide Multiple Means of Representation: Guide information processing, visualization, and manipulation",
-                    "udl_standard_short_ref": "UDL I 3.3 Guide information processing, visualization, and manipulation",
-                    "updated_at": "2017-02-16 01:49:40Z",
-                    "updated_time": 1487209780679,
-                    "uuid": "ee645759-6d92-4a9f-b627-873ab0bc8a0b"
+                    "_id": "52afbb70b79b0b8379000012",
+                    "created_at": "2013-12-17 02:48:16Z",
+                    "text": "It may be helpful for students to observe examples of non-confrontational communication strategies rather than be given explanations or descriptions. A teacher can [[ Preteaching | preteach ]] these strategies by [[modeling behaviors|modeling]] them for the class. It may also be helpful for the teacher to demonstrate a non-example of the strategy as well. For example, if demonstrating expression of a differing opinion, the teacher can demonstrate the strategy by using the desired language (\"I disagree because _______\") as well as the non-example of responding with a personal attack (\"You just don't care about people\").",
+                    "udl_standard_checkpoint_ref": "UDL I 3.1",
+                    "udl_standard_long_ref": "UDL I 3.1 Provide Multiple Means of Representation: Activate or supply background knowledge",
+                    "udl_standard_short_ref": "UDL I 3.1 Activate or supply background knowledge",
+                    "updated_at": "2014-05-23 19:18:10Z",
+                    "updated_time": 1400872690824,
+                    "uuid": "30899e82-342b-41c5-9adc-232cfb00969f"
                 },
                 {
-                    "_id": "53e26118b79b0bb81800000c",
-                    "created_at": "2014-08-06 17:08:40Z",
-                    "text": "[[Graduated guidance|Work 1:1]] with a student who requires intensive support to promptly start and finish an academic task. When possible, guide the student through the task with the least intrusive prompt possible. Some ways to individually guide students through tasks include:<br> \u2022Physical hand-over-hand guidance (e.g. to use math manipulatives at a workstation). <br> \u2022Verbal prompts (e.g. to remind a student of forgotten steps such as necessary materials or skipped questions). <br>\u2022Pointing to the next step on a visual task schedule (e.g. illustrated steps of a science experiment).",
-                    "udl_standard_checkpoint_ref": "UDL II 5.3",
-                    "udl_standard_long_ref": "UDL II 5.3 Provide Multiple Means of Action and Expression: Build fluencies with graduated levels of support for practice and performance",
-                    "udl_standard_short_ref": "UDL II 5.3 Build fluencies with graduated levels of support for practice and performance",
-                    "updated_at": "2017-02-16 01:49:40Z",
-                    "updated_time": 1487209780682,
-                    "uuid": "022d49ba-6190-4296-8c6c-3dfa417c9ee5"
+                    "_id": "52afbcafb79b0b8379000018",
+                    "created_at": "2013-12-17 02:53:35Z",
+                    "text": "Since it can be difficult to predict and control situations in which a student will find themselves expressing a difference of opinion with a peer, it can be difficult for the teacher to intervene with verbal prompts to support the student in responding to the conflict positively. Using [[visual cueing|nonverbal prompts]] such has hand-gestures can help teachers intervene more effectively and discreetly. These prompts serve as a visual reminder of how to respond to a conflicting opinion.",
+                    "udl_standard_checkpoint_ref": "UDL II 6.2",
+                    "udl_standard_long_ref": "UDL II 6.2 Provide Multiple Means of Action and Expression: Support planning and strategy development",
+                    "udl_standard_short_ref": "UDL II 6.2 Support planning and strategy development",
+                    "updated_at": "2014-05-23 19:18:10Z",
+                    "updated_time": 1400872690827,
+                    "uuid": "32ca6c62-6b8f-4770-98e4-ff9644d9b84a"
                 },
                 {
-                    "_id": "53e2614ab79b0bb818000010",
-                    "created_at": "2014-08-06 17:09:30Z",
-                    "text": "[[Check in/Check out|Check that students understand]] the steps of a task before asking them to work. Although this goal requires students to interact with a familiar task, it is a best practice to double check that they know \"what to do.\" For example, before instructing students to start and complete a gallery walk, ask them to verbally break down what exactly that entails (e.g. stand up, push in chair, walk to assigned station with graphic organizer in hand, etc.). As students describe each facet of the task initiation process, chart their answers to serve as a visual reference. Charting the steps will also help the students who don't immediately recall the steps necessary to begin.",
+                    "_id": "52afbde8b79b0b277c000014",
+                    "created_at": "2013-12-17 02:58:48Z",
+                    "text": "[[ Social Role Play | Social role play ]] provides students with the opportunity to practice non-confrontational strategies in a more protected and controlled environment before they have to use the strategy in a real-world scenario. Role play can be particularly useful for students to practice resolving conflict in a controlled environment as oftentimes, the anger or frustration a student might feel during an authentic conflict interferes with the student's ability to use the newly-learned communication strategies.",
                     "udl_standard_checkpoint_ref": "UDL III 8.3",
                     "udl_standard_long_ref": "UDL III 8.3 Provide Multiple Means of Engagement: Foster collaboration and communication",
                     "udl_standard_short_ref": "UDL III 8.3 Foster collaboration and communication",
-                    "updated_at": "2017-02-16 01:49:40Z",
-                    "updated_time": 1487209780685,
-                    "uuid": "3e1bf44d-c8a9-4d4b-922e-ff7a15caac75"
+                    "updated_at": "2014-05-23 19:18:10Z",
+                    "updated_time": 1400872690830,
+                    "uuid": "5aa9e80e-bc24-4764-b6cf-d6da0d6bbf4e"
                 }
             ],
-            "updated_at": "2017-02-16 01:49:40Z",
-            "updated_time": 1487209780693,
-            "uuid": "df17ac91-afb3-49b6-a851-2690abcd084c",
+            "updated_at": "2014-05-23 19:18:10Z",
+            "updated_time": 1400872690835,
+            "uuid": "42ebdbe2-01f8-4007-9bff-19cd855889c7",
             "wida_2007_standard_codes": []
         },
         {

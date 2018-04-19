@@ -4911,343 +4911,6 @@
         },
         {
             "adaptation_strategies": [
-                "5c58c104-a506-4f85-9795-540a7821f503",
-                "029242ed-2fe6-485c-98ab-bcc35552fab2",
-                "920d6724-b3e4-497c-b5d6-72a86f63dfe8"
-            ],
-            "assessment_items": {},
-            "author_id": "106277f8-7d9e-4573-9fb3-e80dd0352343",
-            "ca_eld_standard_codes": [],
-            "coach_standard_codes": [],
-            "created_at": "2013-09-23 22:27:19Z",
-            "demo": false,
-            "dlm_ee_codes": [],
-            "goal_text": "By (date), when given (10) opinions in one column and (10) reasons in another column, (name) will write a complete sentence by choosing one opinion and one reason, connecting the two with an appropriate linking word or phrase (e.g. \"because\", \"therefore\", \"since\", \"for example\") in (8 out of 10 sentences) in (4 out of 5) writing activities.\n\nExample:\nOpinion: Ice cream is the best dessert in the summer. \nReason: It is so hot outside.\nSample Student Response: Ice cream is the best dessert in the summer because it is so hot outside.",
-            "grades": [
-                "3"
-            ],
-            "ils_sel_standard_codes": [],
-            "ncsc_ccc_codes": [],
-            "ny_prek_standard_codes": [],
-            "objectives": [
-                {
-                    "_id": "595fa96933511e005340b73b",
-                    "created_at": "2017-07-07 15:31:53Z",
-                    "example_text": null,
-                    "level": "Mild",
-                    "text": "By (date), when given (10) opinions in one column and (10) reasons in another column, (name) will write a complete sentence by choosing one opinion and one reason, connecting the two by selecting an appropriate linking word or phrase from a [[ Glossary | glossary ]] containing linking words and phrases (e.g. \"because\", \"therefore\", \"since\", \"for example\") in (8 out of 10 sentences) in (4 out of 5) writing activities.",
-                    "title": null,
-                    "updated_at": "2017-07-07 15:31:53Z",
-                    "updated_time": 1499441513240,
-                    "uuid": "3eafaecb-e60d-48fd-8f31-e39aa58db356"
-                },
-                {
-                    "_id": "595fa96933511e005340b73c",
-                    "created_at": "2017-07-07 15:31:53Z",
-                    "example_text": null,
-                    "level": "Moderate",
-                    "text": "By (date), when given (10) sentences that have an opinion and a reason with the linking word or phrase missing, (name) will select the correct linking word/phrase to fill in the blank out of (4) possible [[ multiple choice | multiple choice options ]] scoring (8 out of 10) questions in (2 out of 3) writing activities.",
-                    "title": null,
-                    "updated_at": "2017-07-07 15:31:53Z",
-                    "updated_time": 1499441513241,
-                    "uuid": "f0b92c17-919e-4268-a079-95e2c22f0353"
-                },
-                {
-                    "_id": "595fa96933511e005340b73d",
-                    "created_at": "2017-07-07 15:31:53Z",
-                    "example_text": null,
-                    "level": "Intense",
-                    "text": "By (date), when read aloud (5) sentences that connect an opinion with a reason, (name) will follow along with the same sentence written on paper and will correctly [[ highlighting | highlight ]] the linking word or phrase (e.g. \"because\", \"therefore\", \"since\", \"for example\") in (4 out of 5 sentences).",
-                    "title": null,
-                    "updated_at": "2017-07-07 15:31:53Z",
-                    "updated_time": 1499441513241,
-                    "uuid": "423f8ab7-16a7-4878-b702-27ab81cf12c6"
-                }
-            ],
-            "published": true,
-            "score": 3.98,
-            "slug": "using-linking-words-to-connect-opinion-and-reasons",
-            "standard_codes": [
-                "CCSS.ELA-Literacy.W.3.1c"
-            ],
-            "standard_codes_old": [
-                "CC.ELA-Literacy.3.W.1.c"
-            ],
-            "subject": "Writing",
-            "subject_domains": [
-                "Opinion & Argument"
-            ],
-            "super_page": false,
-            "teks_standard_codes": [],
-            "title": "Use Linking Words to Connect Opinion and Reasons",
-            "udl_adaptations": [
-                {
-                    "_id": "5244b5c9b79b0b0766000004",
-                    "created_at": "2013-09-26 22:31:37Z",
-                    "text": "Rather than creating sentences that use linking words on their own, students can [[ highlighting | highlight ]] linking words that they hear or see in other sentences.  By highlighting the linking words, students are gaining a better understanding of when and how to use the words through model examples.",
-                    "udl_standard_checkpoint_ref": "UDL I 3.2",
-                    "udl_standard_long_ref": "UDL I 3.2 Provide Multiple Means of Representation: Highlight patterns, critical features, big ideas, and relationships",
-                    "udl_standard_short_ref": "UDL I 3.2 Highlight patterns, critical features, big ideas, and relationships",
-                    "updated_at": "2017-07-07 15:31:53Z",
-                    "updated_time": 1499441513327,
-                    "uuid": "11da10d9-6f70-4055-999d-e04b4d1f4dae"
-                },
-                {
-                    "_id": "5244b64cb79b0b1c61000022",
-                    "created_at": "2013-09-26 22:33:48Z",
-                    "text": "Instead of having to create sentences using linking words on their own, students can practice this skill by selecting which linking word fits best to connect the opinion and reason from [[ multiple choice | multiple answer choices ]].  This way the students are given practice with using the correct linking words, and will feel more comfortable to incorporate them into their future writing.",
-                    "udl_standard_checkpoint_ref": "UDL II 5.3",
-                    "udl_standard_long_ref": "UDL II 5.3 Provide Multiple Means of Action and Expression: Build fluencies with graduated levels of support for practice and performance",
-                    "udl_standard_short_ref": "UDL II 5.3 Build fluencies with graduated levels of support for practice and performance",
-                    "updated_at": "2017-07-07 15:31:53Z",
-                    "updated_time": 1499441513336,
-                    "uuid": "8f5f0cdb-718b-47d6-aaf2-1f6abd9f242e"
-                },
-                {
-                    "_id": "5244b779b79b0b076600000b",
-                    "created_at": "2013-09-26 22:38:49Z",
-                    "text": "When using linking words and phrases, teachers can allow students to write about whatever they want.  Rather than saying students must write a sentence about school (or any other specific topic) using a linking word to connect an opinion and reason, teachers can tell the students to write about any opinions they have. As long as the students are using correct linking words, the teacher can allow them to write freely about any topic, provided that it is appropriate.",
-                    "udl_standard_checkpoint_ref": "UDL III 7.1",
-                    "udl_standard_long_ref": "UDL III 7.1 Provide Multiple Means of Engagement: Optimize individual choice and autonomy",
-                    "udl_standard_short_ref": "UDL III 7.1 Optimize individual choice and autonomy",
-                    "updated_at": "2017-07-07 15:31:53Z",
-                    "updated_time": 1499441513345,
-                    "uuid": "f55d4543-ef99-4dc7-b4b7-b2bea21b4733"
-                }
-            ],
-            "updated_at": "2017-07-07 15:31:53Z",
-            "updated_time": 1499441513359,
-            "uuid": "31ba1fb1-0516-40e8-be88-3de77ff73330",
-            "wida_2007_standard_codes": []
-        },
-        {
-            "adaptation_strategies": [
-                "1f416b6b-d63e-4861-8049-51a7a3c49a72",
-                "c297665c-69d9-48e9-8594-44a754b84abd",
-                "d041bbf6-bcde-4426-b0f6-218ba9553c6b",
-                "718c4fc9-401c-469e-9163-b3cb71a5b10e",
-                "691b39bc-d2cd-4f20-9bee-9abd1906428b",
-                "0e6253de-88f7-40ed-a784-b794368a90d6",
-                "ec0a0ed3-6486-4654-9012-706486ff5ff9"
-            ],
-            "assessment_items": {},
-            "author_id": "ab0adacc-e982-44bc-a1b8-528dd09b92c3",
-            "ca_eld_standard_codes": [],
-            "cape_standard_codes": [],
-            "coach_standard_codes": [],
-            "created_at": "2013-10-17 15:42:13Z",
-            "demo": false,
-            "dlm_ee_codes": [],
-            "goal_example_text": "**Informational Text Example:**\nE.O. Wilson's \"The Diversity of Life\"",
-            "goal_text": "By (date), after reading an excerpt from an informational text, (student) will write a (3-paragraph) summary of the text using at least (12) domain-specific vocabulary words/phrases that appear in the informational text (e.g. biological diversity, biosphere, photosynthesis) for (4 out of 5) summary-writing opportunities.",
-            "grades": [
-                "9",
-                "10"
-            ],
-            "ils_sel_standard_codes": [],
-            "ncsc_ccc_codes": [],
-            "ny_prek_standard_codes": [],
-            "objectives": [
-                {
-                    "_id": "5aa6d550f0e3f40bffe0f1d4",
-                    "created_at": "2018-03-12 19:30:24Z",
-                    "example_text": null,
-                    "level": "Mild",
-                    "text": "By (date), after reading an excerpt from an informational text (e.g. E.O. Wilson's \"The Diversity of Life\"), and given a [[ Vocabulary Preview | vocabulary preview ]] of the target vocabulary words in the text, (student) will write a (3-paragraph) summary explanation of the text using at least (12) domain-specific vocabulary words/phrases that appear in the explanatory text (e.g. biological diversity, biosphere, photosynthesis) for (4 out of 5) summary-writing opportunities.",
-                    "title": null,
-                    "updated_at": "2018-03-12 19:30:24Z",
-                    "updated_time": 1520883024038,
-                    "uuid": "a6d2706a-241d-40bd-bd97-30aea86a8eb9"
-                },
-                {
-                    "_id": "5aa6d550f0e3f40bffe0f1d5",
-                    "created_at": "2018-03-12 19:30:24Z",
-                    "example_text": null,
-                    "level": "Moderate",
-                    "text": "By (date), after reading an excerpt from an explanatory text (e.g. E.O. Wilson's \"The Diversity of Life\") with a [[ Partner Reading | partner ]] and given a [[ Vocabulary Preview | vocabulary preview ]] of the target vocabulary words in the text, (student) will write a (1-paragraph) summary explanation of the text using at least (8) domain-specific vocabulary words/phrases that appear in the explanatory text (e.g. biological diversity, biosphere, photosynthesis) for (4 out of 5) summary-writing opportunities.",
-                    "title": null,
-                    "updated_at": "2018-03-12 19:30:24Z",
-                    "updated_time": 1520883024039,
-                    "uuid": "451ada53-97dc-4ba4-bee5-0b702235bea2"
-                },
-                {
-                    "_id": "5aa6d550f0e3f40bffe0f1d6",
-                    "created_at": "2018-03-12 19:30:24Z",
-                    "example_text": null,
-                    "level": "Intense",
-                    "text": "By (date), (student) will use a [[ Labeled Diagram | labeled diagram ]] (e.g. a food chain diagram) to verbally explain at least (5) domain-specific vocabulary words/phrases featured in the diagram for (4 out of 5) vocabulary-explanation opportunities.",
-                    "title": null,
-                    "updated_at": "2018-03-12 19:30:24Z",
-                    "updated_time": 1520883024039,
-                    "uuid": "c85111f4-9256-4617-9188-3fdae075763a"
-                }
-            ],
-            "published": true,
-            "score": 0.88,
-            "slug": "using-precise-language-and-vocabulary",
-            "standard_codes": [
-                "CCSS.ELA-Literacy.W.9-10.2d"
-            ],
-            "standard_codes_old": [
-                "CC.ELA-Literacy.9-10.W.2.d"
-            ],
-            "subject": "Writing",
-            "subject_domains": [
-                "Informative & Explanatory"
-            ],
-            "super_page": false,
-            "teks_standard_codes": [],
-            "title": "Use Precise Language and Vocabulary",
-            "udl_adaptations": [
-                {
-                    "_id": "52729c82b79b0b4237000030",
-                    "created_at": "2013-10-31 18:08:02Z",
-                    "text": "Teachers can improve student's understand of new vocabulary terms by facilitating a [[ Vocabulary Preview | vocabulary preview ]] of the domain-specific vocabulary. Teachers can discuss the words in the context of the reading excerpt, and then provide explanations of the words in a new context. To provide a new context, teachers can write a set of sentences using the vocabulary words, provide a set of [[visual aids|drawings or diagrams]] that depict the words or have students make [[illustration|drawings or diagrams]] of the words.",
-                    "udl_standard_checkpoint_ref": "UDL I 2.1",
-                    "udl_standard_long_ref": "UDL I 2.1 Provide Multiple Means of Representation: Clarify vocabulary and symbols",
-                    "udl_standard_short_ref": "UDL I 2.1 Clarify vocabulary and symbols",
-                    "updated_at": "2018-03-12 19:30:24Z",
-                    "updated_time": 1520883024140,
-                    "uuid": "c67e5255-fbde-4bc4-aab5-926e9c53da1f"
-                },
-                {
-                    "_id": "52729d86b79b0b6930000067",
-                    "created_at": "2013-10-31 18:12:22Z",
-                    "text": "Teachers can ask students to read the excerpt aloud with a [[ Partner Reading | partner ]]. By reading the passage aloud together, students can support each other in sustained reading and learning vocabulary words in context. Teachers can provide students with a list of target words so they can be looking for the words as they read.",
-                    "udl_standard_checkpoint_ref": "UDL III 8.3",
-                    "udl_standard_long_ref": "UDL III 8.3 Provide Multiple Means of Engagement: Foster collaboration and communication",
-                    "udl_standard_short_ref": "UDL III 8.3 Foster collaboration and communication",
-                    "updated_at": "2018-03-12 19:30:24Z",
-                    "updated_time": 1520883024152,
-                    "uuid": "a3cf0a33-6746-4706-a3f0-a502183f8724"
-                },
-                {
-                    "_id": "52729ddeb79b0be5230000b2",
-                    "created_at": "2013-10-31 18:13:50Z",
-                    "text": "Teachers can support students in learning new vocabulary terms by having them create a [[vocabulary journal|vocabulary journal]]. Students can record a word, definition, [[illustration|illustration]], example of use and synonym/antonym to deepen understanding of the terms. Teachers can then permit students to use their vocabulary journals as a [[open notes|reference]] during assignments or tests.",
-                    "udl_standard_checkpoint_ref": "UDL II 5.2",
-                    "udl_standard_long_ref": "UDL II 5.2 Provide Multiple Means of Action and Expression: Use multiple tools for construction and composition",
-                    "udl_standard_short_ref": "UDL II 5.2 Use multiple tools for construction and composition",
-                    "updated_at": "2018-03-12 19:30:24Z",
-                    "updated_time": 1520883024163,
-                    "uuid": "5f4b4f9d-3be1-4318-8add-96b71127b3a2"
-                }
-            ],
-            "updated_at": "2018-03-12 19:30:24Z",
-            "updated_time": 1520883024178,
-            "uuid": "d1de4cf5-b62a-46d0-8c5a-ae443d3ecc46",
-            "wida_2007_standard_codes": []
-        },
-        {
-            "adaptation_strategies": [
-                "7f30cf78-d24d-48e2-8f06-1bbb7b226e4b",
-                "d82473e0-606e-4470-8ee0-f7bda6e5766d",
-                "54b0757c-d449-4f47-b586-a24f71ba3ec4",
-                "ac8a2d1a-84a1-422c-91a6-d93c02fbd21e",
-                "691b39bc-d2cd-4f20-9bee-9abd1906428b",
-                "be7bd060-33b8-4507-8611-0a4a267d4852",
-                "b8cbcc73-5349-49f0-9a6b-eada91fe4d4b",
-                "c37b57c1-483a-4c2b-971f-afc8cce1e616"
-            ],
-            "author_id": "fe23a60a-07e3-4f7f-8e8b-fabc1ae568f7",
-            "ca_eld_standard_codes": [],
-            "coach_standard_codes": [],
-            "created_at": "2014-02-18 18:12:07Z",
-            "demo": false,
-            "dlm_ee_codes": [],
-            "goal_text": "By (date), after given an explanatory topic (e.g. How to Choose a \u201cJust Right\u201d Book) and [[ reference materials | reference materials]] (e.g. grade-level text or teacher-created handout), (name) will identify and write key details in a [[ Graphic Organizers | graphic organizer ]] (e.g. Sequence Chart/First, Next, Then, Last) and use it to write a (5-8) sentence, informational paragraph that introduces the topic, lists at least (3) sequential steps, supporting details or [[illustration|illustrations]] to develop the topic, includes at least (3) linking words (e.g. also, and, but, another) and ends with a concluding statement in (4 out of 5) writing exercises.",
-            "grades": [
-                "3"
-            ],
-            "ils_sel_standard_codes": [],
-            "ncsc_ccc_codes": [],
-            "ny_prek_standard_codes": [],
-            "objectives": [
-                {
-                    "_id": "58a329bd19e9642b4411550e",
-                    "created_at": "2017-02-14 16:01:01Z",
-                    "level": "Mild",
-                    "text": "By (date), after given an explanatory topic (e.g. How to Choose a \u201cJust Right\u201d Book) and teacher-prepared notes in a [[Graphic Organizers | graphic organizer ]] (e.g. Sequence Chart/First, Next, Then, Last), (name) will use key details from the graphic organizer to write a (5-8) sentence, informational paragraph that introduces the topic, lists at least (3) sequential steps, supporting details or [[illustration|illustrations]] to develop the topic, includes at least (3) linking words (e.g. also, and, but, another) and ends with a concluding statement in (4 out of 5) writing exercises.",
-                    "updated_at": "2017-02-14 16:01:01Z",
-                    "updated_time": 1487088061742,
-                    "uuid": "4eb7fb8a-e6cd-4d14-876d-d5358678c5eb"
-                },
-                {
-                    "_id": "58a329bd19e9642b4411550f",
-                    "created_at": "2017-02-14 16:01:01Z",
-                    "level": "Moderate",
-                    "text": "By (date), after given an explanatory topic (e.g. How to Choose a \u201cJust Right\u201d Book), teacher-prepared notes in a [[Graphic Organizers | graphic organizer ]] (e.g. Sequence Chart/First, Next, Then, Last), and [[ Sentence Starters | sentence starters ]] for the introduction and concluding statements, (name) will write a (3-5) sentence, informational paragraph that introduces the topic, lists at least (2) sequential steps, supporting details or [[illustration|illustrations]] to develop the topic, includes at least (2) linking words (e.g. also, and, but, another) and ends with a concluding statement in (4 out of 5) writing exercises.",
-                    "updated_at": "2017-02-14 16:01:01Z",
-                    "updated_time": 1487088061742,
-                    "uuid": "8e4958f5-8c5b-400a-a510-8b7ab36cf887"
-                },
-                {
-                    "_id": "58a329bd19e9642b44115510",
-                    "created_at": "2017-02-14 16:01:01Z",
-                    "level": "Intense",
-                    "text": "By (date), after viewing a grade-level informational [[video|video]] about a topic (e.g. \u201cHow to Choose a \u201cJust Right Book) and after given [[ Picture Sequencing | picture cards ]] with [[illustration|illustrations]], sequential steps, or details supporting an explanatory topic, (name) will select at least (3) cards, arrange them sequentially and orally explain sequential steps or details that develop the topic in (4 out of 5) oral exercises.",
-                    "updated_at": "2017-02-14 16:01:01Z",
-                    "updated_time": 1487088061742,
-                    "uuid": "9afea683-1569-4cad-857a-f3c290643941"
-                }
-            ],
-            "published": true,
-            "score": 2.99,
-            "slug": "write-a-how-to-paragraph",
-            "standard_codes": [
-                "CCSS.ELA-Literacy.W.3.2"
-            ],
-            "standard_codes_old": [
-                "CC.ELA-Literacy.3.W.2"
-            ],
-            "subject": "Writing",
-            "subject_domains": [
-                "Informative & Explanatory"
-            ],
-            "teks_standard_codes": [],
-            "title": "Write a \"How To...\" Paragraph",
-            "udl_adaptations": [
-                {
-                    "_id": "5303a720b79b0bec6a0000b7",
-                    "created_at": "2014-02-18 18:32:00Z",
-                    "text": "When writing about informational or explanatory topics, some learners will require teacher-directed [[interactive writing|discussions]] or teacher-created notes such as [[ Graphic Organizers | graphic organizers]] to activate background knowledge, focus attention on relevant details and organize information sequentially.",
-                    "udl_standard_checkpoint_ref": "UDL I 3.1",
-                    "udl_standard_long_ref": "UDL I 3.1 Provide Multiple Means of Representation: Activate or supply background knowledge",
-                    "udl_standard_short_ref": "UDL I 3.1 Activate or supply background knowledge",
-                    "updated_at": "2017-02-14 16:01:01Z",
-                    "updated_time": 1487088061792,
-                    "uuid": "c77d32da-4545-40bd-9a99-b0fd3cecb9c3"
-                },
-                {
-                    "_id": "5303a920b79b0bdd6c0000db",
-                    "created_at": "2014-02-18 18:40:32Z",
-                    "text": "The fine motor demands of writing or typing may pose a challenge for some students. It may be helpful for students to orally dictate their response or be offered [[ Picture Choices | picture cards ]] to sort and select their answers.",
-                    "udl_standard_checkpoint_ref": "UDL II 4.1",
-                    "udl_standard_long_ref": "UDL II 4.1 Provide Multiple Means of Action and Expression: Vary the methods for response and navigation",
-                    "udl_standard_short_ref": "UDL II 4.1 Vary the methods for response and navigation",
-                    "updated_at": "2017-02-14 16:01:01Z",
-                    "updated_time": 1487088061794,
-                    "uuid": "b0ff3ca8-4717-4d7c-be6b-9789227917d9"
-                },
-                {
-                    "_id": "5303aac4b79b0b42640000f0",
-                    "created_at": "2014-02-18 18:47:32Z",
-                    "text": "Teacher-created notes, [[ Graphic Organizers | graphic organizers ]] and [[ Sentence Starters | sentence starters ]] can supply students with the necessary resources to begin the task of writing and serve as a starting point for reluctant writers. When a student is supported with appropriate resources at his or her instructional level, the student is more likely to experience success. Minimizing the road blocks of getting started encourages students to write longer and more detailed pieces.",
-                    "udl_standard_checkpoint_ref": "UDL III 8.2",
-                    "udl_standard_long_ref": "UDL III 8.2 Provide Multiple Means of Engagement: Vary demands and resources to optimize challenge",
-                    "udl_standard_short_ref": "UDL III 8.2 Vary demands and resources to optimize challenge",
-                    "updated_at": "2017-02-14 16:01:01Z",
-                    "updated_time": 1487088061797,
-                    "uuid": "9241220b-00a0-4240-b4ef-22b4b75a4494"
-                }
-            ],
-            "updated_at": "2017-02-14 16:01:01Z",
-            "updated_time": 1487088061805,
-            "uuid": "016b2db6-55c1-4b98-acf1-57d8d88946e0",
-            "wida_2007_standard_codes": []
-        },
-        {
-            "adaptation_strategies": [
                 "7f30cf78-d24d-48e2-8f06-1bbb7b226e4b",
                 "cc569bb0-a72f-45fc-a716-d9f1ce133826",
                 "691b39bc-d2cd-4f20-9bee-9abd1906428b",
@@ -6132,6 +5795,121 @@
             "updated_at": "2017-02-18 00:48:57Z",
             "updated_time": 1487378937518,
             "uuid": "aedb068d-f95a-4677-9411-29b8d22f7aae",
+            "wida_2007_standard_codes": []
+        },
+        {
+            "adaptation_strategies": [
+                "be7bd060-33b8-4507-8611-0a4a267d4852",
+                "7f30cf78-d24d-48e2-8f06-1bbb7b226e4b",
+                "cc569bb0-a72f-45fc-a716-d9f1ce133826",
+                "7fd3fa7e-c936-4ede-acf6-ccdaed60994b",
+                "f97aabc0-6981-46c9-a138-7b1aac44cc07",
+                "d82473e0-606e-4470-8ee0-f7bda6e5766d",
+                "ac8a2d1a-84a1-422c-91a6-d93c02fbd21e"
+            ],
+            "assessment_items": {},
+            "author_id": "fe23a60a-07e3-4f7f-8e8b-fabc1ae568f7",
+            "ca_eld_standard_codes": [],
+            "coach_standard_codes": [],
+            "created_at": "2014-02-24 15:56:31Z",
+            "demo": false,
+            "dlm_ee_codes": [],
+            "goal_text": "By (date), after given a personal narrative prompt (e.g. \u201cWrite about our field trip to the aquarium.\u201d) and completing a [[ Graphic Organizers | graphic organizer ]] (e.g. Sensory Detail Chart: \u201cWhat you\u2026 Saw, Heard, Smelled, Felt, Said\u201d) to brainstorm and organize ideas, (name) will write an (8-10) sentence personal narrative including: a (1) sentence introduction, (3) temporal transition words (e.g. first, next, last) to signal a clear sequence of events, at least (3) examples of writer\u2019s craft (e.g. sensory details, descriptive words, figurative language, or dialogue), and a (1) concluding sentence in (4 out of 5) writing exercises.",
+            "grades": [
+                "3"
+            ],
+            "ils_sel_standard_codes": [],
+            "ncsc_ccc_codes": [],
+            "ny_prek_standard_codes": [],
+            "objectives": [
+                {
+                    "_id": "595fa95dde0da30051a1dc09",
+                    "created_at": "2017-07-07 15:31:41Z",
+                    "example_text": null,
+                    "level": "Mild",
+                    "text": "By (date), after given a personal narrative prompt (e.g. \u201cWrite about our field trip to the aquarium.\u201d), teacher prepared notes of dialogue examples, and an adjective [[ Word Bank | word bank ]] to assist in completing a [[ Graphic Organizers | graphic organizer ]] (e.g. Sensory Detail Chart: \u201cWhat you\u2026 Saw, Heard, Smelled, Felt, Said\u201d), (name) will write an (8-10) sentence personal narrative including: a (1) sentence introduction, (3) temporal transition words (e.g. first, next, last) to signal a clear sequence of events, at least (3) examples of writer\u2019s craft (e.g. sensory details, descriptive words, figurative language, or dialogue), and a (1) concluding sentence in (4 of 5) writing exercises.",
+                    "title": null,
+                    "updated_at": "2017-07-07 15:31:41Z",
+                    "updated_time": 1499441501370,
+                    "uuid": "af6c76e6-b4c1-41cd-89cc-78d9e3a1fcfa"
+                },
+                {
+                    "_id": "595fa95dde0da30051a1dc0a",
+                    "created_at": "2017-07-07 15:31:41Z",
+                    "example_text": null,
+                    "level": "Moderate",
+                    "text": "By (date), after given a personal narrative prompt (e.g. \u201cWrite about our field trip to the aquarium.\u201d) and  completing a [[ Picture Storytelling | picture storytelling ]] (e.g. comic strip sequence frame), (name) will write a (4-6) sentence personal narrative comic strip by using at least (2) descriptive words from an adjective [[ Word Bank | word bank ]] and use [[ Sentence Starters | sentence frames ]] (e.g. Teacher says \u201cFirst it feIt like\u2026, Then it sounded like\u2026, Next I saw\u2026\") to include (3) sensory details in the sequential order in (3 of 5) writing exercises.",
+                    "title": null,
+                    "updated_at": "2017-07-07 15:31:41Z",
+                    "updated_time": 1499441501371,
+                    "uuid": "9dfda29f-a7e4-49d2-90c0-337eccf4d4b8"
+                },
+                {
+                    "_id": "595fa95dde0da30051a1dc0b",
+                    "created_at": "2017-07-07 15:31:41Z",
+                    "example_text": null,
+                    "level": "Intense",
+                    "text": "By (date), after a teacher-led [[ Interactive Writing | interactive writing ]] exercise to list sensory details and words describing a shared event, (name) will use the [[Word Bank | list]] to select at least (1) descriptive word and (1) sensory detail from teacher [[Reference Materials| prepared notes/class charts]] to respond to a narrative prompt about a shared experience (e.g. \u201cWrite about our field trip to the aquarium\u201d) by orally sharing (3 to 5) complete sentences in sequential order for (4 out of 5) interactive writing exercises.",
+                    "title": null,
+                    "updated_at": "2017-07-07 15:31:41Z",
+                    "updated_time": 1499441501371,
+                    "uuid": "25f18df5-caaa-4a0c-85cf-1c8618439c63"
+                }
+            ],
+            "published": true,
+            "score": 2.97,
+            "slug": "developing-writer-s-craft-in-a-narrative",
+            "standard_codes": [
+                "CCSS.ELA-Literacy.W.3.3"
+            ],
+            "standard_codes_old": [
+                "CC.ELA-Literacy.3.W.3"
+            ],
+            "subject": "Writing",
+            "subject_domains": [
+                "Narrative"
+            ],
+            "super_page": false,
+            "teks_standard_codes": [],
+            "title": "Developing Writer\u2019s Craft in a Narrative",
+            "udl_adaptations": [
+                {
+                    "_id": "530b713eb79b0bdb5a00003c",
+                    "created_at": "2014-02-24 16:20:14Z",
+                    "text": "The task of creative writing requires the application of many skills and information simultaneously to compose an understandable story that follows a clear sequence of events. Students will benefit from well-designed materials and resources like [[ Word Bank | word banks ]], [[ Graphic Organizers | graphic organizers ]], and [[ Picture Storytelling | picture storytelling ]] exercises to assist them in the organization and content of their writing.",
+                    "udl_standard_checkpoint_ref": "UDL I 3.3",
+                    "udl_standard_long_ref": "UDL I 3.3 Provide Multiple Means of Representation: Guide information processing, visualization, and manipulation",
+                    "udl_standard_short_ref": "UDL I 3.3 Guide information processing, visualization, and manipulation",
+                    "updated_at": "2017-07-07 15:31:41Z",
+                    "updated_time": 1499441501454,
+                    "uuid": "1181ff46-fd92-4c2d-b549-b4d41235714d"
+                },
+                {
+                    "_id": "530b7257b79b0b575800002c",
+                    "created_at": "2014-02-24 16:24:55Z",
+                    "text": "The fine motor demands of writing may limit or discourage some students from writing longer, more detailed narratives. Allowing students to participate in [[ Interactive Writing | interactive writing ]] exercises and verbally dictate their story will provide an equal opportunity for all students to participate in creative writing.",
+                    "udl_standard_checkpoint_ref": "UDL II 4.1",
+                    "udl_standard_long_ref": "UDL II 4.1 Provide Multiple Means of Action and Expression: Vary the methods for response and navigation",
+                    "udl_standard_short_ref": "UDL II 4.1 Vary the methods for response and navigation",
+                    "updated_at": "2017-07-07 15:31:41Z",
+                    "updated_time": 1499441501462,
+                    "uuid": "ef30cfd7-b86d-46e9-a4d9-ccfa55a911b7"
+                },
+                {
+                    "_id": "530b74d3b79b0bc14f000054",
+                    "created_at": "2014-02-24 16:35:31Z",
+                    "text": "[[ Guided Peer Discussions | Guided Peer Discussions]] will encourage students to brainstorm and story tell their ideas before writing. This peer interaction not only allows students to develop their ideas, but also requires them to follow a clear sequence of events to communicate effectively with a partner. Moreover, peer questions will prompt the writer to think about additional details that could be added to the narrative.",
+                    "udl_standard_checkpoint_ref": "UDL III 8.3",
+                    "udl_standard_long_ref": "UDL III 8.3 Provide Multiple Means of Engagement: Foster collaboration and communication",
+                    "udl_standard_short_ref": "UDL III 8.3 Foster collaboration and communication",
+                    "updated_at": "2017-07-07 15:31:41Z",
+                    "updated_time": 1499441501471,
+                    "uuid": "f62dc8a6-a52a-4632-ab36-4c0516de83be"
+                }
+            ],
+            "updated_at": "2017-07-07 15:31:41Z",
+            "updated_time": 1499441501484,
+            "uuid": "915f8381-26f9-4ea5-babf-a7215c79bc77",
             "wida_2007_standard_codes": []
         },
         {
@@ -7239,6 +7017,343 @@
             "updated_at": "2013-10-24 03:21:57Z",
             "updated_time": 1382584917064,
             "uuid": "90201c08-5ca0-4f29-9d13-c513fed7f406",
+            "wida_2007_standard_codes": []
+        },
+        {
+            "adaptation_strategies": [
+                "7f30cf78-d24d-48e2-8f06-1bbb7b226e4b",
+                "d82473e0-606e-4470-8ee0-f7bda6e5766d",
+                "54b0757c-d449-4f47-b586-a24f71ba3ec4",
+                "ac8a2d1a-84a1-422c-91a6-d93c02fbd21e",
+                "691b39bc-d2cd-4f20-9bee-9abd1906428b",
+                "be7bd060-33b8-4507-8611-0a4a267d4852",
+                "b8cbcc73-5349-49f0-9a6b-eada91fe4d4b",
+                "c37b57c1-483a-4c2b-971f-afc8cce1e616"
+            ],
+            "author_id": "fe23a60a-07e3-4f7f-8e8b-fabc1ae568f7",
+            "ca_eld_standard_codes": [],
+            "coach_standard_codes": [],
+            "created_at": "2014-02-18 18:12:07Z",
+            "demo": false,
+            "dlm_ee_codes": [],
+            "goal_text": "By (date), after given an explanatory topic (e.g. How to Choose a \u201cJust Right\u201d Book) and [[ reference materials | reference materials]] (e.g. grade-level text or teacher-created handout), (name) will identify and write key details in a [[ Graphic Organizers | graphic organizer ]] (e.g. Sequence Chart/First, Next, Then, Last) and use it to write a (5-8) sentence, informational paragraph that introduces the topic, lists at least (3) sequential steps, supporting details or [[illustration|illustrations]] to develop the topic, includes at least (3) linking words (e.g. also, and, but, another) and ends with a concluding statement in (4 out of 5) writing exercises.",
+            "grades": [
+                "3"
+            ],
+            "ils_sel_standard_codes": [],
+            "ncsc_ccc_codes": [],
+            "ny_prek_standard_codes": [],
+            "objectives": [
+                {
+                    "_id": "58a329bd19e9642b4411550e",
+                    "created_at": "2017-02-14 16:01:01Z",
+                    "level": "Mild",
+                    "text": "By (date), after given an explanatory topic (e.g. How to Choose a \u201cJust Right\u201d Book) and teacher-prepared notes in a [[Graphic Organizers | graphic organizer ]] (e.g. Sequence Chart/First, Next, Then, Last), (name) will use key details from the graphic organizer to write a (5-8) sentence, informational paragraph that introduces the topic, lists at least (3) sequential steps, supporting details or [[illustration|illustrations]] to develop the topic, includes at least (3) linking words (e.g. also, and, but, another) and ends with a concluding statement in (4 out of 5) writing exercises.",
+                    "updated_at": "2017-02-14 16:01:01Z",
+                    "updated_time": 1487088061742,
+                    "uuid": "4eb7fb8a-e6cd-4d14-876d-d5358678c5eb"
+                },
+                {
+                    "_id": "58a329bd19e9642b4411550f",
+                    "created_at": "2017-02-14 16:01:01Z",
+                    "level": "Moderate",
+                    "text": "By (date), after given an explanatory topic (e.g. How to Choose a \u201cJust Right\u201d Book), teacher-prepared notes in a [[Graphic Organizers | graphic organizer ]] (e.g. Sequence Chart/First, Next, Then, Last), and [[ Sentence Starters | sentence starters ]] for the introduction and concluding statements, (name) will write a (3-5) sentence, informational paragraph that introduces the topic, lists at least (2) sequential steps, supporting details or [[illustration|illustrations]] to develop the topic, includes at least (2) linking words (e.g. also, and, but, another) and ends with a concluding statement in (4 out of 5) writing exercises.",
+                    "updated_at": "2017-02-14 16:01:01Z",
+                    "updated_time": 1487088061742,
+                    "uuid": "8e4958f5-8c5b-400a-a510-8b7ab36cf887"
+                },
+                {
+                    "_id": "58a329bd19e9642b44115510",
+                    "created_at": "2017-02-14 16:01:01Z",
+                    "level": "Intense",
+                    "text": "By (date), after viewing a grade-level informational [[video|video]] about a topic (e.g. \u201cHow to Choose a \u201cJust Right Book) and after given [[ Picture Sequencing | picture cards ]] with [[illustration|illustrations]], sequential steps, or details supporting an explanatory topic, (name) will select at least (3) cards, arrange them sequentially and orally explain sequential steps or details that develop the topic in (4 out of 5) oral exercises.",
+                    "updated_at": "2017-02-14 16:01:01Z",
+                    "updated_time": 1487088061742,
+                    "uuid": "9afea683-1569-4cad-857a-f3c290643941"
+                }
+            ],
+            "published": true,
+            "score": 2.99,
+            "slug": "write-a-how-to-paragraph",
+            "standard_codes": [
+                "CCSS.ELA-Literacy.W.3.2"
+            ],
+            "standard_codes_old": [
+                "CC.ELA-Literacy.3.W.2"
+            ],
+            "subject": "Writing",
+            "subject_domains": [
+                "Informative & Explanatory"
+            ],
+            "teks_standard_codes": [],
+            "title": "Write a \"How To...\" Paragraph",
+            "udl_adaptations": [
+                {
+                    "_id": "5303a720b79b0bec6a0000b7",
+                    "created_at": "2014-02-18 18:32:00Z",
+                    "text": "When writing about informational or explanatory topics, some learners will require teacher-directed [[interactive writing|discussions]] or teacher-created notes such as [[ Graphic Organizers | graphic organizers]] to activate background knowledge, focus attention on relevant details and organize information sequentially.",
+                    "udl_standard_checkpoint_ref": "UDL I 3.1",
+                    "udl_standard_long_ref": "UDL I 3.1 Provide Multiple Means of Representation: Activate or supply background knowledge",
+                    "udl_standard_short_ref": "UDL I 3.1 Activate or supply background knowledge",
+                    "updated_at": "2017-02-14 16:01:01Z",
+                    "updated_time": 1487088061792,
+                    "uuid": "c77d32da-4545-40bd-9a99-b0fd3cecb9c3"
+                },
+                {
+                    "_id": "5303a920b79b0bdd6c0000db",
+                    "created_at": "2014-02-18 18:40:32Z",
+                    "text": "The fine motor demands of writing or typing may pose a challenge for some students. It may be helpful for students to orally dictate their response or be offered [[ Picture Choices | picture cards ]] to sort and select their answers.",
+                    "udl_standard_checkpoint_ref": "UDL II 4.1",
+                    "udl_standard_long_ref": "UDL II 4.1 Provide Multiple Means of Action and Expression: Vary the methods for response and navigation",
+                    "udl_standard_short_ref": "UDL II 4.1 Vary the methods for response and navigation",
+                    "updated_at": "2017-02-14 16:01:01Z",
+                    "updated_time": 1487088061794,
+                    "uuid": "b0ff3ca8-4717-4d7c-be6b-9789227917d9"
+                },
+                {
+                    "_id": "5303aac4b79b0b42640000f0",
+                    "created_at": "2014-02-18 18:47:32Z",
+                    "text": "Teacher-created notes, [[ Graphic Organizers | graphic organizers ]] and [[ Sentence Starters | sentence starters ]] can supply students with the necessary resources to begin the task of writing and serve as a starting point for reluctant writers. When a student is supported with appropriate resources at his or her instructional level, the student is more likely to experience success. Minimizing the road blocks of getting started encourages students to write longer and more detailed pieces.",
+                    "udl_standard_checkpoint_ref": "UDL III 8.2",
+                    "udl_standard_long_ref": "UDL III 8.2 Provide Multiple Means of Engagement: Vary demands and resources to optimize challenge",
+                    "udl_standard_short_ref": "UDL III 8.2 Vary demands and resources to optimize challenge",
+                    "updated_at": "2017-02-14 16:01:01Z",
+                    "updated_time": 1487088061797,
+                    "uuid": "9241220b-00a0-4240-b4ef-22b4b75a4494"
+                }
+            ],
+            "updated_at": "2017-02-14 16:01:01Z",
+            "updated_time": 1487088061805,
+            "uuid": "016b2db6-55c1-4b98-acf1-57d8d88946e0",
+            "wida_2007_standard_codes": []
+        },
+        {
+            "adaptation_strategies": [
+                "5c58c104-a506-4f85-9795-540a7821f503",
+                "029242ed-2fe6-485c-98ab-bcc35552fab2",
+                "920d6724-b3e4-497c-b5d6-72a86f63dfe8"
+            ],
+            "assessment_items": {},
+            "author_id": "106277f8-7d9e-4573-9fb3-e80dd0352343",
+            "ca_eld_standard_codes": [],
+            "coach_standard_codes": [],
+            "created_at": "2013-09-23 22:27:19Z",
+            "demo": false,
+            "dlm_ee_codes": [],
+            "goal_text": "By (date), when given (10) opinions in one column and (10) reasons in another column, (name) will write a complete sentence by choosing one opinion and one reason, connecting the two with an appropriate linking word or phrase (e.g. \"because\", \"therefore\", \"since\", \"for example\") in (8 out of 10 sentences) in (4 out of 5) writing activities.\n\nExample:\nOpinion: Ice cream is the best dessert in the summer. \nReason: It is so hot outside.\nSample Student Response: Ice cream is the best dessert in the summer because it is so hot outside.",
+            "grades": [
+                "3"
+            ],
+            "ils_sel_standard_codes": [],
+            "ncsc_ccc_codes": [],
+            "ny_prek_standard_codes": [],
+            "objectives": [
+                {
+                    "_id": "595fa96933511e005340b73b",
+                    "created_at": "2017-07-07 15:31:53Z",
+                    "example_text": null,
+                    "level": "Mild",
+                    "text": "By (date), when given (10) opinions in one column and (10) reasons in another column, (name) will write a complete sentence by choosing one opinion and one reason, connecting the two by selecting an appropriate linking word or phrase from a [[ Glossary | glossary ]] containing linking words and phrases (e.g. \"because\", \"therefore\", \"since\", \"for example\") in (8 out of 10 sentences) in (4 out of 5) writing activities.",
+                    "title": null,
+                    "updated_at": "2017-07-07 15:31:53Z",
+                    "updated_time": 1499441513240,
+                    "uuid": "3eafaecb-e60d-48fd-8f31-e39aa58db356"
+                },
+                {
+                    "_id": "595fa96933511e005340b73c",
+                    "created_at": "2017-07-07 15:31:53Z",
+                    "example_text": null,
+                    "level": "Moderate",
+                    "text": "By (date), when given (10) sentences that have an opinion and a reason with the linking word or phrase missing, (name) will select the correct linking word/phrase to fill in the blank out of (4) possible [[ multiple choice | multiple choice options ]] scoring (8 out of 10) questions in (2 out of 3) writing activities.",
+                    "title": null,
+                    "updated_at": "2017-07-07 15:31:53Z",
+                    "updated_time": 1499441513241,
+                    "uuid": "f0b92c17-919e-4268-a079-95e2c22f0353"
+                },
+                {
+                    "_id": "595fa96933511e005340b73d",
+                    "created_at": "2017-07-07 15:31:53Z",
+                    "example_text": null,
+                    "level": "Intense",
+                    "text": "By (date), when read aloud (5) sentences that connect an opinion with a reason, (name) will follow along with the same sentence written on paper and will correctly [[ highlighting | highlight ]] the linking word or phrase (e.g. \"because\", \"therefore\", \"since\", \"for example\") in (4 out of 5 sentences).",
+                    "title": null,
+                    "updated_at": "2017-07-07 15:31:53Z",
+                    "updated_time": 1499441513241,
+                    "uuid": "423f8ab7-16a7-4878-b702-27ab81cf12c6"
+                }
+            ],
+            "published": true,
+            "score": 3.98,
+            "slug": "using-linking-words-to-connect-opinion-and-reasons",
+            "standard_codes": [
+                "CCSS.ELA-Literacy.W.3.1c"
+            ],
+            "standard_codes_old": [
+                "CC.ELA-Literacy.3.W.1.c"
+            ],
+            "subject": "Writing",
+            "subject_domains": [
+                "Opinion & Argument"
+            ],
+            "super_page": false,
+            "teks_standard_codes": [],
+            "title": "Use Linking Words to Connect Opinion and Reasons",
+            "udl_adaptations": [
+                {
+                    "_id": "5244b5c9b79b0b0766000004",
+                    "created_at": "2013-09-26 22:31:37Z",
+                    "text": "Rather than creating sentences that use linking words on their own, students can [[ highlighting | highlight ]] linking words that they hear or see in other sentences.  By highlighting the linking words, students are gaining a better understanding of when and how to use the words through model examples.",
+                    "udl_standard_checkpoint_ref": "UDL I 3.2",
+                    "udl_standard_long_ref": "UDL I 3.2 Provide Multiple Means of Representation: Highlight patterns, critical features, big ideas, and relationships",
+                    "udl_standard_short_ref": "UDL I 3.2 Highlight patterns, critical features, big ideas, and relationships",
+                    "updated_at": "2017-07-07 15:31:53Z",
+                    "updated_time": 1499441513327,
+                    "uuid": "11da10d9-6f70-4055-999d-e04b4d1f4dae"
+                },
+                {
+                    "_id": "5244b64cb79b0b1c61000022",
+                    "created_at": "2013-09-26 22:33:48Z",
+                    "text": "Instead of having to create sentences using linking words on their own, students can practice this skill by selecting which linking word fits best to connect the opinion and reason from [[ multiple choice | multiple answer choices ]].  This way the students are given practice with using the correct linking words, and will feel more comfortable to incorporate them into their future writing.",
+                    "udl_standard_checkpoint_ref": "UDL II 5.3",
+                    "udl_standard_long_ref": "UDL II 5.3 Provide Multiple Means of Action and Expression: Build fluencies with graduated levels of support for practice and performance",
+                    "udl_standard_short_ref": "UDL II 5.3 Build fluencies with graduated levels of support for practice and performance",
+                    "updated_at": "2017-07-07 15:31:53Z",
+                    "updated_time": 1499441513336,
+                    "uuid": "8f5f0cdb-718b-47d6-aaf2-1f6abd9f242e"
+                },
+                {
+                    "_id": "5244b779b79b0b076600000b",
+                    "created_at": "2013-09-26 22:38:49Z",
+                    "text": "When using linking words and phrases, teachers can allow students to write about whatever they want.  Rather than saying students must write a sentence about school (or any other specific topic) using a linking word to connect an opinion and reason, teachers can tell the students to write about any opinions they have. As long as the students are using correct linking words, the teacher can allow them to write freely about any topic, provided that it is appropriate.",
+                    "udl_standard_checkpoint_ref": "UDL III 7.1",
+                    "udl_standard_long_ref": "UDL III 7.1 Provide Multiple Means of Engagement: Optimize individual choice and autonomy",
+                    "udl_standard_short_ref": "UDL III 7.1 Optimize individual choice and autonomy",
+                    "updated_at": "2017-07-07 15:31:53Z",
+                    "updated_time": 1499441513345,
+                    "uuid": "f55d4543-ef99-4dc7-b4b7-b2bea21b4733"
+                }
+            ],
+            "updated_at": "2017-07-07 15:31:53Z",
+            "updated_time": 1499441513359,
+            "uuid": "31ba1fb1-0516-40e8-be88-3de77ff73330",
+            "wida_2007_standard_codes": []
+        },
+        {
+            "adaptation_strategies": [
+                "1f416b6b-d63e-4861-8049-51a7a3c49a72",
+                "c297665c-69d9-48e9-8594-44a754b84abd",
+                "d041bbf6-bcde-4426-b0f6-218ba9553c6b",
+                "718c4fc9-401c-469e-9163-b3cb71a5b10e",
+                "691b39bc-d2cd-4f20-9bee-9abd1906428b",
+                "0e6253de-88f7-40ed-a784-b794368a90d6",
+                "ec0a0ed3-6486-4654-9012-706486ff5ff9"
+            ],
+            "assessment_items": {},
+            "author_id": "ab0adacc-e982-44bc-a1b8-528dd09b92c3",
+            "ca_eld_standard_codes": [],
+            "cape_standard_codes": [],
+            "coach_standard_codes": [],
+            "created_at": "2013-10-17 15:42:13Z",
+            "demo": false,
+            "dlm_ee_codes": [],
+            "goal_example_text": "**Informational Text Example:**\nE.O. Wilson's \"The Diversity of Life\"",
+            "goal_text": "By (date), after reading an excerpt from an informational text, (student) will write a (3-paragraph) summary of the text using at least (12) domain-specific vocabulary words/phrases that appear in the informational text (e.g. biological diversity, biosphere, photosynthesis) for (4 out of 5) summary-writing opportunities.",
+            "grades": [
+                "9",
+                "10"
+            ],
+            "ils_sel_standard_codes": [],
+            "ncsc_ccc_codes": [],
+            "ny_prek_standard_codes": [],
+            "objectives": [
+                {
+                    "_id": "5aa6d550f0e3f40bffe0f1d4",
+                    "created_at": "2018-03-12 19:30:24Z",
+                    "example_text": null,
+                    "level": "Mild",
+                    "text": "By (date), after reading an excerpt from an informational text (e.g. E.O. Wilson's \"The Diversity of Life\"), and given a [[ Vocabulary Preview | vocabulary preview ]] of the target vocabulary words in the text, (student) will write a (3-paragraph) summary explanation of the text using at least (12) domain-specific vocabulary words/phrases that appear in the explanatory text (e.g. biological diversity, biosphere, photosynthesis) for (4 out of 5) summary-writing opportunities.",
+                    "title": null,
+                    "updated_at": "2018-03-12 19:30:24Z",
+                    "updated_time": 1520883024038,
+                    "uuid": "a6d2706a-241d-40bd-bd97-30aea86a8eb9"
+                },
+                {
+                    "_id": "5aa6d550f0e3f40bffe0f1d5",
+                    "created_at": "2018-03-12 19:30:24Z",
+                    "example_text": null,
+                    "level": "Moderate",
+                    "text": "By (date), after reading an excerpt from an explanatory text (e.g. E.O. Wilson's \"The Diversity of Life\") with a [[ Partner Reading | partner ]] and given a [[ Vocabulary Preview | vocabulary preview ]] of the target vocabulary words in the text, (student) will write a (1-paragraph) summary explanation of the text using at least (8) domain-specific vocabulary words/phrases that appear in the explanatory text (e.g. biological diversity, biosphere, photosynthesis) for (4 out of 5) summary-writing opportunities.",
+                    "title": null,
+                    "updated_at": "2018-03-12 19:30:24Z",
+                    "updated_time": 1520883024039,
+                    "uuid": "451ada53-97dc-4ba4-bee5-0b702235bea2"
+                },
+                {
+                    "_id": "5aa6d550f0e3f40bffe0f1d6",
+                    "created_at": "2018-03-12 19:30:24Z",
+                    "example_text": null,
+                    "level": "Intense",
+                    "text": "By (date), (student) will use a [[ Labeled Diagram | labeled diagram ]] (e.g. a food chain diagram) to verbally explain at least (5) domain-specific vocabulary words/phrases featured in the diagram for (4 out of 5) vocabulary-explanation opportunities.",
+                    "title": null,
+                    "updated_at": "2018-03-12 19:30:24Z",
+                    "updated_time": 1520883024039,
+                    "uuid": "c85111f4-9256-4617-9188-3fdae075763a"
+                }
+            ],
+            "published": true,
+            "score": 0.88,
+            "slug": "using-precise-language-and-vocabulary",
+            "standard_codes": [
+                "CCSS.ELA-Literacy.W.9-10.2d"
+            ],
+            "standard_codes_old": [
+                "CC.ELA-Literacy.9-10.W.2.d"
+            ],
+            "subject": "Writing",
+            "subject_domains": [
+                "Informative & Explanatory"
+            ],
+            "super_page": false,
+            "teks_standard_codes": [],
+            "title": "Use Precise Language and Vocabulary",
+            "udl_adaptations": [
+                {
+                    "_id": "52729c82b79b0b4237000030",
+                    "created_at": "2013-10-31 18:08:02Z",
+                    "text": "Teachers can improve student's understand of new vocabulary terms by facilitating a [[ Vocabulary Preview | vocabulary preview ]] of the domain-specific vocabulary. Teachers can discuss the words in the context of the reading excerpt, and then provide explanations of the words in a new context. To provide a new context, teachers can write a set of sentences using the vocabulary words, provide a set of [[visual aids|drawings or diagrams]] that depict the words or have students make [[illustration|drawings or diagrams]] of the words.",
+                    "udl_standard_checkpoint_ref": "UDL I 2.1",
+                    "udl_standard_long_ref": "UDL I 2.1 Provide Multiple Means of Representation: Clarify vocabulary and symbols",
+                    "udl_standard_short_ref": "UDL I 2.1 Clarify vocabulary and symbols",
+                    "updated_at": "2018-03-12 19:30:24Z",
+                    "updated_time": 1520883024140,
+                    "uuid": "c67e5255-fbde-4bc4-aab5-926e9c53da1f"
+                },
+                {
+                    "_id": "52729d86b79b0b6930000067",
+                    "created_at": "2013-10-31 18:12:22Z",
+                    "text": "Teachers can ask students to read the excerpt aloud with a [[ Partner Reading | partner ]]. By reading the passage aloud together, students can support each other in sustained reading and learning vocabulary words in context. Teachers can provide students with a list of target words so they can be looking for the words as they read.",
+                    "udl_standard_checkpoint_ref": "UDL III 8.3",
+                    "udl_standard_long_ref": "UDL III 8.3 Provide Multiple Means of Engagement: Foster collaboration and communication",
+                    "udl_standard_short_ref": "UDL III 8.3 Foster collaboration and communication",
+                    "updated_at": "2018-03-12 19:30:24Z",
+                    "updated_time": 1520883024152,
+                    "uuid": "a3cf0a33-6746-4706-a3f0-a502183f8724"
+                },
+                {
+                    "_id": "52729ddeb79b0be5230000b2",
+                    "created_at": "2013-10-31 18:13:50Z",
+                    "text": "Teachers can support students in learning new vocabulary terms by having them create a [[vocabulary journal|vocabulary journal]]. Students can record a word, definition, [[illustration|illustration]], example of use and synonym/antonym to deepen understanding of the terms. Teachers can then permit students to use their vocabulary journals as a [[open notes|reference]] during assignments or tests.",
+                    "udl_standard_checkpoint_ref": "UDL II 5.2",
+                    "udl_standard_long_ref": "UDL II 5.2 Provide Multiple Means of Action and Expression: Use multiple tools for construction and composition",
+                    "udl_standard_short_ref": "UDL II 5.2 Use multiple tools for construction and composition",
+                    "updated_at": "2018-03-12 19:30:24Z",
+                    "updated_time": 1520883024163,
+                    "uuid": "5f4b4f9d-3be1-4318-8add-96b71127b3a2"
+                }
+            ],
+            "updated_at": "2018-03-12 19:30:24Z",
+            "updated_time": 1520883024178,
+            "uuid": "d1de4cf5-b62a-46d0-8c5a-ae443d3ecc46",
             "wida_2007_standard_codes": []
         },
         {
@@ -9118,121 +9233,6 @@
             "updated_at": "2017-02-27 21:16:33Z",
             "updated_time": 1488230193661,
             "uuid": "c926a887-41a8-482e-b0f8-6e62c1df259a",
-            "wida_2007_standard_codes": []
-        },
-        {
-            "adaptation_strategies": [
-                "be7bd060-33b8-4507-8611-0a4a267d4852",
-                "7f30cf78-d24d-48e2-8f06-1bbb7b226e4b",
-                "cc569bb0-a72f-45fc-a716-d9f1ce133826",
-                "7fd3fa7e-c936-4ede-acf6-ccdaed60994b",
-                "f97aabc0-6981-46c9-a138-7b1aac44cc07",
-                "d82473e0-606e-4470-8ee0-f7bda6e5766d",
-                "ac8a2d1a-84a1-422c-91a6-d93c02fbd21e"
-            ],
-            "assessment_items": {},
-            "author_id": "fe23a60a-07e3-4f7f-8e8b-fabc1ae568f7",
-            "ca_eld_standard_codes": [],
-            "coach_standard_codes": [],
-            "created_at": "2014-02-24 15:56:31Z",
-            "demo": false,
-            "dlm_ee_codes": [],
-            "goal_text": "By (date), after given a personal narrative prompt (e.g. \u201cWrite about our field trip to the aquarium.\u201d) and completing a [[ Graphic Organizers | graphic organizer ]] (e.g. Sensory Detail Chart: \u201cWhat you\u2026 Saw, Heard, Smelled, Felt, Said\u201d) to brainstorm and organize ideas, (name) will write an (8-10) sentence personal narrative including: a (1) sentence introduction, (3) temporal transition words (e.g. first, next, last) to signal a clear sequence of events, at least (3) examples of writer\u2019s craft (e.g. sensory details, descriptive words, figurative language, or dialogue), and a (1) concluding sentence in (4 out of 5) writing exercises.",
-            "grades": [
-                "3"
-            ],
-            "ils_sel_standard_codes": [],
-            "ncsc_ccc_codes": [],
-            "ny_prek_standard_codes": [],
-            "objectives": [
-                {
-                    "_id": "595fa95dde0da30051a1dc09",
-                    "created_at": "2017-07-07 15:31:41Z",
-                    "example_text": null,
-                    "level": "Mild",
-                    "text": "By (date), after given a personal narrative prompt (e.g. \u201cWrite about our field trip to the aquarium.\u201d), teacher prepared notes of dialogue examples, and an adjective [[ Word Bank | word bank ]] to assist in completing a [[ Graphic Organizers | graphic organizer ]] (e.g. Sensory Detail Chart: \u201cWhat you\u2026 Saw, Heard, Smelled, Felt, Said\u201d), (name) will write an (8-10) sentence personal narrative including: a (1) sentence introduction, (3) temporal transition words (e.g. first, next, last) to signal a clear sequence of events, at least (3) examples of writer\u2019s craft (e.g. sensory details, descriptive words, figurative language, or dialogue), and a (1) concluding sentence in (4 of 5) writing exercises.",
-                    "title": null,
-                    "updated_at": "2017-07-07 15:31:41Z",
-                    "updated_time": 1499441501370,
-                    "uuid": "af6c76e6-b4c1-41cd-89cc-78d9e3a1fcfa"
-                },
-                {
-                    "_id": "595fa95dde0da30051a1dc0a",
-                    "created_at": "2017-07-07 15:31:41Z",
-                    "example_text": null,
-                    "level": "Moderate",
-                    "text": "By (date), after given a personal narrative prompt (e.g. \u201cWrite about our field trip to the aquarium.\u201d) and  completing a [[ Picture Storytelling | picture storytelling ]] (e.g. comic strip sequence frame), (name) will write a (4-6) sentence personal narrative comic strip by using at least (2) descriptive words from an adjective [[ Word Bank | word bank ]] and use [[ Sentence Starters | sentence frames ]] (e.g. Teacher says \u201cFirst it feIt like\u2026, Then it sounded like\u2026, Next I saw\u2026\") to include (3) sensory details in the sequential order in (3 of 5) writing exercises.",
-                    "title": null,
-                    "updated_at": "2017-07-07 15:31:41Z",
-                    "updated_time": 1499441501371,
-                    "uuid": "9dfda29f-a7e4-49d2-90c0-337eccf4d4b8"
-                },
-                {
-                    "_id": "595fa95dde0da30051a1dc0b",
-                    "created_at": "2017-07-07 15:31:41Z",
-                    "example_text": null,
-                    "level": "Intense",
-                    "text": "By (date), after a teacher-led [[ Interactive Writing | interactive writing ]] exercise to list sensory details and words describing a shared event, (name) will use the [[Word Bank | list]] to select at least (1) descriptive word and (1) sensory detail from teacher [[Reference Materials| prepared notes/class charts]] to respond to a narrative prompt about a shared experience (e.g. \u201cWrite about our field trip to the aquarium\u201d) by orally sharing (3 to 5) complete sentences in sequential order for (4 out of 5) interactive writing exercises.",
-                    "title": null,
-                    "updated_at": "2017-07-07 15:31:41Z",
-                    "updated_time": 1499441501371,
-                    "uuid": "25f18df5-caaa-4a0c-85cf-1c8618439c63"
-                }
-            ],
-            "published": true,
-            "score": 2.97,
-            "slug": "developing-writer-s-craft-in-a-narrative",
-            "standard_codes": [
-                "CCSS.ELA-Literacy.W.3.3"
-            ],
-            "standard_codes_old": [
-                "CC.ELA-Literacy.3.W.3"
-            ],
-            "subject": "Writing",
-            "subject_domains": [
-                "Narrative"
-            ],
-            "super_page": false,
-            "teks_standard_codes": [],
-            "title": "Developing Writer\u2019s Craft in a Narrative",
-            "udl_adaptations": [
-                {
-                    "_id": "530b713eb79b0bdb5a00003c",
-                    "created_at": "2014-02-24 16:20:14Z",
-                    "text": "The task of creative writing requires the application of many skills and information simultaneously to compose an understandable story that follows a clear sequence of events. Students will benefit from well-designed materials and resources like [[ Word Bank | word banks ]], [[ Graphic Organizers | graphic organizers ]], and [[ Picture Storytelling | picture storytelling ]] exercises to assist them in the organization and content of their writing.",
-                    "udl_standard_checkpoint_ref": "UDL I 3.3",
-                    "udl_standard_long_ref": "UDL I 3.3 Provide Multiple Means of Representation: Guide information processing, visualization, and manipulation",
-                    "udl_standard_short_ref": "UDL I 3.3 Guide information processing, visualization, and manipulation",
-                    "updated_at": "2017-07-07 15:31:41Z",
-                    "updated_time": 1499441501454,
-                    "uuid": "1181ff46-fd92-4c2d-b549-b4d41235714d"
-                },
-                {
-                    "_id": "530b7257b79b0b575800002c",
-                    "created_at": "2014-02-24 16:24:55Z",
-                    "text": "The fine motor demands of writing may limit or discourage some students from writing longer, more detailed narratives. Allowing students to participate in [[ Interactive Writing | interactive writing ]] exercises and verbally dictate their story will provide an equal opportunity for all students to participate in creative writing.",
-                    "udl_standard_checkpoint_ref": "UDL II 4.1",
-                    "udl_standard_long_ref": "UDL II 4.1 Provide Multiple Means of Action and Expression: Vary the methods for response and navigation",
-                    "udl_standard_short_ref": "UDL II 4.1 Vary the methods for response and navigation",
-                    "updated_at": "2017-07-07 15:31:41Z",
-                    "updated_time": 1499441501462,
-                    "uuid": "ef30cfd7-b86d-46e9-a4d9-ccfa55a911b7"
-                },
-                {
-                    "_id": "530b74d3b79b0bc14f000054",
-                    "created_at": "2014-02-24 16:35:31Z",
-                    "text": "[[ Guided Peer Discussions | Guided Peer Discussions]] will encourage students to brainstorm and story tell their ideas before writing. This peer interaction not only allows students to develop their ideas, but also requires them to follow a clear sequence of events to communicate effectively with a partner. Moreover, peer questions will prompt the writer to think about additional details that could be added to the narrative.",
-                    "udl_standard_checkpoint_ref": "UDL III 8.3",
-                    "udl_standard_long_ref": "UDL III 8.3 Provide Multiple Means of Engagement: Foster collaboration and communication",
-                    "udl_standard_short_ref": "UDL III 8.3 Foster collaboration and communication",
-                    "updated_at": "2017-07-07 15:31:41Z",
-                    "updated_time": 1499441501471,
-                    "uuid": "f62dc8a6-a52a-4632-ab36-4c0516de83be"
-                }
-            ],
-            "updated_at": "2017-07-07 15:31:41Z",
-            "updated_time": 1499441501484,
-            "uuid": "915f8381-26f9-4ea5-babf-a7215c79bc77",
             "wida_2007_standard_codes": []
         },
         {
