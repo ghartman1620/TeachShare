@@ -74,9 +74,11 @@ class Deploy(object):
 
         parser = argparse.ArgumentParser(description='build backend assets')
         parser.add_argument('--settings')
+        parser.add_argument('--update', action='store_true')
         args = parser.parse_args(sys.argv[2:])
         print(args)
         print(args.settings)
+        print(args.update)
         settings_resp = 'DEFAULT (settings.py)'
         settings_path = self.config['settings']
         if str(args.settings) != 'None' and str(args.settings) != '':
@@ -86,14 +88,15 @@ class Deploy(object):
         # check the current state for the deployments
         cprint('Checking the deployments current state...', color='yellow')
 
-        for dep in self.config['deployments']:
-            print('Checking deployment: %s' % dep)
-            self.get_deployment_status(dep)
-            image = self.deployments[dep]['spec']['template']['spec']['containers'][0]['image']
-            new_version = self.parse_deployment_image(image)
-            print(new_version)
-            self.update_deployment_version(
-                dep, new_version, self.config['deployments'][dep]['file'])
+        if args.update:
+            for dep in self.config['deployments']:
+                print('Checking deployment: %s' % dep)
+                self.get_deployment_status(dep)
+                image = self.deployments[dep]['spec']['template']['spec']['containers'][0]['image']
+                new_version = self.parse_deployment_image(image)
+                print(new_version)
+                self.update_deployment_version(
+                    dep, new_version, self.config['deployments'][dep]['file'])
 
         cprint('Running build command, settings=%s' % settings_resp, 'blue')
         print()
@@ -102,17 +105,17 @@ class Deploy(object):
         # images = ['gcr.io/teach-share-200700/teachshare_web', 'gcr.io/teach-share-200700/teachshare_task']
         cprint('Building docker images...', 'blue', attrs=['bold'])
 
-        for k, val in self.config['deployments'].items():
-            cprint('Building: %s' % k, color='yellow')
-            build_result = self.build_docker_image(
-                val['url']+':{}'.format(val['version']), settings_path, val['dockerfile'])
-            if build_result.returncode != 0:
-                raise DockerCommandError(
-                    build_result.args, build_result.stderr)
-            else:
-                cprint('Finished building docker image: %s' % k, 'green')
-        cprint('Finished building all images!', color='green',
-               attrs=['bold', 'reverse', 'blink'])
+        # for k, val in self.config['deployments'].items():
+        #     cprint('Building: %s' % k, color='yellow')
+        #     build_result = self.build_docker_image(
+        #         val['url']+':{}'.format(val['version']), settings_path, val['dockerfile'])
+        #     if build_result.returncode != 0:
+        #         raise DockerCommandError(
+        #             build_result.args, build_result.stderr)
+        #     else:
+        #         cprint('Finished building docker image: %s' % k, 'green')
+        # cprint('Finished building all images!', color='green',
+        #        attrs=['bold', 'reverse', 'blink'])
 
     def push(self):
         parser = argparse.ArgumentParser(description='push backend images')
@@ -163,8 +166,8 @@ class Deploy(object):
         return result
 
     def update_deployment_version(self, name, new_version, filename):
-        self.edit_image_version(name, self.config[name]['name'], new_version)
-        print(self.config['deployments'], name)
+        self.edit_image_version(name, self.config['deployments'][name]['name'], new_version)
+       
         self.config['deployments'][name]['version'] = new_version.split(':')[1]
 
         # write to configuration file

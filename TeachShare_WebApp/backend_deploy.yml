@@ -1,13 +1,8 @@
 deployments:
   api-production: {dockerfile: config/production/production.web.yml, file: config/production/k8s/api-deployment.yml,
-    url: gcr.io/teach-share-200700/teachshare_web, version: 1.0.2, name: api}
+    name: api, url: gcr.io/teach-share-200700/teachshare_web, version: 1.0.5}
   celery-task: {dockerfile: config/production/production.task.yml, file: config/production/k8s/celery-task.yml,
-    url: gcr.io/teach-share-200700/teachshare_task, version: 1.0.2, name: task}
-  frontend: {
-    dockerfile: ../Frontend/teach-share/Dockerfile, 
-    url: gcr.io/teach-share-200700/frontserve,
-    file: config/production/k8s/frontend.yml,
-    version: 1.0.2, 
-    name: frontserve
-  }
+    name: task, url: gcr.io/teach-share-200700/teachshare_task, version: 1.0.4}
+  frontend: {dockerfile: ../Frontend/teach-share/Dockerfile, file: config/production/k8s/frontend.yml,
+    name: frontserve, url: gcr.io/teach-share-200700/frontserve, version: 1.0.2}
 settings: TeachShare_WebApp.settings_production
