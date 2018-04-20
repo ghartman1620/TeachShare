@@ -43,15 +43,6 @@ class Deploy(object):
             exit(1)
         getattr(self, self.args.command)()
 
-    def test(self):
-        test = 'gcr.io/teach-share-200700/teachshare_web:1.0.2'
-        self.parse_deployment_image(test)
-
-        # parser = argparse.ArgumentParser(description='a test command')
-        # parser.add_argument('--test', action='store_true')
-        # args = parser.parse_args(sys.argv[2:])
-        # print('Running command test, --test=%s' % args.test)
-
     def all(self):
         self.build()
         self.push()
@@ -59,11 +50,11 @@ class Deploy(object):
 
     def update(self):
         cprint('Updating Kubernetes cluster.', color='blue', attrs=['bold'])
-        for deployment in self.config['deployments']:
-            print(deployment)
-
-    def update_k8s(self):
-        result = subprocess.run([''])
+        for name, dep in self.config['deployments'].items():
+            print(name, dep)
+            new_version: str = '{}:{}'.format(dep['url'], dep['version']) 
+            print(new_version)
+            self.edit_image_version(name, self.config['deployments'][name]['name'], new_version)
 
     def build(self):
         """
@@ -89,14 +80,14 @@ class Deploy(object):
         cprint('Checking the deployments current state...', color='yellow')
 
         if args.update:
-            for dep in self.config['deployments']:
-                print('Checking deployment: %s' % dep)
-                self.get_deployment_status(dep)
-                image = self.deployments[dep]['spec']['template']['spec']['containers'][0]['image']
+            for name, dep in self.config['deployments'].items():
+                print('Checking deployment: %s' % name)
+                self.get_deployment_status(name)
+                image = self.deployments[name]['spec']['template']['spec']['containers'][0]['image']
                 new_version = self.parse_deployment_image(image)
                 print(new_version)
-                self.update_deployment_version(
-                    dep, new_version, self.config['deployments'][dep]['file'])
+                self.update_deployment_version(name, new_version, dep['file'])
+                
 
         cprint('Running build command, settings=%s' % settings_resp, 'blue')
         print()
@@ -105,17 +96,21 @@ class Deploy(object):
         # images = ['gcr.io/teach-share-200700/teachshare_web', 'gcr.io/teach-share-200700/teachshare_task']
         cprint('Building docker images...', 'blue', attrs=['bold'])
 
-        # for k, val in self.config['deployments'].items():
-        #     cprint('Building: %s' % k, color='yellow')
-        #     build_result = self.build_docker_image(
-        #         val['url']+':{}'.format(val['version']), settings_path, val['dockerfile'])
-        #     if build_result.returncode != 0:
-        #         raise DockerCommandError(
-        #             build_result.args, build_result.stderr)
-        #     else:
-        #         cprint('Finished building docker image: %s' % k, 'green')
-        # cprint('Finished building all images!', color='green',
-        #        attrs=['bold', 'reverse', 'blink'])
+        for k, val in self.config['deployments'].items():
+            build_dir: str = '.'
+            if k == 'frontend':
+                self.build_frontend()
+                build_dir = '../Frontend/teach-share/.'
+            cprint('Building: %s' % k, color='yellow')
+            build_result = self.build_docker_image(
+                val['url']+':{}'.format(val['version']), settings_path, val['dockerfile'], build_dir=build_dir)
+            if build_result.returncode != 0:
+                raise DockerCommandError(
+                    build_result.args, build_result.stderr)
+            else:
+                cprint('Finished building docker image: %s' % k, 'green')
+        cprint('Finished building all images!', color='green',
+               attrs=['bold', 'reverse', 'blink'])
 
     def push(self):
         parser = argparse.ArgumentParser(description='push backend images')
@@ -153,10 +148,14 @@ class Deploy(object):
         print(self.config)
         # self.load_deployment('config/production/k8s/web/api-deployment.yml')
 
-    def build_docker_image(self, image_name, settings='TeachShare_WebApp.settings', dockerfile='config/production/production.web.yml'):
+    def build_docker_image(
+            self, image_name, settings='TeachShare_WebApp.settings', 
+            dockerfile='config/production/production.web.yml', 
+            build_dir: str = '.' ) -> subprocess.CompletedProcess:
         s = 'settings_module={}'.format(settings)
-        result = subprocess.run(['docker', 'build', '-f', dockerfile, '--build-arg',
-                                 s, '-t', image_name, '.'])
+        result: subprocess.CompletedProcess = subprocess.run(
+            ['docker', 'build', '-f', dockerfile, '--build-arg',
+             s, '-t', image_name, build_dir])
         cprint(result, 'blue')
         return result
 
@@ -166,7 +165,7 @@ class Deploy(object):
         return result
 
     def update_deployment_version(self, name, new_version, filename):
-        self.edit_image_version(name, self.config['deployments'][name]['name'], new_version)
+        # self.edit_image_version(name, self.config['deployments'][name]['name'], new_version)
        
         self.config['deployments'][name]['version'] = new_version.split(':')[1]
 
@@ -237,10 +236,11 @@ class Deploy(object):
 
     @staticmethod
     def build_frontend():
-        original_path = os.path.dirname(os.path.realpath(__file__))
+        original_path: str = os.path.dirname(os.path.realpath(__file__))
         os.chdir('../Frontend/teach-share')
         result = subprocess.run(['npm', 'run', 'build', 'production'], subprocess.PIPE)
         print(result.stdout)
+        os.chdir(original_path)
         
 
 if __name__ == '__main__':

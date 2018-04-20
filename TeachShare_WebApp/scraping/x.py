@@ -3,7 +3,8 @@ import csv
 import collections
 from urllib import parse
 import json
-
+from typing import Iterator
+ 
 urls = [
     'https://goalbookapp.com/toolkit/api/search/*?grades%5B%5D=K&grades%5B%5D=Pre-K&grades%5B%5D=1&grades%5B%5D=2&grades%5B%5D=3&grades%5B%5D=4&grades%5B%5D=5&grades%5B%5D=6&grades%5B%5D=7&grades%5B%5D=8&grades%5B%5D=9&grades%5B%5D=10&grades%5B%5D=11&grades%5B%5D=12&subjects%5B%5D=Reading&user_type=default&new_search=true',
     'https://goalbookapp.com/toolkit/api/search/*?subjects%5B%5D=Writing&user_type=default&new_search=true',
