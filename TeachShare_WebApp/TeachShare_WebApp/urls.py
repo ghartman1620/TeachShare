@@ -7,7 +7,7 @@ from django.contrib.auth.views import password_reset, password_reset_done, passw
 from rest_framework import routers
 from accounts.views import UserProfileViewSet, UserViewSet, GroupViewSet, TokenView, TokenVerification
 
-from posts.views import PostViewSet, CommentViewSet, AttachmentViewSet, SearchPostsView
+from posts.views import PostViewSet, CommentViewSet, AttachmentViewSet, SearchPostsView, StandardViewSet
 from posts.views import *
 from posts.views import FileUploadView
 
@@ -19,6 +19,8 @@ router.register(r'groups', GroupViewSet)
 router.register(r'posts', PostViewSet)
 router.register(r'comments', CommentViewSet)
 router.register(r'attachments', AttachmentViewSet)
+
+router.register(r'standards', StandardViewSet)
 
 urlpatterns = [
 

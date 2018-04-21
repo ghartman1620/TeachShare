@@ -11,8 +11,6 @@
             </a>
         </div>
     </side-bar>
-    {{currentPage}}
-    {{currentPage===2}}
     <div v-if="currentPage===1">
         <div v-if="inProgressPost !== undefined && inProgressPost.status !== LOADING" :style="getBodyStyle()">
             <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container">
@@ -141,28 +139,9 @@
         </div>
     </div>
     <div v-else-if="currentPage===2">
-        <b-card class="title-tag-card">
-            <b-form>
-                <b-form-group label="Grade level of lesson">
-                    <b-form-select v-model="currentPost.grade" :options="gradeOptions" class="mb-3" />
-                </b-form-group>
-                <b-form-group 
-                    label="Length of the lesson"
-                    description="Approximately how long, in minutes, will your lesson take?">
-                    <b-form-input v-model="currentPost.length"
-                        type="number"/>
-                </b-form-group>
-                <b-form-group
-                    label="Subject area of your lesson">
-                    <b-form-select v-model="currentPost.subject" :options="subjectOptions" class="mb-3" />
-                </b-form-group>
-                <b-form-group
-                    label="Content type of your lesson">
-                    <b-form-select v-model="currentPost.contentType" :options="contentTypeOptions" class="mb-3" />
-                </b-form-group>
-                <b-button variant="primary" @click="saveDraft">Save Tag Changes</b-button>
-            </b-form>
-        </b-card>
+        <tag-select :post="currentPost">
+
+        </tag-select>
     </div>
 
     <br><br><br> <!-- this is so problems don't occur with bottom of page button presses -->
@@ -241,6 +220,7 @@ import { addElement,
     saveDraft 
 } from "../store_modules/PostCreateService";
 import SideBar from "./SideBar.vue";
+import TagSelect from "./TagSelect.vue";
 import {User} from "../models";
 
 function isBlank(str) {
@@ -274,7 +254,7 @@ const bodyVisible = {
 
 @Component({
     name: "post-create",
-    components: { PostElement, FontAwesomeIcon, SideBar }
+    components: { PostElement, FontAwesomeIcon, SideBar, TagSelect }
 })
 export default class PostCreate extends Vue{
 
@@ -288,47 +268,13 @@ export default class PostCreate extends Vue{
     inProgressTag: string = "";
     tags: string[] = [];
     userPosts: any[] = [];
-    gradeOptions: any = [
-        { value: 0, text: "Preschool"},
-        { value: 1, text: "Kintergarden"},
-        { value: 2, text: "First Grade"},
-        { value: 3, text: "Second Grade"},
-        { value: 4, text: "Third Grade"},
-        { value: 5, text: "Fourth Grade"},
-        { value: 6, text: "Fifth Grade"},
-        { value: 7, text: "Sixth Grade"},
-        { value: 8, text: "Seventh Grade"},
-        { value: 9, text: "Eighth Grade"},
-        { value: 10, text: "Ninth Grade"},
-        { value: 11, text: "Tenth Grade"},
-        { value: 12, text: "Eleventh Grade"},
-        { value: 13, text: "Twelfth Grade"},
-           
-    ];
-    subjectOptions: any = [
-        {value: 0, text: 'Math'},
-        {value: 1, text: 'English Language Arts'},
-        {value: 2, text: 'Physical Sciences'},
-        {value: 3, text: 'Life Sciences'},
-        {value: 4, text: 'Earth and Space Sciences'},
-        {value: 5, text: 'Engineering, Technology, and the Applications of Science'},
-        {value: 6, text: 'Other (elaborate in tags!)'},
-    ]
-    contentTypeOptions: any = [
-        {value: 0, text: 'Game'},
-        {value: 1, text: 'Lab'},
-        {value: 2, text: 'Lecture'},
-    ]
+    
 
     currentPage: number = 0;
 
     //these aren't ever saved into InProgressPost, they're here for the purpose
     //of loading in a post's current info when you load up a post.
-    length: number = 0;
-    contentType: number = 0;
-    subject: number = 0;
-    grade: number = 0;
-
+    
 
 
 
@@ -341,8 +287,8 @@ export default class PostCreate extends Vue{
         return getCurrentPost(this.$store)!.status;
     }
     // getters
-    get inProgressPost() {
-        return getCurrentPost(this.$store);
+    get inProgressPost(): InProgressPost {
+        return getCurrentPost(this.$store)!;
     }
 
     get storeElements() {
@@ -355,6 +301,16 @@ export default class PostCreate extends Vue{
         return getCurrentPost(this.$store)!.title.length > 0;
     }
 
+    saveTagChanges(grade: number, length: number, subject: number, contentType: number, standards: number[]): void {
+        console.log(standards);
+        this.inProgressPost.setStandards(standards);
+        this.inProgressPost.setGrade(grade);
+        this.inProgressPost.setSubject(subject);
+        this.inProgressPost.setContentType(contentType);
+        this.inProgressPost.setLength(length);
+        this.saveDraft();
+    }
+    
     saveDraft() {
         saveDraft(this.$store);
     }
@@ -464,9 +420,12 @@ export default class PostCreate extends Vue{
         console.log(post);
         window.localStorage.setItem("inProgressPost", post.pk);
         var user: User = <User>this.getLoggedInUser;
+        this.beginPost(<number>user.pk, <number>post.pk);
+    }
+    beginPost(userid: number, postid: number | undefined): void {
         beginPost(this.$store, {
-            userid: <number>user.pk, 
-            id: <number>post.pk
+            userid: <number>userid, 
+            id: postid,
         });
     }
 
@@ -513,20 +472,15 @@ export default class PostCreate extends Vue{
         var inProgressPost = window.localStorage.getItem("inProgressPost");
         console.log(inProgressPost);
         if(inProgressPost == undefined){
-            beginPost(this.$store, {
-                userid: this.getLoggedInUser.pk,
-                id: undefined
-            });
+            this.beginPost( this.getLoggedInUser.pk, undefined);
         }
         else{
-            beginPost(this.$store, {
-                userid: this.getLoggedInUser.pk,
-                id: parseInt(<string>inProgressPost)
-            })
+            this.beginPost(this.getLoggedInUser.pk, parseInt(<string>inProgressPost));
         }
         this.getUserPosts();
         
     }
+
     mounted() {
         console.log("mounted post create");
         var vm: PostCreate = this;
@@ -542,6 +496,8 @@ export default class PostCreate extends Vue{
             }
             vm.$router.push({name: "create"});
         })
+
+        this.$on("submitTagChanges", this.saveTagChanges)
     }
 };
 </script>

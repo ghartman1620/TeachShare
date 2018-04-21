@@ -54,10 +54,21 @@ class PostDocument(DocType):
     timestamp = fields.DateField()
     id = fields.IntegerField()
 
+    standards = fields.TextField()
+
+
+
     grade = fields.IntegerField()
     content_type = fields.IntegerField()
     subject = fields.IntegerField()
     length = fields.IntegerField()
+
+    def prepare_standards(self, instance):
+        standardList = []
+        for std in instance.standards.all():
+            standardList.append(std.pk)
+        return standardList
+    
 
     def prepare_length(self, instance):
         return floor(instance.length.days*1440) + floor(instance.length.seconds/60)
@@ -71,8 +82,11 @@ class PostDocument(DocType):
     def prepare_filenames(self, instance):
         files = []
         for element in instance.content:
+            if not isinstance(element, dict):
+                raise Exception("This element is not a dict!" + str(element) + "of post "+ instance.title + " pk: " + str(instance.pk))
             if element['type'] != 'text':
                 #This is code golf speak for call a certain function and append it to our files list
+                
                 files.extend({
                     'image_file' : fileNamesFromImageAudioElement,
                     'audio'      : fileNamesFromImageAudioElement,

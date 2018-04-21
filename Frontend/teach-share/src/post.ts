@@ -19,6 +19,7 @@ export class InProgressPost{
     contentType: number;
     length: number;
     subject: number;
+    standards: number[];
     /*
 
     */ 
@@ -29,23 +30,8 @@ export class InProgressPost{
     //(for example, when we go to allow users to integrate elements of another user's post into their own)
     //wants to use InProgressPost?
 
-    //Theorem: I do not like JS.
-    //Proof:
-    //I like overloading. Overloading is my friend.
-    //JS does not like overloading. Overloading is JS' enemy
-    //The enemy of my friend is my enemy.
-    //Therefore, JS is my enemy. I do not like JS.
-    //QED
 
     constructor(userid: number);
-            //every single time i go to write something in this programming language js is like 
-            //You THOUGHT you wanted to do that regular thing but you ACTUlly wanted to do this stupid thing
-            //that nobody would possibly want to do but I want to do it because i'm an obtuse bad programming language.
-            //Why does typeof return a string? who knows.
-            //Who can't typeof find out the class type of an object? The function dispatcher seems to be able to.
-            //Why doi I have to ask all these questions of the programming language and why didn't the people
-            //writing the language ask themselves this?
-            //I don't know.
     constructor(userid: number, postid: number);
     constructor(userid: number, postid?: number){
         if (typeof postid !== "undefined"){ //there's a postid and a user
@@ -64,6 +50,7 @@ export class InProgressPost{
             this.subject = 0;
             this.contentType = 0;
             this.length = 0;
+            this.standards = [];
             post.pk = postid;
             api.get("/posts/"+ postid).then(function(response){
                 console.log(response);
@@ -74,6 +61,7 @@ export class InProgressPost{
                 post.status = PostStatus.Saved;
                 post.grade = response.data.grade;
                 post.subject = response.data.subject;
+                post.standards = response.data.standards;
                 console.log("subject: " + response.data.subject);
                 //response: #days hh:mm:ss
                 console.log(response.data.length);
@@ -98,6 +86,7 @@ export class InProgressPost{
             this.subject = 0;
             this.contentType = 0;
             this.length = 0;
+            this.standards = [];
             this.createNewDraft();
         }
     }
@@ -118,6 +107,9 @@ export class InProgressPost{
     }
     setLength(length: number): void {
         this.length = length;
+    }
+    setStandards(standards: number[]): void {
+        this.standards = standards;
     }
     
 
@@ -173,12 +165,15 @@ export class InProgressPost{
             length: `00:${this.length}:00`,
             draft: this.draft,
             subject: this.subject,
+            standards: this.standards
         }
     }
     
     saveDraft(): void{
         var post: InProgressPost = this;
         this.status = PostStatus.Saving;
+        console.log(this.json());
+        console.log(this.standards);
         api.put("posts/" + this.pk + "/", this.json()).then(function(response){
             console.log("DRAFT SAVED!");
             console.log(response);

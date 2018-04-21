@@ -5,8 +5,8 @@ import django_filters
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
-from .models import Post, Comment, Attachment
-from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer
+from .models import Post, Comment, Attachment, Standard
+from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer, StandardSerializer
 from .documents import PostDocument
 
 # test
@@ -195,6 +195,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     filter_fields = ('post', 'text', 'user', 'timestamp')
 
+class StandardViewSet(viewsets.ModelViewSet):
+    queryset = Standard.objects.all()
+    serializer_class = StandardSerializer
+    filter_fields= ('grade', 'name', 'subject') 
 
 class AttachmentViewSet(viewsets.ModelViewSet):
     """
