@@ -67,15 +67,15 @@ INSTALLED_APPS = [
 ElasticSearch-DSL Django settings
     - Signal Processor is temporary, will likely increase server load
 """
-# ELASTICSEARCH_DSL = {
-#     'default': {
-#         'hosts': 'search:9200'
-#     },
-# }
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': '10.3.250.69:9200'
+    },
+}
 # TEMPORARY: will cause unneccesary load on the server but simplifies things for now.
-# ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = 'django_elasticsearch_dsl.signals.RealTimeSignalProcessor'
-# ELASTICSEARCH_DSL_AUTOSYNC = False
-# ELASTICSEARCH_DSL_AUTO_REFRESH = False
+ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = 'django_elasticsearch_dsl.signals.RealTimeSignalProcessor'
+ELASTICSEARCH_DSL_AUTOSYNC = False
+ELASTICSEARCH_DSL_AUTO_REFRESH = False
 
 """
 Django Cache Backend Settings (Redis):
@@ -85,7 +85,7 @@ Django Cache Backend Settings (Redis):
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://10.55.254.123:6379/0',
+        'LOCATION': 'redis://10.3.250.87:6379/0',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'SERIALIZER': 'django_redis.serializers.msgpack.MSGPackSerializer',
@@ -96,8 +96,8 @@ DJANGO_REDIS_IGNORE_EXCEPTIONS = True
 
 
 # CELERY:
-CELERY_BROKER_URL = 'redis://10.55.254.123:6379/0'
-CELERY_RESULT_BACKEND = 'redis://10.55.254.123:6379/0'
+CELERY_BROKER_URL = 'redis://10.3.250.87:6379/0'
+CELERY_RESULT_BACKEND = 'redis://10.3.250.87:6379/0'
 CELERY_TASK_SERIALIZER = 'msgpack'
 CELERY_ACCEPT_CONTENT = ['msgpack']
 CELERY_RESULT_SERIALIZER = 'msgpack'

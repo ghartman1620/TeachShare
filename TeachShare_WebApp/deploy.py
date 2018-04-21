@@ -79,14 +79,15 @@ class Deploy(object):
         # check the current state for the deployments
         cprint('Checking the deployments current state...', color='yellow')
 
-        if args.update:
-            for name, dep in self.config['deployments'].items():
-                print('Checking deployment: %s' % name)
-                self.get_deployment_status(name)
-                image = self.deployments[name]['spec']['template']['spec']['containers'][0]['image']
+        for name, dep in self.config['deployments'].items():
+            print('Checking deployment: %s' % name)
+            self.get_deployment_status(name)
+            image = self.deployments[name]['spec']['template']['spec']['containers'][0]['image']
+            new_version = 'latest'
+            if dep['dockerfile'] != '':
                 new_version = self.parse_deployment_image(image)
-                print(new_version)
-                self.update_deployment_version(name, new_version, dep['file'])
+            print(new_version)
+            self.update_deployment_version(name, new_version, dep['file'])
                 
 
         cprint('Running build command, settings=%s' % settings_resp, 'blue')
@@ -98,17 +99,24 @@ class Deploy(object):
 
         for k, val in self.config['deployments'].items():
             build_dir: str = '.'
+ 
+            # Build frontend npm/vue assets if we are in the 'frontend' deployment
             if k == 'frontend':
                 self.build_frontend()
                 build_dir = '../Frontend/teach-share/.'
-            cprint('Building: %s' % k, color='yellow')
-            build_result = self.build_docker_image(
-                val['url']+':{}'.format(val['version']), settings_path, val['dockerfile'], build_dir=build_dir)
-            if build_result.returncode != 0:
-                raise DockerCommandError(
-                    build_result.args, build_result.stderr)
-            else:
-                cprint('Finished building docker image: %s' % k, 'green')
+
+            if val['dockerfile'] != '':
+                # Build the image
+                cprint('Building: %s' % k, color='yellow')
+                build_result = self.build_docker_image(
+                    '{}:{}'.format(val['url'], val['version']), settings_path, val['dockerfile'], build_dir=build_dir)
+                
+                # Check command result
+                if build_result.returncode != 0:
+                    raise DockerCommandError(
+                        build_result.args, build_result.stderr)
+                else:
+                    cprint('Finished building docker image: %s' % k, 'green')
         cprint('Finished building all images!', color='green',
                attrs=['bold', 'reverse', 'blink'])
 
@@ -132,13 +140,16 @@ class Deploy(object):
 
         for k, val in self.config['deployments'].items():
             cprint('Uploading: {}'.format(k), color='yellow')
-            build_result = self.push_docker_image(
-                val['url']+':{}'.format(val['version']))
-            if build_result.returncode != 0:
-                raise DockerCommandError(
-                    build_result.args, build_result.stderr)
-            else:
-                cprint('Finished pushing docker image: %s' % k, 'green')
+
+            if val['dockerfile'] != '':
+                cprint('no dockerfile.... skipping.', color='yellow')
+                build_result = self.push_docker_image(
+                    val['url']+':{}'.format(val['version']))
+                if build_result.returncode != 0:
+                    raise DockerCommandError(
+                        build_result.args, build_result.stderr)
+                else:
+                    cprint('Finished pushing docker image: %s' % k, 'green')
         cprint('Finished pushing all images!', color='green',
                attrs=['bold', 'reverse', 'blink'])
 
@@ -167,9 +178,10 @@ class Deploy(object):
     def update_deployment_version(self, name, new_version, filename):
         # self.edit_image_version(name, self.config['deployments'][name]['name'], new_version)
        
-        self.config['deployments'][name]['version'] = new_version.split(':')[1]
+        if new_version != 'latest':
+            self.config['deployments'][name]['version'] = new_version.split(':')[1]
 
-        # write to configuration file
+        # write to configuration filefile
         with open('backend_deploy.yml', 'w') as ymlfile:
             yaml.dump(self.config, ymlfile)
 

@@ -1,22 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cache
+spec:
+  ports:
+  - port: 6379
+  selector:
+    app: cache
+  type: "NodePort"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    deployment.kubernetes.io/revision: "1"
-  creationTimestamp: 2018-04-10T20:07:16Z
-  generation: 5
   labels:
-    app: redis
-  name: redis
+    app: cache
+  name: cache
   namespace: default
-  resourceVersion: "88687"
-  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/redis
-  uid: c46ba5e1-3cfa-11e8-a938-42010a8a0276
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: redis
+      app: cache
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -26,30 +41,30 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        app: redis
+        app: cache
     spec:
       containers:
       - image: redis:latest
         imagePullPolicy: Always
-        name: redis
+        name: cache
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+        ports:
+        - containerPort: 6379
+          name: mysql
+        volumeMounts:
+        - name: redis-storage
+          mountPath: /var/lib/redis
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: 2018-04-11T17:48:22Z
-    lastUpdateTime: 2018-04-11T17:48:22Z
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  observedGeneration: 5
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1
+      # this is where the volume/claim config goes so that redis can dump it's db to persistent
+      # memory every so often.
+      volumes:
+      - name: redis-storage
+        persistentVolumeClaim:
+          claimName: redis-pv-claim
+status: {}
