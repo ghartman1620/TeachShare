@@ -13,7 +13,7 @@
                 </b-form-group>
                 <b-form-group
                     label="Subject area of your lesson">
-                    <b-form-select v-model="subject" :options="subjectOptions" class="mb-3" />
+                    <b-form-select v-model="subject" @change="loadStandards" :options="subjectOptions" class="mb-3" />
                 </b-form-group>
                 <b-form-group
                     label="Content type of your lesson">
@@ -22,9 +22,7 @@
                 <b-form-group
                     label="Standards your lesson might fulfill"
                     description="use Ctrl+Click to select multiple">
-                    <!-- {{standardOptions}} -->
                     <b-form-select multiple v-model="standards" :select-size="15" :options="standardOptions" class="mb-3">
-                        <!-- <option v-for="std in standardOptions" :value="std.value">{{std.text}}</option> -->
                     </b-form-select>
                 </b-form-group>
 
@@ -37,6 +35,7 @@
 import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 import api from "../api";
+import {gradeOptions, subjectOptions, contentTypeOptions} from "../superTagOptions";
 
 @Component({
     name: "tag-select"
@@ -46,34 +45,11 @@ export default class TagSelect extends Vue {
     @Prop({default: undefined})
     post: any;
 
-    gradeOptions: any = [
-        { value: 0, text: "Preschool"},
-        { value: 1, text: "Kintergarden"},
-        { value: 2, text: "First Grade"},
-        { value: 3, text: "Second Grade"},
-        { value: 4, text: "Third Grade"},
-        { value: 5, text: "Fourth Grade"},
-        { value: 6, text: "Fifth Grade"},
-        { value: 7, text: "Sixth Grade"},
-        { value: 8, text: "Seventh Grade"},
-        { value: 9, text: "Eighth Grade"},
-        { value: 10, text: "9-12th Grade"},
-           
-    ];
-    subjectOptions: any = [
-        {value: 0, text: 'Math'},
-        {value: 1, text: 'English Language Arts'},
-        {value: 2, text: 'Physical Sciences'},
-        {value: 3, text: 'Life Sciences'},
-        {value: 4, text: 'Earth and Space Sciences'},
-        {value: 5, text: 'Engineering, Technology, and the Applications of Science'},
-        {value: 6, text: 'Other (elaborate in tags!)'},
-    ]
-    contentTypeOptions: any = [
-        {value: 0, text: 'Game'},
-        {value: 1, text: 'Lab'},
-        {value: 2, text: 'Lecture'},
-    ]
+    gradeOptions: any = gradeOptions;
+    subjectOptions: any = subjectOptions;
+    contentTypeOptions: any = contentTypeOptions;
+
+    
     standardOptions: any = [        
     ]
     length: number = 0;

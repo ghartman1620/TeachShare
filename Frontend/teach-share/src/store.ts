@@ -15,6 +15,8 @@ Vue.use(Vuex);
 
 export const mutations = {
     LOAD_ALL_POSTS: (state, data) => {
+        console.log("loading all posts...");
+        console.log(data);
         state.posts = data;
     },
     LOAD_POST: (state: IRootState, data: Post) => {
@@ -76,10 +78,14 @@ export const actions = {
             .then(response => state.commit("LOAD_ALL_POSTS", response.data))
             .catch(err => console.error(err));
     },
-    fetchAllPosts: state => {
+    fetchAllPosts: ctx => {
+        console.log("feteching all posts in store");
         api
             .get(`search/`)
-            .then(response => state.commit("LOAD_ALL_POSTS", response.data))
+            .then(function(response) {
+                console.log(response);
+                ctx.commit("LOAD_ALL_POSTS", response.data)
+            })
             .catch(err => console.error(err));
     },
     fetchAllPostsRaw: state => {

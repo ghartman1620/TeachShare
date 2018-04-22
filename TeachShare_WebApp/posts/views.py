@@ -15,7 +15,7 @@ from django.shortcuts import render
 from django.db.models import Q
 from urllib.parse import unquote
 from enum import Enum
-from elasticsearch_dsl.query import MultiMatch
+from elasticsearch_dsl.query import MultiMatch, Match
 from django_filters import rest_framework as filters
 from rest_framework import status, views, viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -30,16 +30,24 @@ from .serializers import (AttachmentSerializer, CommentSerializer,
 from .tasks import add
 import os 
 
+
 #Post search parameters
 #?term=string - searching for this string
 #?in=string - a list containing some of "title" "filenames" "content" "tags"
-#?sort=string - one of "date" "score" TODO - likes
+#?sort=string - one of "date" "score" 
 #?exclude=string - some keywords to discard some search results
-#?termtype=string - either 'and' or 'or' - says whether multiple words
+#?termtype=string - either 'and' or 'or' - says whether multiple words a query
     #should try to match every one of the words or any of the words
-#?excludetype=string - either 'and' or 'or' - says whether to exclude 
+#?excludetype=string - either 'and' or 'or' - says whether to exclude  a query
     #posts with all of the words listed or any of the words listed
-# test
+#?standards=string - space separated list of standard primary keys. a query
+    #returns posts with any of the standards with the pks listed
+
+#?grades=number - a grade number. (0=P, 1=K, 2=1st, etc... 10=9th-12th) query
+#?length=number - right now it must be exact, usually in 15 minute increments. query
+        #@TODO find how to make this be an approximation? Perhaps our times should just be ranges?
+#?subject=number - a subject. math=0, ela=1, phys=2, life=3, earth=4, eng=5. a filter
+#?content_type=number - a content type: 0 game, 1 lab, 2 lecture
 
 
 # Post search parameters
@@ -98,6 +106,17 @@ class SearchPostsView(views.APIView):
         'excludetype' : setExcludeType,
     }
     
+    #Rather than each of these functions performing filters,
+    #they should instead return a set of matches.
+    #These should be combined together to perform a single query.
+
+    #The goal is that with a set of combined matches elasticsearch
+    #will give us a whole bunch of posts that match any of the matches
+    #ranked by relevance. Then on the frontend we can display the results
+    #by relevance, and then have our search results page display in some nice
+    #way to the user which matches they searched for matched posts.
+
+
     #filterParams come next. they perform filters.
     def filterByTerm(self, value, queryset):
         terms = value.split(' ')
@@ -116,9 +135,44 @@ class SearchPostsView(views.APIView):
             myQuery = self.excludeType.joinQueries(myQuery, MultiMatch(query=term, fields=self.searchIn))
         return queryset.exclude(myQuery)
 
+    def queryByStandards(self, value, queryset):
+        print("filtering by standards")
+        terms = value.split(' ')
+        myQuery = Match(standards=terms[0])
+        for term in terms[1:]:
+            myQuery = Term.OR.joinQueries(myQuery, Match(standards=term))
+        return queryset.query(myQuery)
+
+
+        return queryset
+
+    #test me!
+    def queryByContentType(self, value, queryset):
+        myQuery = Match(content_type=int(value))
+        return queryset.query(myQuery)
+    #test
+    def queryByLength(self, value, queryset):
+        myQuery = Match(length=int(value))
+        return queryset.query(myQuery)
+
+    #test
+    def queryBySubject(self, value, queryset):
+        myQuery = Match(subject=int(value))
+        return queryset.query(myQuery)
+
+    #test
+    def queryByGrade(self, value, queryset):
+        myQuery = Match(grade=int(value))
+        return queryset.query(myQuery)
+
     filterParams = {
-        'term'    : filterByTerm,
-        'exclude' : filterByExcludedTerm,
+        'term'         : filterByTerm,
+        'exclude'      : filterByExcludedTerm,
+        'standard'     : queryByStandards,
+        'content_type' : queryByContentType,
+        'length'       : queryByLength,
+        'subject'      : queryBySubject,
+        'grade'        : queryByGrade,
     }
 
     
@@ -143,12 +197,16 @@ class SearchPostsView(views.APIView):
         queryset = self.parseParams(self.optionParams, queryset)
         queryset = self.parseParams(self.filterParams, queryset)
         queryset = self.parseParams(self.sortParams,   queryset)
+    
         return queryset
 
 
     def get(self, request, format=None):
         response = []
-        queryset = self.get_queryset()
+        try:
+            queryset = self.get_queryset()
+        except ValueError:
+            return Response({"error": "bad query parameter type"}, status=status.HTTP_400_BAD_REQUEST)
         for hit in queryset.scan():
             try:
                 response.append(Post.objects.get(id=hit._d_['id']))

@@ -37,24 +37,33 @@
             <b-form-radio-group stacked v-model="sortBy" :options="sortByOptions"/>
         </b-form-group>
     
-        <!--<b-btn v-b-toggle.gradeCollapse variant="primary">Toggle Grades</b-btn>
+        <b-form-group label="Grade level of lesson">
+            <b-form-select v-model="grade" @change="loadStandards" :options="gradeOptions" class="mb-3" />
+        </b-form-group>
+        <b-form-group 
+            label="Length of the lesson"
+            description="Minutes">
+            <b-form-input v-model="length"
+                type="number"/>
+        </b-form-group>
+        <b-form-group
+            label="Subject area of lesson">
+            <b-form-select v-model="subject" @change="loadStandards" :options="subjectOptions" class="mb-3" />
+        </b-form-group>
+        <b-form-group
+            label="Content type of lesson">
+            <b-form-select v-model="contentType" :options="contentTypeOptions" class="mb-3" />
+        </b-form-group>
 
-        <b-collapse id="gradeCollapse" class="mt-2">
-            <b-form-group label="Grades">
-
-                <b-form-checkbox-group stacked v-model="grades" :options="gradeOptions"/>
-                
-            </b-form-group>
-        </b-collapse>-->
-
-
+        <b-form-group
+            label="Standards you're looking for"
+            description="use Ctrl+Click to select multiple">
+            <b-form-select multiple v-model="standards" :select-size="15" :options="standardOptions" class="mb-3">
+            </b-form-select>
+        </b-form-group>
         
-        <span v-show="errors.has('keywords') && errors.has('excluding')" class="help is-danger">
-            You must filter by some keyword(s).
-        </span>
 
         <b-button 
-            :disabled="errors.has('keywords') && errors.has('excluding')"
             type="submit" 
             variant="primary" 
             class="sidebar-btn">
@@ -92,15 +101,24 @@ import { Component, Vue } from "vue-property-decorator";
 import { Watch, Prop } from 'vue-property-decorator'
 import Post from "./Post.vue";
 import SideBar from "./SideBar.vue";
+//these also have "anY" objects prepended to them in mounted()
+import api from "../api";
+import {gradeOptions, subjectOptions, contentTypeOptions} from "../superTagOptions";
+
 
 interface SearchQueryString {
-    term: string
-    exclude: string
-    sort: string
-    in: string
-    termtype: string
-    excludetype: string
+    term: string;
+    exclude: string;
+    sort: string;
+    in: string;
+    termtype: string;
+    excludetype: string;
+    standards: string;
+    grade: number;
+    length: number;
+    content_type: number;
 }
+
 
 @Component({
     name: "post-feed",
@@ -114,22 +132,17 @@ export default class PostFeed extends Vue {
     sortBy: string = "date";
     termtype: string = "or";
     excludetype: string = "or";
-    grades: string[] = [];
-    gradeOptions: object[] = [
-        {text: "K", value: 0},
-        {text: "1", value: 1},
-        {text: "2", value: 2},
-        {text: "3", value: 3},
-        {text: "4", value: 4},
-        {text: "5", value: 5},
-        {text: "6", value: 6},
-        {text: "7", value: 7},
-        {text: "8", value: 8},
-        {text: "9", value: 9},
-        {text: "10", value: 10},
-        {text: "11", value: 11},
-        {text: "12", value: 12}
-    ];
+    grade: number | null = null;
+    subject: number | null = null;
+    contentType: number | null= null;
+    length = "";
+    standards: number[] = [];
+
+    gradeOptions: any = gradeOptions;
+    subjectOptions: any = subjectOptions;
+    standardOptions: any = [];
+    contentTypeOptions: any = contentTypeOptions;
+
     termTypeOptions: object[] = [
         {text: "Any terms", value: "or"},
         {text: "All terms", value: "and"}
@@ -158,6 +171,34 @@ export default class PostFeed extends Vue {
     getPosts() {
         this.$store.dispatch("fetchAllPosts");
     }
+    //it seems like the v-model tag doesn't set this.grade until after the request
+    //has been sent - so we'll give it a few moments to notice we've made a change
+    //before we send the request to update standards.
+    loadStandards() {
+       
+        window.setTimeout(this.loadStandardsHelp,5);
+    }
+    loadStandardsHelp() {
+        if(this.subject != null && this.grade !== null){
+            this.standardOptions = [];   
+            var vm: PostFeed = this;
+            console.log("in loadstandards" + this.grade);
+            console.log(this.standardOptions);
+            api.get(`/standards/?grade=${this.grade}&subject=${this.subject}`).then(function(response: any) {
+                console.log(response.data);
+                console.log(vm.standardOptions);
+                for(var std of <any[]>response.data){
+                    vm.standardOptions.push({
+                        value: std.pk,
+                        text: std.name + " (" + std.code +")",
+                    })
+                }
+                console.log(vm.standardOptions);
+                console.log(vm.grade);
+            })
+            console.log(this.grade);
+        }
+    }
     scroll() {
         var offset =
             document.documentElement.scrollTop + window.innerHeight;
@@ -168,46 +209,70 @@ export default class PostFeed extends Vue {
         }
     }
     reloadPosts(){
-        if(this.$route.query.term != undefined){
+        if(this.$route.query != {}){
             console.log("here");
+            
             this.$store.dispatch("postSearch", this.$route.query);
         }
         else{
+            console.log("fetching all posts");
             this.$store.dispatch("fetchAllPosts");
         }
     }
 
     advancedSearch() {
-        var query = {
-            term: "",
-            exclude: "",
-            sort: "",
-            in: "",
-            termtype: "",
-            excludetype: ""
-        };
-
-        if (this.keywords != ""){
-            query.term = this.keywords;
-        }
-        if (this.excluding != ""){
-            query.exclude = this.excluding;
-        }
+        var query: any = {}
         query.sort = this.sortBy;
-        var searchParam = "";
-        this.searchIn.forEach(function(element){
-            searchParam += element + " ";
-        })
-        console.log(searchParam);
-        query.in = searchParam;
-        query.termtype = this.termtype;
-        query.excludetype = this.excludetype;
+
+        if (this.keywords !== ""){
+            query.term = this.keywords;
+            query.termtype = this.termtype;
+
+        }
+        if (this.excluding !== ""){
+            query.exclude = this.excluding;
+            query.excludetype = this.excludetype;
+        }
+        
+        if(this.keywords !== "" || this.excluding !== ""){
+            var searchParam = "";
+            this.searchIn.forEach(function(element){
+                searchParam += element + " ";
+            })
+            query.in = searchParam;
+        }
+        
+        if(this.contentType !== null){
+            query.content_type = this.contentType.toString();
+        }
+        
+        if(this.length !== ""){
+            query.length = this.length;
+        }
+        if(this.standards !== []){
+            var searchParam = "";
+            this.standards.forEach(function(element){
+                searchParam += element + " ";
+            })
+            query.standards = searchParam;
+        }
+        else{
+            if(this.grade !== null){
+            query.grade = this.grade.toString();
+            }
+            if(this.subject !== null){
+                query.subject = this.subject.toString();
+            }
+        }
+        
         this.$router.push({name: "dashboard", query: query});
     }
 
     beforeMount(){
+        console.log("in beforemount");
+        console.log(this.$route.query);
         this.reloadPosts();
-
+        
         var t = this;
         window.addEventListener(
             "scroll",
@@ -217,7 +282,11 @@ export default class PostFeed extends Vue {
             false
         );
     }
-    mounted() {}
+    mounted() {
+        this.gradeOptions.unshift({value: null, text: "Any Grade"})
+        this.subjectOptions.unshift({value: null, text: "Any Subject"})
+        this.contentTypeOptions.unshift({value: null, text: "Any Content Type"})
+    }
     destroyed() {
         // this doesn't work: because t is not defined.
         // window.removeEventListener("scroll", function() {t.scroll()}, false);

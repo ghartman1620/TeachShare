@@ -49,6 +49,7 @@ export default Vue.component("side-bar", {
     background-color:  #f1f1f1; //this is some random offwhite color that i picked
     // border: 3px solid black; //this is awful lets not use it to indicate end of sidebar 
     opacity: .9; //this is also an option
+    overflow: scroll;
     position: fixed;
     height: auto; //enable me for having the white background conform to the height of the contents of the sidebar
     top: 60px; /* height of top navbar */
@@ -57,7 +58,7 @@ export default Vue.component("side-bar", {
     -webkit-transition: all 0.1s ease-in-out;
     -moz-transition: all 0.1s ease-in-out;
     transition: all 0.1s ease-in-out;
-    overflow-y: auto;
+    overflow-y: scroll;
     z-index: 3;
 }
 .sidebar.collapsed {
