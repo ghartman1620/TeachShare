@@ -69,7 +69,7 @@ ElasticSearch-DSL Django settings
 """
 # ELASTICSEARCH_DSL = {
 #     'default': {
-#         'hosts': 'search:9200'
+#         'hosts': '10.3.250.69:9200'
 #     },
 # }
 # TEMPORARY: will cause unneccesary load on the server but simplifies things for now.
@@ -190,9 +190,9 @@ DATABASES = {
     'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'teach',
-            'USER': os.getenv('DATABASE_USER'),
-            'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-            'HOST': '127.0.0.1',
+            'USER': 'teachsharer',  # os.getenv('DATABASE_USER'),
+            'PASSWORD': 'thisisabadpasasword123',  # os.getenv('DATABASE_PASSWORD'),
+            'HOST': '35.197.35.127',
             'PORT': '5432',
             # 'ENGINE': 'django.db.backends.postgresql',
             # 'HOST': '/cloudsql/teach-share-200700:us-west1:teach-db',

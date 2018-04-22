@@ -119,7 +119,7 @@ export const mutations = {
 
 export const getters = {
     getPosts: (ctx) => ctx.posts,
-    getPostById: (ctx) => (id) => {
+    getPostById: (ctx) => (id): Post => {
         return ctx.posts.filter((post) => post.pk === Number(id))[0];
     }
 };
@@ -144,6 +144,7 @@ const { commit, read, dispatch } =
  * Actions Handlers
  */
 export const fetchAllPosts = dispatch(PostService.actions.fetchAllPosts);
+export const fetchPost = dispatch(PostService.actions.fetchPost);
 export const postSearch = dispatch(PostService.actions.postSearch);
 
 /**
