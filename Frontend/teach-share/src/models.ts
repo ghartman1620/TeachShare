@@ -210,11 +210,9 @@ export class ModelMap<V> implements IterableIterator<V> {
             done: true
         };
     }
-
     public [Symbol.iterator](): IterableIterator<V> {
         return this;
     }
-
     public has(key: string | number): boolean {
         return typeof this.data[String(key)] !== "undefined";
     }
@@ -235,6 +233,9 @@ export class ModelMap<V> implements IterableIterator<V> {
     }
     public get(key: string | number): V {
         return this._data[String(key)];
+    }
+    public remove(key: string | number): boolean {
+        return delete this._data[String(key)];
     }
     public list(): V[] {
         const res = new Array<V>();

@@ -1,7 +1,8 @@
 import { expect } from "chai";
+import { GenericFile, ModelMap } from "../../../src/models";
 import {
-    mutations,
     getters,
+    mutations,
     removeFile
 } from "../../../src/store_modules/FileService";
 import FileService from "../../../src/store_modules/FileService";
@@ -9,7 +10,6 @@ import {
     actions as actionsfn,
     FileState
 } from "../../../src/store_modules/FileService";
-import { GenericFile, ModelMap } from "../../../src/models";
 
 import Vue from "vue";
 import Vuex from "vuex";
@@ -19,7 +19,7 @@ import { uploadFiles } from "../../../src/store_modules/FileService";
 Vue.use(Vuex);
 
 /* eslint-disable no-new */
-let vueInstance = new Vue({
+const vueInstance = new Vue({
     el: "#app",
     // router,
     store,
