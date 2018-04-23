@@ -34,7 +34,7 @@ const state: UserState = {
 };
 
 export const actions = {
-    fetchUser: async (context: UserContext, userID: number) => {
+    fetchUser: async (context: UserContext, userID: number): Promise<User> => {
         try {
             const resp: AxiosResponse<User> = await api.get(`users/${userID}/`);
             mutAddUser(context, resp.data);

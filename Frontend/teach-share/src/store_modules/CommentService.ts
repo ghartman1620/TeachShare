@@ -94,7 +94,7 @@ export const mutations = {
      * @param  {Comment} comment
      */
     CREATE: (state, comment: Comment) => {
-        let c = state.comments as ModelMap<Comment>;
+        const c = state.comments as ModelMap<Comment>;
         if (typeof comment.pk === "undefined" || !c.has(comment.pk)) {
             Vue.set(state.comments.data, String(comment.pk), comment);
         }

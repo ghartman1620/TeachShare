@@ -293,7 +293,9 @@ class FileUploadView(views.APIView):
         file_obj = request.data['file']
         blob = None
 
+        print('File upload...')
         if check_production():
+            print('inside check production')
             blob = self.bucket.blob(filename)
             blob.upload_from_file(file_obj)
             print(blob.public_url)

@@ -34,4 +34,3 @@ describe("[BASE.VUE] Base view component", () => {
     });
 });
 
-function test(val: "something" | "else") {}

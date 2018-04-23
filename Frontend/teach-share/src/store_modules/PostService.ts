@@ -1,21 +1,20 @@
 import { AxiosResponse } from "axios";
+import Vue from "vue";
 import { ActionContext } from "vuex";
 import { getStoreAccessors } from "vuex-typescript";
 import api from "../api";
-import { IRootState, Post } from "../models";
-import { RSA_PKCS1_OAEP_PADDING } from 'constants';
+import { IRootState, ModelMap, Post } from "../models";
 
 // FIXME: change over to ModelMap<Post> so that it can be an associative map + an array.
-interface IPostState {
-    // Post feed
-    posts: Post[];
+export interface IPostState {
+    posts: ModelMap<Post>;
 }
 
 type PostContext = ActionContext<IPostState, IRootState>;
 
 const state = {
     // Post feed
-    posts: new Array<Post>()
+    posts: new ModelMap<Post>()
 };
 
 export const actions = {
@@ -94,12 +93,46 @@ export const actions = {
                 return err.message;
             }
         }
+    },
+    createPost: async (ctx: PostContext, post: Post) => {
+        mutCreate(ctx, post);
     }
 };
 
 export const mutations = {
     LOAD_ALL_POSTS: (ctx, data: Post[]) => {
-        ctx.posts = data;
+        ctx.posts = new ModelMap<Post>(...data);
+    },
+    // @FIXME: fix this to be functioning. Basically implement like other model backed
+    // items..
+    // alt_LOAD_ALL_POSTS: (ctx, data: Post[]) => {
+    //     ctx.posts = data;
+    // },
+
+    CREATE: (ctx, data: Post) => {
+        console.log("[POST]: ", ctx, data);
+        const posts = ctx.posts as ModelMap<Post>;
+
+        if (typeof data.pk !== "undefined") {
+            if (!ctx.posts.has(data.pk)) {
+                // @TODO: check if this actually works with vue reactivity.
+                posts.set(String(data.pk), data);
+                // Vue.set(ctx.posts.data, Number(data.pk), data);
+            }
+        }
+    },
+    UPDATE: (ctx, data: Post) => {
+        if (typeof data.pk !== "undefined") {
+            Vue.set(ctx.posts!.data, Number(data.pk), data);
+        }
+    },
+    DELETE: (ctx: IPostState, data: number | string ) => {
+        if (ctx.posts.has((data as string|number))) {
+            console.log("it has it...");
+            if (ctx.posts.remove(data)) {
+                console.log("Successfully removed key.");
+            }
+        }
     },
     LOAD_POST: (ctx, data: Post) => {
         if (data !== undefined) {
@@ -118,9 +151,9 @@ export const mutations = {
 };
 
 export const getters = {
-    getPosts: (ctx) => ctx.posts,
-    getPostById: (ctx) => (id) => {
-        return ctx.posts.filter((post) => post.pk === Number(id))[0];
+    all: (ctx: IPostState) => ctx.posts.list(),
+    getPostById: (ctx, gett) => (id): Post => {
+        return gett.all(ctx).filter((post) => post.pk === Number(id))[0];
     }
 };
 
@@ -144,16 +177,19 @@ const { commit, read, dispatch } =
  * Actions Handlers
  */
 export const fetchAllPosts = dispatch(PostService.actions.fetchAllPosts);
+export const fetchPost = dispatch(PostService.actions.fetchPost);
 export const postSearch = dispatch(PostService.actions.postSearch);
 
 /**
  * Getters Handlers
  */
-export const getPosts = read(PostService.getters.getPosts);
+export const getPosts = read(PostService.getters.all);
 export const getPostById = read(PostService.getters.getPostById);
 
 /**
  * Mutations Handlers
  */
+export const mutDelete = commit(PostService.mutations.DELETE);
+export const mutCreate = commit(PostService.mutations.CREATE);
 export const mutLoadAll = commit(PostService.mutations.LOAD_ALL_POSTS);
 export const mutLoad = commit(PostService.mutations.LOAD_POST);

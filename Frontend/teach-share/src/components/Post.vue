@@ -86,7 +86,10 @@ import { fetchUser, getUserByID, getLoggedInUser } from "../store_modules/UserSe
     name: "Post",
     props: {
         post: {
-            type: Post
+            type: Post,
+            default: function() { return new Post(); },
+            required: true,
+            validator: p => p instanceof Post
         }, 
         index: {
             type: Number
@@ -96,7 +99,7 @@ import { fetchUser, getUserByID, getLoggedInUser } from "../store_modules/UserSe
         }}
 })
 export default class PostComp extends Vue {
-    @Prop({required: true, default: new Post()}) post: Post;
+    @Prop() post: Post;
     @Prop() index: number;
     @Prop() maxHeight: number;
 
