@@ -12,6 +12,7 @@ import PostCreateService from "./store_modules/PostCreateService";
 import UserService from "./store_modules/UserService";
 import YouTubeService from "./store_modules/YouTubeService";
 import PostService from "./store_modules/PostService";
+import { WatchStore } from "./PersistStore";
 
 Vue.use(Vuex);
 
@@ -27,7 +28,8 @@ const store: StoreOptions<IRootState> = {
         notify: NotificationService,
         comment: CommentService,
         user: UserService
-    }
+    },
+    plugins: [WatchStore]
 };
 
 export default new Vuex.Store<IRootState>(store);

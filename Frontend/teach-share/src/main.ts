@@ -110,6 +110,7 @@ declare module "vue/types/vue" {
     }
 }
 
+
 Vue.use(Notifications);
 Vue.use(Logger, true);
 

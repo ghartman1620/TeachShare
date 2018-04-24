@@ -11,7 +11,7 @@ import { sendNotification } from "../store_modules/NotificationService";
 import { getCurrentPostId } from "./PostCreateService";
 
 export interface FileState {
-    files?: ModelMap<GenericFile>;
+    files: ModelMap<GenericFile>;
     limit: number;
 }
 
@@ -253,9 +253,9 @@ export const mutations = {
  * Getters - used for calculating/'getting' values based on the state.
  */
 export const getters = {
-    files: ctx => ctx.files,
-    filesUploadStatus: ctx => ctx.files.data,
-    allFilesUploadComplete: ctx => {
+    files: (ctx: FileState): ModelMap<GenericFile> => ctx.files,
+    filesUploadStatus: (ctx: FileState) => ctx.files.data, // @TODO: I don't like that this returns the underlying '.data'
+    allFilesUploadComplete: (ctx: FileState) => {
         if (ctx.files.length > 0) {
             const oneHundredPercent = ctx.files.keys.every(
                 val => ctx.files.get(val).percent === 100
@@ -274,13 +274,13 @@ export const getters = {
         }
         return false;
     },
-    has_files: ctx => {
+    has_files: (ctx: FileState) => {
         return ctx.files.length > 0;
     },
-    past_limit: ctx => {
+    past_limit: (ctx: FileState): boolean => {
         return ctx.files.length >= ctx.limit;
     },
-    get: ctx => (id: string): GenericFile => {
+    get: (ctx: FileState) => (id: string): GenericFile => {
         return ctx.files.get(id);
     }
 };
