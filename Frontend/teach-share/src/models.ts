@@ -238,7 +238,7 @@ export class ModelMap<V> implements IterableIterator<V> {
         return delete this._data[String(key)];
     }
     public list(): V[] {
-        const res = new Array<V>();
+        let res = new Array<V>();
         for (const k in this.data) {
             if (typeof k !== "undefined") {
                 res.push(this.get(k));

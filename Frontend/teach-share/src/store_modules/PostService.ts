@@ -5,7 +5,6 @@ import { getStoreAccessors } from "vuex-typescript";
 import api from "../api";
 import { IRootState, ModelMap, Post } from "../models";
 
-// FIXME: change over to ModelMap<Post> so that it can be an associative map + an array.
 export interface IPostState {
     posts: ModelMap<Post>;
 }
@@ -19,11 +18,6 @@ const state = {
 
 export const actions = {
     postSearch: async (ctx: PostContext, query) => {
-        // this code to generate a querystring is very bad but it is
-        // 12:30AM and I do not care right now
-
-        // also eslint needs to stop bitching
-        // you're a code linter not a style guide you asshole
         console.log("in postSearch");
         let querystring = "";
         let firstProperty = true;
@@ -39,8 +33,9 @@ export const actions = {
         try {
             const resp: AxiosResponse<Post[]> = await api.get("search/" + querystring);
             mutLoadAll(ctx, resp.data as Post[]);
+            return resp.data;
         } catch (err) {
-            console.error(err);
+            return err;
         }
     },
     fetchAllPosts: async (ctx: PostContext): Promise<Post[]|any> => {
@@ -64,7 +59,7 @@ export const actions = {
     fetchPost: async (ctx: PostContext, postID: string|number) => {
         try {
             const resp: AxiosResponse<Post> = await api.get(`posts/${postID}/`);
-            mutLoad(ctx, resp.data as Post);
+            mutCreate(ctx, resp.data as Post);
             return resp.data;
         } catch (err) {
             return err;
@@ -103,57 +98,42 @@ export const mutations = {
     LOAD_ALL_POSTS: (ctx, data: Post[]) => {
         ctx.posts = new ModelMap<Post>(...data);
     },
-    // @FIXME: fix this to be functioning. Basically implement like other model backed
-    // items..
-    // alt_LOAD_ALL_POSTS: (ctx, data: Post[]) => {
-    //     ctx.posts = data;
-    // },
-
+    APPEND_MANY: (ctx, data: Post[]) => {
+        for (const post of data) {
+            mutCreate(ctx, post as Post);
+        }
+    },
     CREATE: (ctx, data: Post) => {
-        console.log("[POST]: ", ctx, data);
         const posts = ctx.posts as ModelMap<Post>;
-
         if (typeof data.pk !== "undefined") {
             if (!ctx.posts.has(data.pk)) {
                 // @TODO: check if this actually works with vue reactivity.
-                posts.set(String(data.pk), data);
-                // Vue.set(ctx.posts.data, Number(data.pk), data);
+                // posts.set(String(data.pk), data);
+                Vue.set(ctx.posts.data, Number(data.pk), data);
             }
         }
     },
     UPDATE: (ctx, data: Post) => {
+        const posts = ctx.posts as ModelMap<Post>;
         if (typeof data.pk !== "undefined") {
-            Vue.set(ctx.posts!.data, Number(data.pk), data);
+            posts.set(String(data.pk), data);
+            // Vue.set(ctx.posts!.data, Number(data.pk), data);
         }
     },
     DELETE: (ctx: IPostState, data: number | string ) => {
         if (ctx.posts.has((data as string|number))) {
-            console.log("it has it...");
-            if (ctx.posts.remove(data)) {
-                console.log("Successfully removed key.");
-            }
-        }
-    },
-    LOAD_POST: (ctx, data: Post) => {
-        if (data !== undefined) {
-            const index = ctx.posts.findIndex((val, ind, obj) => {
-                if (val.pk === data.pk) {
-                    return true;
-                }
-            });
-            if (index === -1) {
-                ctx.posts.push(data);
-            } else {
-                ctx.posts.splice(index, data);
+            if (!ctx.posts.remove(data)) {
+                throw new Error("Error deleting key");
             }
         }
     }
 };
 
 export const getters = {
-    all: (ctx: IPostState) => ctx.posts.list(),
-    getPostById: (ctx, gett) => (id): Post => {
-        return gett.all(ctx).filter((post) => post.pk === Number(id))[0];
+    allByPk: (ctx: IPostState) => ctx.posts.data,
+    all: (ctx: IPostState): Post[] => ctx.posts.list(),
+    getPostById: (ctx: IPostState, getters: any) => (id: string|number): Post => {
+        return getters.all.find((post) => post.pk === Number(id));
     }
 };
 
@@ -190,6 +170,6 @@ export const getPostById = read(PostService.getters.getPostById);
  * Mutations Handlers
  */
 export const mutDelete = commit(PostService.mutations.DELETE);
+export const mutUpdate = commit(PostService.mutations.UPDATE);
 export const mutCreate = commit(PostService.mutations.CREATE);
 export const mutLoadAll = commit(PostService.mutations.LOAD_ALL_POSTS);
-export const mutLoad = commit(PostService.mutations.LOAD_POST);

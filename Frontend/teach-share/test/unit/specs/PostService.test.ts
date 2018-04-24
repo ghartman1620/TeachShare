@@ -50,24 +50,22 @@ describe("[POST] Delete", () => {
 
         // sanity check
         expect(s).to.not.equal(undefined);
-        console.log("[POST]: ", s);
         for (let i = 0; i < 100; i++) {
             const newPost = new Post(i);
             CREATE(s, newPost);
         }
         DELETE(s, 10);
         const posts = s.posts as ModelMap<Post>;
-        console.log("[POST]: ", posts);
         expect(posts.length).to.equal(99);
+
+        /* tslint:disable */
         expect(s.posts.get("10")).to.be.undefined;
         expect(s.posts.get(10)).to.be.undefined;
+        /* tslint:enable */
 
         // attempt to delete already deleted...
         DELETE(s, "10");
-        console.log("[POST-DELETE]", s);
-
         expect(s.posts.length).to.equal(99);
-
     });
 });
 
@@ -88,11 +86,7 @@ describe("[POST] Getters", () => {
             out.set(String(i), newPost);
             CREATE(state, newPost);
         }
-
-        console.log("[GETTERS]: ", state);
-
         const result = getters.all(state);
-        console.log(result);
         expect(result).to.deep.equal(out.list());
         expect(result.length).to.equal(100);
     });
@@ -104,11 +98,7 @@ describe("[POST] Getters", () => {
             out.set(String(i), newPost);
             CREATE(state, newPost);
         }
-
-        console.log("[GETTERS]: ", state);
-
         const result = getters.getPostById(state, getters)(10);
-        console.log(result);
         expect(result).to.deep.equal(out.get("10"));
         expect(result).to.deep.equal(out.get(10));
     });
