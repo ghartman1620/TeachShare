@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'django_filters',
-    # 'django_elasticsearch_dsl',
+    'django_elasticsearch_dsl',
 
     'accounts',
     'posts',
@@ -190,9 +190,9 @@ DATABASES = {
     'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'teach',
-            'USER': 'teachsharer',  # os.getenv('DATABASE_USER'),
-            'PASSWORD': 'thisisabadpasasword123',  # os.getenv('DATABASE_PASSWORD'),
-            'HOST': '35.197.35.127',
+            'USER': os.getenv('DATABASE_USER'),  # 'teachsharer',
+            'PASSWORD': os.getenv('DATABASE_PASSWORD'), # 'thisisabadpasasword123',
+            'HOST': '127.0.0.1', # 35.197.35.127
             'PORT': '5432',
             # 'ENGINE': 'django.db.backends.postgresql',
             # 'HOST': '/cloudsql/teach-share-200700:us-west1:teach-db',
