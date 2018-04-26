@@ -9,17 +9,13 @@
     export default {
             extends: Pie,
             props: {
-                    userLabel: {
-                        type: String,
-                        required: true
-                    },
                     userData: {
                         type: Array,
                         required: true
                     },
                     dataLabels: {
                         type: Array,
-                        required: false
+                        required: true
                     }
             },
             data () {
@@ -33,7 +29,7 @@
                         responsive: true,
                         maintainAspectRatio: false
                     }
-                }
+                } 
             },
             components: {
                 BootstrapVue
@@ -54,7 +50,7 @@
                 var backgroundColors = ['#f87979','grey','#ffa500','black','#008040','purple','#990000','#00ff80','#007399'];
                 shuffleArray(backgroundColors);
 
-                //iterate over however many datasets we have
+                //iterate over however many datasets we have to populate graph data
 
                 for (var i = 0; i < this.userData.length; i++) {
                     datacollection.datasets.push(
@@ -70,11 +66,11 @@
                     );
                 };
 
+                console.log("Length of datalabels:   ", this.dataLabels.length);
+                console.log("options: ", this.options);
                 this.renderChart(this.datacollection, this.options);
-                console.log("user label:  ", this.userLabel);
-                console.log("userData:  ", this.userData);
-                console.log("bar graph labels: ", Object.keys(this.userData));
-                console.log("bar graph data: ", Object.values(this.userData));
+                // console.log("bar graph labels: ", Object.keys(this.userData));
+                // console.log("bar graph data: ", Object.values(this.userData));
 
 
             }

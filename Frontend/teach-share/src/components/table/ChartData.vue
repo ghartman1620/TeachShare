@@ -1,6 +1,6 @@
 <template>
     <div>
-         <section class="container">
+        <section class="container">
             <!-- <div class="columns">
 
                 <div class="column">
@@ -18,23 +18,21 @@
             </div> -->
             <b-table striped hover :items="this.displayData"> </b-table>
             <b-tabs>
-                 <b-tab v-if="this.graphOptions.bar === true" title="Bar Graph" @click="setActiveTab('bar')" active>
-                     <br>
-                     <BarGraph v-if="activeTab==='bar'" userLabel=userLabel v-bind:userData=userData v-bind:dataLabels=displayLabels></BarGraph>
-                 </b-tab>
-                 <b-tab v-if="this.graphOptions.line === true" title="Line Graph" @click="setActiveTab('line')">
-                     <br>
-                     <LineGraph v-if="activeTab==='line'" userLabel=userLabel v-bind:userData=userData v-bind:dataLabels=displayLabels></LineGraph>
-                 </b-tab>
-                 <b-tab v-if="this.graphOptions.pie === true" title="Pie Chart" @click="setActiveTab('pie')">
-                     <br>
-                     <PieChart v-if="activeTab==='pie'" userLabel=userLabel v-bind:userData=userData v-bind:dataLabels=displayLabels></PieChart>
-                 </b-tab>
-             </b-tabs>
+                <b-tab v-if="this.graphOptions.bar === true" title="Bar Graph" @click="setActiveTab('bar')" active>
+                    <br>
+                    <BarGraph v-if="activeTab==='bar'" userLabel=userLabel v-bind:userData=userData v-bind:dataLabels=displayLabels></BarGraph>
+                </b-tab>
+                <b-tab v-if="this.graphOptions.line === true" title="Line Graph" @click="setActiveTab('line')">
+                    <br>
+                    <LineGraph v-if="activeTab==='line'" userLabel=userLabel v-bind:userData=userData v-bind:dataLabels=displayLabels></LineGraph>
+                </b-tab>
+                <b-tab v-if="this.graphOptions.pie === true" title="Pie Chart" @click="setActiveTab('pie')">
+                    <br>
+                    <PieChart v-if="activeTab==='pie'" userLabel=userLabel v-bind:userData=userData v-bind:dataLabels=displayLabels></PieChart>
+                </b-tab>
+            </b-tabs>
 
         </section>
-
-
     </div>
 </template>
 
@@ -48,10 +46,6 @@
 
     export default Vue.component( "chart", {
         props: {
-            userLabel: {
-                type: String,
-                required: true
-            },
             userData: {
                 type: Array,
                 required: true
@@ -68,13 +62,28 @@
         data () {
             return {
                 activeTab: 'bar',   
-                displayData: {},
-                displayLabels: []        
+                displayData: [],
+                displayLabels: [],
+                graphOptions: {} 
             }   
         },
         methods: {
             setActiveTab (graph) {
                 this.activeTab = graph;
+            },
+            processData: function () {
+                this.displayData = JSON.parse(JSON.stringify(this.userData)); //save original form of data for displaying in table
+                this.graphOptions = this.userData.pop();
+                var rowLabel = this.graphOptions.rowLabel;                      //row label to hopefully distinguish multiple datasets
+                if (rowLabel !== false) {
+                    for (var i = 0; i < this.userData.length; i++) {
+                        this.displayLabels.push(this.userData[i][rowLabel]);
+                        delete this.userData[i][rowLabel];
+                    }
+                    console.log("Display labels:  ", this.displayLabels);
+                }
+                console.log("User data array to be sent to graphs", this.userData);
+
             }
         },
         components: {
@@ -84,21 +93,7 @@
             BootstrapVue
         },
         mounted () {
-            console.log("ChartData mounted!");
-            this.displayData = JSON.parse(JSON.stringify(this.userData));
-            this.graphOptions = this.userData.pop();
-            console.log("Enabled graphs object: ", this.graphOptions);
-            if (this.graphOptions.rowLabel !== false) {
-                console.log("Have to delete row labels. Here is the userData object: ", this.userData);
-                for (var i = 0; i < this.userData.length; i++) {
-                    this.displayLabels.push(this.userData[i][this.graphOptions.rowLabel]);
-                    delete this.userData[i][this.graphOptions.rowLabel];
-                }
-                console.log("Display labels:  ", this.displayLabels);
-            }
-            console.log("User data array to be sent to graphs", this.userData);
-
-
+            this.processData();
         }
     });
 </script>

@@ -2,15 +2,14 @@
             <table class="table table-bordered table-hover table-condensed table-striped vue-table">
                 <thead>
                     <tr>
-                        <th v-for="column in displayCols" @click="sortBy($event, column.name)"
-                            :key="column"
-                            :class="getClasses(column)">
+                        <th v-for="column in displayCols" :key="column">
+                            <!--:class="getClasses(column)"-->
                             {{ column.title }}
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="entry in values" :key="entry" @click="rowClickHandler($event, entry)">
+                    <tr v-for="entry in values" :key="entry">
                         <td v-for="column in displayColsVisible" :key="column"
                             v-show="column.visible" :class="column.cellstyle">
                             <span v-if="column.renderfunction!==false" v-html="column.renderfunction( column.name, entry )"></span>
@@ -28,51 +27,13 @@
 <style>
 
     .vue-table {
-
-    }
-
-    /*#maindiv {
-        content: " ";
-        box-sizing: border-box;
-        display:
-        table; width: 100%;
-    }
-*/
-    .vue-table-loading .spinner {
-        border: 16px solid #f3f3f3; /* Light grey */
-        border-top: 16px solid #3498db; /* Blue */
-        border-radius: 50%;
-        width: 120px;
-        height: 120px;
-        animation: spin 2s linear infinite;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        margin: -60px 0 0 -60px;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-
-    .vue-table-loading{
-        position: absolute;
-        z-index: 99;
-        background-color: #ddd;
-        opacity: 0.5;
-        width: 100%;
-        height: 100%;
-    }
-
-    .vue-table-loading-hidden {
-        display: none;
+        table-layout: fixed;
     }
 
     table.vue-table thead > tr > th {
         cursor: pointer;
-        padding-right: 30px !important;
+        padding-right: 20px !important;
+        min-width: 100px;
     }
 
 
@@ -100,14 +61,15 @@
 
     /* Field Section used for displaying and editing value of cell */
     var valueFieldSection = {
-      template: '<span v-if="!enabled" @click="toggleInput" class="editableField">{{this.entry[this.columnname]}}</span>'+
-          '<div v-else-if="enabled" class="input-group">'+
-          '  <input type="text" class="form-control" id="number" v-model="datavalue" @keyup.enter="saveThis" @keyup.esc="cancelThis">'+
-          '  <span class="input-group-btn">'+
-          '    <button class="btn btn-danger" type="button" @click="cancelThis" ><span>X</span></button>'+
-          '    <button class="btn btn-primary" type="button" @click="saveThis" ><font-awesome-icon icon="check" fixed-width></font-awesome-icon></button>'+
-          '  </span>'+
-          '</div>',
+        template: 
+            '<span v-if="!enabled" @click="toggleInput" class="editableField">{{this.entry[this.columnname]}}</span>'+
+            '<div v-else-if="enabled" class="input-group">'+
+                '<input type="text" class="form-control" id="number" v-model="datavalue" @keyup.enter="saveThis" @keyup.esc="cancelThis">'+
+                '   <span class="input-group-btn">'+
+                '       <button class="btn btn-danger" type="button" @click="cancelThis" ><span>X</span></button>'+
+                '       <button class="btn btn-primary" type="button" @click="saveThis" ><font-awesome-icon icon="check" fixed-width></font-awesome-icon></button>'+
+                '   </span>'+
+            '</div>',
     components: { FontAwesomeIcon},
       props: ['entry','columnname'],
       data () {
@@ -347,44 +309,42 @@
             processFilter: function () {
             var self = this;
             var result = this.values.filter(item => {
-                                var good = false;
-                                for (var col in self.displayColsVisible) {
-                                    if (self.filterCaseSensitive) {
-                                        if (lodashincludes(item[self.displayColsVisible[col].name] + "", self.filterKey + "")) {
-                                            good = true;
-                                        }
-                                    } else {
-                                        if (lodashincludes((item[self.displayColsVisible[col].name] + "").toLowerCase(), (self.filterKey + "").toLowerCase())) {
-                                            good = true;
-                                        }
-                                    }
-
-                                }
-                                return good;
-                    });
-
-                    var tColsDir = [];
-                    for(var i=0, len=this.sortKey.length; i < len; i++){
-                        tColsDir.push(this.sortOrders[this.sortKey[i]].toLowerCase());
+                var good = false;
+                for (var col in self.displayColsVisible) {
+                    if (self.filterCaseSensitive) {
+                        if (lodashincludes(item[self.displayColsVisible[col].name] + "", self.filterKey + "")) {
+                            good = true;
+                        }
+                    } else {
+                        if (lodashincludes((item[self.displayColsVisible[col].name] + "").toLowerCase(), (self.filterKey + "").toLowerCase())) {
+                            good = true;
+                        }
                     }
 
-                    result = lodashorderby(result, this.sortKey, tColsDir);
+                }
+                return good;
+            });
 
-                    this.filteredSize = result.length;
-                    if (this.paginated) {
-                        var startIndex = (this.page - 1) * this.pageSize;
-                        var tIndex = 0;
-                        var tempResult = [];
-                        while (tIndex < this.pageSize) {
-                            if (typeof result[startIndex + tIndex] !== "undefined")
-                                tempResult.push(result[startIndex + tIndex]);
-                            tIndex++;
-                        }
-                        self.filteredValues = tempResult;
-                    } else
-                        self.filteredValues = result;
-                    self.loading = false;
-                // }
+            var tColsDir = [];
+            for(var i=0, len=this.sortKey.length; i < len; i++){
+                tColsDir.push(this.sortOrders[this.sortKey[i]].toLowerCase());
+            }
+            result = lodashorderby(result, this.sortKey, tColsDir);
+            this.filteredSize = result.length;
+            if (this.paginated) {
+                var startIndex = (this.page - 1) * this.pageSize;
+                var tIndex = 0;
+                var tempResult = [];
+                while (tIndex < this.pageSize) {
+                    if (typeof result[startIndex + tIndex] !== "undefined")
+                        tempResult.push(result[startIndex + tIndex]);
+                    tIndex++;
+                }
+                self.filteredValues = tempResult;
+            } else
+                self.filteredValues = result;
+                self.loading = false;
+            
             },
             buildColumnObject: function (column) {
                 var obj = {};
@@ -425,53 +385,6 @@
                 this.sortOrders = sortOrders;
 
             },
-            sortBy: function (event, key) {
-                if (this.sortable) {
-                    var self = this;
-
-                    if (!this.multiColumnSortable || ( this.multiColumnSortable && !event.shiftKey)) {
-                        this.sortKey = [key];
-                        this.columns.forEach(function (column) {
-                            if (column.name !== key) {
-                                self.sortOrders[column.name] = "";
-                            }
-                        });
-                    } else {
-                        if (lodashfindindex(this.sortKey, function(o) { return o === key; }) === -1) {
-                            this.sortKey.push(key);
-                        }
-                    }
-                    if (this.sortOrders[key] === "") {
-                        this.sortOrders[key] = "ASC";
-                    } else if (this.sortOrders[key] === "ASC") {
-                        this.sortOrders[key] = "DESC";
-                    } else {
-                        this.sortOrders[key] = "ASC";
-                    }
-
-                    this.sortChanged = this.sortChanged * -1;
-                }
-            },
-            getClasses: function (column) {
-                var classes = [column.columnstyle];
-                var key = column.name;
-                if (this.sortable) {
-                    classes.push("arrow");
-                    /*if (this.sortKey === key) {
-                        classes.push("active");
-                    }*/
-                    if (lodashfindindex(this.sortKey, function(o) { return o === key; }) !== -1) {
-                        classes.push("active");
-                    }
-
-                    if (this.sortOrders[key] === "ASC") {
-                        classes.push("asc");
-                    } else if (this.sortOrders[key] === "DESC") {
-                        classes.push("dsc");
-                    }
-                }
-                return classes;
-            },
             toggleColumn: function (column) {
                 column.visible = !column.visible;
             },
@@ -479,7 +392,5 @@
                 this.columnMenuOpen = false;
             },
         },
-        events: {
-        }
     }
 </script>

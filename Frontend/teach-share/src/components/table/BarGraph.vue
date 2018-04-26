@@ -7,17 +7,13 @@
     export default {
         extends: Bar,
         props: {
-                userLabel: {
-                    type: String,
-                    required: true
-                },
                 userData: {
                     type: Array,
                     required: true
                 },
                 dataLabels: {
                     type: Array,
-                    required: false
+                    required: true
                 }
         },
         data () {
@@ -74,10 +70,11 @@
                 colorCount--;
             };
 
+            if (this.dataLabels.length === 0) {
+                this.options.legend.display = false;
+            }
+
             this.renderChart(datacollection, this.options);
-            // console.log("ChartRender mounted");
-            // console.log("user label:  ", this.userLabel);
-            // console.log("userData:  ", this.userData);
             // console.log("bar graph labels: ", Object.keys(this.userData));
             // console.log("bar graph data: ", Object.values(this.userData));
 

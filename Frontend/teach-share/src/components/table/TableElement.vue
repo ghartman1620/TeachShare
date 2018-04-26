@@ -1,8 +1,6 @@
 <template>
     <body>
-        <!-- <b-table striped hover :items="element.content"> </b-table> -->
-        <chart v-bind:userData=this.element.content userLabel='money'></chart>
-
+        <chart v-bind:userData=this.element.content></chart>
     </body>
 </template>
 
@@ -23,11 +21,5 @@ export default Vue.component("table-element", {
         ChartData,
         BootstrapVue
     },
-    mounted () {
-        var con = this.element.content;
-        console.log("element content:", con);
-        console.log("size of element content: ", con.length)
-        console.log("element content[0]: ", con[0]);
-    }
 })
 </script>

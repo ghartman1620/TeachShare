@@ -3,39 +3,41 @@
         <b-card>
             <h1>Create Data Table</h1>
             <div class="row">
-                <div class="col-6">
+                <div class="col-5">
                 <form v-on:submit.prevent="addColumn"  class="form-inline my-2 my-lg-0">
                     <span style="font-size: 1.5rem; padding-right: 1rem;">Add column:  </span>
                     <input class="form-control mr-sm-1" id="columnInput" type="text" v-model=columnToAdd aria-label="+">
                     <button class="btn btn-dark my-2 my-sm-0" type="submit"><strong>+</strong></button>
                 </form>
                 </div>
-                <div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="barCheck">
-                        <label class="form-check-label" for="barCheck">
-                            Display Bar Graph
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="lineCheck">
-                        <label class="form-check-label" for="lineCheck">
-                            Display Line Graph
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="pieCheck">
-                        <label class="form-check-label" for="pieCheck">
-                            Display Pie Chart
-                        </label>
+                <div v-if="this.columns.length > 0 && this.values.length > 0" class="col-2.5">
+                    <span style="font-size: 1.5rem; padding-right: 1rem;">Include graphs:  </span>
+                </div>
+                <div v-if="this.columns.length > 0 && this.values.length > 0" class="col-4">
+                    <div class="col-8 card">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="barCheck">
+                            <label class="form-check-label" for="barCheck">
+                                Bar Graph
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="lineCheck">
+                            <label class="form-check-label" for="lineCheck">
+                                Line Graph
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="pieCheck">
+                            <label class="form-check-label" for="pieCheck">
+                                Pie Chart
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
             <br>
             <button v-if="this.columns.length > 0" @click="addItem" class="btn btn-primary">+ row entry</button> <br>
-            <button @click="chooseGraphs" class="btn btn-primary btn-block">
-                choose graphs
-            </button>
 
             <VueBootstrapTable :columns=columns :values=values></VueBootstrapTable>
             <div class="row">
@@ -75,7 +77,7 @@ var handleRow = function (event, entry) {
         data() {
             return {
                 columnToAdd: "",
-                columns: [],
+                columns : [],
                 values: [],
                 numericValues: [],
                 dataLabelsIncluded: false,
@@ -159,6 +161,7 @@ var handleRow = function (event, entry) {
                     visible: true,
                     editable: true
                 };
+                //populate existing rows with new column value
                 for (var i = 0; i < this.values.length; i++){
                     this.values[i][this.columnToAdd] = "__";
                 }
