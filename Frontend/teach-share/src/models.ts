@@ -109,7 +109,7 @@ enum ContentType {
 }
 
 export class Post extends Model {
-    public comments: Comment[];
+    public comments: Comment[] | number[];
     public user: User;
     public attachments: any[];
     public content: any[];
