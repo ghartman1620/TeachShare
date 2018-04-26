@@ -1,6 +1,6 @@
 <template>
     <body>
-        <b-table striped hover :items="element.content"> </b-table>
+        <!-- <b-table striped hover :items="element.content"> </b-table> -->
         <chart v-bind:userData=this.element.content userLabel='money'></chart>
 
     </body>

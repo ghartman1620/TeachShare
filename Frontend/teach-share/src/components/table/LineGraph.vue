@@ -18,6 +18,10 @@
                 type: Array,
                 required: true
             },
+            dataLabels: {
+                    type: Array,
+                    required: false
+            }
         },
 
         data () {
@@ -54,14 +58,14 @@
         mounted () {
             datacollection.labels = Object.keys(this.userData[0]);
             datacollection.datasets = [];
-            var backgroundColors = ['#f87979','grey','#ffa500','#ffaf31','black','#008040','purple','#990000','#00ff80','#007399'];
+            var backgroundColors = ['#f87979','grey','#ffaf31','black','#008040','purple','#990000','#00ff80','#007399'];
             var colorCount = backgroundColors.length - 1;
             //iterate over however many datasets
             for (var i = 0; i < this.userData.length; i++) {
                 var randomIndex = Math.floor(Math.random()*colorCount);
                 datacollection.datasets.push(
                         {
-                            label: "",
+                            label: this.dataLabels[i],
                             backgroundColor: backgroundColors[randomIndex],
                             fill: false,
                             pointBackgroundColor: backgroundColors[randomIndex],

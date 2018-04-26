@@ -17,6 +17,10 @@
                         type: Array,
                         required: true
                     },
+                    dataLabels: {
+                        type: Array,
+                        required: false
+                    }
             },
             data () {
                 return {
@@ -55,7 +59,7 @@
                 for (var i = 0; i < this.userData.length; i++) {
                     datacollection.datasets.push(
                         {
-                            label: "",
+                            label: this.dataLabels[i],
                             backgroundColor: backgroundColors,
                             hoverBorderColor: 'white',
                             borderWidth: 1,

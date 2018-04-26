@@ -3,8 +3,8 @@
                 <thead>
                     <tr>
                         <th v-for="column in displayCols" @click="sortBy($event, column.name)"
-                            :key="column">
-                            <!-- :class="getClasses(column)"-->
+                            :key="column"
+                            :class="getClasses(column)">
                             {{ column.title }}
                         </th>
                     </tr>
@@ -113,7 +113,7 @@
       data () {
           return {
             enabled: false,
-            datavalue: "__",
+            datavalue: "",
           }
       },
       methods: {
@@ -211,22 +211,6 @@
                 type: Number,
                 required: false,
                 default: 10,
-            },
-            /**
-             * If loading of table is to be done through ajax, then this object must be set
-             */
-            ajax: {
-                type: Object,
-                required: false,
-                default: function () {
-                    return {
-                        enabled: false,
-                        url: "",
-                        method: "GET",
-                        delegate: false,
-                        axiosConfig: {}
-                    }
-                }
             },
             /**
              * Function to handle row clicks
@@ -468,26 +452,26 @@
                     this.sortChanged = this.sortChanged * -1;
                 }
             },
-            // getClasses: function (column) {
-            //     var classes = [column.columnstyle];
-            //     var key = column.name;
-            //     if (this.sortable) {
-            //         classes.push("arrow");
-            //         /*if (this.sortKey === key) {
-            //             classes.push("active");
-            //         }*/
-            //         if (lodashfindindex(this.sortKey, function(o) { return o === key; }) !== -1) {
-            //             classes.push("active");
-            //         }
+            getClasses: function (column) {
+                var classes = [column.columnstyle];
+                var key = column.name;
+                if (this.sortable) {
+                    classes.push("arrow");
+                    /*if (this.sortKey === key) {
+                        classes.push("active");
+                    }*/
+                    if (lodashfindindex(this.sortKey, function(o) { return o === key; }) !== -1) {
+                        classes.push("active");
+                    }
 
-            //         if (this.sortOrders[key] === "ASC") {
-            //             classes.push("asc");
-            //         } else if (this.sortOrders[key] === "DESC") {
-            //             classes.push("dsc");
-            //         }
-            //     }
-            //     return classes;
-            // },
+                    if (this.sortOrders[key] === "ASC") {
+                        classes.push("asc");
+                    } else if (this.sortOrders[key] === "DESC") {
+                        classes.push("dsc");
+                    }
+                }
+                return classes;
+            },
             toggleColumn: function (column) {
                 column.visible = !column.visible;
             },

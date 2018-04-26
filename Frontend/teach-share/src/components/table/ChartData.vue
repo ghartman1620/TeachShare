@@ -16,19 +16,19 @@
                     <PieChart userLabel=userLabel v-bind:userData=userData></PieChart>
                 </div>
             </div> -->
-
-             <b-tabs>
-                 <b-tab title="Bar Graph" @click="setActiveTab('bar')" active>
+            <b-table striped hover :items="this.displayData"> </b-table>
+            <b-tabs>
+                 <b-tab v-if="this.graphOptions.bar === true" title="Bar Graph" @click="setActiveTab('bar')" active>
                      <br>
-                     <BarGraph v-if="activeTab==='bar'" userLabel=userLabel v-bind:userData=userData></BarGraph>
+                     <BarGraph v-if="activeTab==='bar'" userLabel=userLabel v-bind:userData=userData v-bind:dataLabels=displayLabels></BarGraph>
                  </b-tab>
-                 <b-tab title="Line Graph" @click="setActiveTab('line')">
+                 <b-tab v-if="this.graphOptions.line === true" title="Line Graph" @click="setActiveTab('line')">
                      <br>
-                     <LineGraph v-if="activeTab==='line'" userLabel=userLabel v-bind:userData=userData></LineGraph>
+                     <LineGraph v-if="activeTab==='line'" userLabel=userLabel v-bind:userData=userData v-bind:dataLabels=displayLabels></LineGraph>
                  </b-tab>
-                 <b-tab title="Pie Chart" @click="setActiveTab('pie')">
+                 <b-tab v-if="this.graphOptions.pie === true" title="Pie Chart" @click="setActiveTab('pie')">
                      <br>
-                     <PieChart v-if="activeTab==='pie'" userLabel=userLabel v-bind:userData=userData></PieChart>
+                     <PieChart v-if="activeTab==='pie'" userLabel=userLabel v-bind:userData=userData v-bind:dataLabels=displayLabels></PieChart>
                  </b-tab>
              </b-tabs>
 
@@ -67,8 +67,10 @@
         // },
         data () {
             return {
-                activeTab: 'bar'
-            }
+                activeTab: 'bar',   
+                displayData: {},
+                displayLabels: []        
+            }   
         },
         methods: {
             setActiveTab (graph) {
@@ -81,8 +83,21 @@
             PieChart,
             BootstrapVue
         },
-        mounted(){
+        mounted () {
             console.log("ChartData mounted!");
+            this.displayData = JSON.parse(JSON.stringify(this.userData));
+            this.graphOptions = this.userData.pop();
+            console.log("Enabled graphs object: ", this.graphOptions);
+            if (this.graphOptions.rowLabel !== false) {
+                console.log("Have to delete row labels. Here is the userData object: ", this.userData);
+                for (var i = 0; i < this.userData.length; i++) {
+                    this.displayLabels.push(this.userData[i][this.graphOptions.rowLabel]);
+                    delete this.userData[i][this.graphOptions.rowLabel];
+                }
+                console.log("Display labels:  ", this.displayLabels);
+            }
+            console.log("User data array to be sent to graphs", this.userData);
+
 
         }
     });
