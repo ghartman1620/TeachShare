@@ -40,11 +40,20 @@ const Login = () =>
 const Register = () =>
     import ( /* webpackChunkName: "register" */ "../components/auth/Register.vue");
 
+const WebSocketComp = () =>
+    import ( /* webpackChunkName: "register" */ "../components/WebSocket.vue");
+
+
 Vue.use(Router);
 
 const router = new Router({
     mode: "history",
-    routes: [{
+    routes: [
+        {
+            path : "/websocket",
+            component: WebSocketComp
+        },
+        {
             path: "/",
             component: Base,
             children: [

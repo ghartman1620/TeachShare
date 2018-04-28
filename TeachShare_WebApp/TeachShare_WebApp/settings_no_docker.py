@@ -39,6 +39,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 DEFAULT_FROM_EMAIL = 'teamteachbears@gmail.com'
 
 
+LOGGING_CONFIG = None #for the purpose of running a standalone django script
+LOGGING = None
+FORCE_SCRIPT_NAME = None
+
+
 # Application definition.
 
 INSTALLED_APPS = [

@@ -41,4 +41,5 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ('pk', 'title', 'content', 'updated',
                   'likes', 'timestamp', 'user', 'comments',
                   'tags', 'draft', 'length', 'content_type', 
-                  'standards', 'subject', 'grade')
+                  'standards', 'subject', 'grade', 'practices',
+                  'crosscutting_concepts', 'disciplinary_core_ideas')

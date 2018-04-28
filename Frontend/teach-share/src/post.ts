@@ -20,6 +20,9 @@ export class InProgressPost{
     length: number;
     subject: number;
     standards: number[];
+    concepts: number[];
+    coreIdeas: number[];
+    practices: number[];
     /*
 
     */ 
@@ -51,6 +54,9 @@ export class InProgressPost{
             this.contentType = 0;
             this.length = 0;
             this.standards = [];
+            this.concepts = [];
+            this.coreIdeas = [];
+            this.practices = [];
             post.pk = postid;
             api.get("/posts/"+ postid).then(function(response){
                 console.log(response);
@@ -71,6 +77,9 @@ export class InProgressPost{
 
                 console.log(post.length);
                 post.contentType = response.data.content_type;
+                post.coreIdeas = response.data.coreIdeas;
+                post.concepts = response.data.concepts;
+                post.practices = response.data.practices;
             })
             console.log("returning from post constructor");
         }
@@ -87,6 +96,9 @@ export class InProgressPost{
             this.contentType = 0;
             this.length = 0;
             this.standards = [];
+            this.concepts = [];
+            this.practices = [];
+            this.coreIdeas = [];
             this.createNewDraft();
         }
     }
@@ -111,8 +123,15 @@ export class InProgressPost{
     setStandards(standards: number[]): void {
         this.standards = standards;
     }
-    
-
+    setCoreIdeas(coreIdeas: number[]): void {
+        this.coreIdeas = coreIdeas;
+    }
+    setPractices(practices: number[]): void {
+        this.practices = practices;
+    }
+    setConcepts(concepts: number[]): void {
+        this.concepts = concepts;
+    }
 
     addElement(element: any): void{
         this.elements.push(element);
@@ -165,7 +184,10 @@ export class InProgressPost{
             length: `00:${this.length}:00`,
             draft: this.draft,
             subject: this.subject,
-            standards: this.standards
+            standards: this.standards,
+            crosscutting_concepts: this.concepts,
+            disciplinary_core_ideas: this.coreIdeas,
+            practices: this.practices,
         }
     }
     

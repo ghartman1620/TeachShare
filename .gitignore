@@ -8,3 +8,4 @@ __pycache__/
 *.pydevproject
 media/
 *celerybeat-schedule*
+Rust_ws/target

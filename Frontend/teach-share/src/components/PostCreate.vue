@@ -301,13 +301,16 @@ export default class PostCreate extends Vue{
         return getCurrentPost(this.$store)!.title.length > 0;
     }
 
-    saveTagChanges(grade: number, length: number, subject: number, contentType: number, standards: number[]): void {
+    saveTagChanges(grade: number, length: number, subject: number, contentType: number, standards: number[],
+            concepts, practices, coreIdeas): void {
         console.log(standards);
         this.inProgressPost.setStandards(standards);
         this.inProgressPost.setGrade(grade);
         this.inProgressPost.setSubject(subject);
         this.inProgressPost.setContentType(contentType);
         this.inProgressPost.setLength(length);
+        this.inProgressPost.setConcepts(concepts);
+        this.inProgressPost.setPractices(practices);
         this.saveDraft();
     }
     
