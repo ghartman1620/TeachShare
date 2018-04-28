@@ -50,7 +50,7 @@
 
 <script lang = "ts">
 import Vue from "vue";
-import FileUpload from "../FileUpload";
+import FileUpload from "../FileUpload.vue";
 import { mapGetters } from "vuex";
 import { Component } from "vue-property-decorator";
 import {
@@ -98,7 +98,7 @@ export default class EditAudio extends Vue{
         this.submitAudioFiles(this.generateJSON());
     }
     generateJSON() {
-        var val = this.files.objectify()[0]; //one file max in audio elements
+        var val = this.files.list()[0]; //one file max in audio elements
         return  {
             type: "audio_file",
             id: val.db_id,

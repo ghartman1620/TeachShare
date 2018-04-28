@@ -1,10 +1,10 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
+import VeeValidate, { Validator } from "vee-validate";
 import Vue from "vue";
 import Vuex from "vuex";
-import VeeValidate, { Validator } from "vee-validate";
-import Notifications from "./notifications";
 import Logger from "./logging/logger";
+import Notifications from "./notifications";
 import UserPlugin from "./user";
 
 // our stuff
@@ -17,24 +17,24 @@ import store from "./store";
 declare function require(name: string): any;
 
 import {
-    Carousel,
     Alert,
-    Card,
-    Collapse,
-    Navbar,
+    Badge,
     Button,
-    Layout,
-
+    Card,
+    Carousel,
+    Collapse,
     Form,
+
+    FormCheckbox,
     FormGroup,
     FormInput,
     FormRadio,
     FormSelect,
     FormTextarea,
-    FormCheckbox,
-    Pagination,
-    Badge,
-    Jumbotron
+    Jumbotron,
+    Layout,
+    Navbar,
+    Pagination
 
 } from "bootstrap-vue/es/components";
 
@@ -42,16 +42,16 @@ import {
 import fontawesome from "@fortawesome/fontawesome";
 
 // import brands from "@fortawesome/fontawesome-free-brands";
-import * as faPlus from "@fortawesome/fontawesome-free-solid/faPlus";
-import * as faUndo from "@fortawesome/fontawesome-free-solid/faUndo";
-import * as faRedo from "@fortawesome/fontawesome-free-solid/faRedo";
-import * as faCheck from "@fortawesome/fontawesome-free-solid/faCheck";
-import * as faTimes from "@fortawesome/fontawesome-free-solid/faTimes";
-import * as faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
-import * as faUserCircle from "@fortawesome/fontawesome-free-solid/faUserCircle";
 import * as faArrowLeft from "@fortawesome/fontawesome-free-solid/faArrowLeft";
 import * as faArrowRight from "@fortawesome/fontawesome-free-solid/faArrowRight";
+import * as faCheck from "@fortawesome/fontawesome-free-solid/faCheck";
+import * as faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
+import * as faPlus from "@fortawesome/fontawesome-free-solid/faPlus";
+import * as faRedo from "@fortawesome/fontawesome-free-solid/faRedo";
 import * as faSpinner from "@fortawesome/fontawesome-free-solid/faSpinner";
+import * as faTimes from "@fortawesome/fontawesome-free-solid/faTimes";
+import * as faUndo from "@fortawesome/fontawesome-free-solid/faUndo";
+import * as faUserCircle from "@fortawesome/fontawesome-free-solid/faUserCircle";
 
 fontawesome.library.add(
     faPlus,

@@ -9,3 +9,4 @@ __pycache__/
 media/
 *celerybeat-schedule*
 Rust_ws/target
+static/

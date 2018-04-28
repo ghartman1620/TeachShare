@@ -2,7 +2,7 @@
     <nav class="navbar fixed-top navbar-inverse navbar-expand-lg navbar-dark dark-green">
         <div class="container">
             <!-- brand section -->
-            <router-link class="navbar-brand" to="/"><img class="img-responsive ts-logo" src="/static/ts-logo.png"></router-link>
+            <router-link class="navbar-brand" to="/"><img class="img-responsive ts-logo" src="static/ts-logo.png"></router-link>
 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -52,6 +52,8 @@ import Vue from "vue";
 import SearchBox from "./SearchBox.vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import { Component, Prop } from "vue-property-decorator";
+import { User } from "../models";
+import { isLoggedIn, getLoggedInUser, logout } from "../store_modules/UserService";
 import {
   State,
   Getter,
@@ -65,22 +67,17 @@ import {
     components: {SearchBox, FontAwesomeIcon},
 })
 export default class NavBar extends Vue{
-    @State("user") userState;
-    @Getter("isLoggedIn") isLoggedIn;   
-    @Getter("getLoggedInUser") user;
-    @Action("logout") logout;
+    get isLoggedIn() {
+        return isLoggedIn(this.$store);
+    }
 
+    get user() {
+        return getLoggedInUser(this.$store);
+    }
 
     logoutSubmit() {
-        this.logout();
+        logout(this.$store);
         this.$router.push({name: "login"});
-    }
-    created(){
-        console.log("created navbar");
-        console.log(this.user);
-        console.log(this.userState);
-        console.log(this.userState.user !== undefined);
-        console.log(this.isLoggedIn);
     }
 }
 </script>

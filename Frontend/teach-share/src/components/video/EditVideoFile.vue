@@ -49,8 +49,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import FileUpload from "../FileUpload";
-import DimensionPicker from "../DimensionPicker";
+import FileUpload from "../FileUpload.vue";
+import DimensionPicker from "../DimensionPicker.vue";
 import { mapGetters } from "vuex";
 import { Component } from "vue-property-decorator";
 import { clearFiles } from "../../store_modules/FileService";
@@ -99,7 +99,7 @@ export default class EditVideoFile extends Vue{
         this.$router.push({name: "create"});
     }
     generateFileJSON() {
-        let val = this.files.objectify()[0];
+        let val = this.files.list()[0];
         var obj = {
             post: 2,
             type: "video_file",

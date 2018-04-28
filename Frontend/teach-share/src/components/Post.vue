@@ -72,7 +72,8 @@ import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import forEach from "lodash/forEach";
 import Logger from "../logging/logger";
 import {Comment, Post, User} from "../models";
-import { createUpdateComment, getByPost } from "../store_modules/CommentService";
+import { createUpdateComment, getByPost, getCommentsForPost } from "../store_modules/CommentService";
+import { fetchUser, getUserByID, getLoggedInUser } from "../store_modules/UserService";
 
 @Component({
     components: {
@@ -83,24 +84,36 @@ import { createUpdateComment, getByPost } from "../store_modules/CommentService"
         FontAwesomeIcon
     },
     name: "Post",
-    props: ["post", "index", "maxHeight"]
+    props: {
+        post: {
+            type: Post,
+            default: function() { return new Post(); },
+            required: true,
+            validator: p => p instanceof Post
+        }, 
+        index: {
+            type: Number
+        }, 
+        maxHeight: {
+            type: Number
+        }}
 })
 export default class PostComp extends Vue {
-    @Prop({required: true}) post;
-    @Prop() index;
-    @Prop() maxHeight;
+    @Prop() post: Post;
+    @Prop() index: number;
+    @Prop() maxHeight: number;
 
     newCommentText: string = "";
 
     get actualMaxHeight() {
         // @TODO: make this actually show the WHOLE content, not just an arbitrarily huge maxHeight
-        return this.maxHeight !== undefined ? this.maxHeight : 1000000;
+        return this.maxHeight !== undefined ? this.maxHeight : 10000000;
     }
     get textLength() {
         return this.newCommentText.length > 10;
     }
     get fullUser() {
-        return this.$store.getters.getUserByID(this.post.user as User);
+        return getUserByID(this.$store)(this.post.user);
     }
     get fullUsername() {
         if (this.fullUser !== undefined) {
@@ -108,32 +121,34 @@ export default class PostComp extends Vue {
         }
         return "";
     }
+    constructor() {
+        super();
+    }
 
     getComments() {
         var vm = this;
-        // createUpdateComment(this.$store, )
-        getByPost(this.$store, this.post.pk).then(function(res) {
-            console.log(res);
-
-            // @TODO: fix user stuff
-
-            // for (let c of vm.post.comments) {
-            //     console.log(c);
-            //     let hasUser = vm.$store.state.users.find(
-            //         (val: User) => val.pk === (c as Comment).pk
-            //     );
-
-            //     if (hasUser === null) {
-            //     }
-            //     if (typeof c !== "undefined") {
-            //         // vm.$store.dispatch("fetchUser", c.user);
-            //     } 
-            // }
+        getByPost(this.$store, Number(this.post.pk)).then(function(res) {
+            for (let c of getCommentsForPost(vm.$store)(vm.post.pk as number)) {
+                console.log(c);
+                let hasUser = vm.$store.state.user.otherUsers.find(
+                    (val: User) => {
+                        console.log(val, c, typeof c);
+                        if (val.pk === ((c as Comment).user as number)) {
+                            return true;
+                        }
+                        return false;
+                    }
+                );
+                let currentUser = vm.$store.state.user.user;
+                if (typeof c !== "undefined" && typeof hasUser === "undefined") {
+                    fetchUser(vm.$store, c.user as number);
+                } 
+            }
         });
     }
     submitComment() {
         var vm = this;
-        let currentUser = this.$store.getters.user.getCurrentUser.profile;
+        let currentUser = this.$store.getters.getLoggedInUser;
         if (currentUser === undefined) {
             // this.$log("cookie: ", this.$cookie.get("userId"));
 
@@ -151,36 +166,38 @@ export default class PostComp extends Vue {
     actualSubmit() {
         var vm = this;
         this.$logDanger(this.$store.state.user.profile);
-        let comment = new Comment(
-            undefined,
-            Number(this.post.pk),
-            this.$store.getters.getCurrentUser.profile.pk,
-            this.newCommentText
-        );
-        createUpdateComment(this.$store, comment).then(function(ret: any): any {
-                if (ret.status < 300) {
-                    console.log(ret);
-                    vm.$notifySuccess(
-                        "Your comment was successfully posted!"
-                    );
-                } else {
-                    let total = "";
-                    ret.forEach((val, key) => {
-                        let currentValue = val.join(" ");
-                        total = `${total} "${key}: ${currentValue}" `;
-                    });
+        if (typeof getLoggedInUser(this.$store) !== "undefined") {
+            let comment = new Comment(
+                undefined,
+                Number(this.post.pk),
+                (getLoggedInUser(this.$store) as User).pk as number,
+                this.newCommentText
+            );
+            createUpdateComment(this.$store, comment).then(function(ret: any): any {
+                    if (ret.status < 300) {
+                        console.log(ret);
+                        vm.$notifySuccess(
+                            "Your comment was successfully posted!"
+                        );
+                    } else {
+                        let total = "";
+                        ret.forEach((val, key) => {
+                            let currentValue = val.join(" ");
+                            total = `${total} "${key}: ${currentValue}" `;
+                        });
 
+                        vm.$notifyDanger(
+                            `There was a problem submitting your comment. ${total}`
+                        );
+                    }
+                })
+                .catch(function(ret) {
+                    console.log(ret);
                     vm.$notifyDanger(
-                        `There was a problem submitting your comment. ${total}`
+                        `There was a problem submitting your comment.`
                     );
-                }
-            })
-            .catch(function(ret) {
-                console.log(ret);
-                vm.$notifyDanger(
-                    "There was an unknown error with your request."
-                );
-            });
+                });
+        }
     }
 
     created() {

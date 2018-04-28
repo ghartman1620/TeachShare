@@ -65,9 +65,6 @@ export default class SeeMore extends Vue {
         console.log(this);
         Vue.nextTick().then(function() {
             var ele = vm.$refs.content as HTMLElement;
-            // ele.clientHeight
-            console.log(ele.offsetHeight);
-            console.log(ele.getBoundingClientRect());
             vm.elementHeight = ele.offsetHeight;
             if (vm.elementHeight > vm.maxHeight) {
                 vm.contentClasses.push("gradient");

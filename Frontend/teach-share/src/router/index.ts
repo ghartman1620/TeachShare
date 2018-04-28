@@ -2,16 +2,15 @@ import Base from "@/components/Base.vue";
 import Vue from "vue";
 import Router from "vue-router";
 
-
 import api from "../api";
-import store from "../store"; 
+import store from "../store";
+import { setUser } from "../store_modules/UserService";
 import User from "../user";
 
 // typescript 'require' workaround hack
 declare function require(name: string): any;
 
 // route-splitting to minimize necessary download size and will download javascript as-needed.
-// @ts-ignore
 const Home = () =>
     import ( /* webpackChunkName: "home" */ "../components/HomePage.vue");
 const PostCreate = () =>
@@ -34,7 +33,6 @@ const Comments = () =>
     import ( /* webpackChunkName: "comments" */ "../components/comments/Comments.vue");
 const CommentEntry = () =>
     import ( /* webpackChunkName: "comments" */ "../components/comments/CommentEntry.vue");
-
 const Login = () =>
     import ( /* webpackChunkName: "login" */ "../components/auth/Login.vue");
 const Register = () =>
@@ -138,132 +136,57 @@ const router = new Router({
     ]
 });
 
-// Returns true or false if user is logged in.
-// Refreshes token if necessary.
-/**function verifyAndRefreshLogin() {
-    var token = Cookie.get("token");
-
-    // @TODO: using != causes a type cast before comparison, leading to inconsistent results
-    // consider using !== and finding the correct comparison, to avoid unknown behavior.
-    if (token != undefined) {
-        // verify token
-        (<any>Object).assign(api.defaults, {
-            headers: { authorization: "Bearer " + token }
-        });
-
-        return new Promise<any>((resolve, reject) => {
-            api
-                .get("/verify_token")
-                .then((response) => resolve(true))
-                .catch((err) => resolve(false));
-        });
-    } else {
-        const refresh_token: string | null = window.localStorage.getItem("refresh_token");
-        if (refresh_token != undefined) {
-            const body = {
-                grant_type: "refresh_token",
-                refresh_token: refresh_token,
-                username: window.localStorage.getItem("username")
-            };
-            const head = { headers: { "content-type": "application/json" } };
-            return new Promise((resolve, reject) => {
-                api
-                    .post("/get_token", body, head)
-                    .then((response) => {
-                        const date = new Date();
-                        date.setTime(
-                            date.getTime() +
-                            (response.data.body.expires_in * 1000 - 120000)
-                        );
-                        Cookie.set(
-                            "token",
-                            response.data.body.access_token,
-                            date.toISOString()
-                        );
-                        Cookie.set("loggedIn", true, date.toISOString());
-                        Cookie.set(
-                            "userId",
-                            response.data.userId,
-                            date.toISOString()
-                        );
-                        Cookie.set(
-                            "username",
-                            response.data.username,
-                            date.toISOString()
-                        );
-                        window.localStorage.setItem(
-                            "refresh_token",
-                            response.data.body.refresh_token
-                        );
-                        window.localStorage.setItem(
-                            "access_token",
-                            response.data.body.access_token
-                        );
-                        resolve(true);
-                    })
-                    .catch(err => resolve(false));
-            });
-        }
-        return new Promise((resolve, reject) => {
-            resolve(false);
-        });
-    }
-}
-*/
 var Cookie = require("tiny-cookie");
 function verifyAndRefreshLogin(): Promise<any> {
-    if(store.getters.isLoggedIn){
+    if (store.getters.isLoggedIn){
         console.log("is logged in with store");
         return new Promise((resolve) => {resolve(true);});
-    }
-    else if(Cookie.get("token") != null){
+    } else if (Cookie.get("token") != null){
         console.log("is logged in with token");
-        var u: User = new User();
-        store.dispatch("setUser", u);
-        return new Promise((resolve) => {resolve(true);});
-    }
-    else if(window.localStorage.getItem("refreshToken") !== null){
+        const u: User = new User();
+        setUser(store, u);
+        // store.dispatch("setUser", u);
+        return new Promise((resolve) => {resolve(true); });
+    } else if (window.localStorage.getItem("refreshToken") !== null){
         console.log("logging back in...");
         console.log(window.localStorage.getItem("refreshToken"));
 
         console.log(window.localStorage.getItem("username"));
         return new Promise((resolve, reject) => {
-            var body = {
+            const body = {
                 grant_type: "refresh_token",
                 refresh_token: window.localStorage.getItem("refreshToken"),
                 username: window.localStorage.getItem("username")
             };
             console.log(body);
-            var head = { headers: { "content-type": "application/json" } };
+            const head = { headers: { "content-type": "application/json" } };
             Object.assign(api.defaults, {});
-            api.post("get_token/", body, head).then(function(response: any) {
+            api.post("get_token/", body, head).then((response: any) => {
                 console.log(response);
                 console.log(response.data.user);
                 console.log(response.data.user.username);
-                var user: User = new User(response.data.user.username, 
-                    response.data.user.pk, 
+                const user: User = new User(response.data.user.username,
+                    response.data.user.pk,
                     response.data.user.email,
-                    response.data.user.first_name, 
-                    response.data.user.last_name, 
+                    response.data.user.first_name,
+                    response.data.user.last_name,
                     response.data.body.access_token,
-                    new Date(Date.now() + response.data.body.expiresIn*1000),
+                    new Date(Date.now() + response.data.body.expiresIn * 1000),
                     response.data.body.refresh_token);
-                store.dispatch("setUser", user);
+                setUser(store, user);
+                // store.dispatch("setUser", user);
                 resolve(true);
 
             }).catch(function(error: any) {
                 console.log(error);
                 resolve(false);
-            })
+            });
         });
-    }   
-    else{
+    } else{
         console.log("foobar");
-        return new Promise((resolve) => {resolve(false);});
+        return new Promise((resolve) => {resolve(false); });
     }
-
 }
-
 
 const loginProtectedRoutes = ["create"];
 const loggedOutRoutes = ["login", "register"];
@@ -287,7 +210,7 @@ router.beforeEach((to, from, next) => {
                 next({ name: "login" });
             }
         });
-    } 
+    }
     next();
 });
 

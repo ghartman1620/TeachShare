@@ -28,7 +28,9 @@ from .models import Attachment, Comment, Post
 from .serializers import (AttachmentSerializer, CommentSerializer,
                           PostSerializer)
 from .tasks import add
-import os 
+import os
+import google.cloud.storage
+from django.conf import settings
 
 
 #Post search parameters
@@ -57,25 +59,29 @@ import os
 class Term(Enum):
     AND = 0
     OR = 1
+
     @staticmethod
     def fromString(str):
-        if(str=='and'):
+        if(str == 'and'):
             print('retuning and term')
             return Term.AND
         else:
             print('returning or term')
             return Term.OR
+
     def joinQueries(self, query1, query2):
         print(self)
-        
+
         if(self.value == Term.AND.value):
             print('retruning and')
             return query1 & query2
-        else: #or
+        else:  # or
             print('returning or')
             return query1 | query2
+
+
 class SearchPostsView(views.APIView):
-    searchIn = ['title', 'content', 'tags'] #default
+    searchIn = ['title', 'content', 'tags']  # default
     termType = Term.OR
     excludeType = Term.OR
     permission_classes = (AllowAny,)
@@ -86,14 +92,17 @@ class SearchPostsView(views.APIView):
     Each of these functions takes two arguments - the query param
     value and the queryset.
     '''
-    #optionParams will be dealt with first. They affect filtering. 
+    # optionParams will be dealt with first. They affect filtering.
+
     def setSearchIn(self, value, queryset):
         self.searchIn = value.split(" ")
         return queryset
+
     def setTermType(self, value, queryset):
         print(value)
         self.termType = Term.fromString(value)
         return queryset
+
     def setExcludeType(self, value, queryset):
         print('in exclude type')
         print(value)
@@ -101,9 +110,9 @@ class SearchPostsView(views.APIView):
         return queryset
 
     optionParams = {
-        'in'      : setSearchIn,
+        'in': setSearchIn,
         'termtype': setTermType,
-        'excludetype' : setExcludeType,
+        'excludetype': setExcludeType,
     }
     
     #Rather than each of these functions performing filters,
@@ -123,7 +132,8 @@ class SearchPostsView(views.APIView):
         myQuery = MultiMatch(query=terms[0], fields=self.searchIn)
 
         for term in terms[1:]:
-            myQuery = self.termType.joinQueries(myQuery, MultiMatch(query=term, fields=self.searchIn))
+            myQuery = self.termType.joinQueries(
+                myQuery, MultiMatch(query=term, fields=self.searchIn))
         return queryset.query(myQuery)
 
     def filterByExcludedTerm(self, value, queryset):
@@ -132,7 +142,8 @@ class SearchPostsView(views.APIView):
         print('in exclude filter')
         print(value)
         for term in terms[1:]:
-            myQuery = self.excludeType.joinQueries(myQuery, MultiMatch(query=term, fields=self.searchIn))
+            myQuery = self.excludeType.joinQueries(
+                myQuery, MultiMatch(query=term, fields=self.searchIn))
         return queryset.exclude(myQuery)
 
     def queryByStandards(self, value, queryset):
@@ -175,14 +186,13 @@ class SearchPostsView(views.APIView):
         'grade'        : queryByGrade,
     }
 
-    
-    #sort parameters are last. They sort results.  
+    # sort parameters are last. They sort results.
     def sortBy(self, value, queryset):
         return queryset.sort(
             'title'
         )
     sortParams = {
-        'sort'    : sortBy,
+        'sort': sortBy,
     }
 
     def parseParams(self, paramSet, queryset):
@@ -194,12 +204,12 @@ class SearchPostsView(views.APIView):
 
     def get_queryset(self):
         queryset = PostDocument.search()
+        print('[get_queryset]: ', queryset)
         queryset = self.parseParams(self.optionParams, queryset)
         queryset = self.parseParams(self.filterParams, queryset)
         queryset = self.parseParams(self.sortParams,   queryset)
     
         return queryset
-
 
     def get(self, request, format=None):
         response = []
@@ -222,7 +232,8 @@ class PostFilter(filters.FilterSet):
 
     class Meta:
         model = Post
-        fields = ('draft', 'user', 'title', 'updated', 'likes', 'timestamp', 'comments')
+        fields = ('draft', 'user', 'title', 'updated',
+                  'likes', 'timestamp', 'comments')
 
     def filterNumberPosts(self, queryset, name, value):
         return queryset[value:value+10]
@@ -233,11 +244,12 @@ class StandardResultsSetPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 100
 
+
 class PostViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Post model
     """
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     filter_class = PostFilter
@@ -248,7 +260,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     filter_fields = ('post', 'text', 'user', 'timestamp')
@@ -295,13 +307,16 @@ def SimpleMethod(request):
 # @TODO: figure out how to deal with bad url characters
 
 # @TODO: write tests for uploading restricted files
+
+
 def isBinary(f):
     chunk = f.read(1024)
     if '\0' in chunk:
         return True
     else:
         return False
- 
+
+
 def fileExt(filename):
     ext = ""
     for i in reversed(range(0, len(filename))):
@@ -311,8 +326,15 @@ def fileExt(filename):
 
     print(ext)
     return ext
-#these are allowed binary filetypes
-whitelist = ['pdf','doc', 'ppt','docx', 'odt', 'xlsx', 'xls', 'xlt', 'csv', 'ods', 'ots', 'fods', 'tex']
+
+
+# these are allowed binary filetypes
+whitelist = ['pdf', 'doc', 'ppt', 'docx', 'odt', 'xlsx',
+             'xls', 'xlt', 'csv', 'ods', 'ots', 'fods', 'tex']
+
+
+def check_production():
+    return settings.IS_PRODUCTION
 
 
 class FileUploadView(views.APIView):
@@ -320,20 +342,45 @@ class FileUploadView(views.APIView):
     #permission_classes = (IsAuthenticated,)
     parser_classes = (FileUploadParser, JSONParser)
 
+    if check_production():
+        storage_client = google.cloud.storage.Client(
+            'teach-share-200700')  # .from_service_account_json(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
+        # 'AIzaSyCgvEvHSGGIuhU6sV5Qb85gSKvBx5ZRzKQ')
+        bucket_name = 'teachshare-media'
+        bucket = storage_client.get_bucket(bucket_name)
+        print(bucket)
+        print(check_production())
+
     def put(self, request, filename, format=None):
         post_id = request.query_params['post']
         file_obj = request.data['file']
+        blob = None
+
+        print('File upload...')
+        if check_production():
+            print('inside check production')
+            blob = self.bucket.blob(filename)
+            print('Chunk Size: {}'.format(blob.chunk_size))
+            print('Chunk data: {}'.format(blob))
+            try :
+                result = blob.upload_from_file(file_obj)
+            except google.cloud.exceptions.GoogleCloudError as err:
+                print(err)
+                raise err
+            print(blob.public_url)
+
         print("file upload")
         from pprint import pprint
         print(request.data)
         print(request.query_params['post'])
-        p = Post.objects.get(pk=post_id) # this is where we need to actually know the post.
+        # this is where we need to actually know the post.
+        p = Post.objects.get(pk=post_id)
         a = Attachment.objects.create(post=p, file=file_obj)
-        
+
         # print(os.path.dirname(os.path.realpath(__file__)) + a.file.url[1:])
         # with open(os.path.dirname(os.path.realpath(__file__)) + a.file.url, encoding='latin1') as f:
         #     if isBinary(f) and not fileExt(a.file.url) in whitelist:
-        #         print('bad filetype!') 
+        #         print('bad filetype!')
         #         return Response(data={
         #             'error' : fileExt(a.file.url) + ' files are allowed. Allowed filetypes are: ' + str(whitelist)
         #         }, status=status.HTTP_400_BAD_REQUEST)
@@ -344,7 +391,6 @@ class FileUploadView(views.APIView):
             'status': 'OK',
             'id': a.pk,
             'request_id': request.query_params['id'],
-            'url': a.file.url,
+            'url': blob.public_url if blob else 'http://127.0.0.1:8000' + a.file.url,
             'filename': a.file.name
-        },
-            status=201)
+        }, status=201)

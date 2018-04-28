@@ -24,7 +24,6 @@ export class InProgressPost{
     coreIdeas: number[];
     practices: number[];
     /*
-
     */ 
    
     //@TODO: instead of dealing with window localstorage here this should accept
@@ -32,7 +31,6 @@ export class InProgressPost{
     //This is currently bad design - what if some module that doens't care about the state of local storage 
     //(for example, when we go to allow users to integrate elements of another user's post into their own)
     //wants to use InProgressPost?
-
 
     constructor(userid: number);
     constructor(userid: number, postid: number);
@@ -197,7 +195,7 @@ export class InProgressPost{
         console.log(this.json());
         console.log(this.standards);
         api.put("posts/" + this.pk + "/", this.json()).then(function(response){
-            console.log("DRAFT SAVED!");
+            console.log("DRAFT SAVED!"); 
             console.log(response);
             post.status = PostStatus.Saved;
         })

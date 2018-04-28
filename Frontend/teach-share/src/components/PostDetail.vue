@@ -1,10 +1,10 @@
 <template>
     <div>
-        <PostComp
-            v-if="postLocal !== undefined"
+        <PostComponent
+            v-if="typeof postLocal !== 'undefined'"
             :post="postLocal"
             :index="postid">
-        </PostComp>
+        </PostComponent>
     </div>
 </template>
 
@@ -13,55 +13,53 @@
 import PostComp from "./Post.vue";
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { Post, Comment, User } from "../models";
-import { getByPost } from "../store_modules/CommentService";
+import { getByPost, getCommentsForPost } from "../store_modules/CommentService";
+import { getPostById, fetchPost } from "../store_modules/PostService";
+import { fetchUser } from "../store_modules/UserService";
+import {
+  State,
+  Getter,
+  namespace
+} from 'vuex-class'
+
+const ModuleGetter = namespace('', Getter)
 
 @Component({
-    props: [
-        "post"
-    ],
-    components: { "post": PostComp }
+    props: {},
+    components: { "PostComponent": PostComp }
 })
 export default class PostDetail extends Vue {
+    @State(state => state.user) userModule;
 
-    // @TODO: fix this
-    @Prop({default: new Post()}) post!: Post;
-
-
-    get postLocal(): any {
-        console.log(<Post>this.$store.getters.getPostById(this.$route.params.post_id));
-        return <Post>this.$store.getters.getPostById(this.$route.params.post_id);
+    get postLocal(): Post {
+        return getPostById(this.$store)(this.$route.params.post_id);
     }
     get postid() {
-        return this.postLocal !== undefined ? this.postLocal.pk : this.$route.params.post_id
+        return this.postLocal !== undefined ? Number(this.postLocal.pk) : Number(this.$route.params.post_id)
     }
 
     getComments() {
-        // let ae = new AudioElement(10, "filename.jpg");
-
         var vm = this;
         // createUpdateComment(this.$store, )
         getByPost(this.$store, Number(this.$route.params.post_id)).then(function(res) {
             console.log(res);
-            // for (let c of vm.post.comments) {
-            //     console.log(c);
-            //     let hasUser = vm.$store.state.users.find(
-            //         (val: User) => val.pk === (c as Comment).pk
-            //     );
-
-            //     if (hasUser === null) {
-            //     }
-            //     if (typeof c !== "undefined") {
-            //         // vm.$store.dispatch("fetchUser", c.user);
-            //     }
-            // }
+            let comments = getCommentsForPost(vm.$store)(Number(vm.$route.params.post_id));
+            console.log(comments);
+            for (let c of comments) {
+                console.log(c);
+                let alreadyFetchedUsers = vm.userModule.otherUsers as User[]
+                if (typeof c !== 'undefined' && typeof c.user !== 'undefined') {
+                    if (typeof alreadyFetchedUsers.find( (val) => (val as User).pk as number === (c as Comment).user as number) === 'undefined') {
+                        fetchUser(vm.$store, c.user as number);
+                    }
+                }
+            }
         });
     }
     created() {
-
-        // @TODO: fix this
-        // this.fetchPost(this.$route.params.post_id).then((res) => {
-        //     this.getComments();
-        // }); 
+        fetchPost(this.$store, this.$route.params.post_id).then((res) => {
+            this.getComments();
+        }); 
     }
 }
 </script>

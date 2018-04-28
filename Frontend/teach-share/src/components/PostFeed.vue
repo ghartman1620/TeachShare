@@ -79,11 +79,11 @@
 <div :key="post.pk" v-for="(post, index) in posts">
     <div class="card post-container-card card-shadow">
         <div class="card-body">
-            <post
+            <post-comp
                 :maxHeight="500"
-                :post="post"
+                :post="castPost(post)"
                 :index="index">
-            </post>
+            </post-comp>
         </div>
     </div>
     <br><br> 
@@ -99,12 +99,13 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { Watch, Prop } from 'vue-property-decorator'
-import Post from "./Post.vue";
+import PostComp from "./Post.vue";
 import SideBar from "./SideBar.vue";
 //these also have "anY" objects prepended to them in mounted()
 import api from "../api";
+import { Post } from "../models";
 import {gradeOptions, subjectOptions, contentTypeOptions} from "../superTagOptions";
-
+import { fetchAllPosts, postSearch, getPosts } from "../store_modules/PostService";
 
 interface SearchQueryString {
     term: string;
@@ -160,7 +161,7 @@ export default class PostFeed extends Vue {
     ];
 
     get posts() {
-        return this.$store.getters.getPosts();
+        return getPosts(this.$store);
     }
     get keywordRules() {
         return this.excluding.length ? "" : "required";
@@ -198,6 +199,11 @@ export default class PostFeed extends Vue {
             })
             console.log(this.grade);
         }
+        const p = fetchAllPosts(this.$store);
+        p.then((res) => { 
+            console.log("blah...");
+            console.log("***********", res);
+        });
     }
     scroll() {
         var offset =
@@ -272,7 +278,7 @@ export default class PostFeed extends Vue {
         console.log("in beforemount");
         console.log(this.$route.query);
         this.reloadPosts();
-        
+
         var t = this;
         window.addEventListener(
             "scroll",

@@ -3,12 +3,12 @@
 	<ul style="list-style-type: none;">
 		<li>
 			<div class="row">
-				<div v-for="file in element.content" class="col-xl-4 col-sm-6">
+				<div :key="file.pk" v-for="file in element.content" class="col-xl-4 col-sm-6">
 					<div class="card">
 						<div class="card-body">
 							<div>
 								<h5 class="card-title text-center">
-									<a :href="'http://127.0.0.1:8000' + file.url" class="card-link">{{file.name}}</a>
+									<a :href="file.url" class="card-link">{{file.name}}</a>
 								</h5>
 							</div>
 						</div>

@@ -94,16 +94,16 @@ var _ = require("lodash");
     name: "edit-video-embed",
     components: { DimensionPicker },
     props: [],
-    computed: mapGetters("yt", [
-            "ytVideoDescription",
-            "ytVideoDescriptionShort",
-            "ytVideoThumbnail",
-            "ytVideoTitle",
-            "ytVideoID"
-    ])
+    // computed: mapGetters([
+    //         "ytVideoDescription",
+    //         "ytVideoDescriptionShort",
+    //         "ytVideoThumbnail",
+    //         "ytVideoTitle",
+    //         "ytVideoID"
+    // ])
 })
 export default class EditVideoEmbed extends Vue {
-    ytVideoDescription!: string;
+    ytVideoDescription!: string ;
     ytVideoID!: string;
 
     width: number = 640;
@@ -173,7 +173,6 @@ export default class EditVideoEmbed extends Vue {
     }
 
     async getYoutubeData(input: string = this.EmbedURL) {
-        console.log("getting yt data");
         try {
             let resp = await getVideoInfo(this.$store, input);
             return resp;

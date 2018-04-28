@@ -90,14 +90,39 @@ export class Comment extends Model {
 }
 
 export class User extends Model {
+    public username: string;
+    public email: string;
+    public firstName: string;
+    public lastName: string;
+    public token: string;
+    public expires: Date;
+
     constructor(pk?: number) {
         super(typeof pk === "undefined" ? -1 : pk);
     }
 }
 
+enum ContentType {
+    Game = 0,
+    Lab,
+    Lecture
+}
+
 export class Post extends Model {
-    public comments: Comment[];
+    public comments: Comment[] | number[];
     public user: User;
+    public attachments: any[];
+    public content: any[];
+    public content_type: ContentType;
+    public draft: boolean;
+    public grade: number;
+    public length: string;
+    public likes: number;
+    public subject: string|null|undefined;
+    public tags: string[];
+    public timestamp: Date;
+    public title: string;
+    public updated: Date;
 
     constructor(pk?: number, comments?: Comment[], user?: User) {
         super(typeof pk === "undefined" ? -1 : pk);
@@ -149,13 +174,7 @@ export interface INotification {
     content: string;
 }
 
-export interface IRootState {
-    user: User;
-    users: User[];
-
-    // Post feed
-    posts: Array<Post>;
-}
+export interface IRootState {}
 
 /**
  * ModelMap is a structure for keeping track of a group of
@@ -191,11 +210,9 @@ export class ModelMap<V> implements IterableIterator<V> {
             done: true
         };
     }
-
     public [Symbol.iterator](): IterableIterator<V> {
         return this;
     }
-
     public has(key: string | number): boolean {
         return typeof this.data[String(key)] !== "undefined";
     }
@@ -217,22 +234,13 @@ export class ModelMap<V> implements IterableIterator<V> {
     public get(key: string | number): V {
         return this._data[String(key)];
     }
-    // returns an object representation of this modelMap's data for use in conversion to JSON
-    // why is this necessary?! doesn't it do this automatically?!
-    // TODO: figure out this issue.
-    // public objectify(): any[] {
-    //     const objects: any[] = [];
-    //     for (const key in this.data) {
-    //         const obj: any = {};
-    //         objects.push(this.get(key));
-    //     }
-    //     return objects;
-    // }
+    public remove(key: string | number): boolean {
+        return delete this._data[String(key)];
+    }
     public list(): V[] {
-        const res = new Array<V>();
+        let res = new Array<V>();
         for (const k in this.data) {
             if (typeof k !== "undefined") {
-                console.log("****", k);
                 res.push(this.get(k));
             }
         }
