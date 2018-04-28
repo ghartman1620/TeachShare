@@ -12,7 +12,7 @@ import PostCreateService from "./store_modules/PostCreateService";
 import UserService from "./store_modules/UserService";
 import YouTubeService from "./store_modules/YouTubeService";
 import PostService from "./store_modules/PostService";
-import { WatchStore } from "./PersistStore";
+import { WatchStore } from "./WatchStore";
 
 Vue.use(Vuex);
 

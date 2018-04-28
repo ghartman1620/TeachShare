@@ -150,6 +150,7 @@ class SearchPostsView(views.APIView):
 
     def get_queryset(self):
         queryset = PostDocument.search()
+        print('[get_queryset]: ', queryset)
         queryset = self.parseParams(self.optionParams, queryset)
         queryset = self.parseParams(self.filterParams, queryset)
         queryset = self.parseParams(self.sortParams,   queryset)
@@ -297,7 +298,13 @@ class FileUploadView(views.APIView):
         if check_production():
             print('inside check production')
             blob = self.bucket.blob(filename)
-            blob.upload_from_file(file_obj)
+            print('Chunk Size: {}'.format(blob.chunk_size))
+            print('Chunk data: {}'.format(blob))
+            try :
+                result = blob.upload_from_file(file_obj)
+            except google.cloud.exceptions.GoogleCloudError as err:
+                print(err)
+                raise err
             print(blob.public_url)
 
         print("file upload")
