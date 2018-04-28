@@ -219,6 +219,9 @@ import { addElement,
     setLength,
     saveDraft 
 } from "../store_modules/PostCreateService";
+import {
+    getLoggedInUser
+} from "../store_modules/UserService.ts";
 import SideBar from "./SideBar.vue";
 import TagSelect from "./TagSelect.vue";
 import {User} from "../models";
@@ -258,7 +261,9 @@ const bodyVisible = {
 })
 export default class PostCreate extends Vue{
 
-    @Getter("getLoggedInUser") getLoggedInUser;
+    get getLoggedInUser(): User {
+        return getLoggedInUser(this.$store);
+    }
     
     SAVING = PostStatus.Saving;
     LOADING = PostStatus.Loading;
@@ -475,10 +480,15 @@ export default class PostCreate extends Vue{
         var inProgressPost = window.localStorage.getItem("inProgressPost");
         console.log(inProgressPost);
         if(inProgressPost == undefined){
-            this.beginPost( this.getLoggedInUser.pk, undefined);
+            this.beginPost( 
+                //???? how on earth is this type string | undefined
+                //It's definitely just a number. Look at user.ts.
+                <number>this.getLoggedInUser.pk,
+                undefined);
         }
         else{
-            this.beginPost(this.getLoggedInUser.pk, parseInt(<string>inProgressPost));
+            this.beginPost(
+                <number>this.getLoggedInUser.pk, parseInt(<string>inProgressPost));
         }
         this.getUserPosts();
         

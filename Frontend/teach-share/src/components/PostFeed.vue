@@ -81,7 +81,7 @@
         <div class="card-body">
             <post-comp
                 :maxHeight="500"
-                :post="castPost(post)"
+                :post="post"
                 :index="index">
             </post-comp>
         </div>
@@ -217,7 +217,7 @@ export default class PostFeed extends Vue {
         if(this.$route.query != {}){
             console.log("here");
             
-            this.$store.dispatch("postSearch", this.$route.query);
+            postSearch(this.$store,this.$route.query);
         }
         else{
             console.log("fetching all posts");
