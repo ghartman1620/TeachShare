@@ -15,33 +15,34 @@
 </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
+import {Component} from "vue-property-decorator"
 
-
-export default Vue.component("side-bar", {
-    components: { FontAwesomeIcon },
+@Component({
+    name: "side-bar",
     props: ["collapsedString"],
-    data() {
-        return {
-            sidebarClasses: ["sidebar"],
-            collapsed: false,
+    components: { FontAwesomeIcon}
+})
+export default class SideBar extends Vue {
+    sidebarClasses: string[] = ["sidebar"];
+    collapsed: boolean = false;
+
+
+
+    toggleSidebarCollapse() {
+        if(this.collapsed){
+            this.sidebarClasses.pop();
+            this.collapsed = false;
         }
-    },
-    methods: {
-        toggleSidebarCollapse() {
-            if(this.collapsed){
-                this.sidebarClasses.pop();
-                this.collapsed = false;
-            }
-            else{
-                this.sidebarClasses.push("collapsed");
-                this.collapsed = true;
-            }
-        },
-    },
-});
+        else{
+            this.sidebarClasses.push("collapsed");
+            this.collapsed = true;
+        }
+    }
+
+};
 </script>
 
 <style lang="scss" scoped>

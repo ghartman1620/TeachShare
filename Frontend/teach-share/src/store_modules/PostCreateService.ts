@@ -36,7 +36,7 @@ const state: PostState = {
     post: undefined,
     doneMutations: [],
     unDoneMutations: []
-};z
+};
 
 export const mutations = {
     SET_TAGS: (state: PostState, tags: string[]) => {
@@ -307,56 +307,6 @@ export const actions = {
     }
     
 };
-const PostCreateService = {
-    namespaced: true,
-    strict: false, // process.env.NODE_ENV !== "production",
-    state,
-    mutations,
-    actions,
-    getters
-};
-
-export default PostCreateService;
-
-/**
- * Type safe definitions for FileService
- */
-const { commit, read, dispatch } = getStoreAccessors<PostState, IRootState>(
-    "create"
-);
-
-/**
- * Action Handlers
- */
-export const addElement = dispatch(PostCreateService.actions.addElement);
-export const beginPost = dispatch(PostCreateService.actions.beginPost);
-export const setTags = dispatch(PostCreateService.actions.setTags);
-export const setTitle = dispatch(PostCreateService.actions.setTitle);
-export const undo = dispatch(PostCreateService.actions.undo);
-export const redo = dispatch(PostCreateService.actions.redo);
-export const swapElements = dispatch(PostCreateService.actions.swapElements);
-export const removeElement = dispatch(PostCreateService.actions.removeElement);
-export const removeAttachments = dispatch(
-    PostCreateService.actions.removeAttachments
-);
-export const addAttachments = dispatch(
-    PostCreateService.actions.addAttachments
-);
-export const editElement = dispatch(PostCreateService.actions.editElement);
-export const saveDraft = dispatch(PostCreateService.actions.saveDraft);
-export const createPost = dispatch(PostCreateService.actions.createPost);
-
-/**
- * Getter Handlers
- */
-export const getTags = read(PostCreateService.getters.getTags);
-export const getTitle = read(PostCreateService.getters.getTitle);
-export const getContent = read(PostCreateService.getters.getContent);
-export const getCurrentPost = read(PostCreateService.getters.getCurrentPost);
-export const getCurrentPostId = read(
-    PostCreateService.getters.getCurrentPostId
-);
-export const postElements = read(PostCreateService.getters.postElements);
 
 export const getters = {
     getTags: (state: PostState) => { 
@@ -402,7 +352,7 @@ const PostCreateService = {
 export default PostCreateService;
 
 /**
- * Type safe definitions
+ * Type safe definitions for FileService
  */
 const { commit, read, dispatch } = getStoreAccessors<PostState, IRootState>(
     "create"
@@ -452,6 +402,7 @@ export const postElements = read(PostCreateService.getters.postElements);
  *
  * This also makes them really easily testable.
  */
+
 export const mutAddElement = commit(PostCreateService.mutations.ADD_ELEMENT);
 export const mutBeginPost = commit(PostCreateService.mutations.BEGIN_POST);
 export const mutClearRedo = commit(PostCreateService.mutations.CLEAR_REDO);

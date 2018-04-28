@@ -204,7 +204,7 @@ export default class PostComp extends Vue {
         // this.$store.dispatch("fetchUser", this.post.user);
         this.$log(this.post);
     }
-}
+};
 </script>
 
 <style lang="scss" scoped>

@@ -99,8 +99,8 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { Watch, Prop } from 'vue-property-decorator'
-import PostComp from "./Post.vue";
 import SideBar from "./SideBar.vue";
+import PostComp from "./Post.vue";
 //these also have "anY" objects prepended to them in mounted()
 import api from "../api";
 import { Post } from "../models";
@@ -123,10 +123,9 @@ interface SearchQueryString {
 
 @Component({
     name: "post-feed",
-    components: { Post, SideBar },
+    components: { PostComp, SideBar }
 })
 export default class PostFeed extends Vue {
-
     keywords: string = "";
     searchIn: Array<string> = ["title", "content", "tags"];
     excluding: string = "";

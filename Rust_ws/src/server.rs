@@ -7,15 +7,12 @@ struct Server {
 }
 
 impl Handler for Server {
-
     fn on_open(&mut self, shake: Handshake) -> Result<()> {
         println!("connected. request: {} response: {}", shake.request, shake.response);
         println!("");
         println!("origin: {} ", shake.request.origin().unwrap().unwrap());
-
-
         let x: Result<()> = self.out.send("Hello!");
-        assert_eq!(x.is_ok(), true);
+        assert!(x.is_ok());
         Ok(())
     }
 
