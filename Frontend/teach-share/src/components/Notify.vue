@@ -8,7 +8,7 @@
                         show
                         dismissible
                         @dismissed="close(n)"
-                        :variant="n.type">
+                        :variant="convertNotifyType(n.type)">
                             <div v-html="n.content"></div>
                     </b-alert>
                 </div>
@@ -17,25 +17,30 @@
       </div>
   </div>
 </template>
-<script>
-import { mapGetters } from "vuex";
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+import { NotifyType } from "../models";
+import { getAllNotifications, removeNotification } from "../store_modules/NotificationService";
+import { State } from "vuex-class";
 
-export default {
-    name: "notify",
-    props: [],
-    computed: {
-        ...mapGetters(["getAllNotifications"])
-    },
-    data: function() {
-        return {}
-    },
-    methods: {
-        close(note) {
-            this.$store.dispatch("removeNotification", note.id);
-        }
-        
+@Component({
+    props: {},
+    name: "notify"
+})
+export default class Notify extends Vue {
+    @State("notify") notificationState;
+
+    // computed
+    get getAllNotifications() {
+        return this.notificationState.pending;
     }
-  
+
+    close(note: any) {
+        removeNotification(this.$store, note.id);
+    }
+    convertNotifyType(val: number): string {
+        return NotifyType[val];
+    }
 }
 </script>
 

@@ -27,18 +27,41 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Notify from "../Notify";
-export default Vue.component('auth-page', {
-    props: ['submitFunctionName', "redirectText", "redirectName"],
-    components: {Notify,},
-    methods: {
-        submit() {
-            this.$log("IN SUBMIT");
-            this.$emit("submitAuth");
-        }
+import Notify from "../Notify.vue";
+
+import { Component, Prop } from "vue-property-decorator";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
+
+@Component({
+    name: "auth-page",
+    components: {Notify,}
+})
+export default class AuthPage extends Vue{
+    @Prop ({})
+    submitFunctionName!: string;
+
+    
+
+    @Prop({})
+    redirectText!: string;
+
+    @Prop({})
+    redirectName!: string;
+
+    
+
+    submit() {
+        this.$log("IN SUBMIT");
+        this.$emit("submitAuth");
     }
-});
-</scrip>
+};
+</script>
 
 <style lang="scss" scoped>
 .auth-page {

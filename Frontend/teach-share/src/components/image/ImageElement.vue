@@ -23,80 +23,70 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 
 const carouselWidth = 900;
 const carouselHeight = 600;
 var carouselAR = carouselWidth/carouselHeight;
+import { Component, Prop } from "vue-property-decorator";
 
 
 import Vue from "vue";
 
-export default Vue.component("image-element", {
-    props: ["title", "body", "images"],
-    data() {
-        return {
-            audio: null,
-            editing: false,
-            localTitle: this.title,
-            localBody: this.body,
-            sizeStyle: { width: "100%", height: "600px", padding: "20px" }
-        };
-    },
-    computed: {},
-    mounted: function() {
-        this.audio = document.getElementById(this.id);
-    },
-    methods: {
-        getSizeStyle() {
-            if (this.isMounted) {
-            }
-            return {
-                width: "100%",
-                height: "600px",
-                padding: "20px"
-            };
-        },
-        URL(val) {
-            if (val.indexOf("http") === -1) {
-                return `http://localhost:8000${val}`;
-            }
-            return `${val}`;
-        },
-        toggleEditText() {
-            //@deprecated: no longer in use
-            this.editing = !this.editing;
-        },
-        changedTitle() {
-            this.$parent.$emit("changedTitle", this.localTitle);
-        },
-        changedBody() {
-            this.$parent.$emit("changedBody", this.localBody);
-        },
+@Component({
+    name: "image-element",
+    props: ["title", "body", "images"]
+})
+export default class ImageElement extends Vue{
+    @Prop({}) title!: string;
+    @Prop({}) body!: any;
+    @Prop({}) images!: any;
 
-        changeSizeStyle() {
-            var maxImageHeight = 0;
-            var self = this;
-            this.images.forEach(function(img) {
-                var imageObj = new Image();
-                imageObj.src = self.URL(img.url);
-                maxImageHeight =
-                    imageObj.height > maxImageHeight
-                        ? imageObj.height
-                        : maxImageHeight;
-            });
-            this.sizeStyle = {
-                width: "100%",
-                height: maxImageHeight + 10 + "px",
-                padding: "20px"
-            };
+    audio: any = null;
+    editing: boolean = false;
+    sizeStyle: any = { width: "100%", height: "600px", padding: "20px" }; 
+
+    getSizeStyle() {
+
+        return {
+            width: "100%",
+            height: "600px",
+            padding: "20px"
+        };
+    }
+    URL(val) {
+        if (val.indexOf("http") === -1) {
+            return `http://localhost:8000${val}`;
         }
-    },
+        return `${val}`;
+    }
+    toggleEditText() {
+        //@deprecated: no longer in use
+        this.editing = !this.editing;
+    }
+
+    changeSizeStyle() {
+        var maxImageHeight = 0;
+        var self = this;
+        this.images.forEach(function(img) {
+            var imageObj = new Image();
+            imageObj.src = self.URL(img.url);
+            maxImageHeight =
+                imageObj.height > maxImageHeight
+                    ? imageObj.height
+                    : maxImageHeight;
+        });
+        this.sizeStyle = {
+            width: "100%",
+            height: maxImageHeight + 10 + "px",
+            padding: "20px"
+        };
+    }
     mounted() {
         window.setTimeout(this.changeSizeStyle, 500);
         console.log("in mounted function");
     }
-});
+};
 
 </script>
 

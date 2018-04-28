@@ -21,7 +21,7 @@
 
                     <!-- just an example dropdown -->
                     <li class="nav-item dropdown">
-                        <a v-if="!isLoggedIn()" class="nav-link dropdown-toggle" href="#" id="Account Profile" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <a v-if="!isLoggedIn" class="nav-link dropdown-toggle" href="#" id="Account Profile" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                             <font-awesome-icon icon="user-circle" fixed-width></font-awesome-icon> Profile
                         </a>
                         <a v-else class="nav-link dropdown-toggle" href="#" id="Account Profile" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -32,7 +32,7 @@
                             <a class="dropdown-item" href="">Your posts</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="">Account details</a>
-                            <a @click="logout" class="dropdown-item" href="">Logout</a>
+                            <a @click="logoutSubmit" class="dropdown-item" href="">Logout</a>
                             <!-- <router-link v-else class="dropdown-item" to="login">Login</router-link> -->
                         </div>
                     </li>
@@ -47,33 +47,42 @@
     </nav>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import SearchBox from "./SearchBox.vue";
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
+import { Component, Prop } from "vue-property-decorator";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
 
-export default Vue.component("nav-bar", {
-    components: { SearchBox, FontAwesomeIcon },
-    props: ["query"],
-    data() {
-        return {};
-    },
-    computed: {
-        user() {
-            return this.$store.getters.getLoggedInUser;
-        }
-    },
-    methods: {
-        logout() {
-            this.logout();
-            this.$router.push({name: "login"});
-        }
-    },
-    mounted(){
-        console.log(this.isLoggedIn());
-        console.log(this.$store.getters.getLoggedInUser);
+@Component({   
+    name: "nav-bar",
+    components: {SearchBox, FontAwesomeIcon},
+})
+export default class NavBar extends Vue{
+    @State("user") userState;
+    @Getter("isLoggedIn") isLoggedIn;   
+    @Getter("getLoggedInUser") user;
+    @Action("logout") logout;
+
+
+    logoutSubmit() {
+        this.logout();
+        this.$router.push({name: "login"});
     }
-});
+    created(){
+        console.log("created navbar");
+        console.log(this.user);
+        console.log(this.userState);
+        console.log(this.userState.user !== undefined);
+        console.log(this.isLoggedIn);
+    }
+}
 </script>
 
 

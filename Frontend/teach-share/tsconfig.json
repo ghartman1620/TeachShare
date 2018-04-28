@@ -1,16 +1,19 @@
 {
     "compilerOptions": {
-      "lib": ["dom", "es5", "es2015", "es2015.promise"],
-      "target": "es5",
+      "lib": ["dom", "es5", "es2016", "es6", "scripthost","es2015", "es2015.promise"],
+      "target": "es2015",
       "strict": true,
       "module": "esnext",
       "moduleResolution": "node",
       "emitDecoratorMetadata": true,
       "noImplicitAny": false,
       "noImplicitReturns": false,
+      "strictNullChecks": true,
+      "noImplicitThis": true,
       "experimentalDecorators": true,
+      "sourceMap": true,
       "allowSyntheticDefaultImports": true,
-      "allowJs": true,
+      "allowJs": false,
       "importHelpers": true
     },
     "include": [

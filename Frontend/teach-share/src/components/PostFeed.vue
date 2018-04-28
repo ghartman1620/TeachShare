@@ -1,7 +1,7 @@
 <template>
 <div>
 <router-view/>
-<side-bar>
+<side-bar collapsedString="Search">
     <b-form :class="{'control' : true}" style="padding: 8px;" v-on:submit.prevent="advancedSearch()">
 
         <b-form-group label="Search for posts with:">
@@ -37,24 +37,33 @@
             <b-form-radio-group stacked v-model="sortBy" :options="sortByOptions"/>
         </b-form-group>
     
-        <!--<b-btn v-b-toggle.gradeCollapse variant="primary">Toggle Grades</b-btn>
+        <b-form-group label="Grade level of lesson">
+            <b-form-select v-model="grade" @change="loadStandards" :options="gradeOptions" class="mb-3" />
+        </b-form-group>
+        <b-form-group 
+            label="Length of the lesson"
+            description="Minutes">
+            <b-form-input v-model="length"
+                type="number"/>
+        </b-form-group>
+        <b-form-group
+            label="Subject area of lesson">
+            <b-form-select v-model="subject" @change="loadStandards" :options="subjectOptions" class="mb-3" />
+        </b-form-group>
+        <b-form-group
+            label="Content type of lesson">
+            <b-form-select v-model="contentType" :options="contentTypeOptions" class="mb-3" />
+        </b-form-group>
 
-        <b-collapse id="gradeCollapse" class="mt-2">
-            <b-form-group label="Grades">
-
-                <b-form-checkbox-group stacked v-model="grades" :options="gradeOptions"/>
-                
-            </b-form-group>
-        </b-collapse>-->
-
-
+        <b-form-group
+            label="Standards you're looking for"
+            description="use Ctrl+Click to select multiple">
+            <b-form-select multiple v-model="standards" :select-size="15" :options="standardOptions" class="mb-3">
+            </b-form-select>
+        </b-form-group>
         
-        <span v-show="errors.has('keywords') && errors.has('excluding')" class="help is-danger">
-            You must filter by some keyword(s).
-        </span>
 
         <b-button 
-            :disabled="errors.has('keywords') && errors.has('excluding')"
             type="submit" 
             variant="primary" 
             class="sidebar-btn">
@@ -87,117 +96,181 @@
 </div>
 </template>
 
-<script>
-import Vue from "vue";
-import Post from "./Post";
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+import { Watch, Prop } from 'vue-property-decorator'
+import Post from "./Post.vue";
 import SideBar from "./SideBar.vue";
+//these also have "anY" objects prepended to them in mounted()
+import api from "../api";
+import {gradeOptions, subjectOptions, contentTypeOptions} from "../superTagOptions";
 
 
-export default {
-    name: "PostFeed",
+interface SearchQueryString {
+    term: string;
+    exclude: string;
+    sort: string;
+    in: string;
+    termtype: string;
+    excludetype: string;
+    standards: string;
+    grade: number;
+    length: number;
+    content_type: number;
+}
+
+
+@Component({
+    name: "post-feed",
     components: { Post, SideBar },
-    data: function() {
-        return {
-            
-            keywords: "",
-            searchIn: ["title", "content", "tags"],
-            excluding: "",
-            sortBy: "date",
-            termtype: "or",
-            excludetype: "or",
-            grades: [],
-            gradeOptions: [
-                {text: "K", value: 0},
-                {text: "1", value: 1},
-                {text: "2", value: 2},
-                {text: "3", value: 3},
-                {text: "4", value: 4},
-                {text: "5", value: 5},
-                {text: "6", value: 6},
-                {text: "7", value: 7},
-                {text: "8", value: 8},
-                {text: "9", value: 9},
-                {text: "10", value: 10},
-                {text: "11", value: 11},
-                {text: "12", value: 12},
-                   
-            ],
-            termTypeOptions: [
-                {text: "Any terms", value: "or"},
-                {text: "All terms", value: "and"},
-            ],
-            
-            searchInOptions: [
-                {text: "Title", value: "title"},
-                {text: "Content", value: "content"},
-                {text: "File names", value: "filenames"},
-                {text: "Tags", value: "tags"}
-            ],
-            sortByOptions: [
-                {text: "Date", value: "date"},
-                {text: "Relevance", value: "score"},
-                //TODO
-                //{text: "Likes", value: "likes"},
-            ]
-        
-        }
-    },
-    computed: {
-        posts: function() {
-            return this.$store.getters.getPosts();
-        },
-        keywordRules() {
-            return this.excluding.length ? "" : "required";
-        },
-        excludingRules() {
-            return this.keywords.length ? "required" : ""
-        }
-        
-    },
-    methods: {
-        getPosts: function() {
-            this.$store.dispatch("fetchAllPosts");
-        },
-        scroll() {
-            var offset =
-                document.documentElement.scrollTop + window.innerHeight;
-            var height = document.documentElement.offsetHeight;
+})
+export default class PostFeed extends Vue {
 
-            if (offset >= height) {
-                //this.getPosts();
-            }        
-        },
-        reloadPosts(){
-            if(this.$route.query.term != undefined){
-                console.log("here");
-                this.$store.dispatch("postSearch", this.$route.query);
-            }
-            else{
-                this.$store.dispatch("fetchAllPosts");
-            }
-        },
-        advancedSearch() {
+    keywords: string = "";
+    searchIn: Array<string> = ["title", "content", "tags"];
+    excluding: string = "";
+    sortBy: string = "date";
+    termtype: string = "or";
+    excludetype: string = "or";
+    grade: number | null = null;
+    subject: number | null = null;
+    contentType: number | null= null;
+    length = "";
+    standards: number[] = [];
+
+    gradeOptions: any = gradeOptions;
+    subjectOptions: any = subjectOptions;
+    standardOptions: any = [];
+    contentTypeOptions: any = contentTypeOptions;
+
+    termTypeOptions: object[] = [
+        {text: "Any terms", value: "or"},
+        {text: "All terms", value: "and"}
+    ];
+    searchInOptions: object[] = [
+        {text: "Title", value: "title"},
+        {text: "Content", value: "content"},
+        {text: "File names", value: "filenames"},
+        {text: "Tags", value: "tags"}
+    ];
+    sortByOptions: object[] = [
+        {text: "Date", value: "date"},
+        {text: "Relevance", value: "score"}
+        // {text: "Likes", value: "likes"},
+    ];
+
+    get posts() {
+        return this.$store.getters.getPosts();
+    }
+    get keywordRules() {
+        return this.excluding.length ? "" : "required";
+    }
+    get excludingRules() {
+        return this.keywords.length ? "required" : ""
+    }
+    getPosts() {
+        this.$store.dispatch("fetchAllPosts");
+    }
+    //it seems like the v-model tag doesn't set this.grade until after the request
+    //has been sent - so we'll give it a few moments to notice we've made a change
+    //before we send the request to update standards.
+    loadStandards() {
+       
+        window.setTimeout(this.loadStandardsHelp,5);
+    }
+    loadStandardsHelp() {
+        if(this.subject != null && this.grade !== null){
+            this.standardOptions = [];   
+            var vm: PostFeed = this;
+            console.log("in loadstandards" + this.grade);
+            console.log(this.standardOptions);
+            api.get(`/standards/?grade=${this.grade}&subject=${this.subject}`).then(function(response: any) {
+                console.log(response.data);
+                console.log(vm.standardOptions);
+                for(var std of <any[]>response.data){
+                    vm.standardOptions.push({
+                        value: std.pk,
+                        text: std.name + " (" + std.code +")",
+                    })
+                }
+                console.log(vm.standardOptions);
+                console.log(vm.grade);
+            })
+            console.log(this.grade);
+        }
+    }
+    scroll() {
+        var offset =
+            document.documentElement.scrollTop + window.innerHeight;
+        var height = document.documentElement.offsetHeight;
+
+        if (offset >= height) {
+            // this.getPosts();
+        }
+    }
+    reloadPosts(){
+        if(this.$route.query != {}){
+            console.log("here");
             
-            var query = {};
-            if(this.keywords != ""){
-                query.term = this.keywords;
-            }
-            if(this.excluding != ""){
-                query.exclude = this.excluding;
-            }
-            query.sort = this.sortBy;
+            this.$store.dispatch("postSearch", this.$route.query);
+        }
+        else{
+            console.log("fetching all posts");
+            this.$store.dispatch("fetchAllPosts");
+        }
+    }
+
+    advancedSearch() {
+        var query: any = {}
+        query.sort = this.sortBy;
+
+        if (this.keywords !== ""){
+            query.term = this.keywords;
+            query.termtype = this.termtype;
+
+        }
+        if (this.excluding !== ""){
+            query.exclude = this.excluding;
+            query.excludetype = this.excludetype;
+        }
+        
+        if(this.keywords !== "" || this.excluding !== ""){
             var searchParam = "";
             this.searchIn.forEach(function(element){
                 searchParam += element + " ";
             })
-            console.log(searchParam);
             query.in = searchParam;
-            query.termtype = this.termtype;
-            query.excludetype = this.excludetype;
-            this.$router.push({name: "dashboard", query: query});
         }
-    },
+        
+        if(this.contentType !== null){
+            query.content_type = this.contentType.toString();
+        }
+        
+        if(this.length !== ""){
+            query.length = this.length;
+        }
+        if(this.standards !== []){
+            var searchParam = "";
+            this.standards.forEach(function(element){
+                searchParam += element + " ";
+            })
+            query.standards = searchParam;
+        }
+        else{
+            if(this.grade !== null){
+            query.grade = this.grade.toString();
+            }
+            if(this.subject !== null){
+                query.subject = this.subject.toString();
+            }
+        }
+        
+        this.$router.push({name: "dashboard", query: query});
+    }
+
     beforeMount(){
+        console.log("in beforemount");
+        console.log(this.$route.query);
         this.reloadPosts();
         
         var t = this;
@@ -208,17 +281,21 @@ export default {
             },
             false
         );
-    },
-    mounted() {},
-    destroyed() {
-        window.removeEventListener("scroll", function() {t.scroll()}, false);
-    },
-    watch: {
-        $route (to, from){
-            this.reloadPosts();
-        }
     }
-};
+    mounted() {
+        this.gradeOptions.unshift({value: null, text: "Any Grade"})
+        this.subjectOptions.unshift({value: null, text: "Any Subject"})
+        this.contentTypeOptions.unshift({value: null, text: "Any Content Type"})
+    }
+    destroyed() {
+        // this doesn't work: because t is not defined.
+        // window.removeEventListener("scroll", function() {t.scroll()}, false);
+    }
+    @Watch("$route")
+    onRouteChange(to: any, from: any) {
+        this.reloadPosts();
+    }
+}
 </script>
 
 <style lang="scss" scoped>

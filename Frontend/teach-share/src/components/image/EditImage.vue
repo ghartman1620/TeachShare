@@ -52,85 +52,88 @@
 </div>
 </template>
 
-<script>
+<script lang = "ts">
 import Vue from "vue";
-import FileUpload from "../FileUpload";
+import FileUpload from "../FileUpload.vue";
 import { mapGetters } from "vuex";
-import ImageElement from "./ImageElement";
-import DimensionPicker from "../DimensionPicker";
+import DimensionPicker from "../DimensionPicker.vue";
+import { Component } from "vue-property-decorator";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
 
 var _ = require("lodash");
 
-export default Vue.component("edit-image", {
-    components: { FileUpload, ImageElement, DimensionPicker },
+@Component({
+    name: "edit-image",
+    components: { FileUpload, DimensionPicker },
     props: [],
-    data() {
-    return {
-            title: "",
-            description: "",
-            height: 480,
-            width: 640
-        };
-    },
-    computed: {
-        ...mapGetters(["hasFiles", "allFilesUploadComplete"])
-    },
-    methods: {
-        submit() {
-            var vm = this;
-            if (this.$route.query.index === this.$store.state.create.postElements.length) {
-                this.$store.dispatch("addElement", this.generateJSON())
-                    .then(function(){
-                        vm.$router.push({name: "create"});
-                });
-            } else {
-                this.$store.dispatch("editElement", {
-                    index: this.$route.query.index,
-                    component: this.generateJSON()
-                }).then(function(){
-                    vm.$router.push({name: "create"});
-                });
-            }
-            // this.$store.dispatch("LoadImages", this.generateJSON());
-            // this.$router.push({name: "create"});
-        },
-        generateJSON() {
-            let output = new Array();
-            var vm = this;
-            _.map(this.$store.state.fs.uploadedFiles, function(val, ind, arr) {
-                output.push({
-                    post: 2,
-                    type: "image_file",
-                    id: val.db_id,
-                    title: vm.title,
-                    file: val.file,
-                    name: val.file.name,
-                    url: val.url,
-                    description: vm.description
-                });
-            });
-            return { 
-                type: "image_file", 
-                description: this.description, 
-                title: this.title, 
-                content: output,
-                width: this.width,
-                height: this.height  
-            };
-        },
-        cancelEdit() {
-            this.$router.push({ name: "create" });
-        }
-    },
+})
+export default class EditImage extends Vue{
+    @State("create") postState;
+    @State("fs") fileState;
+    @Action("addElement") addElement;
+    @Action("editElement") editElement;
+    @Getter("fs/allFilesUploadComplete") allFilesUploadComplete;
+    @Getter("fs/files") files;
+
+    title: string = "";
+    description: string = "";
+    height: number = 480;
+    width: number = 640;
+
+    // getters
+    get hasFiles(){
+        return this.$store.getters.hasFiles;
+    }
+
     mounted() {
-        this.$on("changeHeight", function(h) {
-            this.height = h;
+        var vm: EditImage = this; // get rid of "this implicitly has type any"
+        vm.$on("changeHeight", function(h) {
+            vm.height = h;
         });
-        this.$on("changeWidth", function(w) {
-            this.width = w;
+        vm.$on("changeWidth", function(w) {
+            vm.width = w;
         });
     }
-});
+    // methods
+    submit() {
+        this.$parent.$emit("submitElement", this.generateJSON(), this.$route.query.index);
+        // this.$store.dispatch("LoadImages", this.generateJSON());
+        // this.$router.push({name: "create"});
+    }
+    generateJSON() {
+        let output = new Array();
+        var vm = this;
+        _.map(this.fileState.uploadedFiles, function(val, ind, arr) {
+            output.push({
+                post: 2,
+                type: "image_file",
+                id: val.db_id,
+                title: vm.title,
+                file: val.file,
+                name: val.file.name,
+                url: val.url,
+                description: vm.description
+            });
+        });
+        return {
+            type: "image_file",
+            description: this.description,
+            title: this.title,
+            content: this.files.objectify(),
+            width: this.width,
+            height: this.height
+        };
+    }
+    cancelEdit() {
+        this.$router.push({ name: "create" });
+    }
+}
 </script>
 
 

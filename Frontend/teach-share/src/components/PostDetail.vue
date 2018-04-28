@@ -1,56 +1,67 @@
 <template>
     <div>
-        <post
+        <PostComp
             v-if="postLocal !== undefined"
             :post="postLocal"
-            :index="postid"
-        >
-        </post>
-        <br><br>
+            :index="postid">
+        </PostComp>
     </div>
 </template>
 
-<script>
-import Post from "./Post";
+<script lang="ts">
 
-export default {
-    name: "PostDetail",
-    components: {Post},
-    data: function() { 
-        return { }
-    },
-    computed: {
-        postLocal() {
-            return this.$store.getters.getPostById(this.$route.params.post_id);
-        },
-        postid() {
-            return this.postLocal !== undefined ? this.postLocal.pk : this.$route.params.post_id
-        }
-    },
-    methods: {
-        getComments() {
-            var vm = this;
-            this.$store
-                .dispatch("fetchCommentsForPost", this.postLocal.pk)
-                .then(function(res) {
-                    vm.$log(res);
-                    for (let c of vm.post.comments) {
-                        vm.$log(c);
-                        let hasUser = vm.$store.state.users.find((val) => val.pk === c.pk);
-                        vm.$logWarning("Post.vue", hasUser);
-                        if (hasUser === null) {
-                            
-                        }
-                        vm.$store.dispatch("fetchUser", c.user);
-                    }
-                });
-        },
+import PostComp from "./Post.vue";
+import { Vue, Component, Prop } from "vue-property-decorator";
+import { Post, Comment, User } from "../models";
+import { getByPost } from "../store_modules/CommentService";
 
-    },
-    created() {
-        this.$store.dispatch("fetchPost", this.$route.params.post_id).then((res) => {
-            this.getComments();
+@Component({
+    props: [
+        "post"
+    ],
+    components: { "post": PostComp }
+})
+export default class PostDetail extends Vue {
+
+    // @TODO: fix this
+    @Prop({default: new Post()}) post!: Post;
+
+
+    get postLocal(): any {
+        console.log(<Post>this.$store.getters.getPostById(this.$route.params.post_id));
+        return <Post>this.$store.getters.getPostById(this.$route.params.post_id);
+    }
+    get postid() {
+        return this.postLocal !== undefined ? this.postLocal.pk : this.$route.params.post_id
+    }
+
+    getComments() {
+        // let ae = new AudioElement(10, "filename.jpg");
+
+        var vm = this;
+        // createUpdateComment(this.$store, )
+        getByPost(this.$store, Number(this.$route.params.post_id)).then(function(res) {
+            console.log(res);
+            // for (let c of vm.post.comments) {
+            //     console.log(c);
+            //     let hasUser = vm.$store.state.users.find(
+            //         (val: User) => val.pk === (c as Comment).pk
+            //     );
+
+            //     if (hasUser === null) {
+            //     }
+            //     if (typeof c !== "undefined") {
+            //         // vm.$store.dispatch("fetchUser", c.user);
+            //     }
+            // }
         });
+    }
+    created() {
+
+        // @TODO: fix this
+        // this.fetchPost(this.$route.params.post_id).then((res) => {
+        //     this.getComments();
+        // }); 
     }
 }
 </script>

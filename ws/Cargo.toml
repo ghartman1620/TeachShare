@@ -1,0 +1,20 @@
+[package]
+name = "Rust_ws"
+version = "0.1.0"
+authors = ["Gabe H <ghartman@ucsc.edu>"]
+
+[[bin]]
+name="client"
+path="src/client.rs"
+
+[[bin]]
+name="server"
+path="src/server.rs"
+
+[[bin]]
+name="main"
+path="src/main.rs"
+
+[dependencies]
+ws = "*"
+actix = "0.5"

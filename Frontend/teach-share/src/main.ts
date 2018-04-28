@@ -4,17 +4,17 @@ import Vue from "vue";
 import Vuex from "vuex";
 import VeeValidate, { Validator } from "vee-validate";
 import Notifications from "./notifications";
-import UserMixin from "./user";
-
-import Logger from "./logger";
+import Logger from "./logging/logger";
+import UserPlugin from "./user";
 
 // our stuff
 import App from "./App.vue";
-import router from "./router"; 
+import router from "./router";
+
 import store from "./store";
 
 // typescript 'require' workaround hack
-declare function require(name:string): any;
+declare function require(name: string): any;
 
 import {
     Carousel,
@@ -32,7 +32,7 @@ import {
     FormSelect,
     FormTextarea,
     FormCheckbox,
-
+    Pagination,
     Badge,
     Jumbotron
 
@@ -51,6 +51,7 @@ import * as faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
 import * as faUserCircle from "@fortawesome/fontawesome-free-solid/faUserCircle";
 import * as faArrowLeft from "@fortawesome/fontawesome-free-solid/faArrowLeft";
 import * as faArrowRight from "@fortawesome/fontawesome-free-solid/faArrowRight";
+import * as faSpinner from "@fortawesome/fontawesome-free-solid/faSpinner";
 
 fontawesome.library.add(
     faPlus,
@@ -59,6 +60,7 @@ fontawesome.library.add(
     faCheck,
     faTimes,
     faEdit,
+    faSpinner,
     faUserCircle,
     faArrowLeft,
     faArrowRight
@@ -68,7 +70,8 @@ fontawesome.library.add(
 Vue.use(require("vue-moment"));
 
 // // vue-cookie because js cookies are awful
-Vue.use(require("vue-cookie"));
+var VueCookie = require("vue-cookie");
+Vue.use(VueCookie);
 
 Vue.use(Carousel);
 Vue.use(Jumbotron);
@@ -88,8 +91,28 @@ Vue.use(FormSelect);
 Vue.use(FormTextarea);
 Vue.use(FormCheckbox);
 
+Vue.use(Pagination);
+
 Vue.use(Badge);
-Vue.mixin(UserMixin);
+
+// This is frustrating. We are 'suppose' to be able to create *.d.ts files for types such as this
+// but it only seems to work when I put it here. This is mostly just for plugins I think, though.
+import _Vue from "vue";
+declare module "vue/types/vue" {
+    export interface Vue {
+        $log(...args: any[]): void;
+        $logDanger(...args: any[]): void;
+        $notify(type: any, content: any): void;
+        $notifySuccess(content: string): void;
+        $notifyDanger(content: string): void;
+        $notifyInfo(content: string): void;
+        $notifyWarning(content: string): void;
+        $notifyPrimary(content: string): void;
+        $notifySecondary(content: string): void;
+        $notifyDark(content: string): void;
+        $notifyLight(content: string): void;
+    }
+}
 
 Vue.use(Notifications);
 Vue.use(Logger, true);

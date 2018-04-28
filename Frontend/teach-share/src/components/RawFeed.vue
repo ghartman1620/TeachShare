@@ -16,36 +16,27 @@
 </div>
 </template>
 
-<script>
-import Vue from "vue";
-import Post from "./Post";
-import SideBar from "./SideBar.vue";
+<script lang="ts">
+import Post from "./Post.vue";
+import { Component, Vue } from "vue-property-decorator";
 
-
-export default {
-    name: "RawFeed",
-    components: { Post },
-    data: function() {
-        return {}
-    },
-    computed: {
-        posts: function() {
-            return this.$store.getters.getPosts();
-        }    
-    },
-    methods: {
-        getPosts: function() {
+@Component({
+    name: "raw-feed",
+    components: { Post }
+})
+export default class RawFeed extends Vue {
+    get posts() {
+        return this.$store.getters.getPosts();
+    }    
+    getPosts() {
             this.$store.dispatch("fetchAllPostsRaw");
-        }
-    },
+    }
     created(){
         this.getPosts();
-    },
-    mounted() {
-        this.getPosts();
-    },
-    destroyed() {},
-    watch: {}
+    }
+    destroyed() {}
+
+    watch() {}
 };
 </script>
 

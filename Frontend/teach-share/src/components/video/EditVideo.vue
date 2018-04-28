@@ -49,53 +49,50 @@
 </div>
 </template>
 
-<script>
-import Vue from "vue";
-import EditVideoEmbed from "./EditVideoEmbed";
-import EditVideoFile from "./EditVideoFile";
+<script lang="ts">
+import { Vue, Component } from "vue-property-decorator";
+import EditVideoEmbed from "./EditVideoEmbed.vue";
+import EditVideoFile from "./EditVideoFile.vue";
 import { mapGetters } from "vuex";
 
-var _ = require("lodash");
 
-export default Vue.component("edit-video", {
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
+
+@Component({
+    name: "edit-video",
     components: { EditVideoFile, EditVideoEmbed },
-    props: [],
-    data() {
-        return {
-            styleObject: {
-                "max-height": 100
-            }
-        };
-    },
-    computed: {
-        embedActiveStyle() {
-            let t = this.$route.query.videotype;
-            if (t === "embed") {
-                return "nav-item nav-link active";
-            }
-            return "nav-item nav-link";
-        },
-        uploadActiveStyle() {
-            let t = this.$route.query.videotype;
-            if (t === "upload") {
-                return "nav-item nav-link active";
-            }
-            return "nav-item nav-link";
-        },
-        descriptionEmbed() {
-            return this.$store.state.video.videos[0].description;
-        },
-        descriptionFile() {
-            return this.$store.state.video.videos[0].description;
-        },
-        removedFile() {
-            var vm = this;
-            this.$on("RemoveItem", function(item) {
-                vm.$dispatch("removeVideo", item);
-            });
+    props: []
+})
+export default class EditVideo extends Vue {
+    styleObject: any = {"max-height": 100};
+
+    get embedActiveStyle() {
+        let t = this.$route.query.videotype;
+        if (t === "embed") {
+            return "nav-item nav-link active";
         }
+        return "nav-item nav-link";
     }
-});
+    get uploadActiveStyle() {
+        let t = this.$route.query.videotype;
+        if (t === "upload") {
+            return "nav-item nav-link active";
+        }
+        return "nav-item nav-link";
+    }
+    mounted(){
+        var vm: EditVideo = this;
+        this.$on("submitElement", function(element, index){
+            vm.$parent.$emit("submitElement", element, index);
+        });
+    }
+}
 </script>
 
 

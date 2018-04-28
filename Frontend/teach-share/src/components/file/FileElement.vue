@@ -23,13 +23,16 @@
 
 </style>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
+import { Component, Prop } from "vue-property-decorator";
 
-export default Vue.component("file-element", {
-    props: ["element"],
-    data() {
-        return {};
-    }
-});
+@Component({
+	name: "file-element",
+	props: ["element"]
+})
+export default class FileElement extends Vue{
+	@Prop({})
+	element: any;
+};
 </script>

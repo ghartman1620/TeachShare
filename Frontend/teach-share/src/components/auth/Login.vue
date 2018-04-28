@@ -31,41 +31,39 @@
 
 
 
-<script>
+<script lang="ts">
+import Vue from "vue";
 import AuthPage from "./AuthPage";
-import UserMixin from "../../user";
-export default {
+import { Component, Prop } from "vue-property-decorator";
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
+
+@Component({
     name: "login",
-    mixins: [UserMixin],
-    data: function(){
-        return {
-            username: "",
-            pw: "",
-            persist: false,
-        }
-    },
-    computed: {
-        token() {
-            return this.$store.state.user.token;
-        }
+    components: {AuthPage},
+})
+export default class Login extends Vue {
+    @Action("login") login;
+    username: string = "";
+    pw: string = "";
+    persist: boolean = false;
 
-    },
-    methods: {
-        loginSubmit: function() {
-            var vm = this;
-            this.login(this.username, this.pw, this.persist)
-            .then(function() {
-                vm.$router.push({name: "create"});
-            })
-            .catch(function(err){
-                console.log(err);
-                vm.$notifyDanger("You could not login<br>" + err.response.data.error_description);
-            }); 
-        },
-    },
-    mounted() {
 
-        
+    loginSubmit() {
+        var vm = this;
+        this.login({username: this.username, password: this.pw, persist: this.persist})
+        .then(function() {
+            vm.$router.push({name: "create"});
+        })
+        .catch(function(err){
+            console.log(err);
+            vm.$notifyDanger("You could not login<br>" + err.response.data.error_description);
+        }); 
     }
 }
 </script>

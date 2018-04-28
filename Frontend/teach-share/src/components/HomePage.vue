@@ -15,30 +15,29 @@
 </div>
 </template>
 
-<script>
-import Vue from "vue";
-import RawFeed from "./RawFeed";
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+import RawFeed from "./RawFeed.vue";
 
-export default Vue.component("base-page", {
-    components: { RawFeed },
+@Component({
     props: [],
-    data() {
-        return {
-            showPosts: false
-        };
-    },
-    methods: {
-        seePosts(event) {
-            // this.$logSuccess(event);
-            // this.$store.dispatch("fetchAllPostsRaw");
-            // this.showPosts = true;
-            this.$router.push({ name: "dashboard" });
-        },
-        createPost() {
-            this.$router.push({ name: "create" });
-        }
+    components: { RawFeed }
+})
+
+export default class HomePage extends Vue {
+    showPosts: boolean = false
+
+    seePosts(event) {
+        // this.$logSuccess(event);
+        // this.$store.dispatch("fetchAllPostsRaw");
+        // this.showPosts = true;
+        this.$router.push({ name: "dashboard" });
     }
-});
+    createPost() {
+        this.$router.push({ name: "create" });
+    }
+    
+}
 </script>
 
 <style lang="scss" scoped>

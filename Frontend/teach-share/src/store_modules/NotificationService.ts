@@ -1,42 +1,91 @@
 import v4 from "uuid/v4";
+import { ActionContext } from "vuex";
+import { getStoreAccessors } from "vuex-typescript";
 
-// NotificationService definition -- this is where you send and remove
-// notifications from. Generally speaking, all you have to do is that.
-//
-// @TODO: make them 'time-out', so that it disappears eventually on it's own.
-const NotificationService = {
-    state: {
-        pendingNotifications: []
-    },
-    mutations: {
-        SEND_NOTIFICATION: (state, notification) => {
-            let current = state.pendingNotifications.findIndex(v => v == notification);
-            if (current === -1) {
-                notification.id = v4();
-                state.pendingNotifications.push(notification);
-            } else {
-                state.pendingNotifications[current] = notification;
-            }
-        },
-        REMOVE_NOTIFICATION: (state, notificationID) => {
-            let current = state.pendingNotifications.findIndex(n => n.id === notificationID);
-            if (current !== -1) {
-                state.pendingNotifications.splice(current, 1);
-            }
+import { INotification, IRootState } from "../models";
+
+export interface INotifyState {
+    pending: INotification[];
+    max: number;
+    ttl: number;
+}
+
+type NotifyContext = ActionContext<INotifyState, IRootState>;
+
+const state = {
+    pending: [],
+    max: 0,
+    ttl: 0
+};
+
+export const mutations = {
+    SEND: (ctx, notification) => {
+        const current = ctx.pending.findIndex((v) => v === notification);
+        if (current === -1) {
+            notification.id = v4();
+            ctx.pending.push(notification);
+        } else {
+            ctx.pending[current] = notification;
         }
     },
-    actions: {
-        sendNotification: (state, notification) => {
-            state.commit("SEND_NOTIFICATION", notification);
-        },
-        removeNotification: (state, notificationID) => {
-            state.commit("REMOVE_NOTIFICATION", notificationID);
+    REMOVE: (ctx, notificationID) => {
+        const current = ctx.pending.findIndex((n) => n.id === notificationID);
+        if (current !== -1) {
+            ctx.pending.splice(current, 1);
         }
+    }
+};
+export const actions = {
+    sendNotification: (ctx, notification: INotification) => {
+        mutSend(ctx, notification);
     },
-    getters: {
-        getAllNotifications: state => state.pendingNotifications,
-        getAllSuccess: state => state.pendingNotifications.filter(x => x.type === "SUCCESS")
+    removeNotification: (ctx, notificationID: number) => {
+        mutRemove(ctx, notificationID);
     }
 };
 
+export const getters = {
+    getAllNotifications: (ctx) => ctx.pending,
+    getAllSuccess: (ctx) => ctx.pending.filter((x) => x.type === "SUCCESS")
+};
+
+const NotificationService = {
+    namespaced: true,
+    strict: process.env.NODE_ENV !== "production",
+    state,
+    mutations,
+    actions,
+    getters
+};
+
 export default NotificationService;
+
+/**
+ * Type safe definitions for NotificationService
+ */
+const { commit, read, dispatch } = getStoreAccessors<INotifyState, IRootState>(
+    "notify"
+);
+
+/**
+ * Actions Handlers
+ */
+export const sendNotification = dispatch(
+    NotificationService.actions.sendNotification
+);
+export const removeNotification = dispatch(
+    NotificationService.actions.removeNotification
+);
+/**
+ * Getters Handlers
+ */
+export const getAllNotifications = read(
+    NotificationService.getters.getAllNotifications
+);
+export const getAllSuccess = read(NotificationService.getters.getAllSuccess);
+
+/**
+ * Mutations Handlers
+ */
+export const mutSend = commit(NotificationService.mutations.SEND);
+export const mutRemove = commit(NotificationService.mutations.REMOVE);

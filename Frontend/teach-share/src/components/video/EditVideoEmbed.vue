@@ -10,7 +10,7 @@
                     <span class="input-group-text" id="basic-addon3">Embed URL</span>
                 </div>
                 <input
-                    v-on:input="DebounceSubmit"
+                    v-on:input="debounceSubmit"
                     v-validate="'required|url|YoutubeEmbedURL'"
                     :class="{'input': true, 'outline-danger': errors.has('embedurl') }"
                     v-model="EmbedURL"
@@ -22,14 +22,14 @@
                 <span v-show="errors.has('embedurl')" class="help text-danger">{{ errors.first('embedurl') }}</span>
             <br>
             <transition name="fade">
-                <div v-if="ytVideoDescription || ytVideoThumbnail || ytVideoTitle" class="row">
+                <div v-if="videoDetail || ytVideoThumbnail || ytVideoTitle" class="row">
                     <!-- <div class="col-1"></div> -->
                     <div class="col">
                         <div class="media">
                             <img class="mr-3" :src="ytVideoThumbnail.url" alt="Generic placeholder image">
                             <div class="media-body">
                                 <h5 class="mt-0">{{ ytVideoTitle }}</h5>
-                                    {{ytVideoDescriptionShort}}
+                                    {{smVideoDetail}}
                             </div>
                         </div>
                     <div class="col-1"></div>
@@ -72,109 +72,150 @@
     </div>
 </template>
 
-<script>
-import Vue from "vue";
-import FileUpload from "../FileUpload";
-import EditVideoEmbed from "./EditVideoEmbed";
-import DimensionPicker from "../DimensionPicker";
+<script lang="ts">
+import { Vue, Component, Prop } from "vue-property-decorator";
+import FileUpload from "../FileUpload.vue";
+import DimensionPicker from "../DimensionPicker.vue";
 import { mapGetters } from "vuex";
+import debounce from "lodash/debounce";
+import {
+    getVideoInfo,
+    videoTitle,
+    videoDetail,
+    videoThumbnail,
+    smVideoDetail,
+    clearVideoInfo
+} from "../../store_modules/YouTubeService";
+import { addElement } from "../../store_modules/PostCreateService";
 
 var _ = require("lodash");
 
-export default Vue.component("edit-video-embed", {
+@Component({
+    name: "edit-video-embed",
     components: { DimensionPicker },
     props: [],
-    data() {
-        return {
-            width: 640,
-            height: 480,
-            title: "",
-            source: "",
-            EmbedURL: "",
-            EmbedDescription: "",
-            EmbedHeight: 480,
-            includeYtData: true,
-            dimensionErrors: {
-                any: function() {
-                    return false;
-                } 
-            }
-        };
-    },
-    computed: {
-        ActualDescription() {
-            if (this.includeYtData) {
-                return this.ytVideoDescription;
-            } else {
-                return this.EmbedDescri1ption;
-            }
-        },
-        ...mapGetters([
+    computed: mapGetters("yt", [
             "ytVideoDescription",
             "ytVideoDescriptionShort",
             "ytVideoThumbnail",
             "ytVideoTitle",
             "ytVideoID"
-        ])
-    },
-    methods: {
-        DebounceSubmit: _.debounce(function() {
-            this.getYoutubeData();
-        }, 400),
-        submit() {
-            if (
-                this.$route.query.index ==
-                this.$store.state.create.postElements.length
-            ) {
-                this.$store.dispatch("addElement", this.generateEmbedJSON());
-            } else {
-                this.$store.dispatch("editElement", {
-                    index: this.$route.query.index,
-                    element: this.generateEmbedJSON()
-                });
-            }
-        },
+    ])
+})
+export default class EditVideoEmbed extends Vue {
+    ytVideoDescription!: string;
+    ytVideoID!: string;
 
-        getYoutubeData() {
-            var self = this;
-            this.$store
-                .dispatch("getYoutubeVideoInfo", this.EmbedURL)
-                .catch(err => console.log(err));
-        },
-        generateEmbedJSON() {
-            var obj = {
-                post: 2,
-                type: "video_link",
-                id: this.ytVideoID,
-                url: this.EmbedURL,
-                height: this.height,
-                width: this.width,
-                title: this.ytVideoTitle,
-                thumbnail: this.ytVideoThumbnail,
-                description: this.ActualDescription
-            };
-            this.$store.dispatch("submitVideoEmbed", obj);
-            this.$router.push({ name: "create" });
-            return { type: "video_link", content: obj };
-        },
-        cancelEdit() {
-            this.$router.push({ name: "create" });
+    width: number = 640;
+    height: number = 480;
+    title: string = "";
+    source: string = "";
+    EmbedURL: string = "";
+    EmbedDescription: string = "";
+    EmbedHeight: number = 480;
+    includeYtData: boolean = true;
+    dimensionErrors: any = {
+        any: function() {
+            return false;
         }
-    },
+    };
+
+    get ytVideoTitle(): string {
+        return videoTitle(this.$store);
+    }
+
+    get ytVideoThumbnail(): string {
+        return videoThumbnail(this.$store);
+    }
+
+    get videoDetail(): string {
+        return videoDetail(this.$store);
+    }
+
+    get actualDescription() {
+        if (this.includeYtData) {
+            return videoDetail(this.$store);
+        } else {
+            return this.EmbedDescription;
+        }
+    }
+    get smVideoDetail() {
+        return smVideoDetail(this.$store);
+    }
+
+    debounceSubmit() {
+        this.getYoutubeData();
+        var vm = this;
+        debounce(function() {
+            vm.getYoutubeData();
+        }, 400);
+    }
+    async submit() {
+        // debugger;
+        console.log("POST CREATE: ", this.$store.state.create);
+        if (
+            this.$route.query.index ==
+            this.$store.state.create.post.elements.length
+        ) {
+            try {
+                const resp = await addElement(this.$store, this.generateEmbedJSON());
+                console.log(resp);
+                // this.$notifySuccess(resp);
+            } catch (err) {
+                this.$notifyDanger(err);
+            }
+        } else {
+            this.$store.dispatch("editElement", {
+                index: this.$route.query.index,
+                element: this.generateEmbedJSON()
+            });
+        }
+    }
+
+    async getYoutubeData(input: string = this.EmbedURL) {
+        console.log("getting yt data");
+        try {
+            let resp = await getVideoInfo(this.$store, input);
+            return resp;
+        } catch (err) {
+            console.log(err);
+            return err;
+        }
+    }
+    generateEmbedJSON() {
+        var obj = {
+            post: 2,
+            type: "video_link",
+            id: this.ytVideoID,
+            url: this.EmbedURL,
+            height: this.height,
+            width: this.width,
+            title: videoTitle(this.$store),
+            thumbnail: this.ytVideoThumbnail,
+            description: this.actualDescription
+        };
+        this.$store.dispatch("submitVideoEmbed", obj);
+        this.$router.push({ name: "create" });
+        return { type: "video_link", content: obj };
+    }
+    cancelEdit() {
+        this.$router.push({ name: "create" });
+    }
     mounted() {
+        var vm = this;
         this.$on("changeHeight", function(h) {
-            this.height = h.value;
-            this.dimensionErrors = h.errors;
+            vm.height = h.value;
+            vm.dimensionErrors = h.errors;
         });
         this.$on("changeWidth", function(w) {
-            this.width = w.value;
-            this.dimensionErrors = w.errors;
+            vm.width = w.value;
+            vm.dimensionErrors = w.errors;
         });
-    },
-    destroyed() {
-        this.$store.dispatch("clearYoutubeData");
     }
-});
+    destroyed() {
+        clearVideoInfo(this.$store);
+    }
+}
 </script>
 
 <style lang="scss" scoped>

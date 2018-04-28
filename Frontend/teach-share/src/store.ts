@@ -1,53 +1,43 @@
+import { AxiosResponse } from "axios";
 import Vue from "vue";
-import Vuex from "vuex";
+import Vuex, { StoreOptions } from "vuex";
+
 import api from "../src/api";
+import { IRootState, Post, User } from "./models";
+import CommentService from "./store_modules/CommentService";
 import FileService from "./store_modules/FileService";
-import YouTubeService from "./store_modules/YouTubeService";
-import VideoService from "./store_modules/VideoService";
-import AudioService from "./store_modules/AudioService";
-import ImageService from "./store_modules/ImageService";
-import PostCreateService from "./store_modules/PostCreateService";
 import NotificationService from "./store_modules/NotificationService";
+import PostCreateService from "./store_modules/PostCreateService";
 import UserService from "./store_modules/UserService";
+import YouTubeService from "./store_modules/YouTubeService";
 
 Vue.use(Vuex);
 
-const state = {
-    user: null,
-    comment: null,
-    comments: [],
-    users: [],
-
-    // file upload
-    files: [],
-    filesPercents: [],
-
-    // Post feed
-    posts: []
-};
-
 export const mutations = {
     LOAD_ALL_POSTS: (state, data) => {
+        console.log("loading all posts...");
+        console.log(data);
         state.posts = data;
     },
-    LOAD_POST: (state, data) => {
+    LOAD_POST: (state: IRootState, data: Post) => {
         if (data !== undefined) {
-            let index = state.posts.findIndex(function(val, ind, obj) {
+            let index = state.posts.findIndex(function(val: Post, ind: number, obj: Post[]) {
                 if (val.pk === data.pk) {
-                    return true;
+                    return <boolean>true;
                 }
+                return <boolean>false;
             });
             if (index === -1) {
                 state.posts.push(data);
             } else {
-                state.posts.splice(index, data);
+                state.posts.splice(index, 1, data);
             }
         }
     },
     LOAD_USER: (state, data) => {
         state.user = Object.assign({}, data);
     },
-    ADD_USER: (state, user) => {
+    ADD_USER: (state, user: User) => {
         console.log("ADDUSER: ", user);
         let index = state.users.findIndex(val => val.pk === user.pk);
         console.log(index);
@@ -58,35 +48,6 @@ export const mutations = {
         }
         state.users.push(user);
         console.log(state.users);
-    },
-    LOAD_COMMENT: (state, data) => {
-        state.comment = Object.assign({}, data);
-    },
-    LOAD_COMMENTS_FOR_POST: (state, data) => {
-        let index = state.posts.findIndex(val => val.pk === data.post);
-        if (index !== -1) {
-            state.posts[index].comments = Object.assign([], data.comments);
-        }
-        state.comments = Object.assign([], data);
-    },
-    CREATE_UPDATE_COMMENT: (state, comment) => {
-        let postindex = state.posts.findIndex(val => val.pk === comment.post);
-        if (postindex === -1) {
-            console.error("Couldn't find it!", "danger");
-        } else {
-            let post = state.posts[postindex];
-            let comments = post.comments;
-            let commentindex = post.comments.findIndex(
-                val => val.pk === comment.pk
-            );
-            if (commentindex === -1) {
-                comments.push(comment);
-                // Vue.$set(state.posts.postindex.comments, comments);
-            } else {
-                comments.splice(commentindex, comment);
-                // Vue.$set(state.posts.postindex.comments, comments);
-            }
-        }
     },
     LOAD_FILTERED_POSTS: (state, data) => {
         state.posts = Object.assign([], data);
@@ -117,10 +78,14 @@ export const actions = {
             .then(response => state.commit("LOAD_ALL_POSTS", response.data))
             .catch(err => console.error(err));
     },
-    fetchAllPosts: state => {
+    fetchAllPosts: ctx => {
+        console.log("feteching all posts in store");
         api
             .get(`search/`)
-            .then(response => state.commit("LOAD_ALL_POSTS", response.data))
+            .then(function(response) {
+                console.log(response);
+                ctx.commit("LOAD_ALL_POSTS", response.data)
+            })
             .catch(err => console.error(err));
     },
     fetchAllPostsRaw: state => {
@@ -144,40 +109,22 @@ export const actions = {
                 .catch(err => console.error(err));
         });
     },
-    fetchUser: (state, userID) => {
-        api
-            .get(`users/${userID}/`)
-            .then(response => state.commit("ADD_USER", response.data))
-            .catch(err => console.error(err));
+    fetchUser: async (state, userID: number) => {
+        try {
+            let resp: AxiosResponse = await api.get(`users/${userID}/`);
+            state.commit("ADD_USER", resp.data);
+            return resp.data
+        } catch (err) {
+            console.log(err);
+            return err
+        }
     },
+
+    /**
+     * This is some text to test something. Below should have one type for user.
+     */
     addUser: (state, user) => {
         state.commit("ADD_USER", user);
-    },
-    fetchComment: (state, commentID) => {
-        api
-            .get(`comments/${commentID}/`)
-            .then(response => state.commit("LOAD_COMMENT", response.data))
-            .catch(err => console.error(err));
-    },
-    fetchComments: (state, commentID) => {
-        api
-            .get(`comments/${commentID}/`)
-            .then(response => state.commit("LOAD_COMMENTS", response.data))
-            .catch(err => console.error(err));
-    },
-    fetchCommentsForPost: (state, postID) => {
-        return new Promise((resolve, reject) => {
-            api
-                .get(`comments/?post=${postID}`)
-                .then(response => {
-                    state.commit("LOAD_COMMENTS_FOR_POST", {
-                        comments: response.data,
-                        post: postID
-                    });
-                    resolve(response);
-                })
-                .catch(err => reject(err));
-        });
     },
     fetchFilteredPosts: (state, filterParams) => {
         api
@@ -186,22 +133,6 @@ export const actions = {
                 state.commit("LOAD_FILTERED_POSTS", response.data)
             )
             .catch(err => console.error(err));
-    },
-    createPost: (state, postObj) => {
-        return new Promise((resolve, reject) => {
-            api
-                .post("posts/", postObj)
-                .then(response => resolve(response))
-                .catch(function(error) {
-                    if (error.response) {
-                        return resolve(error.response.data);
-                    } else if (error.request) {
-                        return resolve(error.request);
-                    } else {
-                        return resolve(error.message);
-                    }
-                });
-        });
     },
     updateExistingPost: (state, postObj) => {
         return new Promise((resolve, reject) => {
@@ -219,38 +150,7 @@ export const actions = {
                 });
         });
     },
-    saveDraft: ctx => {
-        if (ctx.rootGetters.getCurrentPostId === null) {
-            // hasn't yet been saved...
-            var obj = {
-                user: ctx.rootGetters.getCurrentUser.profile.pk,
-                title: ctx.rootGetters.getTitle,
-                content: ctx.rootGetters.getContent,
-                likes: 0,
-                comments: [],
-                tags: ctx.rootGetters.getTags,
-                attachments: [],
-                content_type: 0,
-                grade: 0,
-                length: 0
-            };
-            return ctx.dispatch("createPost", obj).then(result => {
-                ctx.dispatch("setCurrentPost", result.data);
-                return result.data.pk;
-            });
-        } else {
-            // might be redundant! Check.
-            var currentPost = ctx.rootGetters.getCurrentPost;
-            currentPost.content = ctx.state.create.postElements;
-            currentPost.user = ctx.rootGetters.getCurrentUser.profile.pk;
-            currentPost.tags = ctx.rootGetters.getTags;
-            currentPost.title = ctx.rootGetters.getTitle;
 
-            return ctx.dispatch("updateExistingPost", currentPost).then(res => {
-                return ctx.dispatch("setCurrentPost", res.data);
-            });
-        }
-    },
     createOrUpdateComment: (state, comment) => {
         if (comment.pk !== undefined) {
             return new Promise((resolve, reject) => {
@@ -281,30 +181,35 @@ export const getters = {
     getPostById: state => id => {
         return state.posts.filter(post => post.pk === Number(id))[0];
     },
-    getCommentsByPost: (state, getters) => postid => {
-        return getters.getPostById(postid).comments;
-    },
     getCurrentUser: (state, getters) => {
         return state.user;
     },
     getUserByID: state => id => {
         return state.users.find((val, ind, obj) => val.pk === id);
+    },
+    getUsers: state => {
+        return state.users;
     }
 };
 
-export default new Vuex.Store({
+const store: StoreOptions<IRootState> = {
+    state: {
+        user: new User(),
+        users: new Array<User>(),
+
+        // Post feed
+        posts: new Array<Post>()
+    },
     modules: {
         fs: FileService,
-        yts: YouTubeService,
-        video: VideoService,
-        audio: AudioService,
-        image: ImageService,
+        yt: YouTubeService,
         create: PostCreateService,
-        notifications: NotificationService,
+        notify: NotificationService,
+        comment: CommentService,
         user: UserService
     },
-    state,
     mutations,
     actions,
     getters
-});
+};
+export default new Vuex.Store<IRootState>(store);

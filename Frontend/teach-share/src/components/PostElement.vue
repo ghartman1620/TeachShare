@@ -18,13 +18,8 @@ Uses TextElement, VideoElement, etc.
                 :height="element.height"
             />
         </div>
-        <div class="post-element card" v-else-if="element.type === 'audio'">
-            <audio-element :id="element.content[0].id"
-            :title="element.content[0].title"
-            :body="element.content[0].description"
-            :controls="true" :source="element.content[0].url"
-            :filetype="element.content[0].filetype"
-            autoplay="false"/>
+        <div class="post-element card" v-else-if="element.type === 'audio_file'">
+            <audio-element :element="element"/>
         </div>
 
         <div class="post-element card" id="outer-video-container" v-else-if="element.type === 'video_link' || element.type === 'video_file'">
@@ -63,22 +58,27 @@ Uses TextElement, VideoElement, etc.
     </div>
 </template>
 
-<script>
-import Vue from "vue";
-import SeeMore from "./SeeMore"
+<script lang="ts">
+import { Component, Vue, Prop } from "vue-property-decorator";
 
-import TextElement from "./text/TextElement";
+import SeeMore from "./SeeMore.vue"
+import TextElement from "./text/TextElement.vue";
+import AudioElement from "./audio/AudioElement.vue";
+import VideoElement from "./video/VideoElement.vue";
+import FileElement from "./file/FileElement.vue";
+import ImageElement from "./image/ImageElement.vue";
 
-import AudioElement from "./audio/AudioElement";
-import VideoElement from "./video/VideoElement";
-import FileElement from "./file/FileElement";
-import ImageElement from "./image/ImageElement";
+@Component({
+    name: "post-element",
+    components: {SeeMore, TextElement, VideoElement, AudioElement, FileElement, ImageElement}
+})
+export default class PostElement extends Vue {
+    @Prop({})
+    element!: any;
 
-
-export default Vue.component("post-element", {
-    props: ["element", "index"],
-    components: {SeeMore, TextElement, VideoElement, FileElement, ImageElement},
-});
+    @Prop({})
+    index!: number;
+}
 </script>
 
 <style lang="scss" scoped>

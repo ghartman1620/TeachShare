@@ -10,23 +10,27 @@
     </div>
 </template>
 
-<script>
-import CommentEntry from "./CommentEntry";
+<script lang="ts">
+import { Vue, Component, Prop } from "vue-property-decorator";
+import { Post } from "../../models";
+import CommentEntry from "./CommentEntry.vue";
+import { getCommentsForPost } from "../../store_modules/CommentService";
 
-export default {
-    name: "comments",
-    props: ["post"],
+@Component({
+    name: "Comments",
     components: { CommentEntry },
-    computed: {
-        watchComments() {
-            return this.$store.getters.getCommentsByPost(this.post.pk);
-        },
-        
-    },
-    mounted() {
-        
+    props: [
+        "post"
+    ]
+})
+export default class Comments extends Vue {
+    @Prop({required: true}) post;
+
+    get watchComments() {
+        return getCommentsForPost(this.$store)(this.post.pk as number);
     }
-};
+    mounted() {}
+}
 </script>
 
 <style lang="scss" scoped>

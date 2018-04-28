@@ -20,51 +20,71 @@
 </body>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
-import FileUpload from "../FileUpload";
+
+import FileUpload from "../FileUpload.vue";
 import { mapGetters } from "vuex";
-export default Vue.component("edit-file", {
-	components: {FileUpload},
-	computed: {
-		...mapGetters(["hasFiles", "allFilesUploadComplete"])
-	},
-	methods: {
-		submit() {
-			var vm = this;
-			if (this.$route.query.index === this.$store.state.create.postElements.length) {
-				this.$store.dispatch("addElement", this.generateJSON())
-					.then(function(){
-						vm.$router.push({name: "create"});
-					});
-			} else {
-				this.$store.dispatch("editElement", {
-					index: this.$route.query.index,
-					element: this.generateJSON()
-				}).then(function(){
-                    vm.$router.push({name: "create"});
-                });
-			}
-		},
-		generateJSON() {
-			var files = [];
-			this.$store.state.fs.uploadedFiles.forEach(function(val){
-				files.push({
-                    post: 2,
-                    type: "file",
-                    id: val.db_id,
-                    file: val.file,
-                    name: val.file.name,
-                    url: val.url,
-                });
-			});
-			return {type: "file", content: files}
-		},
-		cancel() {
-            this.$router.push({ name: "create" });
-        }
+import { Component, Prop } from "vue-property-decorator";
+import { GenericFile, ModelMap } from "../../models";
+import { hasFiles, filesUploadStatus, files, allFilesUploadComplete } from "../../store_modules/FileService"
+import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
+
+@Component({
+    components: {FileUpload},
+    name: "edit-file",
+})
+export default class EditFile extends Vue {
+
+	@Action("addElement") addElement;
+
+    get hasFiles() {
+        return hasFiles(this.$store);
+    }
+    get files(){
+        return filesUploadStatus(this.$store);
 	}
-});
+	get fileMap(): ModelMap<GenericFile>{
+		return files(this.$store);
+	}
+    get allFilesUploadComplete(): boolean {
+        return allFilesUploadComplete(this.$store);
+    }
+
+    submit(): void {
+        console.log("submitting file element");
+        console.log(this.generateJSON());
+        this.$parent.$emit("submitElement", this.generateJSON(), this.$route.query.index);
+        /*
+		var vm = this;
+		if (this.$route.query.index === this.$store.state.create.postElements.length) {
+			this.addElement(this.generateJSON())
+				.then(function(){
+					vm.$router.push({name: "create"});
+				});
+		} else {
+			this.$store.dispatch("editElement", {
+				index: this.$route.query.index,
+				element: this.generateJSON()
+			}).then(function(){
+				vm.$router.push({name: "create"});
+			}
+		}
+		*/
+    }
+    generateJSON(): any {
+        return {type: "file", content: this.fileMap.list()}
+    }
+    cancel(): void{
+        this.$router.push({ name: "create" });
+    }
+}
 </script>
 
 
