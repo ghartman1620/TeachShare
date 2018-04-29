@@ -87,6 +87,7 @@ fn main() {
     let mut vec = Vec::new();
     vec.push(addr);
     vec.push(addr1);
+    // addr.send()
     let director: Addr<Unsync, Director> = Director {actors: vec, responses: Vec::new()}.start();
     // send message and get future for result
     let _res = director.send(Ping(10));

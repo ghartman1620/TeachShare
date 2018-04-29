@@ -1,0 +1,8 @@
+[package]
+name = "cache"
+version = "0.1.0"
+authors = ["Bryan McCoid <bryan.mccoid@gmail.com>"]
+
+[dependencies]
+actix = "0.5"
+futures = "0.1.21"
