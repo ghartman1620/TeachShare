@@ -19,7 +19,8 @@ impl Handler for Server {
     fn on_message(&mut self, msg: Message) -> Result<()> {
         // Echo the message back
         println!("send msg: {}", msg);
-        self.out.broadcast(msg) //the result<()> returned by self.out.broadcast is returned by this on_message function
+        println!("send token {}", self.out.token());
+        self.out.send(msg) //the result<()> returned by self.out.broadcast is returned by this on_message function
     }
 
     fn on_close(&mut self, code: CloseCode, reason: &str) {
