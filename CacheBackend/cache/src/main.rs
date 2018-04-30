@@ -1,60 +1,13 @@
-#[macro_use]
 extern crate actix;
+
+use actix::prelude::*;
 use std::collections::HashMap;
 use std::sync::mpsc::channel;
-use std::sync::mpsc::{Sender, Receiver};
+use std::sync::mpsc::{Receiver, Sender};
 use std::sync::{Arc, RwLock};
 use std::thread;
 
-// use actix::{Actor, Addr, Arbiter, Handler, Context, msgs, Message, Unsync, Recipient};
-// use futures::{future, Future};
-use actix::prelude::*;
-
-// <actix::Syn, WSActor, GenericMessage>;
-
-pub struct User {
-    pub pk: i64,
-    pub username: String,
-    pub email: String,
-    // etc..
-
-    // assumes the value for a watch is a string temporarily
-    pub watches: Vec<Watch<String>>,
-}
-
-pub enum WatchType {
-    Post,
-    PostList,
-    UserProfile,
-    // etc...
-}
-
-// Model + Field which are used to define what in Django's models is being watched.
-// This is really just a placeholder for the general idea.
-pub struct Model {}
-pub struct Field {}
-
-pub struct WatchValue {
-    model: Model,
-    field: Field,
-    identifiers: Vec<String>,
-}
-
-pub struct Watch<V> {
-    pub id: i64, // the ID of the WATCH, not the thing being watched
-    pub watch_type: WatchType,
-    pub value: V, // will depend on what kind of value you are watching
-}
-
-pub struct ConnRef {
-    pub user: User,
-}
-
-pub struct Nexus {
-    pub id: i8, // not gonna be many if even more than 1
-    pub users: Vec<User>,
-    pub connections: HashMap<i32, ConnRef>,
-}
+mod models;
 
 pub struct WSActor {
     id: i64,
@@ -104,6 +57,7 @@ impl Handler<GenericMessage> for WSActor {
 
     fn handle(&mut self, msg: GenericMessage, ctx: &mut Context<Self>) -> Self::Result {
         println!("{:?}", msg.data);
+
         ()
     }
 }
@@ -134,55 +88,63 @@ fn main() {
 
     // This is a way to have a thread safe mutux-backed, reference counted
     // hash map. So yeah..
-    let mut themap = HashMap::new();
-    themap.insert(String::from("test"), 10);
+    // let mut themap: HashMap<String, Addr<Syn, _>> = HashMap::new();
+    // themap.insert(String::from("test"), 10);
 
-    let lock = RwLock::new(&themap);
+    // let lock = RwLock::new(&themap);
 
-    let refcounter: Arc<RwLock<&HashMap<String, i64>>> = Arc::new(lock);
+    // let refcounter: Arc<RwLock<&HashMap<String, Addr<Syn, _>>>> = Arc::new(lock);
+    // let refcounter2 = refcounter.clone();
     // .insert(String::from("test"), 10);
-    {
-        let result = refcounter.write().unwrap()["test"];
-        // assert_eq!(*result, HashMap::new());
-        let v = result;
-        println!("{}", v);
-    }
+    // {
+    //     let result = refcounter.write().unwrap()["test"];
+    //     // assert_eq!(*result, HashMap::new());
+    //     let v = result;
+    //     //println!("{:?}", v);
+    // }
 
-    let mut hm: HashMap<String, Addr<Syn, _>> = HashMap::new();
-    let (sen, rec) = channel();
+    // let mut hm: HashMap<String, Addr<Syn, _>> = HashMap::new();
+    // let (sen, rec) = channel();
+    let mut handles: Vec<std::thread::JoinHandle<()>> = vec!(); 
 
-    let handle = thread::spawn(|| {
-        let system = actix::System::new("test");
-        let addr2: Addr<Syn, _> = WSActor::create(move |ctx| {
-            let addr: Addr<Syn, _> = ctx.address();
-            let addr2: Addr<Syn, _> = WSActor::new(0, addr.recipient()).start();
+    for _ in 0..10 {
+        let handle = thread::spawn(|| {
+            let system = actix::System::new("test");
+            let addr2: Addr<Syn, _> = WSActor::create(|ctx| {
+                let addr: Addr<Syn, _> = ctx.address();
+                let addr2: Addr<Syn, _> = WSActor::new(0, addr.recipient()).start();
 
-            let add_copy = addr2.clone();
+                let add_copy = addr2.clone();
 
-            hm.insert(String::from("test"), add_copy);
-            sen.send(hm).unwrap();
-            addr2.do_send(GenericMessage {
-                timestamp: 10,
-                data: vec![],
+                // let localnum = Arc::get_mut(&mut refcounter2).unwrap();
+
+                // localnum.insert(String::from("test"), add_copy);
+                // println!("{:?}", localnum);
+                // sen.send(refcounter2.read().unwrap()).unwrap();
+                addr2.do_send(GenericMessage {
+                    timestamp: 10,
+                    data: vec![],
+                });
+                WSActor::new(2, addr2.recipient())
             });
-            WSActor::new(2, addr2.recipient())
+            system.run();
         });
-        system.run();
-    });
-
+        handles.push(handle);
+    }
+    println!("{:?}", handles);
     // println!("{:?}", reciever.recv().unwrap());
 
     //println!("{:?}", hm);
-    let hm = rec.recv().unwrap();
+    // let hm = rec.recv().unwrap();
 
-    for (k, val) in hm {
-        println!("Have key: {} ---> {}", k, val.connected());
-    }
-    // assert!(handle.join().is_ok());
-    let good = handle.join();
-    if good.is_ok() {
-        println!("Joined threads successfully!");
-    }
+    // for (k, val) in hm {
+    //     println!("Have key: {} ---> {}", k, val.connected());
+    // }
+    // // assert!(handle.join().is_ok());
+    // let good = handle.join();
+    // if good.is_ok() {
+    //     println!("Joined threads successfully!");
+    // }
 
     // let addr: Addr<Unsync, _> = WSActor::new(2, String::from("fake")).start();
     // println!("Is connected?: {}", addr.connected());
