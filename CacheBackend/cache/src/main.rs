@@ -1,14 +1,16 @@
-#[macro_use] extern crate actix;
-use std::sync::mpsc::channel;
-use std::thread;
+#[macro_use]
+extern crate actix;
 use std::collections::HashMap;
+use std::sync::mpsc::channel;
+use std::sync::mpsc::{Sender, Receiver};
+use std::sync::{Arc, RwLock};
+use std::thread;
 
 // use actix::{Actor, Addr, Arbiter, Handler, Context, msgs, Message, Unsync, Recipient};
 // use futures::{future, Future};
 use actix::prelude::*;
-use std::sync::Mutex;
 
- // <actix::Syn, WSActor, GenericMessage>;
+// <actix::Syn, WSActor, GenericMessage>;
 
 pub struct User {
     pub pk: i64,
@@ -17,7 +19,7 @@ pub struct User {
     // etc..
 
     // assumes the value for a watch is a string temporarily
-    pub watches: Vec<Watch<String>>, 
+    pub watches: Vec<Watch<String>>,
 }
 
 pub enum WatchType {
@@ -54,16 +56,15 @@ pub struct Nexus {
     pub connections: HashMap<i32, ConnRef>,
 }
 
-pub struct WSActor{
+pub struct WSActor {
     id: i64,
     addr: Recipient<Syn, GenericMessage>,
-
 }
 
 #[derive(Debug)]
 pub struct GenericMessage {
     timestamp: i64,
-    data: Vec<i64>
+    data: Vec<i64>,
 }
 
 impl WSActor {
@@ -102,45 +103,75 @@ impl Handler<GenericMessage> for WSActor {
     type Result = ();
 
     fn handle(&mut self, msg: GenericMessage, ctx: &mut Context<Self>) -> Self::Result {
-
         println!("{:?}", msg.data);
         ()
-    } 
+    }
 }
 
-// fn addr_closure() -> 
+fn produce(sender: Sender<String>) {
+    // let pool = CpuPool::new_num_cpus();
+
+    // for chunk in reader {
+    //     let future = pool.spawn_fn(|| /* do work */);
+    //     sender.send(future);
+    // }
+
+    // Dropping the sender signals there's no more work to consumer
+}
+
+fn consume(receiver: Receiver<String>) {
+    while let Ok(future) = receiver.recv() {
+        // let item = future.wait().expect("Computation Error?");
+
+        /* do something with item */
+    }
+}
+
+// fn addr_closure() ->
 
 fn main() {
-    // println!("Hello, world!");
     // let (sender, reciever) = channel();
-    
-    // use futures::{future, Future};
+
+    // This is a way to have a thread safe mutux-backed, reference counted
+    // hash map. So yeah..
+    let mut themap = HashMap::new();
+    themap.insert(String::from("test"), 10);
+
+    let lock = RwLock::new(&themap);
+
+    let refcounter: Arc<RwLock<&HashMap<String, i64>>> = Arc::new(lock);
+    // .insert(String::from("test"), 10);
+    {
+        let result = refcounter.write().unwrap()["test"];
+        // assert_eq!(*result, HashMap::new());
+        let v = result;
+        println!("{}", v);
+    }
 
     let mut hm: HashMap<String, Addr<Syn, _>> = HashMap::new();
     let (sen, rec) = channel();
-    // let a: WSActor = WSActor{};
-    // let a = WSActor::new(1, String::from("fake"));
-    // hm.insert(String::from("test"), a);
-    
-    let handle = thread::spawn(||{
+
+    let handle = thread::spawn(|| {
         let system = actix::System::new("test");
         let addr2: Addr<Syn, _> = WSActor::create(move |ctx| {
             let addr: Addr<Syn, _> = ctx.address();
             let addr2: Addr<Syn, _> = WSActor::new(0, addr.recipient()).start();
-            
+
             let add_copy = addr2.clone();
 
             hm.insert(String::from("test"), add_copy);
-            sen.send(hm).unwrap();        
-            addr2.do_send(GenericMessage{timestamp: 10, data: vec!()});
+            sen.send(hm).unwrap();
+            addr2.do_send(GenericMessage {
+                timestamp: 10,
+                data: vec![],
+            });
             WSActor::new(2, addr2.recipient())
         });
         system.run();
     });
-    
+
     // println!("{:?}", reciever.recv().unwrap());
-    
-    
+
     //println!("{:?}", hm);
     let hm = rec.recv().unwrap();
 
@@ -159,7 +190,7 @@ fn main() {
 
     // let res = addr.send(m);
     // let addr2 = WSActor::new(3, String::from("fake"))
-    
+
     // system.handle().spawn(res.then(|res| {
     //     match res {
     //         Ok(result) => println!("Result: {}", result),
@@ -170,5 +201,4 @@ fn main() {
     //     return future::result(Ok(()));
     // }));
     // // send();
-    
 }
