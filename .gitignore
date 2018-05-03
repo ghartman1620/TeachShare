@@ -9,4 +9,6 @@ __pycache__/
 media/
 *celerybeat-schedule*
 Rust_ws/target
+TeachShare_WebApp/cache/diesel_demo/target
 static/
+
