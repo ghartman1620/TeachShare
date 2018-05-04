@@ -203,14 +203,30 @@ table! {
         content_type -> Int4,
         grade -> Int4,
         length -> Interval,
-        subject_id -> Nullable<Int4>,
+        subject -> Int4,
+        crosscutting_concepts -> Array<Int4>,
+        disciplinary_core_ideas -> Array<Int4>,
+        practices -> Array<Int4>,
     }
 }
 
 table! {
-    posts_subject (id) {
+    posts_post_standards (id) {
+        id -> Int4,
+        post_id -> Int4,
+        standard_id -> Int4,
+    }
+}
+
+table! {
+    posts_standard (id) {
         id -> Int4,
         name -> Varchar,
+        category -> Varchar,
+        grade -> Int4,
+        description -> Text,
+        subject -> Int4,
+        code -> Varchar,
     }
 }
 
@@ -290,7 +306,8 @@ joinable!(posts_attachment -> posts_post (post_id));
 joinable!(posts_comment -> auth_user (user_id));
 joinable!(posts_comment -> posts_post (post_id));
 joinable!(posts_post -> auth_user (user_id));
-joinable!(posts_post -> posts_subject (subject_id));
+joinable!(posts_post_standards -> posts_post (post_id));
+joinable!(posts_post_standards -> posts_standard (standard_id));
 joinable!(social_auth_usersocialauth -> auth_user (user_id));
 
 allow_tables_to_appear_in_same_query!(
@@ -314,7 +331,8 @@ allow_tables_to_appear_in_same_query!(
     posts_attachment,
     posts_comment,
     posts_post,
-    posts_subject,
+    posts_post_standards,
+    posts_standard,
     social_auth_association,
     social_auth_code,
     social_auth_nonce,
