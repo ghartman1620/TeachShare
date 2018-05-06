@@ -146,7 +146,6 @@ impl<'a> Cache<'a> {
         return self.posts.get(&key);
     }
     pub fn set_post(&mut self, key: String, val: Post) -> Option<Model<Post>> {
-        // let mut newpost = &mut Post{..val};
         let model = Model::new(val);
         self.posts.insert(key, model)
     }
