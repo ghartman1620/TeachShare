@@ -15,7 +15,10 @@ interface AudioElement extends PostElement{
 
 
 
-
+interface IColorStyle {
+    selector: string;
+    color: string;
+}
 
 export default class InProgressPost{
     elements: any[];
@@ -25,10 +28,6 @@ export default class InProgressPost{
     attachments: any[];
     pk: number = -1; //-1 if post is not yet saved as draft
 
-    interface IColorStyle {
-        selector: string;
-        color: string;
-    }
     private _background: IColorStyle;
     get background() {
         return this._background;
@@ -36,17 +35,16 @@ export default class InProgressPost{
     set background(background: IColorStyle){
         this._background = background;
     }
-    constructor(user: User){
+    constructor(user: User) {
         this.elements = [];
         this.title = "";
         this.tags = [];
         this.userPk = user.pk;
         this.attachments = [];
-        this.background = IColorStyle {selector: ; string: ;};
+        this._background = {selector: "", color: ""};
         console.log(user);
         console.log("new post constructor");
         this.createDraft();
-        
     }
 
     setTags(tags: string[]): void {
@@ -60,7 +58,7 @@ export default class InProgressPost{
     }
 
     setColor(color: string): void{
-        this.background = IColorStyle {selector: ; string: ;};
+        this.background = {selector: "", color: ""};
     }
     addElement(element: any): void{
         this.elements.push(element);
