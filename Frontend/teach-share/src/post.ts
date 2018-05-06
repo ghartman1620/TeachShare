@@ -25,17 +25,30 @@ export default class InProgressPost{
     attachments: any[];
     pk: number = -1; //-1 if post is not yet saved as draft
 
+    interface IColorStyle {
+        selector: string;
+        color: string;
+    }
+    private _background: IColorStyle;
+    get background() {
+        return this._background;
+    }
+    set background(background: IColorStyle){
+        this._background = background;
+    }
     constructor(user: User){
         this.elements = [];
         this.title = "";
         this.tags = [];
         this.userPk = user.pk;
         this.attachments = [];
+        this.background = IColorStyle {selector: ; string: ;};
         console.log(user);
         console.log("new post constructor");
         this.createDraft();
         
     }
+
     setTags(tags: string[]): void {
         this.tags = tags;
     }
@@ -46,6 +59,9 @@ export default class InProgressPost{
         this.attachments = attachments;
     }
 
+    setColor(color: string): void{
+        this.background = IColorStyle {selector: ; string: ;};
+    }
     addElement(element: any): void{
         this.elements.push(element);
     }
