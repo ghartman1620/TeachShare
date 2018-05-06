@@ -58,9 +58,15 @@ export const actions = {
     },
     fetchPost: async (ctx: PostContext, postID: string|number) => {
         try {
-            const resp: AxiosResponse<Post> = await api.get(`posts/${postID}/`);
-            mutCreate(ctx, resp.data as Post);
-            return resp.data;
+
+            if(typeof postID === "string"){
+                postID = parseInt(postID);
+            }
+            console.log("awaiting Post.get with postid with type " + (typeof postID))
+            var p: Post = await Post.get(postID as number);
+            //const resp: AxiosResponse<Post> = await api.get(`posts/${postID}/`);
+            mutCreate(ctx, p);
+            return p;
         } catch (err) {
             return err;
         }
