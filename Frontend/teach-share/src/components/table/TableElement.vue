@@ -1,6 +1,6 @@
 <template>
     <body>
-        <chart v-bind:userData=this.element.content></chart>
+        <chart v-bind:userData=this.element.values></chart>
     </body>
 </template>
 
@@ -25,7 +25,8 @@ export default Vue.component("table-element", {
         BootstrapVue
     },
     mounted: function () {
-        console.log("content sent to table element: ", this.element);
+        console.log("Table Element mounted!");
+        console.log("content sent to table element: ", this.element.values);
     }
 })
 </script>

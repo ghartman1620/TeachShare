@@ -128,8 +128,7 @@ var handleRow = function (event, entry) {
             submit: function(event) {
                 this.filterNumericValues();
                 this.chooseGraphs();
-                this.returnObject["values"] = this.values;
-                this.$parent.$emit("submitElement", this.returnObject, this.$route.query.index);
+                this.$parent.$emit("submitElement", { type: 'table', values: this.values}, this.$route.query.index);
                 // if (
                 //     this.$route.query.index ==
                 //     this.$store.state.create.postElements.length
