@@ -4,13 +4,14 @@ extern crate serde_json;
 use std::cmp::{Eq, PartialEq};
 use std::collections::HashMap;
 use std::rc::Rc;
+use std::collections;
 
 /**
  *  This
  */
-#[derive(Serialize, Deserialize, Hash, Debug)]
+#[derive(Serialize, Deserialize, Hash, Clone, Debug)]
 pub struct User {
-    pub pk: i64,
+    pub pk: i32,
     pub username: String,
     pub email: String,
 }
@@ -23,7 +24,7 @@ impl PartialEq for User {
 impl Eq for User {}
 
 impl User {
-    pub fn new(pk: i64, username: String, email: String) -> User {
+    pub fn new(pk: i32, username: String, email: String) -> User {
         User {
             pk: pk,
             username: username,
@@ -37,7 +38,7 @@ pub struct Resource<T> {
     /// Watchers: These keep track of all the users that are watching this
     /// peice of data. 
     /// 
-    pub watchers: Rc<HashMap<i32, User>>,
+    pub watchers: HashMap<i32, User>,
 
     /// Data: Where the data is actually stored. Generically, of course.
     /// 
@@ -61,12 +62,35 @@ impl<'a, T> Resource<T> {
     pub fn new(inner: T) -> Resource<T> {
         Resource::<T>{
             data: inner,
-            watchers: Rc::new(HashMap::new()),
+            watchers: HashMap::new(),
             version: [0, 0, 0],
         }
     }
     pub fn increment(&mut self) {
         self.version[1] = self.version[1]+1;
+    }
+    pub fn add_watch(&mut self, user: User) -> Option<User>{
+        self.watchers.insert(user.pk, user)
+    }
+
+    /// remove_watch: remove's a watch from the watchers map
+    pub fn remove_watch(&mut self, user_id: i32) -> Option<User> {
+        self.watchers.remove(&user_id)
+    }
+
+    /// all_watchers: goal is to get a vector of copy'd user's
+    pub fn all_watchers(&mut self) -> Vec<User> {
+        let out: &mut Vec<User> = &mut vec!();
+        let temp = self.watchers.clone();
+        for (_, user) in temp.iter() {
+            out.push(user.clone());
+        }
+        return out.clone();
+    }
+
+    /// watchers_to_iter: gives an iterator from the watchers list
+    pub fn watchers_to_iter(&self) -> collections::hash_map::Iter<i32, User> {
+        self.watchers.iter()
     }
 }
 
@@ -107,6 +131,7 @@ pub struct Message<T> where
     pub version: [i32; 3],
 }
 
+#[derive(Debug)]
 pub struct Cache {
     // using classical generics and predefined models
     pub posts: HashMap<String, Resource<Post>>,
@@ -134,8 +159,10 @@ impl Cache {
         let model = Resource::new(val);
         self.posts.insert(key, model)
     }
-    pub fn update_post(&mut self, key: String, new_post: &mut Post) {
-        self.posts.entry(key).and_modify(new_post);
+    pub fn update_post(&mut self, key: String, new_post: Resource<Post>) -> bool {
+        let prev = self.posts.get_mut(&key).unwrap();
+        *prev = new_post;
+        true
     }
 }
 

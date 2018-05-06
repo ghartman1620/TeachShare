@@ -86,10 +86,21 @@ fn main() {
     let m = &mut models::Resource::<models::Post>::new(p);
     println!("Post: {:?}", m.data);
 
-    let watchers = m.watchers.clone();
-    println!("New Model Watchers: {:?}", watchers);
-
+    m.add_watch(models::User{pk: 1, username: String::from("bryandmc"), email: String::from("bmccoid@gmail.com")});
+    m.add_watch(models::User{pk: 2, username: String::from("bman"), email: String::from("fake@gmail.com")});
+    let all = m.all_watchers();
+    println!("All ---> {:?}", all);
     // let t = m.data;
+
+    for (id, user) in m.watchers_to_iter() {
+        println!("User [{}] --> {:?}", id, user);
+    }
+
+    let rm = match m.remove_watch(1) {
+        Some(val) => println!("returned: {:?}", val),
+        None => println!("Nothign was returned."),
+    };
+    println!("new watchers: {:?}", m.watchers);
     // t.id = 2;
     // t.username = String::from("bryandmc");
     m.increment();
@@ -111,13 +122,23 @@ fn main() {
         Some(_) => false,
     };
     println!("Did exist? -> {}", exists);
+    {
+        let temp = match cache.get_post(String::from("something")) {
+            None => Err("key does not exist"),
+            Some(val) => Ok(val),
+        };
+        let result = temp;
+    }
+    let p1 = models::Post{id: 43, username: String::from("changedUser555")};
+    let resource = models::Resource::new(p1);
+    
+    // let mut_resource = resource;
 
-    let temp = match cache.get_post(String::from("something")) {
-        None => Err("key does not exist"),
-        Some(val) => Ok(val),
-    };
-    let result = temp;
-    println!("from cache: {:?}", result);
+    let temp2 = cache.update_post(String::from("something"), resource);
+
+    println!("Result from update: {:?}", temp2);
+    println!("{:?}", cache);
+
     listen("127.0.0.1:3012", |out| {
         let (send, _) = mpsc::channel();
         let res = Node::<String> { out: out, tx: send }.clone();
