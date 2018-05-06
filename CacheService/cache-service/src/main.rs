@@ -34,7 +34,17 @@ impl<T> Handler for Node<T> {
 
     fn on_message(&mut self, msg: Message) -> Result<()> {
         // this is the Tx for where this data message came from
-
+        let result = match msg {
+            Message::Binary(bin) => {
+                println!("{:?}", bin); 
+                String::from("")
+            }, // ...
+            Message::Text(text) => { 
+                println!("{}", text);
+                text    
+            },
+        };
+        
         self.out.send("Some text...")
     }
 
@@ -54,6 +64,10 @@ impl<T> Handler for Node<T> {
     }
 }
 
+// fn parse_message<T>(msg: String) ->  {
+
+// }
+
 fn main() {
     let pool = pool::ThreadPool::new(2).unwrap();
     println!("{:?}", pool);
@@ -66,21 +80,10 @@ fn main() {
         user_pool: Cell::new(users),
         // watches: Vec::new(),
     };
-
-    let p = models::PostModel {
-        data: models::Post{id: 1, username: String::from("bryan")},
-        watchers: vec![models::User {
-            pk: 1,
-            username: String::from("bryan"),
-            email: String::from("test@gmail.com"),
-        }],
-    };
     
-    let results = p.watchers();
-    println!("{:?}", results);
 
     let p = models::Post{id: 1, username: String::from("bryan")}; 
-    let m = &mut models::Model::<models::Post>::new(p);
+    let m = &mut models::Resource::<models::Post>::new(p);
     println!("Post: {:?}", m.data);
 
     let watchers = m.watchers.clone();

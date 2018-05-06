@@ -32,30 +32,8 @@ impl User {
     }
 }
 
-// pub struct Resource <T> {
-//     watchers: HashMap<i32, User>,
-//     data: T, // alternatively a [u8] or Vec<u8> would work for holding data
-// }
-
-#[derive(Serialize, Deserialize, Hash, Debug)]
-pub struct Field {}
-
-// This is WHAT the watch is watching...
-#[derive(Serialize, Deserialize, Hash, Debug)]
-pub enum WatchType {
-    Post,
-    UserProfile,
-    // etc...
-}
-
-pub struct WatchValue {
-    field: Field,
-    watch_type: WatchType,
-    data: Box<Resource>,
-}
-
 #[derive(Debug)]
-pub struct Model<T> {
+pub struct Resource<T> {
     /// Watchers: These keep track of all the users that are watching this
     /// peice of data. 
     /// 
@@ -67,7 +45,7 @@ pub struct Model<T> {
 
     /// Version: [u32; 3] is...
     /// 
-    /// something along the linse of [browser, cache, db]
+    /// something along the lines of [browser, cache, db]
     /// to keep track of which version this current data is.
     /// Although it could be done using a single integer, having actual
     /// 'mutators' identified allows for a finer grained decision making
@@ -79,9 +57,9 @@ pub struct Model<T> {
     version: [u32; 3],
 }
 
-impl<'a, T> Model<T> {
-    pub fn new(inner: T) -> Model<T> {
-        Model::<T>{
+impl<'a, T> Resource<T> {
+    pub fn new(inner: T) -> Resource<T> {
+        Resource::<T>{
             data: inner,
             watchers: Rc::new(HashMap::new()),
             version: [0, 0, 0],
@@ -90,94 +68,125 @@ impl<'a, T> Model<T> {
     pub fn increment(&mut self) {
         self.version[1] = self.version[1]+1;
     }
+}
 
+impl PartialEq for Resource<Post> {
+    fn eq(&self, other: &Resource<Post>) -> bool {
+        self.data.id == other.data.id
+    }
+}
+impl Eq for Resource<Post> {}
+
+
+pub enum MessageType {
+    Watch=0,
+    Create,
+    Update,
+    Double,
+    Get,
+}
+
+pub trait Model {
+    type model;
+    fn id(&self) -> i32;
+    fn me(&self) -> &Self::model;
+    fn save(&mut self) -> bool;
 }
 
 
-pub trait Resource {
-    fn watchers(&self);
+
+/// Message<T> is a wrapper for defining messages for communication
+/// with this very service. 
+#[allow(unused_variables)]
+pub struct Message<T> where
+    T: Model
+{
+    pub data: T,
+    pub msg_type: MessageType,
+    pub timestamp: i32,
+    pub version: [i32; 3],
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+pub struct Cache {
+    // using classical generics and predefined models
+    pub posts: HashMap<String, Resource<Post>>,
+    pub users: HashMap<String, Resource<User>>,
+    pub comments: HashMap<String, Resource<Comment>>,
+    
+    // using trait objects -- This uses vtable lookups at runtime as appose
+    // to the much quicker standard method. It is relatively clean but also requires
+    // separate implementations for each model, even if they are largely copy/pasted.
+    // data: HashMap<String, &'a Resource>,
+}
+
+impl Cache {
+    pub fn new() -> Cache {
+        Cache {
+            posts: HashMap::new(),
+            users: HashMap::new(),
+            comments: HashMap::new(),
+        }
+    }
+    pub fn get_post(&mut self, key: String) -> Option<&Resource<Post>> {
+        return self.posts.get(&key);
+    }
+    pub fn set_post(&mut self, key: String, val: Post) -> Option<Resource<Post>> {
+        let model = Resource::new(val);
+        self.posts.insert(key, model)
+    }
+    pub fn update_post(&mut self, key: String, new_post: &mut Post) {
+        self.posts.entry(key).and_modify(new_post);
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Post{
     pub id: i32,
     pub username: String,
 }
 
-pub struct PostModel {
-    pub data: Post,
-    pub watchers: Vec<User>,
-}
-impl PostModel {
-    pub fn watchers(self) -> Vec<User> {
-        return self.watchers;
+impl Model for Post {
+    type model = Post;
+    fn id(&self) -> i32 {
+        self.id
     }
-    pub fn new(&self) -> PostModel {
-        PostModel{
-            data: Post{id: 1, username: String::from("bryan")},
-            watchers: vec!(),
-        }
+    fn me(&self) -> &Self::model {
+        self
+    }
+    fn save(&mut self) -> bool {
+        true
     }
 }
 
-
-
-pub struct Cache<'a> {
-    // using trait objects -- This uses vtable lookups at runtime as appose
-    // to the much quicker standard method. It is relatively clean but also requires
-    // separate implementations for each model, even if they are largely copy/pasted.
-    data: HashMap<String, &'a Resource>,
-
-    // using classical generics and predefined models
-    posts: HashMap<String, Model<Post>>,
-    users: HashMap<String, &'a Model<User>>,
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+pub struct Comment {
+    pub id: i32,
+    pub text: String,
 }
 
-impl<'a> Cache<'a> {
-    pub fn new() -> Cache<'a> {
-        Cache {
-            data: HashMap::new(),
+#[cfg(test)]
 
-            posts: HashMap::new(),
-            users: HashMap::new(),
-        }
+mod tests {
+    use models;
+    use std::any::TypeId;
+    use std::any::Any;
+    use std;
+
+    pub fn typeid<T: Any>(_: &T) -> TypeId {
+        TypeId::of::<T>()
     }
-    pub fn get_post(&mut self, key: String) -> Option<&Model<Post>> {
-        return self.posts.get(&key);
+    // just 'test' tests.. 
+    #[test]
+    fn test_post() {
+        let p = models::Post{id: 1, username: String::from("bryandmc")};
+        assert_eq!(models::Post{id: 1, username: String::from("bryandmc")}, p)
     }
-    pub fn set_post(&mut self, key: String, val: Post) -> Option<Model<Post>> {
-        let model = Model::new(val);
-        self.posts.insert(key, model)
+
+    #[test]
+    fn test_new_model() {
+        let m = models::Resource::new(models::Post{id: 1, username: String::from("bryandmc")});
+        let typ = typeid(&m);
+        println!("{:?}", typ);
+        assert_eq!(std::any::TypeId::of::<models::Resource<models::Post>>(), typ);
     }
-}
-
-pub struct UserModel {
-    data: User,
-    watchers: Vec<User>,
-}
-impl UserModel {
-    pub fn watchers(self) -> Vec<User> {
-        return self.watchers;
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Watch {
-    pub id: i64, // the ID of the WATCH, not the thing being watched
-                 // pub value: WatchValue, // will depend on what kind of value you are watching
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ConnRef {
-    pub user: User,
-}
-
-pub struct Nexus {
-    pub id: i8, // not gonna be many if even more than 1
-
-    // @TODO: change to posts with users connected
-    // pub users: Vec<User>,
-    pub resources: Vec<Box<Resource>>,
-    pub connections: HashMap<i32, ConnRef>,
-}
-
+} 
