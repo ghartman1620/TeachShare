@@ -1,4 +1,4 @@
-aiohttp==3.1.3
+
 aioredis==1.0.0
 amqp==2.2.2
 argcomplete==1.9.4
@@ -30,7 +30,6 @@ django-braces==1.12.0
 django-cors-headers==2.1.0
 django-elasticsearch-dsl==0.4.4
 django-filter==1.1.0
-django-haystack==2.7.0
 django-oauth-toolkit==1.0.0
 django-redis==4.9.0
 django-rest-framework-social-oauth2==1.1.0

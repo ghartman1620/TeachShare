@@ -66,7 +66,7 @@ INSTALLED_APPS = [
 ElasticSearch-DSL Django settings
     - Signal Processor is temporary, will likely increase server load
 """
-ELASTICSEARCH_DSL = {
+ELASTICSEARCH_DSL = {1
     'default': {
         'hosts': 'search:9200'
     },
