@@ -25,6 +25,8 @@ const EditImage = () =>
     import ( /* webpackChunkName: "edit-image" */ "../components/image/EditImage.vue");
 const EditFile = () =>
     import ( /* webpackChunkName: "edit-file" */ "../components/file/EditFile.vue");
+const EditTable = () =>
+    import ( /* webpackChunkName: "edit-file" */ "../components/table/EditTable.vue");
 const PostFeed = () =>
     import ( /* webpackChunkName: "post-feed" */ "../components/PostFeed.vue");
 const PostDetail = () =>
@@ -74,6 +76,12 @@ const router = new Router({
                             name: "edit-audio",
                             path: "audio",
                             component: EditAudio
+                        },
+                        {
+                            name: "edit-table",
+                            path: "table",
+                            component: EditTable
+
                         },
                         {
                             name: "edit-image",

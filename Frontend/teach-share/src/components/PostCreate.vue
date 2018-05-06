@@ -44,7 +44,14 @@
                         </router-link>
                     </div>
                     <h2></h2>
-
+                    <div class="round-button" id="table-icon">
+                        <router-link :to="{name: 'edit-table', query: {index: this.maxElementIndex()}}">
+                            <img src="/static/table-button.png"
+                                        onmouseover="this.src='/static/table-button-hover.png'"
+                                        onmouseout="this.src='/static/table-button.png'">
+                        </router-link>
+                    </div>
+                    <h2></h2>
                     <div class="round-button" id="image-icon">
                         <router-link :to="{name: 'edit-image', query: {index: this.maxElementIndex()}}">
                             <img src="/static/image-button.png" >

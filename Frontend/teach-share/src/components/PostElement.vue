@@ -21,6 +21,9 @@ Uses TextElement, VideoElement, etc.
         <div class="post-element card" v-else-if="element.type === 'audio_file'">
             <audio-element :element="element"/>
         </div>
+        <div class="post-element card" v-else-if="element.type === 'table'">
+            <table-element :element="element"/>
+        </div>
 
         <div class="post-element card" id="outer-video-container" v-else-if="element.type === 'video_link' || element.type === 'video_file'">
             <div class="post-element video-post" id="inner-video-container" v-if="element.type === 'video_link'">
@@ -67,10 +70,11 @@ import AudioElement from "./audio/AudioElement.vue";
 import VideoElement from "./video/VideoElement.vue";
 import FileElement from "./file/FileElement.vue";
 import ImageElement from "./image/ImageElement.vue";
+import TableElement from "./table/TableElement.vue";
 
 @Component({
     name: "post-element",
-    components: {SeeMore, TextElement, VideoElement, AudioElement, FileElement, ImageElement}
+    components: {SeeMore, TextElement, VideoElement, AudioElement, TableElement, FileElement, ImageElement}
 })
 export default class PostElement extends Vue {
     @Prop({})
