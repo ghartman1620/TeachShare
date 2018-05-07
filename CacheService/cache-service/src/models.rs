@@ -1,5 +1,5 @@
-extern crate serde;
-extern crate serde_json;
+// use diesel::pg::data_types::{PgTimestamp, PgInterval};
+// use serde_json::value::Value;
 
 use std::cmp::{Eq, PartialEq};
 use std::collections::HashMap;
@@ -9,26 +9,43 @@ use std::collections;
 /**
  *  This
  */
-#[derive(Serialize, Deserialize, Hash, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct User {
-    pub pk: i32,
+    id: i32,
+    password: String,
+    // last_login: Option<PgTimestamp>,
+    is_superuser: bool,
     pub username: String,
+    pub first_name: String,
+    pub last_name: String,
     pub email: String,
+    pub is_staff: bool,
+    pub is_active: bool,
+    // date_joined: PgTimestamp,
 }
+
 
 impl PartialEq for User {
     fn eq(&self, other: &User) -> bool {
-        self.pk == other.pk
+        self.id == other.id
     }
 }
 impl Eq for User {}
 
 impl User {
-    pub fn new(pk: i32, username: String, email: String) -> User {
+    pub fn new() -> User {
         User {
-            pk: pk,
-            username: username,
-            email: email,
+            id: 0,
+            password: String::from(""),
+            // last_login: Option::from(PgTimestamp(0)),
+            is_superuser: false,
+            username: String::from(""),
+            first_name: String::from(""),
+            last_name: String::from(""),
+            email: String::from(""),
+            is_staff: false,
+            is_active: false,
+            // date_joined: PgTimestamp(0),
         }
     }
 }
@@ -70,7 +87,7 @@ impl<'a, T> Resource<T> {
         self.version[1] = self.version[1]+1;
     }
     pub fn add_watch(&mut self, user: User) -> Option<User>{
-        self.watchers.insert(user.pk, user)
+        self.watchers.insert(user.id, user)
     }
 
     /// remove_watch: remove's a watch from the watchers map
@@ -101,14 +118,20 @@ impl PartialEq for Resource<Post> {
 }
 impl Eq for Resource<Post> {}
 
-
+#[derive(Debug, Clone)]
 pub enum MessageType {
     Watch=0,
     Create,
     Update,
-    Double,
+    Delete,
     Get,
 }
+
+#[derive(Debug, Clone)]
+pub enum CommandType {
+    Exit=0,
+}
+
 
 pub trait Model {
     type model;
@@ -122,6 +145,7 @@ pub trait Model {
 /// Message<T> is a wrapper for defining messages for communication
 /// with this very service. 
 #[allow(unused_variables)]
+#[derive(Debug, Clone)]
 pub struct Message<T> where
     T: Model
 {
@@ -132,11 +156,17 @@ pub struct Message<T> where
 }
 
 #[derive(Debug)]
+pub struct Command<T> {
+    pub cmd_type: CommandType,
+    pub value: T,
+}
+
+#[derive(Debug)]
 pub struct Cache {
     // using classical generics and predefined models
-    pub posts: HashMap<String, Resource<Post>>,
-    pub users: HashMap<String, Resource<User>>,
-    pub comments: HashMap<String, Resource<Comment>>,
+    pub posts: HashMap<i32, Resource<Post>>,
+    pub users: HashMap<i32, Resource<User>>,
+    pub comments: HashMap<i32, Resource<Comment>>,
     
     // using trait objects -- This uses vtable lookups at runtime as appose
     // to the much quicker standard method. It is relatively clean but also requires
@@ -152,25 +182,63 @@ impl Cache {
             comments: HashMap::new(),
         }
     }
-    pub fn get_post(&mut self, key: String) -> Option<&Resource<Post>> {
+    pub fn get_post(&mut self, key: i32) -> Option<&Resource<Post>> {
         return self.posts.get(&key);
     }
-    pub fn set_post(&mut self, key: String, val: Post) -> Option<Resource<Post>> {
+    pub fn set_post(&mut self, key: i32, val: Post) -> Option<Resource<Post>> {
         let model = Resource::new(val);
         self.posts.insert(key, model)
     }
-    pub fn update_post(&mut self, key: String, new_post: Resource<Post>) -> bool {
+    pub fn update_post(&mut self, key: i32, new_post: Resource<Post>) -> bool {
         let prev = self.posts.get_mut(&key).unwrap();
         *prev = new_post;
         true
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
-pub struct Post{
+#[derive(Debug, Clone, PartialEq, Eq)] // , PartialEq, Eq
+pub struct Post {
     pub id: i32,
-    pub username: String,
+    pub title: String,
+    // pub content: Value,
+    // pub updated: PgTimestamp,
+    pub likes: i32,
+    // pub timestamp: PgTimestamp,
+    // pub tags: Value,
+    pub user_id: i32,
+    pub draft: bool,
+    pub content_type: i32,
+    pub grade: i32,
+    // pub length: PgInterval,
+    pub subject: i32,
+    pub crosscutting_concepts: Vec<i32>,
+    pub disciplinary_core_ideas: Vec<i32>,
+    pub practices: Vec<i32>,
 }
+
+impl Post {
+    pub fn new() -> Post {
+        Post {
+            id: 0,
+            title: String::from(""),
+            // content: Value::Null,
+            // updated: PgTimestamp(0),
+            likes: 0,
+            // timestamp: PgTimestamp(0),
+            // tags: Value::Array(vec!()),
+            user_id: 0,
+            draft: false,
+            content_type: 0,
+            grade: 0,
+            // length: PgInterval::new(0, 0, 0),
+            subject: 0,
+            crosscutting_concepts: vec!(),
+            disciplinary_core_ideas: vec!(),
+            practices: vec!(),
+        }
+    }
+}
+
 
 impl Model for Post {
     type model = Post;
@@ -205,13 +273,13 @@ mod tests {
     // just 'test' tests.. 
     #[test]
     fn test_post() {
-        let p = models::Post{id: 1, username: String::from("bryandmc")};
-        assert_eq!(models::Post{id: 1, username: String::from("bryandmc")}, p)
+        let p = models::Post::new();
+        assert_eq!(models::Post::new(), p)
     }
 
     #[test]
     fn test_new_model() {
-        let m = models::Resource::new(models::Post{id: 1, username: String::from("bryandmc")});
+        let m = models::Resource::new(models::Post::new());
         let typ = typeid(&m);
         println!("{:?}", typ);
         assert_eq!(std::any::TypeId::of::<models::Resource<models::Post>>(), typ);

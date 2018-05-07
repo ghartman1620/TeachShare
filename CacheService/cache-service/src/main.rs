@@ -2,22 +2,36 @@ extern crate ws;
 #[macro_use]
 extern crate serde_derive;
 
+// #[macro_use]
+// extern crate diesel;
+// extern crate serde;
+// extern crate serde_json;
+
+#[macro_use]
+extern crate crossbeam_channel;
+
 use std::cell::Cell;
 use std::collections::HashMap;
 use std::sync::*;
 
 use ws::{listen, CloseCode, Error, Handler, Handshake, Message, Result, Sender};
+use std::thread;
+
 mod models;
 mod pool;
+mod cache;
 
-struct GrandSocketStation {
-    // represents the list of users
-    user_pool: Cell<HashMap<models::User, Node<String>>>,
-    // represents the resources that are being watched by users
-    // watches: Vec<models::Resource>,
-}
+// use crossbeam_channel::{Receiver, Sender};
+
+// struct GrandSocketStation {
+//     // represents the list of users
+//     user_pool: Cell<HashMap<models::User, Node<String>>>,
+//     // represents the resources that are being watched by users
+//     // watches: Vec<models::Resource>,
+// }
 
 #[derive(Clone)]
+
 struct Node<T> {
     tx: mpsc::Sender<T>,
     out: Sender,
@@ -75,19 +89,20 @@ fn main() {
         println!("This is getting executed!");
     });
 
-    let users = HashMap::new();
-    let mut hub = GrandSocketStation {
-        user_pool: Cell::new(users),
-        // watches: Vec::new(),
-    };
+    
+    // let users: HashMap<i32, models::User> = HashMap::new();
+    // let mut hub = GrandSocketStation {
+    //     user_pool: Cell::new(users),
+    //     // watches: Vec::new(),
+    // };
     
 
-    let p = models::Post{id: 1, username: String::from("bryan")}; 
+    let p = models::Post::new(); 
     let m = &mut models::Resource::<models::Post>::new(p);
     println!("Post: {:?}", m.data);
 
-    m.add_watch(models::User{pk: 1, username: String::from("bryandmc"), email: String::from("bmccoid@gmail.com")});
-    m.add_watch(models::User{pk: 2, username: String::from("bman"), email: String::from("fake@gmail.com")});
+    m.add_watch(models::User::new());
+    m.add_watch(models::User::new());
     let all = m.all_watchers();
     println!("All ---> {:?}", all);
     // let t = m.data;
@@ -105,9 +120,9 @@ fn main() {
     // t.username = String::from("bryandmc");
     m.increment();
     println!("Model: {:?}", m);
-
+    
     let cache = &mut models::Cache::new();
-    let t = models::Post{id: 1, username: String::from("bryandmc")};
+    let t = models::Post::new();
     let old_result = cache.set_post(String::from("something"), t);
     let exists: bool = match old_result {
         None => true,
@@ -115,7 +130,7 @@ fn main() {
     };
     println!("Did exist? -> {}", exists);
     
-    let t = models::Post{id: 1, username: String::from("bryandmc")};
+    let t = models::Post::new();
     let old_result = cache.set_post(String::from("something"), t);
     let exists: bool = match old_result {
         None => true,
@@ -129,7 +144,7 @@ fn main() {
         };
         let result = temp;
     }
-    let p1 = models::Post{id: 43, username: String::from("changedUser555")};
+    let p1 = models::Post::new();
     let resource = models::Resource::new(p1);
     
     // let mut_resource = resource;
@@ -138,21 +153,21 @@ fn main() {
 
     println!("Result from update: {:?}", temp2);
     println!("{:?}", cache);
-
+    // handle.join().unwrap();
     listen("127.0.0.1:3012", |out| {
         let (send, _) = mpsc::channel();
         let res = Node::<String> { out: out, tx: send }.clone();
         let output = res.clone();
 
         // Store a copy of the user/connection
-        hub.user_pool
-            .get_mut()
-            .entry(models::User {
-                pk: 1,
-                email: String::from(""),
-                username: String::from(""),
-            })
-            .or_insert(res);
+        // hub.user_pool
+        //     .get_mut()
+        //     .entry(models::User {
+        //         pk: 1,
+        //         email: String::from(""),
+        //         username: String::from(""),
+        //     })
+        //     .or_insert(res);
 
         // println!("{:?}", hub.watches);
         return output;
