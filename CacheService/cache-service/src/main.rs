@@ -1,3 +1,7 @@
+/*!
+ The websocket cache service is used for realtime communication between connected users.
+
+*/
 extern crate ws;
 #[macro_use]
 extern crate serde_derive;
@@ -14,12 +18,12 @@ use std::cell::Cell;
 use std::collections::HashMap;
 use std::sync::*;
 
-use ws::{listen, CloseCode, Error, Handler, Handshake, Message, Result, Sender};
 use std::thread;
+use ws::{listen, CloseCode, Error, Handler, Handshake, Message, Result, Sender};
 
+mod cache;
 mod models;
 mod pool;
-mod cache;
 
 // use crossbeam_channel::{Receiver, Sender};
 
@@ -50,15 +54,15 @@ impl<T> Handler for Node<T> {
         // this is the Tx for where this data message came from
         let result = match msg {
             Message::Binary(bin) => {
-                println!("{:?}", bin); 
+                println!("{:?}", bin);
                 String::from("")
-            }, // ...
-            Message::Text(text) => { 
+            } // ...
+            Message::Text(text) => {
                 println!("{}", text);
-                text    
-            },
+                text
+            }
         };
-        
+
         self.out.send("Some text...")
     }
 
@@ -89,15 +93,13 @@ fn main() {
         println!("This is getting executed!");
     });
 
-    
     // let users: HashMap<i32, models::User> = HashMap::new();
     // let mut hub = GrandSocketStation {
     //     user_pool: Cell::new(users),
     //     // watches: Vec::new(),
     // };
-    
 
-    let p = models::Post::new(); 
+    let p = models::Post::new();
     let m = &mut models::Resource::<models::Post>::new(p);
     println!("Post: {:?}", m.data);
 
@@ -120,25 +122,25 @@ fn main() {
     // t.username = String::from("bryandmc");
     m.increment();
     println!("Model: {:?}", m);
-    
+
     let cache = &mut models::Cache::new();
     let t = models::Post::new();
-    let old_result = cache.set_post(String::from("something"), t);
+    let old_result = cache.set_post(1, t);
     let exists: bool = match old_result {
         None => true,
         Some(_) => false,
     };
     println!("Did exist? -> {}", exists);
-    
+
     let t = models::Post::new();
-    let old_result = cache.set_post(String::from("something"), t);
+    let old_result = cache.set_post(1, t);
     let exists: bool = match old_result {
         None => true,
         Some(_) => false,
     };
     println!("Did exist? -> {}", exists);
     {
-        let temp = match cache.get_post(String::from("something")) {
+        let temp = match cache.get_post(1) {
             None => Err("key does not exist"),
             Some(val) => Ok(val),
         };
@@ -146,10 +148,10 @@ fn main() {
     }
     let p1 = models::Post::new();
     let resource = models::Resource::new(p1);
-    
+
     // let mut_resource = resource;
 
-    let temp2 = cache.update_post(String::from("something"), resource);
+    let temp2 = cache.update_post(1, resource);
 
     println!("Result from update: {:?}", temp2);
     println!("{:?}", cache);
@@ -158,7 +160,7 @@ fn main() {
         let (send, _) = mpsc::channel();
         let res = Node::<String> { out: out, tx: send }.clone();
         let output = res.clone();
-
+        // ws::Sender().
         // Store a copy of the user/connection
         // hub.user_pool
         //     .get_mut()

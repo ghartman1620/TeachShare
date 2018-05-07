@@ -2,9 +2,9 @@
 // use serde_json::value::Value;
 
 use std::cmp::{Eq, PartialEq};
+use std::collections;
 use std::collections::HashMap;
 use std::rc::Rc;
-use std::collections;
 
 /**
  *  This
@@ -23,7 +23,6 @@ pub struct User {
     pub is_active: bool,
     // date_joined: PgTimestamp,
 }
-
 
 impl PartialEq for User {
     fn eq(&self, other: &User) -> bool {
@@ -50,19 +49,19 @@ impl User {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Resource<T> {
     /// Watchers: These keep track of all the users that are watching this
-    /// peice of data. 
-    /// 
+    /// peice of data.
+    ///
     pub watchers: HashMap<i32, User>,
 
     /// Data: Where the data is actually stored. Generically, of course.
-    /// 
+    ///
     pub data: T,
 
     /// Version: [u32; 3] is...
-    /// 
+    ///
     /// something along the lines of [browser, cache, db]
     /// to keep track of which version this current data is.
     /// Although it could be done using a single integer, having actual
@@ -71,22 +70,22 @@ pub struct Resource<T> {
     ///
     /// using unsigned ints because therre's no such thing as a negative
     /// version.
-    /// 
+    ///
     version: [u32; 3],
 }
 
 impl<'a, T> Resource<T> {
     pub fn new(inner: T) -> Resource<T> {
-        Resource::<T>{
+        Resource::<T> {
             data: inner,
             watchers: HashMap::new(),
             version: [0, 0, 0],
         }
     }
     pub fn increment(&mut self) {
-        self.version[1] = self.version[1]+1;
+        self.version[1] = self.version[1] + 1;
     }
-    pub fn add_watch(&mut self, user: User) -> Option<User>{
+    pub fn add_watch(&mut self, user: User) -> Option<User> {
         self.watchers.insert(user.id, user)
     }
 
@@ -97,7 +96,7 @@ impl<'a, T> Resource<T> {
 
     /// all_watchers: goal is to get a vector of copy'd user's
     pub fn all_watchers(&mut self) -> Vec<User> {
-        let out: &mut Vec<User> = &mut vec!();
+        let out: &mut Vec<User> = &mut vec![];
         let temp = self.watchers.clone();
         for (_, user) in temp.iter() {
             out.push(user.clone());
@@ -120,7 +119,7 @@ impl Eq for Resource<Post> {}
 
 #[derive(Debug, Clone)]
 pub enum MessageType {
-    Watch=0,
+    Watch = 0,
     Create,
     Update,
     Delete,
@@ -129,27 +128,26 @@ pub enum MessageType {
 
 #[derive(Debug, Clone)]
 pub enum CommandType {
-    Exit=0,
+    Exit = 0,
 }
 
-
-pub trait Model {
-    type model;
-    fn id(&self) -> i32;
-    fn me(&self) -> &Self::model;
-    fn save(&mut self) -> bool;
+#[derive(Debug, Clone)]
+pub enum ModelType {
+    Post = 0,
+    User,
+    Comment,
 }
-
-
 
 /// Message<T> is a wrapper for defining messages for communication
-/// with this very service. 
+/// with this very service.
 #[allow(unused_variables)]
 #[derive(Debug, Clone)]
-pub struct Message<T> where
-    T: Model
+pub struct Message<T>
+where
+    T: Model,
 {
     pub data: T,
+    pub data_type: ModelType,
     pub msg_type: MessageType,
     pub timestamp: i32,
     pub version: [i32; 3],
@@ -161,13 +159,14 @@ pub struct Command<T> {
     pub value: T,
 }
 
+type ModelTable<T: Model> = HashMap<i32, Resource<T>>;
+
 #[derive(Debug)]
 pub struct Cache {
     // using classical generics and predefined models
     pub posts: HashMap<i32, Resource<Post>>,
     pub users: HashMap<i32, Resource<User>>,
     pub comments: HashMap<i32, Resource<Comment>>,
-    
     // using trait objects -- This uses vtable lookups at runtime as appose
     // to the much quicker standard method. It is relatively clean but also requires
     // separate implementations for each model, even if they are largely copy/pasted.
@@ -232,24 +231,34 @@ impl Post {
             grade: 0,
             // length: PgInterval::new(0, 0, 0),
             subject: 0,
-            crosscutting_concepts: vec!(),
-            disciplinary_core_ideas: vec!(),
-            practices: vec!(),
+            crosscutting_concepts: vec![],
+            disciplinary_core_ideas: vec![],
+            practices: vec![],
         }
     }
 }
 
+pub trait Model {
+    type model;
+    fn id(&self) -> i32;
+}
 
+impl Model for Comment {
+    type model = Comment;
+    fn id(&self) -> i32 {
+        self.id
+    }
+}
 impl Model for Post {
     type model = Post;
     fn id(&self) -> i32 {
         self.id
     }
-    fn me(&self) -> &Self::model {
-        self
-    }
-    fn save(&mut self) -> bool {
-        true
+}
+impl Model for User {
+    type model = User;
+    fn id(&self) -> i32 {
+        self.id
     }
 }
 
@@ -263,14 +272,14 @@ pub struct Comment {
 
 mod tests {
     use models;
-    use std::any::TypeId;
-    use std::any::Any;
     use std;
+    use std::any::Any;
+    use std::any::TypeId;
 
     pub fn typeid<T: Any>(_: &T) -> TypeId {
         TypeId::of::<T>()
     }
-    // just 'test' tests.. 
+    // just 'test' tests..
     #[test]
     fn test_post() {
         let p = models::Post::new();
@@ -282,6 +291,9 @@ mod tests {
         let m = models::Resource::new(models::Post::new());
         let typ = typeid(&m);
         println!("{:?}", typ);
-        assert_eq!(std::any::TypeId::of::<models::Resource<models::Post>>(), typ);
+        assert_eq!(
+            std::any::TypeId::of::<models::Resource<models::Post>>(),
+            typ
+        );
     }
-} 
+}
