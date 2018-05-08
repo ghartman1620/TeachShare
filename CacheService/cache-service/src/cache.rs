@@ -101,6 +101,8 @@ pub fn cash_looper(chans: Vec<ChannelCycle<Post, Resource<Post>, Cancel>>) -> Jo
     })
 }
 
+
+/// named affectionately after something from starcraft, the video game. 
 #[derive(Debug)]
 pub struct Nexus<T, U, V> {
     pool: pool::ThreadPool,
@@ -112,11 +114,11 @@ pub struct Nexus<T, U, V> {
 }
 
 
-impl<T, U, V> Nexus<T, U, V> 
+impl<T, U, V, a> Nexus<T, U, V> 
 where
-    T: Debug + Send + 'static,
-    U: Debug + Send + 'static,
-    V: Debug + Send + 'static,
+    T: Debug + Send + MessageSender + 'static,
+    U: Debug + Send + Sync + 'static,
+    V: Debug + Send + Sync + Cancellable + 'static,
 {
     pub fn new() -> &Nexus<T, U, V> {
         let p: pool::ThreadPool = pool::ThreadPool::new(1).unwrap();
@@ -149,16 +151,26 @@ where
         }
     }
 }
-/// remember starcraft?! that game was dope.
-pub trait CacheHolder {
-    fn cache() -> Cache;
 
-    // messages go out this
-    fn sender() -> Sender<Post>;
-
-    // messages go in this
-    fn reciever() -> Receiver<Post>;
-    fn cancel() -> (Sender<Cancel>, Receiver<Cancel>);
+pub fn selector<T, U, V, F>(in_pipe: Receiver<T>, ret_pipe: Sender<U>, cancel: Receiver<V>, closure: F) 
+where 
+    T: Debug,
+    U: Debug,
+    V: Debug,
+    F: Fn(T) -> U //This is crucial need to be able to go from Message<T> -> Message<U>
+{
+    loop {
+        select_loop! {
+            recv(in_pipe, msg) => {
+                let response = closure(msg);
+                ret_pipe.send(response);
+            },
+            recv(cancel, s) => {
+                println!("Cancel Message: {:?}", s);
+                return;
+            }
+        }
+    }
 }
 
 pub trait MessageSender<T> {

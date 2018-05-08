@@ -163,7 +163,7 @@ type ModelTable<T> = HashMap<i32, Resource<T>>;
 #[derive(Debug)]
 pub struct Cache<T> {
     // using classical generics and predefined models
-    pub _data: HashMap<i32, Resource<T>>,
+    pub _data: ModelTable<T>,
 }
 
 impl<T> Cache<T> {
