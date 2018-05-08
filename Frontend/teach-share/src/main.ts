@@ -1,10 +1,10 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
+import VeeValidate, { Validator } from "vee-validate";
 import Vue from "vue";
 import Vuex from "vuex";
-import VeeValidate, { Validator } from "vee-validate";
-import Notifications from "./notifications";
 import Logger from "./logging/logger";
+import Notifications from "./notifications";
 import UserPlugin from "./user";
 
 // our stuff
@@ -17,24 +17,24 @@ import store from "./store";
 declare function require(name: string): any;
 
 import {
-    Carousel,
     Alert,
-    Card,
-    Collapse,
-    Navbar,
+    Badge,
     Button,
-    Layout,
-
+    Card,
+    Carousel,
+    Collapse,
     Form,
+
+    FormCheckbox,
     FormGroup,
     FormInput,
     FormRadio,
     FormSelect,
     FormTextarea,
-    FormCheckbox,
+    Jumbotron,
 
-    Badge,
-    Jumbotron
+    Layout,
+    Navbar
 
 } from "bootstrap-vue/es/components";
 
@@ -68,7 +68,7 @@ fontawesome.library.add(
 Vue.use(require("vue-moment"));
 
 // // vue-cookie because js cookies are awful
-var VueCookie = require("vue-cookie");
+let VueCookie = require("vue-cookie");
 Vue.use(VueCookie);
 
 Vue.use(Carousel);
@@ -110,15 +110,14 @@ declare module "vue/types/vue" {
     }
 }
 
-
 Vue.use(Notifications);
 Vue.use(Logger, true);
 
 Validator.extend("YoutubeEmbedURL", {
     getMessage: (field: any) => "The " + field + " value is not a valid YouTube link.",
     validate: (value: any) => {
-        var videoURL = new URL(value);
-        var videoID = videoURL.searchParams.get("v");
+        const videoURL = new URL(value);
+        const videoID = videoURL.searchParams.get("v");
         if (videoID) {
             return true;
         }
