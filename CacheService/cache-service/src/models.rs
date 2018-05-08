@@ -60,16 +60,15 @@ pub struct Resource<T> {
     ///
     pub data: T,
 
-    /// Version: [u32; 3] is...
-    ///
-    /// something along the lines of [browser, cache, db]
+    /// Version is something along the lines of [browser, cache, db]
     /// to keep track of which version this current data is.
     /// Although it could be done using a single integer, having actual
     /// 'mutators' identified allows for a finer grained decision making
     /// process when it comes to WHICH value to keep/save as most 'current'.
     ///
-    /// using unsigned ints because therre's no such thing as a negative
-    /// version.
+    /// ```
+    /// version = [1, 0, 0];
+    /// ```
     ///
     version: [u32; 3],
 }
@@ -159,38 +158,30 @@ pub struct Command<T> {
     pub value: T,
 }
 
-type ModelTable<T: Model> = HashMap<i32, Resource<T>>;
+type ModelTable<T> = HashMap<i32, Resource<T>>;
 
 #[derive(Debug)]
-pub struct Cache {
+pub struct Cache<T> {
     // using classical generics and predefined models
-    pub posts: HashMap<i32, Resource<Post>>,
-    pub users: HashMap<i32, Resource<User>>,
-    pub comments: HashMap<i32, Resource<Comment>>,
-    // using trait objects -- This uses vtable lookups at runtime as appose
-    // to the much quicker standard method. It is relatively clean but also requires
-    // separate implementations for each model, even if they are largely copy/pasted.
-    // data: HashMap<String, &'a Resource>,
+    pub _data: HashMap<i32, Resource<T>>,
 }
 
-impl Cache {
-    pub fn new() -> Cache {
+impl<T> Cache<T> {
+    pub fn new<T>() -> Cache<T> {
         Cache {
-            posts: HashMap::new(),
-            users: HashMap::new(),
-            comments: HashMap::new(),
+            _data: HashMap::new(),
         }
     }
-    pub fn get_post(&mut self, key: i32) -> Option<&Resource<Post>> {
-        return self.posts.get(&key);
+    pub fn get(&mut self, key: i32) -> Option<&Resource<T>> {
+        return self._data.get(&key);
     }
-    pub fn set_post(&mut self, key: i32, val: Post) -> Option<Resource<Post>> {
-        let model = Resource::new(val);
-        self.posts.insert(key, model)
+    pub fn set(&mut self, key: i32, new_post: T) -> Option<Resource<T>> {
+        let model = Resource::new(new_post);
+        self._data.insert(key, model)
     }
-    pub fn update_post(&mut self, key: i32, new_post: Resource<Post>) -> bool {
-        let prev = self.posts.get_mut(&key).unwrap();
-        *prev = new_post;
+    pub fn update(&mut self, key: i32, new_post: T) -> bool {
+        let prev = self._data.get_mut(&key).unwrap();
+        *prev = Resource::new(new_post);
         true
     }
 }
