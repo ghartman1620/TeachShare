@@ -1,25 +1,26 @@
-use std::sync::{mpsc, Arc, Mutex};
+use std::sync::{Arc, Mutex};
+use crossbeam_channel;
 use std::thread;
 
-enum Message {
+pub enum Message {
     NewJob(Job),
     Terminate,
 }
 
 #[derive(Debug)]
 pub struct ThreadPool {
-    workers: Vec<Worker>,
-    sender: mpsc::Sender<Message>,
+    pub workers: Vec<Worker>,
+    pub sender: crossbeam_channel::Sender<Message>,
 }
 
 #[derive(Debug)]
 pub struct Worker {
-    id: usize,
-    thread: Option<thread::JoinHandle<()>>,
+    pub id: usize,
+    pub thread: Option<thread::JoinHandle<()>>,
 }
 
 impl Worker {
-    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Message>>>) -> Worker {
+    fn new(id: usize, receiver: Arc<Mutex<crossbeam_channel::Receiver<Message>>>) -> Worker {
         let thread = thread::spawn(move || loop {
             let msg = receiver
                 .lock()
@@ -57,7 +58,7 @@ impl<F: FnOnce()> FnBox for F {
     }
 }
 
-type Job = Box<FnBox + Send + 'static>;
+pub type Job = Box<FnBox + Send + 'static>;
 
 #[derive(Debug)]
 pub struct PoolCreationError;
@@ -66,7 +67,7 @@ impl ThreadPool {
     pub fn new(size: usize) -> Result<ThreadPool, PoolCreationError> {
         // not sure if this will return a Result on failure or whatever..?
         assert!(size > 0);
-        let (sender, receiver) = mpsc::channel();
+        let (sender, receiver) = crossbeam_channel::unbounded();
         // let snd: mpsc::Sender<Message> = sender.clone();
         let receiver = Arc::new(Mutex::new(receiver));
 

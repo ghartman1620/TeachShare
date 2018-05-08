@@ -3,10 +3,13 @@
 
  
 */
-use crossbeam_channel::{Receiver, Select, Sender};
+extern crate crossbeam_channel;
+use crossbeam_channel::{Receiver, Select, Sender, TryRecvError, TrySendError};
 use models::*;
+use pool;
 use std::thread;
 use std::thread::JoinHandle;
+use std::fmt::Debug;
 
 // separate function so that if there is necessary logic it'll happen here and not
 // in the cache_looper method where it'll be called.
@@ -16,7 +19,7 @@ pub fn build_cache() -> Cache {
 }
 
 #[derive(Clone, Debug)]
-pub struct ChannelCycle<T, V>
+pub struct ChannelCycle<T, V, U>
 where
     T: Model,
 {
@@ -24,6 +27,7 @@ where
 
     // this is the return channel for operations that require a response.
     ret: Sender<V>,
+    cancel: Receiver<U>,
 }
 
 pub type SendMsg<T> = Sender<Message<T>>;
@@ -52,12 +56,14 @@ pub type ChanTuple<T> = (SendMsg<T>, RecvMsg<T>);
 ///
 /// ```
 #[allow(unused)]
-pub fn cash_looper(chans: Vec<ChannelCycle<Post, Resource<Post>>>) -> JoinHandle<()> {
+pub fn cash_looper(chans: Vec<ChannelCycle<Post, Resource<Post>, Cancel>>) -> JoinHandle<()> {
     let mut sel = Select::new();
     let mut cache = build_cache();
 
     thread::spawn(move || {
-        loop {
+        let mut close = false;
+
+        'outer: while !close {
             let msg = 'select: loop {
                 // In each iteration of the selection loop we probe cases in the same order.
                 for vals in &chans {
@@ -78,14 +84,143 @@ pub fn cash_looper(chans: Vec<ChannelCycle<Post, Resource<Post>>>) -> JoinHandle
                         // Break the outer loop with the received message as the result.
                         break 'select msg;
                     }
+
+                    if let Ok(cancel) = sel.recv(&vals.cancel) {
+                        println!("recieved CANCEL: {:?}", cancel);
+                        // panic!("CLOSE");
+                        // return Message<Post>(Post::new());
+                        close = true;
+                        break 'outer;
+                        // break 'getout;
+                    }
                 }
             };
             // println!("Recieved post message: {:?}", msg);
         }
+        println!("Thread is closing!!!!");
     })
 }
 
-fn handle_post_msg(msg: &Message<Post>, cash: &mut Cache) -> Option<Resource<Post>> {
+
+/// named affectionately after something from starcraft, the video game. 
+#[derive(Debug)]
+pub struct Nexus<T, U, V> {
+    pool: pool::ThreadPool,
+    cache: &Cache,
+    send: Sender<T>,
+    recv: Receiver<U>,
+    cancel_send: Receiver<V>,
+    cancel_recv: Sender<V>,
+}
+
+
+impl<T, U, V, a> Nexus<T, U, V> 
+where
+    T: Debug + Send + MessageSender + 'static,
+    U: Debug + Send + Sync + 'static,
+    V: Debug + Send + Sync + Cancellable + 'static,
+{
+    pub fn new() -> &Nexus<T, U, V> {
+        let p: pool::ThreadPool = pool::ThreadPool::new(1).unwrap();
+        let (snd, _) = crossbeam_channel::unbounded::<T>();
+        let (_, rec) = crossbeam_channel::unbounded::<U>();
+        let rec2 = rec.clone();
+        let (cancel_send, cancel_recv) = crossbeam_channel::unbounded::<V>();
+        let cancel_closure = cancel_recv.clone();
+        let mut c = &mut Cache::new();
+        p.execute(move || {
+            loop {
+                select_loop! {
+                    recv(rec, r) => {
+                        println!("Recieved: {:?}", r);
+                        handle_post_msg(&r, c);
+                    },
+                    recv(cancel_closure, s) => {
+                        println!("Send: {:?}", s);
+                    }
+                }
+            }
+        });
+        &Nexus {
+            pool: pool::ThreadPool::new(1).unwrap(),
+            send: snd,
+            recv: rec2,
+            cache: &c,
+            cancel_send: cancel_recv,
+            cancel_recv: cancel_send
+        }
+    }
+}
+
+pub fn selector<T, U, V, F>(in_pipe: Receiver<T>, ret_pipe: Sender<U>, cancel: Receiver<V>, closure: F) 
+where 
+    T: Debug,
+    U: Debug,
+    V: Debug,
+    F: Fn(T) -> U //This is crucial need to be able to go from Message<T> -> Message<U>
+{
+    loop {
+        select_loop! {
+            recv(in_pipe, msg) => {
+                let response = closure(msg);
+                ret_pipe.send(response);
+            },
+            recv(cancel, s) => {
+                println!("Cancel Message: {:?}", s);
+                return;
+            }
+        }
+    }
+}
+
+pub trait MessageSender<T> {
+    fn send(&self, msg: T) -> Result<(), TrySendError<T>>;
+}
+
+pub trait MessageReciever<V> {
+    fn recv(&self, sender: Receiver<V>, block: bool) -> Result<V, &'static str>;
+}
+
+pub trait Cancellable<V> {
+    fn cancel(&self, msg: String) -> Result<(), crossbeam_channel::SendError<V>>;
+}
+
+impl MessageSender<Message<Post>> for Nexus<Message<Post>, Message<Post>, Cancel> {
+    fn send(&self, msg: Message<Post>) -> Result<(), TrySendError<Message<Post>>> {
+        let (sender, _) = crossbeam_channel::unbounded::<Message<Post>>();
+        sender.try_send(msg)
+    }
+}
+
+impl MessageReciever<Message<Post>> for Nexus<Message<Post>, Receiver<Message<Post>>, Cancel> {
+    fn recv(
+        &self,
+        reciever: Receiver<Message<Post>>,
+        block: bool,
+    ) -> Result<Message<Post>, &'static str> {
+        if !reciever.is_disconnected() && !block {
+            let res = reciever.try_recv();
+            match res {
+                Ok(val) => Ok(val),
+                Err(_) => Err("Could not receive"),
+            }
+        } else {
+            let res = reciever.recv();
+            match res {
+                Ok(val) => Ok(val),
+                Err(_) => Err("Could not receive"),
+            }
+        }
+    }
+}
+
+impl Cancellable<Cancel> for Nexus<Message<Post>, Message<Post>, Cancel> {
+    fn cancel(&self, msg: String) -> Result<(), crossbeam_channel::SendError<Cancel>> {
+        return self.cancel_recv.send(Cancel { msg: msg });
+    }
+}
+
+fn handle_post_msg<T>(msg: T, cash: &mut Cache<T>) -> Option<Resource<T>> {
     match msg.msg_type {
         MessageType::Create => handle_create(&msg, cash),
         MessageType::Watch => handle_watch(&msg, cash),
@@ -93,6 +228,11 @@ fn handle_post_msg(msg: &Message<Post>, cash: &mut Cache) -> Option<Resource<Pos
         MessageType::Delete => handle_delete(&msg, cash),
         MessageType::Get => handle_get(&msg, cash),
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Cancel {
+    msg: String,
 }
 
 /// handle_get is used to do an actual CREATE of a Post Resource in the Cache.
@@ -121,11 +261,11 @@ fn handle_watch(msg: &Message<Post>, cash: &mut Cache) -> Option<Resource<Post>>
 }
 
 /// handle_create is used to do an actual CREATE of a Post Resource in the Cache.
-fn handle_create(msg: &Message<Post>, cash: &mut Cache) -> Option<Resource<Post>> {
+fn handle_create<T>(msg: T, cash: &mut Cache<T>) -> Option<Resource<T>> {
     println!("[CREATE] ------------------------------------------------->");
-    let result = cash.set_post(msg.data.id, msg.data.clone());
+    let result = cash.set(msg.data.id, msg.data.clone());
     print!("\n\n");
-    for (i, c) in &cash.posts {
+    for (i, c) in &cash._data {
         println!("{}.) {:?}", i, c);
     }
     return result;
@@ -137,7 +277,9 @@ mod tests {
     use cache::*;
     use models;
     use models::*;
+    use pool;
 
+    use std::sync::{Arc, RwLock};
     use std::thread;
     use std::time::Duration;
 
@@ -145,29 +287,58 @@ mod tests {
     use crossbeam_channel::{Receiver, Select, Sender};
 
     #[test]
+    /// Tests whether or not the cach_handler works as expected in that it sends a certain
+    /// number of messages and gets back a certain number of messages on a select-loop.
     fn test_cash_handler() {
-        let mut list: Vec<ChannelCycle<Post, Resource<Post>>> = vec![];
+        let (cancel_send, cancel_recv) = crossbeam_channel::unbounded::<Cancel>();
+
+        let mut list: Vec<ChannelCycle<Post, Resource<Post>, Cancel>> = vec![];
+        let count = Arc::new(RwLock::new(0));
+
         let (ret, x) = crossbeam_channel::unbounded::<Resource<Post>>();
-        thread::spawn(move || {
+        let c2 = count.clone();
+        let last = count.clone();
+        let cancel2 = cancel_recv.clone();
+        let p = pool::ThreadPool::new(4).unwrap();
+        let receiver = p.execute(move || {
+            let c3 = &mut c2.clone();
             loop {
-                let res = x.recv();
-                println!("X: {:?}", res.unwrap());
+                select_loop! {
+                    recv(cancel2, result) => {
+                        println!("Recieved [cancel]: {:?}", result);
+                        return;
+                    },
+                    recv(x, result) => {
+                        println!("Recieved: {:?}", result);
+                        {
+                            let mut n = c3.write().unwrap();
+                            *n = *n + 1;
+                            println!("{}", n);
+                        }
+                        println!("X: {:?} --> count = {}.", result, c3.read().unwrap());
+                    }
+                }
             }
         });
         let (send, recv) = crossbeam_channel::unbounded::<Message<Post>>();
+        // let (cancel_send, cancel_recv) = crossbeam_channel::unbounded::<Cancel>();
         for a in 0..5 {
             let (s, r) = crossbeam_channel::unbounded::<Message<Post>>();
-            let val = ChannelCycle{io: (s, r), ret: ret.clone()};
+            let val = ChannelCycle {
+                io: (s, r),
+                ret: ret.clone(),
+                cancel: cancel_recv.clone(),
+            };
             list.push(val);
         }
 
         let l2 = list.clone();
         let res = cache::cash_looper(list);
 
-        let second = thread::spawn(move || {
+        let second = p.execute(move || {
             let mut i = 0;
             for val in &l2 {
-                let (s, r) = &val.io;
+                let &(ref s, ref r) = &val.io;
                 // let v = &val.ret;
                 let mut p = Post::new();
                 p.id = i;
@@ -178,13 +349,42 @@ mod tests {
                     timestamp: 0,
                     version: [0, 0, 0],
                 };
-                let o = s.try_send(m).unwrap();
+                let o = s.send(m).unwrap();
                 i = i + 1;
                 println!("Result: {:?} => {}", o, i);
             }
+            println!("EXITING SECOND THREAD");
         });
-        second.join();
-        res.join().unwrap();
+        thread::sleep(Duration::from_secs(1));
+        let x = Arc::strong_count(&last);
+        println!("Strong references: {}", x);
+
+        cancel_send.send(Cancel {
+            msg: String::from("Need to close for the test."),
+        });
+        cancel_send.send(Cancel {
+            msg: String::from("Need to close for the test."),
+        });
+        res.join();
+        let x = Arc::strong_count(&count);
+        println!("Strong references: {}", x);
+        drop(last);
+        let x = Arc::strong_count(&count);
+        println!("Strong references: {}", x);
+        let v = Arc::try_unwrap(count);
+        let y = v.unwrap();
+        println!("Total count: {:?}", *y.read().unwrap());
+        assert_eq!(*y.read().unwrap(), 5);
+    }
+
+    
+    /// Tests whether or not the cach_handler works as expected in that it sends a certain
+    /// number of messages and gets back a certain number of messages on a select-loop.
+    #[test]
+    fn test_cash_handler_create() {
+        let c_loop/*: Nexus<Message<Post>, Message<Post>, Cancel>*/ =
+            Nexus::<Message<Post>, Message<Post>, Cancel>::new();
+        
     }
 
 }
