@@ -6,15 +6,16 @@ import store from "./store";
 
 export enum PostStatus {Loading, Saving, Saved}
 
-export class InProgressPost{
+export class InProgressPost {
     elements: any[];
     title: string;
     tags: string[];
     userPk: number;
     status: PostStatus;
     draft: boolean;
-    pk: number = -1; //-1 if post is not yet saved as draft
-    //supertags
+    pk: number = -1;
+    // -1 if post is not yet saved as draft
+    // supertags
     grade: number;
     contentType: number;
     length: number;

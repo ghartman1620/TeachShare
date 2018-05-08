@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-12">
                     <br>
-                    <h2 class="text-center"><strong>{{post.title}}</strong></h2>
+                    <h2 class="text-center"><strong v-html="postTitle"></strong></h2>
                     <h5 class="text-center">posted: {{ post.updated | moment("from") }}</h5>
                     <h6 class="text-center">by <b-badge variant="dark">{{fullUsername}}</b-badge></h6>
                     <h4 class="text-right">
@@ -18,7 +18,7 @@
                     <hr>
                     <div>
                         <div :key="element.pk" v-for="element in post.content">
-                            <post-element :element="element" :index="index"/>
+                            <post-element :element="element"  :index="index"/>
                         </div>
                     </div>
                 </div> <!-- div class="col-12" -->
@@ -63,7 +63,7 @@
 
 <script lang="ts">
 
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import SeeMore from "./SeeMore.vue";
 import PostElement from "./PostElement.vue";
 import Comments from "./comments/Comments.vue";
@@ -103,7 +103,8 @@ export default class PostComp extends Vue {
     @Prop() index: number;
     @Prop() maxHeight: number;
 
-    @Prop() highlightedTerms: String[];
+    highlightedWords: String[] = [];
+    postTitle: String = this.createPostTitle();
 
     newCommentText: string = "";
 
@@ -125,6 +126,25 @@ export default class PostComp extends Vue {
     }
     constructor() {
         super();
+    }
+
+
+    createPostTitle(): String {
+        var postTitle = "";
+        if(!this.$route.query.term){
+            return this.post.title;
+        }
+        this.highlightedWords = this.$route.query.term.split(" ");
+        console.log("create post title with " + this.highlightedWords[0]);
+        for( var word of this.post.title.split(" ")){
+            if(this.highlightedWords.includes(word as String)){
+                postTitle = postTitle.concat(`<span class=\"highlight\">${word} </span>`);
+            }
+            else{
+                postTitle = postTitle.concat(word + " ");
+            }
+        }
+        return postTitle;
     }
 
     getComments() {
@@ -202,16 +222,20 @@ export default class PostComp extends Vue {
         }
     }
 
-    created() {
-        // this.$store.dispatch("fetchUser", this.post.user);
-        this.$log(this.post);
+    @Watch("$route")
+    onRouteChange(to: any, from: any) {
+        this.createPostTitle();
     }
+
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .tag-entry {
     padding: 6px;
     margin: 4px;
+}
+.highlight {
+    background-color: yellow;
 }
 </style>

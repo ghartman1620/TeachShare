@@ -291,10 +291,7 @@ export default class PostFeed extends Vue {
         // this doesn't work: because t is not defined.
         // window.removeEventListener("scroll", function() {t.scroll()}, false);
     }
-    @Watch("$route")
-    onRouteChange(to: any, from: any) {
-        this.reloadPosts();
-    }
+    
 }
 </script>
 
