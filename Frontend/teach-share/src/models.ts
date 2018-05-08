@@ -14,9 +14,11 @@ export abstract class Model {
  */
 export enum FieldEnum {
     "file",
+    "table",
     "video_file",
     "video_link",
     "audio_file"
+
 }
 
 /**

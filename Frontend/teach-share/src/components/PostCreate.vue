@@ -13,7 +13,7 @@
     </side-bar>
     <div v-if="currentPage===1">
         <div v-if="inProgressPost !== undefined && inProgressPost.status !== LOADING" :style="getBodyStyle()">
-            <div class="col-sm-12 col-lg-offset-2 col-lg-8  card card-outline-danger container icon-card-container">
+            <div class="col-sm-12 col-lg-10 col-md-12 card card-outline-danger container icon-card-container">
                 <div class="col-8 mx-auto card-deck" id="button-bar">
 
                     <h2></h2>
@@ -44,7 +44,14 @@
                         </router-link>
                     </div>
                     <h2></h2>
-
+                    <div class="round-button" id="table-icon">
+                        <router-link :to="{name: 'edit-table', query: {index: this.maxElementIndex()}}">
+                            <img src="/static/table-button.png"
+                                        onmouseover="this.src='/static/table-button-hover.png'"
+                                        onmouseout="this.src='/static/table-button.png'">
+                        </router-link>
+                    </div>
+                    <h2></h2>
                     <div class="round-button" id="image-icon">
                         <router-link :to="{name: 'edit-image', query: {index: this.maxElementIndex()}}">
                             <img src="/static/image-button.png" >
@@ -65,7 +72,7 @@
                 <div class="col-2"></div>
                 <div class="col-8">
                     <div class="form-group">
-                        <div class="title-tag-card card">
+                        <div class="card" id="title-tag-card">
                             <br>
                             <div class="title-container container">
                                 <div class="row">
@@ -74,6 +81,7 @@
                                     </div>
 
                                     <div class="col-10">
+                                    
                                         <input class="form-control" type="text" v-model="inProgressPost.title"
                                             placeholder="Title required" id="titleTextbox">
                                     </div>
@@ -555,7 +563,7 @@ $card-color: #96e6b3;
 }
 
 #button-bar {
-    min-width: 580px;
+    min-width: 665px;
     max-height: 240px;
     padding-top: 8px;
     padding-bottom: 8px;
@@ -602,7 +610,7 @@ $card-color: #96e6b3;
     background: #1a3c68;
 }
 
-.title-tag-card {
+#title-tag-card {
     background-color: $title-tag-card-background;
     margin-top: 2rem;
     border: none;
