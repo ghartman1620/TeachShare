@@ -12,6 +12,7 @@
     <slot v-if="!collapsed">
     
     </slot>
+    <!-- <br><br> make sure any kind of submit button doesn't run into bottom of page -->
 </div>
 </template>
 

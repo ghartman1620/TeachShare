@@ -56,7 +56,7 @@
         </b-form-group>
 
         <b-form-group
-            label="Standards you're looking for"
+            label="Standards you're looking for (select grade & subject)"
             description="use Ctrl+Click to select multiple">
             <b-form-select multiple v-model="standards" :select-size="15" :options="standardOptions" class="mb-3">
             </b-form-select>
@@ -198,11 +198,7 @@ export default class PostFeed extends Vue {
             })
             console.log(this.grade);
         }
-        const p = fetchAllPosts(this.$store);
-        p.then((res) => { 
-            console.log("blah...");
-            console.log("***********", res);
-        });
+
     }
     scroll() {
         var offset =
@@ -214,19 +210,16 @@ export default class PostFeed extends Vue {
         }
     }
     reloadPosts(){
-        if(this.$route.query != {}){
-            console.log("here");
-            
+        if(this.$route.query != {}){            
             postSearch(this.$store,this.$route.query);
         }
         else{
-            console.log("fetching all posts");
             this.$store.dispatch("fetchAllPosts");
         }
     }
 
     advancedSearch() {
-        var query: any = {}
+        var query: any = {};
         query.sort = this.sortBy;
 
         if (this.keywords !== ""){
@@ -271,6 +264,8 @@ export default class PostFeed extends Vue {
         }
         
         this.$router.push({name: "dashboard", query: query});
+        //this.$router.go(0);
+        this.reloadPosts();
     }
 
     beforeMount(){

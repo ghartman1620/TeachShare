@@ -201,6 +201,7 @@ export class InProgressPost{
         })
     }
     publishPost(): Promise<any>{
+        this.draft = false;
         return new Promise((resolve, reject) => {
             api.put("posts/" + this.pk + "/", this.json()).then(function(response){
                 console.log("post published");

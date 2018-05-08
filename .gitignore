@@ -10,3 +10,4 @@ media/
 *celerybeat-schedule*
 Rust_ws/target
 static/
+TeachShare_WebApp/cache/websockets/target

@@ -103,6 +103,8 @@ export default class PostComp extends Vue {
     @Prop() index: number;
     @Prop() maxHeight: number;
 
+    @Prop() highlightedTerms: String[];
+
     newCommentText: string = "";
 
     get actualMaxHeight() {

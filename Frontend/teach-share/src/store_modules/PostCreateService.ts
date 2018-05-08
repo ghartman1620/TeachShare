@@ -262,6 +262,7 @@ export const actions = {
         ctx.commit("SAVE_DRAFT");
     },
     createPost: (context: PostContext) => {
+        
         return new Promise((resolve, reject) => {
             context.state
                 .post!.publishPost()
