@@ -172,6 +172,7 @@ where
         }
     }
 }
+// get, update, subscribe
 
 pub trait MessageSender<T> {
     fn send(&self, msg: T) -> Result<(), TrySendError<T>>;
@@ -269,6 +270,16 @@ fn handle_create<T>(msg: T, cash: &mut Cache<T>) -> Option<Resource<T>> {
         println!("{}.) {:?}", i, c);
     }
     return result;
+}
+
+fn test() {
+    let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<Message<Post>>();
+    let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<Message<Post>>();
+    let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<Cancel>();
+    let result = selector(recv_pipe, send_ret_pipe, recv_cancel, move |msg| {
+        println!("Message: {:?}", msg);
+        msg
+    });
 }
 
 #[cfg(test)]
@@ -387,4 +398,10 @@ mod tests {
         
     }
 
+    #[test]
+    fn test_selector() {
+        let (in_pipe, out_pipe) = crossbeam_channel::unbounded::<Message<Post>, Message<Cancel>>();
+        let result = cache::selector();
+
+    }
 }
