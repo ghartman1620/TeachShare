@@ -167,7 +167,7 @@ pub struct Cache<T> {
 }
 
 impl<T> Cache<T> {
-    pub fn new<T>() -> Cache<T> {
+    pub fn new() -> Cache<T> {
         Cache {
             _data: HashMap::new(),
         }
