@@ -123,38 +123,38 @@ fn main() {
     m.increment();
     println!("Model: {:?}", m);
 
-    let cache = &mut models::Cache::new();
+    // let cache = &mut models::Cache::new();
     let t = models::Post::new();
-    let old_result = cache.set_post(1, t);
-    let exists: bool = match old_result {
-        None => true,
-        Some(_) => false,
-    };
-    println!("Did exist? -> {}", exists);
+    // let old_result = cache.set_post(1, t);
+    // let exists: bool = match old_result {
+    //     None => true,
+    //     Some(_) => false,
+    // };
+    // println!("Did exist? -> {}", exists);
 
     let t = models::Post::new();
-    let old_result = cache.set_post(1, t);
-    let exists: bool = match old_result {
-        None => true,
-        Some(_) => false,
-    };
-    println!("Did exist? -> {}", exists);
-    {
-        let temp = match cache.get_post(1) {
-            None => Err("key does not exist"),
-            Some(val) => Ok(val),
-        };
-        let result = temp;
-    }
+    // let old_result = cache.set_post(1, t);
+    // let exists: bool = match old_result {
+    //     None => true,
+    //     Some(_) => false,
+    // };
+    // println!("Did exist? -> {}", exists);
+    // {
+    //     let temp = match cache.get_post(1) {
+    //         None => Err("key does not exist"),
+    //         Some(val) => Ok(val),
+    //     };
+    //     let result = temp;
+    // }
     let p1 = models::Post::new();
     let resource = models::Resource::new(p1);
 
     // let mut_resource = resource;
 
-    let temp2 = cache.update_post(1, resource);
+    // let temp2 = cache.update_post(1, resource);
 
-    println!("Result from update: {:?}", temp2);
-    println!("{:?}", cache);
+    // println!("Result from update: {:?}", temp2);
+    // println!("{:?}", cache);
     // handle.join().unwrap();
     listen("127.0.0.1:3012", |out| {
         let (send, _) = mpsc::channel();

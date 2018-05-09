@@ -121,7 +121,6 @@ pub enum MessageType {
     Watch = 0,
     Create,
     Update,
-    Delete,
     Get,
 }
 

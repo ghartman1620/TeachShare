@@ -2,9 +2,10 @@ extern crate crossbeam_channel;
 use crossbeam_channel::{Receiver, Select, Sender, TryRecvError, TrySendError};
 use models::*;
 use pool;
+use std::fmt::Debug;
+use std::ops::Fn;
 use std::thread;
 use std::thread::JoinHandle;
-use std::fmt::Debug;
 
 // separate function so that if there is necessary logic it'll happen here and not
 // in the cache_looper method where it'll be called.
@@ -96,8 +97,7 @@ pub type ChanTuple<T> = (SendMsg<T>, RecvMsg<T>);
 //     })
 // }
 
-
-/// named affectionately after something from starcraft, the video game. 
+/// named affectionately after something from starcraft, the video game.
 // #[derive(Debug)]
 // pub struct Nexus<T, U, V> {
 //     pool: pool::ThreadPool,
@@ -108,8 +108,7 @@ pub type ChanTuple<T> = (SendMsg<T>, RecvMsg<T>);
 //     cancel_recv: Sender<V>,
 // }
 
-
-// impl<T, U, V, a> Nexus<T, U, V> 
+// impl<T, U, V, a> Nexus<T, U, V>
 // where
 //     T: Debug + Send + MessageSender + 'static,
 //     U: Debug + Send + Sync + 'static,
@@ -147,17 +146,22 @@ pub type ChanTuple<T> = (SendMsg<T>, RecvMsg<T>);
 //     }
 // }
 
-pub fn selector<T, U, V, F>(in_pipe: Receiver<T>, ret_pipe: Sender<U>, cancel: Receiver<V>, closure: F) 
-where 
+pub fn selector<S, T, U, V, F>(
+    in_pipe: Receiver<T>,
+    ret_pipe: Sender<U>,
+    cancel: Receiver<V>,
+    closure: F,
+) where
     T: Debug,
     U: Debug,
     V: Debug,
-    F: Fn(T) -> U //This is crucial need to be able to go from Message<T> -> Message<U>
+    F: Fn(T, Cache<S>) -> U, //This is crucial need to be able to go from Message<T> -> Message<U>
 {
+    let cache = Cache::<S>::new();
     loop {
         select_loop! {
             recv(in_pipe, msg) => {
-                let response = closure(msg);
+                let response = closure(msg, cache);
                 ret_pipe.send(response);
             },
             recv(cancel, s) => {
@@ -267,33 +271,52 @@ pub struct Cancel {
 //     return result;
 // }
 
-
-
 /// wire_up<T, U, V> uses the types to setup crossbeam channels and returns the relevant information
-fn wire_up<'a, T, U, V, F>(closure: F) -> (Sender<&'a T>, Receiver<&'a U>, Sender<'a, V>) 
-where 
-    T: Debug + Sized ,
-    U: Debug + Sized,
-    V: Debug + Sized,
-    F: Fn(T) -> U,
+fn wire_up<'a, T, U, V, F: 'a>(closure: F) -> (Sender<T>, Receiver<U>, Sender<V>)
+where
+    T: Debug + Sized + Send + 'static,
+    U: Debug + Sized + Send + 'static,
+    V: Debug + Sized + Send + 'static,
+    F: Fn(T) -> U + Send + 'static,
 {
-    let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<&T>();
-    let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<&U>();
-    let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<&V>();
-    selector(recv_pipe, send_ret_pipe, recv_cancel, closure);
-    (send_pipe, &recv_ret_pipe, send_cancel)
+    let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<T>();
+    let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<U>();
+    let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<V>();
+    // let pool = pool::ThreadPool::new(1).unwrap();
+    // pool.execute(|| {
+    //     println!("We are inside the pool.executre(||){{...}}");
+    //     let sel = selector(recv_pipe, send_ret_pipe, recv_cancel, closure);
+    //     println!("Selector finished...");
+    // });
+    thread::spawn(move || {
+        println!("We are inside the pool.executre(||){{...}}");
+        let sel = selector(recv_pipe, send_ret_pipe, recv_cancel, closure);
+        println!("Selector finished...");
+    });
+    println!("Selector closure finished...");
+    (send_pipe, recv_ret_pipe, send_cancel)
 }
 
+fn handle_get<T, U>(msg: T, cash: &mut Cache<U>) -> Option<T> {
+    println!("[GET] ------------------------------------------------->");
+    Option::from(msg)
+}
 
 fn test() {
     let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<Message<Post>>();
     let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<Message<Post>>();
     let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<Cancel>();
 
-    wire_up::<Message<Post>, Message<Post>, Cancel, Fn(Message<Post>) -> Message<Post>>(move |msg|{
-        msg
-    });
-    let result = selector(recv_pipe, send_ret_pipe, recv_cancel, move |msg| {
+    let (snd, ret, cancel): (
+        crossbeam_channel::Sender<Message<Post>>,
+        crossbeam_channel::Receiver<Message<Post>>,
+        crossbeam_channel::Sender<Cancel>,
+    ) = wire_up(|msg: Message<Post>| msg);
+    println!("A: {}", snd.len());
+    println!("B: {}", ret.len());
+    println!("C: {}", cancel.len());
+
+    let result = selector(recv_pipe, send_ret_pipe, recv_cancel, move |msg, cache| {
         println!("Message: {:?}", msg);
         msg
     });
@@ -405,25 +428,64 @@ mod tests {
     //     assert_eq!(*y.read().unwrap(), 5);
     // }
 
-    
     /// Tests whether or not the cach_handler works as expected in that it sends a certain
     /// number of messages and gets back a certain number of messages on a select-loop.
     // #[test]
     // fn test_cash_handler_create() {
     //     let c_loop/*: Nexus<Message<Post>, Message<Post>, Cancel>*/ =
     //         Nexus::<Message<Post>, Message<Post>, Cancel>::new();
-        
     // }
 
     #[test]
     fn test_selector() {
-        let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<Message<Post>>();
-        let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<Message<Post>>();
-        let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<Cancel>();
-        let result = selector(recv_pipe, send_ret_pipe, recv_cancel, move |msg| {
-            println!("Message: {:?}", msg);
+        let (a, b, c): (
+            crossbeam_channel::Sender<Message<Post>>,
+            crossbeam_channel::Receiver<Message<Post>>,
+            crossbeam_channel::Sender<Cancel>,
+        ) = wire_up(|msg: Message<Post>| {
+            println!("MESSAGE: {:?}", msg);
             msg
         });
+        println!("A: {}", a.len());
+        println!("B: {}", b.len());
+        println!("C: {}", c.len());
+        let response = c.send(Cancel {
+            msg: String::from("Cancelled it!"),
+        }).expect("There was a terrible error cancelling it!");
+        println!("response: {:?}", response);
+    }
 
+    #[test]
+    fn test_selector_extended() {
+        let (a, b, c): (
+            crossbeam_channel::Sender<Message<Post>>,
+            crossbeam_channel::Receiver<Message<Post>>,
+            crossbeam_channel::Sender<Cancel>,
+        ) = wire_up(|msg: Message<Post>| {
+            println!("MESSAGE: {:?}", msg);
+            match msg.msg_type {
+                MessageType::Get => {
+                    println!("Msg: {:?}", msg.msg_type);
+                    handle_get(msg);
+                },
+                MessageType::Create => {
+                    println!("Msg: {:?}", msg.msg_type);
+                },
+                MessageType::Watch => {
+                    println!("Msg: {:?}", msg.msg_type);
+                },
+                MessageType::Update => {
+                    println!("Msg: {:?}", msg.msg_type);
+                }
+            }
+            msg
+        });
+        println!("A: {}", a.len());
+        println!("B: {}", b.len());
+        println!("C: {}", c.len());
+        let response = c.send(Cancel {
+            msg: String::from("Cancelled it!"),
+        }).expect("There was a terrible error cancelling it!");
+        println!("response: {:?}", response);
     }
 }

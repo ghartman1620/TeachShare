@@ -1,5 +1,5 @@
-use std::sync::{Arc, Mutex};
 use crossbeam_channel;
+use std::sync::{Arc, Mutex};
 use std::thread;
 
 pub enum Message {
