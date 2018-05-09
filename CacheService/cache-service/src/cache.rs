@@ -146,7 +146,7 @@ pub type ChanTuple<T> = (SendMsg<T>, RecvMsg<T>);
 //     }
 // }
 
-pub fn selector<S, T, U, V, F>(
+pub fn selector<'a, S: 'a, T, U, V, F>(
     in_pipe: Receiver<T>,
     ret_pipe: Sender<U>,
     cancel: Receiver<V>,
@@ -272,12 +272,12 @@ pub struct Cancel {
 // }
 
 /// wire_up<T, U, V> uses the types to setup crossbeam channels and returns the relevant information
-fn wire_up<'a, T, U, V, F: 'a>(closure: F) -> (Sender<T>, Receiver<U>, Sender<V>)
+fn wire_up<'a, S: 'a, T, U, V, F>(closure: F) -> (Sender<T>, Receiver<U>, Sender<V>)
 where
     T: Debug + Sized + Send + 'static,
     U: Debug + Sized + Send + 'static,
     V: Debug + Sized + Send + 'static,
-    F: Fn(T) -> U + Send + 'static,
+    F: Fn(T, Cache<S>) -> U + Send + 'static,
 {
     let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<T>();
     let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<U>();
@@ -297,7 +297,7 @@ where
     (send_pipe, recv_ret_pipe, send_cancel)
 }
 
-fn handle_get<T, U>(msg: T, cash: &mut Cache<U>) -> Option<T> {
+fn handle_get<T, U>(msg: T, cash: Cache<U>) -> Option<T> {
     println!("[GET] ------------------------------------------------->");
     Option::from(msg)
 }
@@ -311,12 +311,12 @@ fn test() {
         crossbeam_channel::Sender<Message<Post>>,
         crossbeam_channel::Receiver<Message<Post>>,
         crossbeam_channel::Sender<Cancel>,
-    ) = wire_up(|msg: Message<Post>| msg);
+    ) = wire_up(|msg: Message<Post>, cache: Cache<Post>| msg);
     println!("A: {}", snd.len());
     println!("B: {}", ret.len());
     println!("C: {}", cancel.len());
 
-    let result = selector(recv_pipe, send_ret_pipe, recv_cancel, move |msg, cache| {
+    let result = selector(recv_pipe, send_ret_pipe, recv_cancel, move |msg, cache: Cache<Post>| {
         println!("Message: {:?}", msg);
         msg
     });
@@ -442,7 +442,7 @@ mod tests {
             crossbeam_channel::Sender<Message<Post>>,
             crossbeam_channel::Receiver<Message<Post>>,
             crossbeam_channel::Sender<Cancel>,
-        ) = wire_up(|msg: Message<Post>| {
+        ) = wire_up(|msg: Message<Post>, cache: Cache<Post>| {
             println!("MESSAGE: {:?}", msg);
             msg
         });
@@ -461,12 +461,12 @@ mod tests {
             crossbeam_channel::Sender<Message<Post>>,
             crossbeam_channel::Receiver<Message<Post>>,
             crossbeam_channel::Sender<Cancel>,
-        ) = wire_up(|msg: Message<Post>| {
+        ) = wire_up(|msg: Message<Post>, cache: Cache<Post>| {
             println!("MESSAGE: {:?}", msg);
             match msg.msg_type {
                 MessageType::Get => {
                     println!("Msg: {:?}", msg.msg_type);
-                    handle_get(msg);
+                    handle_get(&msg, cache);
                 },
                 MessageType::Create => {
                     println!("Msg: {:?}", msg.msg_type);
