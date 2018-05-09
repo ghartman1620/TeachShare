@@ -268,12 +268,20 @@ pub struct Cancel {
 // }
 
 
+
 /// wire_up<T, U, V> uses the types to setup crossbeam channels and returns the relevant information
-fn wire_up<T, U, V>(closure: FnOnce) -> (Sender<T>, Receiver<U>, Sender<V>) {
-    let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<T>();
-    let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<U>();
-    let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<V>();
-    (send_pipe, recv_ret_pipe, send_cancel)
+fn wire_up<'a, T, U, V, F>(closure: F) -> (Sender<&'a T>, Receiver<&'a U>, Sender<'a, V>) 
+where 
+    T: Debug + Sized ,
+    U: Debug + Sized,
+    V: Debug + Sized,
+    F: Fn(T) -> U,
+{
+    let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<&T>();
+    let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<&U>();
+    let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<&V>();
+    selector(recv_pipe, send_ret_pipe, recv_cancel, closure);
+    (send_pipe, &recv_ret_pipe, send_cancel)
 }
 
 
@@ -282,7 +290,9 @@ fn test() {
     let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<Message<Post>>();
     let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<Cancel>();
 
-    wire_up::<Message<Post>, Message<Post>, Cancel>(||{});
+    wire_up::<Message<Post>, Message<Post>, Cancel, Fn(Message<Post>) -> Message<Post>>(move |msg|{
+        msg
+    });
     let result = selector(recv_pipe, send_ret_pipe, recv_cancel, move |msg| {
         println!("Message: {:?}", msg);
         msg
