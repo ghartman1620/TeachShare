@@ -5,6 +5,7 @@ use pool;
 use std::fmt::Debug;
 use std::ops::Fn;
 use std::thread;
+use std::sync::Arc;
 use std::thread::JoinHandle;
 
 // separate function so that if there is necessary logic it'll happen here and not
@@ -146,22 +147,24 @@ pub type ChanTuple<T> = (SendMsg<T>, RecvMsg<T>);
 //     }
 // }
 
-pub fn selector<'a, S: 'a, T, U, V, F>(
+pub fn selector<'a, S, T, U, V, F>(
     in_pipe: Receiver<T>,
     ret_pipe: Sender<U>,
     cancel: Receiver<V>,
     closure: F,
-) where
+) where 
     T: Debug,
     U: Debug,
     V: Debug,
-    F: Fn(T, Cache<S>) -> U, //This is crucial need to be able to go from Message<T> -> Message<U>
+    
+    F: Fn(T, Arc<Cache<S>>) -> U, //This is crucial need to be able to go from Message<T> -> Message<U>
 {
-    let cache = Cache::<S>::new();
+    let cache = Arc::new(Cache::<S>::new());
     loop {
         select_loop! {
             recv(in_pipe, msg) => {
-                let response = closure(msg, cache);
+                let cpy = cache.clone();
+                let response = closure(msg, cpy);
                 ret_pipe.send(response);
             },
             recv(cancel, s) => {
@@ -272,12 +275,12 @@ pub struct Cancel {
 // }
 
 /// wire_up<T, U, V> uses the types to setup crossbeam channels and returns the relevant information
-fn wire_up<'a, S: 'a, T, U, V, F>(closure: F) -> (Sender<T>, Receiver<U>, Sender<V>)
+fn wire_up<'a, S, T, U, V, F>(closure: F) -> (Sender<T>, Receiver<U>, Sender<V>)
 where
     T: Debug + Sized + Send + 'static,
     U: Debug + Sized + Send + 'static,
     V: Debug + Sized + Send + 'static,
-    F: Fn(T, Cache<S>) -> U + Send + 'static,
+    F: Fn(T, Arc<Cache<S>>) -> U + Send + 'static,
 {
     let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<T>();
     let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<U>();
@@ -288,7 +291,7 @@ where
     //     let sel = selector(recv_pipe, send_ret_pipe, recv_cancel, closure);
     //     println!("Selector finished...");
     // });
-    thread::spawn(move || {
+    thread::spawn( move || {
         println!("We are inside the pool.executre(||){{...}}");
         let sel = selector(recv_pipe, send_ret_pipe, recv_cancel, closure);
         println!("Selector finished...");
@@ -297,29 +300,40 @@ where
     (send_pipe, recv_ret_pipe, send_cancel)
 }
 
-fn handle_get<T, U>(msg: T, cash: Cache<U>) -> Option<T> {
+fn handle_get<T, U>(msg: T, cash: &Arc<Cache<U>>) -> Option<T> where
+    T: Debug,
+{
+    println!("{:?}", msg);
     println!("[GET] ------------------------------------------------->");
     Option::from(msg)
 }
 
+fn handle_create<T, U>(msg: T, cash: &mut Arc<Cache<U>>) -> Option<T> where
+    T: Debug,
+{
+    println!("{:?}", msg);
+    println!("[CREATE] ------------------------------------------------->");
+    Option::from(msg)
+}
+
 fn test() {
-    let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<Message<Post>>();
-    let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<Message<Post>>();
-    let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<Cancel>();
+    // let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<Message<Post>>();
+    // let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<Message<Post>>();
+    // let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<Cancel>();
 
-    let (snd, ret, cancel): (
-        crossbeam_channel::Sender<Message<Post>>,
-        crossbeam_channel::Receiver<Message<Post>>,
-        crossbeam_channel::Sender<Cancel>,
-    ) = wire_up(|msg: Message<Post>, cache: Cache<Post>| msg);
-    println!("A: {}", snd.len());
-    println!("B: {}", ret.len());
-    println!("C: {}", cancel.len());
+    // let (snd, ret, cancel): (
+    //     crossbeam_channel::Sender<Message<Post>>,
+    //     crossbeam_channel::Receiver<Message<Post>>,
+    //     crossbeam_channel::Sender<Cancel>,
+    // ) = wire_up(&mut |msg: Message<Post>, cache: &mut Cache<Post>| msg);
+    // println!("A: {}", snd.len());
+    // println!("B: {}", ret.len());
+    // println!("C: {}", cancel.len());
 
-    let result = selector(recv_pipe, send_ret_pipe, recv_cancel, move |msg, cache: Cache<Post>| {
-        println!("Message: {:?}", msg);
-        msg
-    });
+    // let result = selector(recv_pipe, send_ret_pipe, recv_cancel,  &mut |msg, cache: &mut Cache<Post>| {
+    //     println!("Message: {:?}", msg);
+    //     msg
+    // });
 }
 
 #[cfg(test)]
@@ -442,7 +456,7 @@ mod tests {
             crossbeam_channel::Sender<Message<Post>>,
             crossbeam_channel::Receiver<Message<Post>>,
             crossbeam_channel::Sender<Cancel>,
-        ) = wire_up(|msg: Message<Post>, cache: Cache<Post>| {
+        ) = wire_up(|msg: Message<Post>, cache: Arc<Cache<Post>>| {
             println!("MESSAGE: {:?}", msg);
             msg
         });
@@ -461,15 +475,18 @@ mod tests {
             crossbeam_channel::Sender<Message<Post>>,
             crossbeam_channel::Receiver<Message<Post>>,
             crossbeam_channel::Sender<Cancel>,
-        ) = wire_up(|msg: Message<Post>, cache: Cache<Post>| {
+        ) = wire_up(|msg: Message<Post>, cache: Arc<Cache<Post>>| {
             println!("MESSAGE: {:?}", msg);
+            let m = msg.clone();
+            let mut c = cache.clone();
             match msg.msg_type {
                 MessageType::Get => {
                     println!("Msg: {:?}", msg.msg_type);
-                    handle_get(&msg, cache);
+                    handle_get(&m, &c);
                 },
                 MessageType::Create => {
                     println!("Msg: {:?}", msg.msg_type);
+                    handle_create(&m, &mut c);
                 },
                 MessageType::Watch => {
                     println!("Msg: {:?}", msg.msg_type);
@@ -483,9 +500,20 @@ mod tests {
         println!("A: {}", a.len());
         println!("B: {}", b.len());
         println!("C: {}", c.len());
-        let response = c.send(Cancel {
-            msg: String::from("Cancelled it!"),
-        }).expect("There was a terrible error cancelling it!");
+
+        // get
+        let response = a.send(Message::<Post>::new()).expect("There was a terrible error sending it!");
         println!("response: {:?}", response);
+        let resp = b.recv();
+        println!("resp: {:?}", resp);
+
+        // create
+        let mut create = Message::<Post>::new();
+        create.msg_type = MessageType::Create;
+        let response = a.send(create).expect("There was a terrible error sending it!");
+        
+        println!("response: {:?}", response);
+        let resp = b.recv();
+        println!("resp: {:?}", resp);
     }
 }

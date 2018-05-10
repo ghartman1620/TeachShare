@@ -151,6 +151,20 @@ where
     pub version: [i32; 3],
 }
 
+impl<T> Message<T> where 
+    T: Model,
+{
+    pub fn new() -> Message<T> {
+        Message {
+            data: T::new(),
+            data_type: ModelType::Post,
+            msg_type: MessageType::Get,
+            timestamp: 0,
+            version: [0,0,0],
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Command<T> {
     pub cmd_type: CommandType,
@@ -231,26 +245,30 @@ impl Post {
 pub trait Model {
     type model;
     fn id(&self) -> i32;
+    fn new() -> Self;
 }
 
-impl Model for Comment {
-    type model = Comment;
-    fn id(&self) -> i32 {
-        self.id
-    }
-}
+// impl Model for Comment {
+//     type model = Comment;
+//     fn id(&self) -> i32 {
+//         self.id
+//     }
+// }
 impl Model for Post {
     type model = Post;
     fn id(&self) -> i32 {
         self.id
     }
-}
-impl Model for User {
-    type model = User;
-    fn id(&self) -> i32 {
-        self.id
+    fn new() -> Post {
+        Post::new()
     }
 }
+// impl Model for User {
+//     type model = User;
+//     fn id(&self) -> i32 {
+//         self.id
+//     }
+// }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Comment {

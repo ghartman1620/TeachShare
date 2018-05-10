@@ -1,6 +1,6 @@
+
 /*!
  The websocket cache service is used for realtime communication between connected users.
-
 */
 extern crate ws;
 #[macro_use]
@@ -13,17 +13,13 @@ extern crate serde_derive;
 
 #[macro_use]
 extern crate crossbeam_channel;
-
-use std::cell::Cell;
-use std::collections::HashMap;
 use std::sync::*;
-
-use std::thread;
 use ws::{listen, CloseCode, Error, Handler, Handshake, Message, Result, Sender};
 
 mod cache;
 mod models;
 mod pool;
+
 
 // use crossbeam_channel::{Receiver, Sender};
 
