@@ -4,7 +4,7 @@
 use std::cmp::{Eq, PartialEq};
 use std::collections;
 use std::collections::HashMap;
-use std::rc::Rc;
+use std::cell::RefCell;
 
 /**
  *  This
@@ -171,29 +171,36 @@ pub struct Command<T> {
     pub value: T,
 }
 
-type ModelTable<T> = HashMap<i32, Resource<T>>;
+type ModelTable<T> = RefCell<HashMap<i32, Resource<T>>>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Cache<T> {
     // using classical generics and predefined models
     pub _data: ModelTable<T>,
 }
 
-impl<T> Cache<T> {
+impl<'a, T> Cache<T> 
+where
+    T: Model,
+{
     pub fn new() -> Cache<T> {
         Cache {
-            _data: HashMap::new(),
+            _data: RefCell::from(HashMap::new()),
         }
     }
-    pub fn get(&mut self, key: i32) -> Option<&Resource<T>> {
-        return self._data.get(&key);
+    pub fn get(self, key: i32) /*-> Option<&'a Resource<T>>*/ {
+        let temp = self._data;
+        let selfy = temp.borrow();
+        let result = selfy.get(&key).unwrap();
+        // println!("{:?}", result.id());
     }
-    pub fn set(&mut self, key: i32, new_post: T) -> Option<Resource<T>> {
+    pub fn set(&mut self, key: i32, new_post: T) /*-> Option<Resource<T>>*/ {
         let model = Resource::new(new_post);
-        self._data.insert(key, model)
+        let selfy = self._data.borrow_mut();
+        let res = selfy.insert(key, model);
     }
     pub fn update(&mut self, key: i32, new_post: T) -> bool {
-        let prev = self._data.get_mut(&key).unwrap();
+        let prev = self._data.borrow_mut().get_mut(&key).unwrap();
         *prev = Resource::new(new_post);
         true
     }
@@ -246,7 +253,19 @@ pub trait Model {
     type model;
     fn id(&self) -> i32;
     fn new() -> Self;
+    fn data(self) -> Self where 
+        Self: Sized,
+    {
+        return self;
+    }
+    fn inner(self) -> Self where 
+        Self: Sized,
+    {
+        return self;
+    }
 }
+
+
 
 // impl Model for Comment {
 //     type model = Comment;
@@ -262,7 +281,28 @@ impl Model for Post {
     fn new() -> Post {
         Post::new()
     }
+    fn inner(self) -> Self where 
+        Self: Sized,
+    {
+        return self;
+    }
 }
+
+impl Model for Resource<Post> {
+    type model = Resource<Post>;
+    fn id(&self) -> i32 {
+        self.data().id()
+    }
+    fn new() -> Resource<Post> {
+        Resource::new(Post::new())
+    }
+    fn inner(self) -> Self where 
+        Self: Sized,
+    {
+        return self;
+    }
+}
+
 // impl Model for User {
 //     type model = User;
 //     fn id(&self) -> i32 {
@@ -303,5 +343,11 @@ mod tests {
             std::any::TypeId::of::<models::Resource<models::Post>>(),
             typ
         );
+    }
+
+    #[test]
+    fn test_model_post() {
+        let p = models::Post::new();
+        // p.data();
     }
 }

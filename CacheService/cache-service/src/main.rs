@@ -89,6 +89,7 @@ fn main() {
         println!("This is getting executed!");
     });
 
+    
     // let users: HashMap<i32, models::User> = HashMap::new();
     // let mut hub = GrandSocketStation {
     //     user_pool: Cell::new(users),
@@ -113,6 +114,7 @@ fn main() {
         Some(val) => println!("returned: {:?}", val),
         None => println!("Nothign was returned."),
     };
+    println!("rm: {:?}", rm);
     println!("new watchers: {:?}", m.watchers);
     // t.id = 2;
     // t.username = String::from("bryandmc");

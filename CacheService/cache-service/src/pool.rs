@@ -48,7 +48,7 @@ impl Worker {
     }
 }
 
-trait FnBox {
+pub trait FnBox {
     fn call_box(self: Box<Self>);
 }
 
