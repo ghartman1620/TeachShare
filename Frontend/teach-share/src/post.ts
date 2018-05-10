@@ -3,6 +3,7 @@ import User from "./user";
 import api from "./api";
 import {Post} from "./models";
 import store from "./store";
+import {asLoggedIn} from "./router/index";
 
 export enum PostStatus {Loading, Saving, Saved}
 
@@ -57,7 +58,7 @@ export class InProgressPost {
             this.coreIdeas = [];
             this.practices = [];
             post.pk = postid;
-            api.get("/posts/"+ postid).then(function(response){
+            asLoggedIn(api.get("/posts/"+ postid)).then(function(response){
                 console.log(response);
                 post.elements = response.data.content;
                 post.title = response.data.title;

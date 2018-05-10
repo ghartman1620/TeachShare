@@ -1,11 +1,15 @@
 import Base from "@/components/Base.vue";
+import * as Cookie from "tiny-cookie";
 import Vue from "vue";
 import Router from "vue-router";
 
 import api from "../api";
 import store from "../store";
+import {logout} from "../store_modules/UserService";
+import {AxiosPromise} from "axios";
 import { setUser } from "../store_modules/UserService";
 import User from "../user";
+
 
 // typescript 'require' workaround hack
 declare function require(name: string): any;
@@ -144,7 +148,18 @@ const router = new Router({
     ]
 });
 
-var Cookie = require("tiny-cookie");
+export function asLoggedIn(promise: AxiosPromise<any>): Promise<any> {
+    return new Promise((resolve, reject) => {
+        promise
+        .then((response) => {resolve(response); })
+        .catch((err) => {
+            logout(store);
+            router.push({name: "login"});
+            reject();
+        });
+    });
+}
+
 function verifyAndRefreshLogin(): Promise<any> {
     if (store.getters.isLoggedIn){
         console.log("is logged in with store");
@@ -157,8 +172,6 @@ function verifyAndRefreshLogin(): Promise<any> {
         return new Promise((resolve) => {resolve(true); });
     } else if (window.localStorage.getItem("refreshToken") !== null){
         console.log("logging back in...");
-        console.log(window.localStorage.getItem("refreshToken"));
-
         console.log(window.localStorage.getItem("username"));
         return new Promise((resolve, reject) => {
             const body = {
@@ -201,6 +214,7 @@ const loggedOutRoutes = ["login", "register"];
 router.beforeEach((to, from, next) => {
     console.log(window.localStorage.getItem("refreshToken"));
     if (loggedOutRoutes.some(val => val === to.name)) {
+        console.log("I'm trying to get to a logged out page.");
         verifyAndRefreshLogin().then((loggedIn) => {
             if (loggedIn) {
                 next({ name: "dashboard" });
@@ -208,18 +222,18 @@ router.beforeEach((to, from, next) => {
                 next();
             }
         });
-    }
-    // @TODO: make sure this works!!!
-    if (loginProtectedRoutes.some((val) => val === to.name)) {
+    } else if (loginProtectedRoutes.some((val) => val === to.name)) {
         verifyAndRefreshLogin().then((loggedIn) => {
+            console.log(loggedIn);
             if (loggedIn) {
                 next();
             } else {
                 next({ name: "login" });
             }
         });
+    } else {
+        next();
     }
-    next();
 });
 
 export default router;

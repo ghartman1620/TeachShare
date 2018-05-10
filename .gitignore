@@ -11,3 +11,4 @@ media/
 Rust_ws/target
 static/
 TeachShare_WebApp/cache/websockets/target
+CacheService/cache-service/target

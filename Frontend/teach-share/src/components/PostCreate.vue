@@ -228,11 +228,15 @@ import { addElement,
     saveDraft 
 } from "../store_modules/PostCreateService";
 import {
-    getLoggedInUser
-} from "../store_modules/UserService.ts";
+    getLoggedInUser,
+    logout
+} from "../store_modules/UserService";
 import SideBar from "./SideBar.vue";
+import {asLoggedIn} from "../router/index";
 import TagSelect from "./TagSelect.vue";
 import {User} from "../models";
+import * as Cookie from "tiny-cookie";
+
 
 function isBlank(str) {
     return !str || /^\s*$/.test(str);
@@ -260,7 +264,6 @@ const bodyHidden = {
 const bodyVisible = {
     opacity: "1"
 };
-
 
 
 @Component({
@@ -475,8 +478,19 @@ export default class PostCreate extends Vue{
         //@TODO: use store and Post model for this work
         //This is also all reloaded every time somebody reloads the page.. which is really quite no good.
         var nextPage = 1;
+        console.log("I'M SHOUTING ABOUT GETTING USER POSTS CAUSE TOO DAMN MANY CONSOLE LOGS HOLY SHIT");
         do{
-            var response = await api.get("/posts/?user=" + this.getLoggedInUser.pk + "&page=" + nextPage.toString());
+            var response;
+            /*try{
+                response = await api.get("/posts/?user=" + this.getLoggedInUser.pk + "&page=" + nextPage.toString())
+            }
+            catch(e) {
+                console.log(e);
+                console.log("SHOUTING ABOUT ERROR HANDLING");
+                logout(this.$store);
+                this.$router.push({name: "login"});
+            }*/
+            response = await asLoggedIn(api.get(`/posts/?user=${this.getLoggedInUser.pk}&page=${nextPage.toString()}`));
             for(var post of response.data.results){
                 vm.userPosts.push(post);
             }
@@ -503,6 +517,7 @@ export default class PostCreate extends Vue{
     }
 
     mounted() {
+
         console.log("mounted post create");
         var vm: PostCreate = this;
         this.$on("submitElement", function(element: any, index: number){

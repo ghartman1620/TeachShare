@@ -55,6 +55,7 @@ export const actions = {
     setUser: (context: UserContext, user: User): void  => {
         mutSetUser(context, user);
     },
+
     addUser: (context: UserContext, user: User): void  => {
         mutAddUser(context, user);
     },
@@ -68,6 +69,7 @@ export const actions = {
 
         window.localStorage.removeItem("refreshToken");
         window.localStorage.removeItem("username");
+        mutClearUser(context);
     },
     login: (context: UserContext, credentials: LoginCredentials): Promise<any> => {
         const body = {
@@ -114,6 +116,9 @@ const mutations = {
         state.otherUsers.push(user);
         console.log(state.otherUsers);
     },
+    CLEAR_USER: (state) => {
+        state.user = undefined;
+    }
 };
 
 export const getters = {
@@ -168,3 +173,5 @@ export const isLoggedIn = read(UserService.getters.isLoggedIn);
  */
 export const mutAddUser = commit(UserService.mutations.ADD_USER);
 export const mutSetUser = commit(UserService.mutations.SET_USER);
+
+export const mutClearUser = commit(UserService.mutations.CLEAR_USER);
