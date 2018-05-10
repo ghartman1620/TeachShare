@@ -182,21 +182,15 @@ export default class PostFeed extends Vue {
         if(this.subject != null && this.grade !== null){
             this.standardOptions = [];   
             var vm: PostFeed = this;
-            console.log("in loadstandards" + this.grade);
-            console.log(this.standardOptions);
             api.get(`/standards/?grade=${this.grade}&subject=${this.subject}`).then(function(response: any) {
-                console.log(response.data);
-                console.log(vm.standardOptions);
                 for(var std of <any[]>response.data){
                     vm.standardOptions.push({
                         value: std.pk,
                         text: std.name + " (" + std.code +")",
                     })
                 }
-                console.log(vm.standardOptions);
-                console.log(vm.grade);
+
             })
-            console.log(this.grade);
         }
 
     }
@@ -269,8 +263,7 @@ export default class PostFeed extends Vue {
     }
 
     beforeMount(){
-        console.log("in beforemount");
-        console.log(this.$route.query);
+
         this.reloadPosts();
 
         var t = this;

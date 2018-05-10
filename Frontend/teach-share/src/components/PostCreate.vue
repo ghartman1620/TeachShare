@@ -319,7 +319,6 @@ export default class PostCreate extends Vue{
 
     saveTagChanges(grade: number, length: number, subject: number, contentType: number, standards: number[],
             concepts, practices, coreIdeas): void {
-        console.log(standards);
         this.inProgressPost.setStandards(standards);
         this.inProgressPost.setGrade(grade);
         this.inProgressPost.setSubject(subject);
@@ -334,11 +333,9 @@ export default class PostCreate extends Vue{
         saveDraft(this.$store);
     }
     changeGrade(grade: number) {
-        console.log(grade);
         setGrade(this.$store, grade);
     }
     changeSubject(subject: number) {
-        console.log(subject);
         setSubject(this.$store, subject);
     }
     changeContentType(contentType: number){
@@ -435,8 +432,7 @@ export default class PostCreate extends Vue{
     //as a teacher, I want to be able to draft edits to my lesson plan and see them before I publish those edits, even
     //if my post is already published.
     editPost(post): void {
-        console.log("EDITING POST...");
-        console.log(post);
+
         window.localStorage.setItem("inProgressPost", post.pk);
         var user: User = <User>this.getLoggedInUser;
         this.beginPost(<number>user.pk, <number>post.pk);
@@ -449,7 +445,6 @@ export default class PostCreate extends Vue{
     }
 
     moveElementUp(index: number) {
-        console.log("move element up" + index);
         if (index != 0) {
             swapElements(this.$store, [index, index - 1]);
             // dispatch only allows one argument so we'll pass them as an array
@@ -478,18 +473,9 @@ export default class PostCreate extends Vue{
         //@TODO: use store and Post model for this work
         //This is also all reloaded every time somebody reloads the page.. which is really quite no good.
         var nextPage = 1;
-        console.log("I'M SHOUTING ABOUT GETTING USER POSTS CAUSE TOO DAMN MANY CONSOLE LOGS HOLY SHIT");
         do{
             var response;
-            /*try{
-                response = await api.get("/posts/?user=" + this.getLoggedInUser.pk + "&page=" + nextPage.toString())
-            }
-            catch(e) {
-                console.log(e);
-                console.log("SHOUTING ABOUT ERROR HANDLING");
-                logout(this.$store);
-                this.$router.push({name: "login"});
-            }*/
+
             response = await asLoggedIn(api.get(`/posts/?user=${this.getLoggedInUser.pk}&page=${nextPage.toString()}`));
             for(var post of response.data.results){
                 vm.userPosts.push(post);
@@ -498,9 +484,7 @@ export default class PostCreate extends Vue{
         }while(response.data.next !== null);
     }
     created() {
-        console.log(this.getLoggedInUser);
         var inProgressPost = window.localStorage.getItem("inProgressPost");
-        console.log(inProgressPost);
         if(inProgressPost == undefined){
             this.beginPost( 
                 //???? how on earth is this type string | undefined
@@ -518,12 +502,9 @@ export default class PostCreate extends Vue{
 
     mounted() {
 
-        console.log("mounted post create");
         var vm: PostCreate = this;
         this.$on("submitElement", function(element: any, index: number){
-            console.log("submitting element");
-            console.log(element);
-            console.log(index);
+
             if(index == getCurrentPost(vm.$store)!.elements.length){
                 addElement(vm.$store, element);
             }
