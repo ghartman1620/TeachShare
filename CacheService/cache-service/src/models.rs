@@ -196,11 +196,12 @@ where
     }
     pub fn set(&mut self, key: i32, new_post: T) /*-> Option<Resource<T>>*/ {
         let model = Resource::new(new_post);
-        let selfy = self._data.borrow_mut();
+        let mut selfy = self._data.borrow_mut();
         let res = selfy.insert(key, model);
     }
-    pub fn update(&mut self, key: i32, new_post: T) -> bool {
-        let prev = self._data.borrow_mut().get_mut(&key).unwrap();
+    pub fn update(&'static mut self, key: i32, new_post: T) -> bool {
+        let mut temp = self._data.borrow_mut(); 
+        let prev = temp.get_mut(&key).unwrap();
         *prev = Resource::new(new_post);
         true
     }
@@ -288,20 +289,20 @@ impl Model for Post {
     }
 }
 
-impl Model for Resource<Post> {
-    type model = Resource<Post>;
-    fn id(&self) -> i32 {
-        self.data().id()
-    }
-    fn new() -> Resource<Post> {
-        Resource::new(Post::new())
-    }
-    fn inner(self) -> Self where 
-        Self: Sized,
-    {
-        return self;
-    }
-}
+// impl Model for Resource<Post> {
+//     type model = Resource<Post>;
+//     fn id(&self) -> i32 {
+//         self.data().id()
+//     }
+//     fn new() -> Resource<Post> {
+//         Resource::new(Post::new())
+//     }
+//     fn inner(self) -> Self where 
+//         Self: Sized,
+//     {
+//         return self;
+//     }
+// }
 
 // impl Model for User {
 //     type model = User;

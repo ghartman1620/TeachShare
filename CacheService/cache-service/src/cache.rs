@@ -18,21 +18,22 @@ pub type ChanTuple<T> = (SendMsg<T>, RecvMsg<T>);
 
 pub fn selector<'a, S, T, U, V, F>(
     in_pipe: Receiver<T>,
-    ret_pipe: Sender<Resource<U>>,
+    ret_pipe: Sender<U>,
     cancel: Receiver<V>,
     closure: F,
 ) where 
+    S: Model,
     T: Debug + 'static,
     U: Debug + 'static,
     V: Debug + 'static,  
-    F: Fn(T, &Rc<Cache<Resource<S>>>) -> Resource<U> + 'static, //This is crucial need to be able to go from Message<T> -> Message<U>
+    F: Fn(T, &mut Rc<Cache<S>>) -> U + 'static, //This is crucial need to be able to go from Message<T> -> Message<U>
 {
-    let cache = Rc::new(Cache::<Resource<S>>::new());
+    let mut cache = &mut Rc::new(Cache::new());
     loop {
         select_loop! {
             recv(in_pipe, msg) => {
-                let cpy = cache.clone();
-                let response = closure(msg, &cpy);
+                // let mut cpy = cache.clone();
+                let response = closure(msg, cache);
                 let ret_resp = ret_pipe.send(response).unwrap();
                 println!("ret_resp: {:?}", ret_resp);
             },
@@ -64,15 +65,15 @@ pub struct Cancel {
 
 #[allow(dead_code)]
 /// wire_up<T, U, V> uses the types to setup crossbeam channels and returns the relevant information
-fn wire_up<'a, T, U, V, F>(closure: F) -> (Sender<T>, Receiver<Resource<U>>, Sender<V>)
+fn wire_up<'a, T, U, V, F>(closure: F) -> (Sender<T>, Receiver<U>, Sender<V>)
 where
     T: Debug + Sized + Send + 'static,
-    U: Debug + Sized + Send + 'static,
+    U: Debug + Sized + Send + Model + 'static,
     V: Debug + Sized + Send + 'static,
-    F: Fn(T, &Rc<Cache<Resource<U>>>) -> Resource<U> + Send + 'static,
+    F: Fn(T, &mut Rc<Cache<U>>) -> U + Send + 'static,
 {
     let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<T>();
-    let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<Resource<U>>();
+    let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<U>();
     let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<V>();
     thread::spawn( move || {
 
@@ -86,7 +87,7 @@ where
 }
 
 #[allow(dead_code)]
-fn handle_get<'a, T, U>(msg: T, cash: &'a Cache<Resource<U>>) -> Option<T> where
+fn handle_get<'a, T, U>(msg: T, cash: &'a Cache<U>) -> Result<T, &str> where
     T: Debug + Model,
     U: 'static,
 {
@@ -94,15 +95,16 @@ fn handle_get<'a, T, U>(msg: T, cash: &'a Cache<Resource<U>>) -> Option<T> where
     println!("[GET] ------------------------------------------------->");
     // let cash = &cash;
     // cash.get(msg.id());
-    Option::from(msg)
+    Ok(msg)
 }
 
 #[allow(dead_code)]
-fn handle_create<T>(msg: T, cash: &mut Cache<Resource<T>>) /* -> Option<Resource<T>> */  where
+fn handle_create<T>(msg: T, cash: &mut Cache<T>) -> Result<T, &str> where
     T: Debug + Model,
 {
     println!("{:?}", msg);
     println!("[CREATE] ------------------------------------------------->"); 
+    Ok(msg)
     // println!("************** ==>> {:?}", msg.data());
     // let inner =  msg.data();
     // let c = Rc::get_mut(cash).unwrap(); // TODO: handle errors better...
@@ -120,7 +122,7 @@ fn handle_create<T>(msg: T, cash: &mut Cache<Resource<T>>) /* -> Option<Resource
 } 
 
 #[allow(dead_code)]
-fn handle_watch<T, U>(msg: T, cash: &Rc<Cache<U>>) -> Option<T> where
+fn handle_watch<T, U>(msg: T, cash: &mut Rc<Cache<U>>) -> Option<T> where
     T: Model + Debug,
 {
     println!("{:?}", msg);
@@ -132,29 +134,30 @@ fn handle_watch<T, U>(msg: T, cash: &Rc<Cache<U>>) -> Option<T> where
 fn test_selector_extended<'a>() {
     let (a, b, c): (
         crossbeam_channel::Sender<Message<Post>>,
-        crossbeam_channel::Receiver<Resource<Post>>,
+        crossbeam_channel::Receiver<Post>,
         crossbeam_channel::Sender<Cancel>,
-    ) = wire_up(|msg: Message<Post>, cache: &Rc<Cache<Resource<Post>>>| {
+    ) = wire_up(|msg: Message<Post>, cache: &mut Rc<Cache<Post>>| {
         println!("MESSAGE: {:?}", msg);
         // let m = msg.clone();
-        let temp = &mut cache.clone();
-        let temp2 = cache.clone();
-        let c_create = Rc::make_mut(temp);  
-        let c_get = temp2;
+        // let temp = &mut cache.clone();
+        // let temp2 = cache.clone();
+        // let c_create = Rc::make_mut(temp);  
+        // let c_get = temp2;
                                 
         match msg.msg_type {
             MessageType::Get => {
                 println!("Msg: {:?}", msg.msg_type);
                 
                 {
-                    handle_get(msg.data, &c_get);
+                    handle_get(msg.data, &cache);
                 }
             },
             MessageType::Create => {
                 println!("Msg: {:?}", msg.msg_type);
                 // let c_create = Rc::make_mut(&mut c);
                 let inner = msg.data;
-                handle_create(inner, c_create);
+                // let mutable_cache = &mut cache.clone();
+                // handle_create(inner, cache);
             },
             MessageType::Watch => {
                 println!("Msg: {:?}", msg.msg_type);
@@ -164,7 +167,7 @@ fn test_selector_extended<'a>() {
                 println!("Msg: {:?}", msg.msg_type);
             }
         }
-        Resource::new(Post::new())
+        Post::new()
     });
     println!("A: {}", a.len());
     println!("B: {}", b.len());
@@ -243,79 +246,8 @@ mod tests {
     // }
 
     #[test]
-    fn test_selector_extended<'a>() {
-        let (a, b, c): (
-            crossbeam_channel::Sender<Message<Post>>,
-            crossbeam_channel::Receiver<Resource<Post>>,
-            crossbeam_channel::Sender<Cancel>,
-        ) = wire_up(|msg: Message<Post>, cache: &Rc<Cache<Resource<Post>>>| {
-            println!("MESSAGE: {:?}", msg);
-            // let m = msg.clone();
-            let temp = &mut cache.clone();
-            let temp2 = cache.clone();
-            let c_create = Rc::make_mut(temp);  
-            let c_get = temp2;
-                                    
-            match msg.msg_type {
-                MessageType::Get => {
-                    println!("Msg: {:?}", msg.msg_type);
-                    
-                    {
-                        handle_get(msg.data, &c_get);
-                    }
-                },
-                MessageType::Create => {
-                    println!("Msg: {:?}", msg.msg_type);
-                    // let c_create = Rc::make_mut(&mut c);
-                    let inner = msg.data;
-                    handle_create(inner, c_create);
-                },
-                MessageType::Watch => {
-                    println!("Msg: {:?}", msg.msg_type);
-                    // handle_watch(m.data(), &c);
-                },
-                MessageType::Update => {
-                    println!("Msg: {:?}", msg.msg_type);
-                }
-            }
-            Resource::new(Post::new())
-        });
-        println!("A: {}", a.len());
-        println!("B: {}", b.len());
-        println!("C: {}", c.len());
-
-        // get
-        let response = a.send(Message::<Post>::new()).expect("There was a terrible error sending it!");
-        println!("response: {:?}", response);
-        let resp = b.recv();
-        println!("resp: {:?}", resp);
-
-        // create
-        let mut create = Message::<Post>::new();
-        create.msg_type = MessageType::Create;
-        let response = a.send(create).expect("There was a terrible error sending it!");
-        
-        println!("response: {:?}", response);
-        let resp = b.recv();
-        println!("resp: {:?}", resp);
-
-        // watch
-        let mut create = Message::<Post>::new();
-        create.msg_type = MessageType::Watch;
-        let response = a.send(create).expect("There was a terrible error sending it!");
-        
-        println!("response: {:?}", response);
-        let resp = b.recv();
-        println!("resp: {:?}", resp);
-
-        // cancel
-        let cancel = Cancel{msg: String::from("CANCEL MEOOOW.")};
-        create.msg_type = MessageType::Watch;
-        let response = c.send(cancel).expect("There was a terrible error sending it!");
-        
-        println!("response: {:?}", response);
-        let resp = b.recv();
-        println!("resp: {:?}", resp);
+    fn test_selector_extended() {
+        cache::test_selector_extended();
     }
 }
 
