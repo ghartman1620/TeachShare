@@ -1,4 +1,5 @@
 
+ #![feature(ptr_internals)]
 /*!
  The websocket cache service is used for realtime communication between connected users.
 */

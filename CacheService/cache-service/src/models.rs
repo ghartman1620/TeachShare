@@ -142,7 +142,7 @@ pub enum ModelType {
 #[derive(Debug, Clone)]
 pub struct Message<T>
 where
-    T: Model,
+    T: Model + Clone,
 {
     pub data: T,
     pub data_type: ModelType,
@@ -152,7 +152,7 @@ where
 }
 
 impl<T> Message<T> where 
-    T: Model,
+    T: Model + Clone,
 {
     pub fn new() -> Message<T> {
         Message {
@@ -194,10 +194,11 @@ where
         let result = selfy.get(&key).unwrap();
         // println!("{:?}", result.id());
     }
-    pub fn set(&mut self, key: i32, new_post: T) /*-> Option<Resource<T>>*/ {
+    pub fn set(&mut self, key: i32, new_post: T) -> Option<Resource<T>> {
         let model = Resource::new(new_post);
         let mut selfy = self._data.borrow_mut();
         let res = selfy.insert(key, model);
+        res
     }
     pub fn update(&'static mut self, key: i32, new_post: T) -> bool {
         let mut temp = self._data.borrow_mut(); 

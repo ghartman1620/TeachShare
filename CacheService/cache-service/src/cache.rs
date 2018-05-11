@@ -7,6 +7,7 @@ use std::ops::Fn;
 use std::thread;
 use std::rc::Rc;
 use std::thread::JoinHandle;
+use std::collections::HashMap;
 
 
 pub type SendMsg<T> = Sender<Message<T>>;
@@ -16,26 +17,27 @@ pub type RecvMsg<T> = Receiver<Message<T>>;
 /// where `SendMsg<T>` is `Sender<Message<T>>` and RecvMsg is `Reciever<Message<T>>`.
 pub type ChanTuple<T> = (SendMsg<T>, RecvMsg<T>);
 
-pub fn selector<'a, S, T, U, V, F>(
+pub fn selector<T, U, V, F>(
     in_pipe: Receiver<T>,
-    ret_pipe: Sender<U>,
+    ret_pipe: Sender<Resource<U>>,
     cancel: Receiver<V>,
     closure: F,
 ) where 
-    S: Model,
     T: Debug + 'static,
     U: Debug + 'static,
     V: Debug + 'static,  
-    F: Fn(T, &mut Rc<Cache<S>>) -> U + 'static, //This is crucial need to be able to go from Message<T> -> Message<U>
+    F: Fn(T, &mut RcHashBox<U>) -> Resource<U> + 'static, //This is crucial need to be able to go from Message<T> -> Message<U>
 {
-    let mut cache = &mut Rc::new(Cache::new());
+    let cache = Rc::new(Box::new(HashMap::<i32, Resource<U>>::new()));  // Rc::new(Cache::new());
     loop {
+        // println!("Strong count: {}.", Rc::strong_count(&cache));
         select_loop! {
             recv(in_pipe, msg) => {
                 // let mut cpy = cache.clone();
-                let response = closure(msg, cache);
+                // let cloned_cache = cache.clone();
+                // let temp_cache = cloned_cache.clone();
+                let response = closure(msg, &mut cache.clone());
                 let ret_resp = ret_pipe.send(response).unwrap();
-                println!("ret_resp: {:?}", ret_resp);
             },
             recv(cancel, s) => {
                 println!("Cancel Message: {:?}", s);
@@ -63,17 +65,19 @@ pub struct Cancel {
     msg: String,
 }
 
+type RcHashBox<'a, T> = Rc<&'a mut Box<HashMap<i32, Resource<T>>>>;
+
 #[allow(dead_code)]
 /// wire_up<T, U, V> uses the types to setup crossbeam channels and returns the relevant information
-fn wire_up<'a, T, U, V, F>(closure: F) -> (Sender<T>, Receiver<U>, Sender<V>)
+fn wire_up<'a, T, U, V, F>(closure: F) -> (Sender<T>, Receiver<Resource<U>>, Sender<V>)
 where
     T: Debug + Sized + Send + 'static,
-    U: Debug + Sized + Send + Model + 'static,
+    U: Debug + Sized + Send + 'static,
     V: Debug + Sized + Send + 'static,
-    F: Fn(T, &mut Rc<Cache<U>>) -> U + Send + 'static,
+    F: Fn(T, &mut RcHashBox<U>) -> Resource<U> + Send + 'static,
 {
     let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<T>();
-    let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<U>();
+    let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<Resource<U>>();
     let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<V>();
     thread::spawn( move || {
 
@@ -87,7 +91,7 @@ where
 }
 
 #[allow(dead_code)]
-fn handle_get<'a, T, U>(msg: T, cash: &'a Cache<U>) -> Result<T, &str> where
+fn handle_get<T, U>(msg: T, cash: HashMap<i32, Resource<U>>) -> Result<T, &'static str> where
     T: Debug + Model,
     U: 'static,
 {
@@ -99,11 +103,13 @@ fn handle_get<'a, T, U>(msg: T, cash: &'a Cache<U>) -> Result<T, &str> where
 }
 
 #[allow(dead_code)]
-fn handle_create<T>(msg: T, cash: &mut Cache<T>) -> Result<T, &str> where
-    T: Debug + Model,
+fn handle_create<T, U>(msg: T, cash: HashMap<i32, Resource<U>>) -> Result<T, &'static str> where
+    T: Debug + Model + Clone,
 {
     println!("{:?}", msg);
     println!("[CREATE] ------------------------------------------------->"); 
+    // let mut mutable_cache = Rc::make_mut(&mut cash);
+    // cash.set(msg.id(), T::new());
     Ok(msg)
     // println!("************** ==>> {:?}", msg.data());
     // let inner =  msg.data();
@@ -122,21 +128,32 @@ fn handle_create<T>(msg: T, cash: &mut Cache<T>) -> Result<T, &str> where
 } 
 
 #[allow(dead_code)]
-fn handle_watch<T, U>(msg: T, cash: &mut Rc<Cache<U>>) -> Option<T> where
+fn handle_watch<T, U>(msg: T, cash: HashMap<i32, Resource<U>>) -> Result<T, &'static str> where
     T: Model + Debug,
 {
     println!("{:?}", msg);
     
     println!("[WATCH] ------------------------------------------------->");
-    Option::from(msg)
+    // Option::from(msg)
+    Ok(msg)
+}
+
+#[allow(dead_code)]
+fn handle_update<T, U>(msg: T, cash: HashMap<i32, Resource<U>>) -> Result<T, &'static str> where
+    T: Debug,
+{
+    println!("{:?}", msg);
+    
+    println!("[UPDATE] ------------------------------------------------->");
+    Ok(msg)
 }
 
 fn test_selector_extended<'a>() {
     let (a, b, c): (
         crossbeam_channel::Sender<Message<Post>>,
-        crossbeam_channel::Receiver<Post>,
+        crossbeam_channel::Receiver<Resource<Post>>,
         crossbeam_channel::Sender<Cancel>,
-    ) = wire_up(|msg: Message<Post>, cache: &mut Rc<Cache<Post>>| {
+    ) = wire_up(|msg: Message<Post>, cache: &mut RcHashBox<Post>| {
         println!("MESSAGE: {:?}", msg);
         // let m = msg.clone();
         // let temp = &mut cache.clone();
@@ -147,27 +164,36 @@ fn test_selector_extended<'a>() {
         match msg.msg_type {
             MessageType::Get => {
                 println!("Msg: {:?}", msg.msg_type);
+                // #![feature(ptr_internals)]
                 
-                {
-                    handle_get(msg.data, &cache);
+                
+                let val = cache.get(&msg.data.id());
+                if val.is_some() {
+                    println!("It exists!");
+                    let result = val.unwrap();
+                } else {
+                    println!("It doesn't exist");
                 }
+                
             },
             MessageType::Create => {
                 println!("Msg: {:?}", msg.msg_type);
                 // let c_create = Rc::make_mut(&mut c);
                 let inner = msg.data;
+                cache.insert(inner.id(), Resource::new(inner));
                 // let mutable_cache = &mut cache.clone();
-                // handle_create(inner, cache);
+                // handle_create(inner, );
             },
             MessageType::Watch => {
                 println!("Msg: {:?}", msg.msg_type);
-                // handle_watch(m.data(), &c);
+                // handle_watch(msg.data, Rc::try_unwrap(cache).unwrap());
             },
             MessageType::Update => {
                 println!("Msg: {:?}", msg.msg_type);
+                // handle_update(msg, Rc::try_unwrap(cache).unwrap());
             }
         }
-        Post::new()
+        Resource::new(Post::new())
     });
     println!("A: {}", a.len());
     println!("B: {}", b.len());
@@ -196,6 +222,16 @@ fn test_selector_extended<'a>() {
     println!("response: {:?}", response);
     let resp = b.recv();
     println!("resp: {:?}", resp);
+
+    // update
+    let mut create = Message::<Post>::new();
+    create.msg_type = MessageType::Update;
+    let response = a.send(create).expect("There was a terrible error sending it!");
+    
+    println!("response: {:?}", response);
+    let resp = b.recv();
+    println!("resp: {:?}", resp);
+
 
     // cancel
     let cancel = Cancel{msg: String::from("CANCEL MEOOOW.")};
