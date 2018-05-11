@@ -8,7 +8,8 @@ use std::thread;
 use std::rc::Rc;
 use std::thread::JoinHandle;
 use std::collections::HashMap;
-
+use std::cell::RefCell;
+use std::time::Duration;
 
 pub type SendMsg<T> = Sender<Message<T>>;
 pub type RecvMsg<T> = Receiver<Message<T>>;
@@ -18,34 +19,236 @@ pub type RecvMsg<T> = Receiver<Message<T>>;
 pub type ChanTuple<T> = (SendMsg<T>, RecvMsg<T>);
 
 pub fn selector<T, U, V, F>(
-    in_pipe: Receiver<T>,
-    ret_pipe: Sender<Resource<U>>,
+    in_pipe: Receiver<Message<Post>>,
+    ret_pipe: Sender<Resource<Post>>,
     cancel: Receiver<V>,
     closure: F,
 ) where 
-    T: Debug + 'static,
-    U: Debug + 'static,
-    V: Debug + 'static,  
-    F: Fn(T, &mut RcHashBox<U>) -> Resource<U> + 'static, //This is crucial need to be able to go from Message<T> -> Message<U>
+    T: Debug + Send + 'static,
+    U: Debug + Send + 'static,
+    V: Debug + Send + 'static,  
+    F: Fn(T, RcCellHash<U>) -> Resource<U> + 'static, //This is crucial need to be able to go from Message<T> -> Message<U>
 {
-    let cache = Rc::new(Box::new(HashMap::<i32, Resource<U>>::new()));  // Rc::new(Cache::new());
-    loop {
-        // println!("Strong count: {}.", Rc::strong_count(&cache));
-        select_loop! {
-            recv(in_pipe, msg) => {
-                // let mut cpy = cache.clone();
-                // let cloned_cache = cache.clone();
-                // let temp_cache = cloned_cache.clone();
-                let response = closure(msg, &mut cache.clone());
-                let ret_resp = ret_pipe.send(response).unwrap();
-            },
-            recv(cancel, s) => {
-                println!("Cancel Message: {:?}", s);
-                return;
+    thread::spawn(move || {    
+        let mut cache = Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new()));  // Rc::new(Cache::new());
+        loop {
+            // println!("Strong count: {}.", Rc::strong_count(&cache));
+            select_loop! {
+                recv(in_pipe, msg) => {
+                    let response = match msg.msg_type {
+                        MessageType::Get => {
+                            println!("Msg: {:?}", msg.msg_type);
+                            {
+                                let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
+                                let borrowed_val = c.borrow_mut();
+                                let res = borrowed_val.get(&msg.data.id());
+                                if res.is_some() {
+                                    let val = res.unwrap();
+                                    println!("For key: {:?} ----> {:?}", msg.data.id(), val);
+                                    let ret_result = ret_pipe.send(val.clone());
+
+                                } else {
+                                    println!("Key ({:?}) did not exist.", msg.data.id());
+                                    let ret_result = ret_pipe.send(Resource::new(msg.data));
+                                }
+                            }
+                            // let ret_result = ret_pipe.send(val.clone());
+                        },
+                        MessageType::Create => {
+                            println!("Msg: {:?}", msg.msg_type);
+                            // let c_create = Rc::make_mut(&mut c);
+                            // let inner = msg.data;
+                            {
+                                let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
+                                let mut borrowed_val = c.borrow_mut();
+                                let res = borrowed_val.insert(msg.data.id(), Resource::new(msg.data.clone()));
+                                if res.is_some() {
+                                    let val = res.unwrap();
+                                    println!("For key: {:?} ----> {:?}", msg.data.id(), val);
+                                    let ret_result = ret_pipe.send(val.clone());
+                                    
+                                } else {
+                                    println!("Key ({:?}) did not exist.", msg.data.id());
+                                    let ret_result = ret_pipe.send(Resource::new(msg.data));
+                                    
+                                }
+                            }
+                            println!("Value: {:?}", cache);
+                            // cache.insert(inner.id(), Resource::new(inner));
+                            // let mutable_cache = &mut cache.clone();
+                            // handle_create(inner, );
+                        },
+                        MessageType::Watch => {
+                            println!("Msg: {:?}", msg.msg_type);
+                            {
+                                let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
+                                let mut borrowed_val = c.borrow_mut();
+                                let res = borrowed_val.get_mut(&msg.data.id());
+                                if res.is_some() {
+                                    let val: &mut Resource<Post> = res.unwrap();
+                                    println!("For key: {:?} ----> {:?}", msg.data.id(), val);
+                                    val.add_watch(User::new());
+                                    let watchers = &mut val.all_watchers();
+                                    println!("Watchers: {:?}", watchers);
+                                    // let watch_iter = watchers.into_iter();
+                                    let by_ids: Vec<i32> = watchers.iter_mut().map(|x| x.id).collect();
+                                    println!("Watcher id's ==> {:?}", by_ids);
+                                    let ret_result = ret_pipe.send(val.clone());
+                                } else {
+                                    println!("Key ({:?}) did not exist.", msg.data.id());
+                                    let ret_result = ret_pipe.send(Resource::new(msg.data));
+                                }
+                            }
+                            println!("Value: {:?}", cache);
+                            // handle_watch(msg.data, Rc::try_unwrap(cache).unwrap());
+                        },
+                        MessageType::Update => {
+                            println!("Msg: {:?}", msg.msg_type);
+                            {
+                                let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
+                                let mut borrowed_val = c.borrow_mut();
+                                let res = borrowed_val.insert(msg.data.id(), Resource::new(msg.data.clone()));
+                                if res.is_some() {
+                                    let val = res.unwrap();
+                                    println!("For key: {:?} ----> {:?}", msg.data.id(), val);
+                                    let ret_result = ret_pipe.send(val.clone());
+                                } else {
+                                    println!("Key ({:?}) did not exist.", msg.data.id());
+                                    let ret_result = ret_pipe.send(Resource::new(msg.data));
+                                }
+                            }
+                            println!("Value: {:?}", cache);
+                            // handle_update(msg, Rc::try_unwrap(cache).unwrap());
+                        }
+                    };
+
+                    // let ret_resp = ret_pipe.send(response).unwrap();
+                },
+                recv(cancel, s) => {
+                    println!("Cancel Message: {:?}", s);
+                    return;
+                }
             }
         }
-    }
+    });
 }
+
+type RcCellHash<T> = Rc<RefCell<HashMap<i32, Resource<T>>>>;
+
+#[allow(dead_code)]
+/// wire_up<T, U, V> uses the types to setup crossbeam channels and returns the relevant information
+fn wire_up<'a, T, U, V, F>(closure: F) -> (Sender<Message<Post>>, Receiver<Resource<Post>>, Sender<V>)
+where
+    T: Debug + Sized + Send + 'static,
+    U: Debug + Sized + Send + 'static,
+    V: Debug + Sized + Send + 'static,
+    F: Fn(T, RcCellHash<U>) -> Resource<U> + Send + 'static,
+{
+    let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<Message<Post>>();
+    let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<Resource<Post>>();
+    let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<V>();
+    let _sel = selector(recv_pipe, send_ret_pipe, recv_cancel, closure);
+    println!("Selector closure finished...");
+    (send_pipe, recv_ret_pipe, send_cancel)
+}
+
+fn test_selector_extended<'a>() {
+    let (a, b, c): (
+        crossbeam_channel::Sender<Message<Post>>,
+        crossbeam_channel::Receiver<Resource<Post>>,
+        crossbeam_channel::Sender<Cancel>,
+    ) = wire_up(|msg: Message<Post>, cache: RcCellHash<Post>| {
+        println!("MESSAGE: {:?}", msg);
+        // let m = msg.clone();
+        // let temp = &mut cache.clone();
+        // let temp2 = cache.clone();
+        // let c_create = Rc::make_mut(temp);  
+        // let c_get = temp2;
+                                
+        match msg.msg_type {
+            MessageType::Get => {
+                println!("Msg: {:?}", msg.msg_type);
+                // #![feature(ptr_internals)]
+                println!("Number of strong references: {}", Rc::strong_count(&cache));
+                // let c = &mut Rc::get_mut(&cache);
+                // let val = cache.get(&msg.data.id());
+                // if val.is_some() {
+                //     println!("It exists!");
+                //     let result = val.unwrap();
+                // } else {
+                //     println!("It doesn't exist");
+                // }
+                
+            },
+            MessageType::Create => {
+                println!("Msg: {:?}", msg.msg_type);
+                // let c_create = Rc::make_mut(&mut c);
+                let inner = msg.data;
+                // cache.insert(inner.id(), Resource::new(inner));
+                // let mutable_cache = &mut cache.clone();
+                // handle_create(inner, );
+            },
+            MessageType::Watch => {
+                println!("Msg: {:?}", msg.msg_type);
+                // handle_watch(msg.data, Rc::try_unwrap(cache).unwrap());
+            },
+            MessageType::Update => {
+                println!("Msg: {:?}", msg.msg_type);
+                // handle_update(msg, Rc::try_unwrap(cache).unwrap());
+            }
+        }
+        Resource::new(Post::new())
+    });
+    println!("A: {}", a.len());
+    println!("B: {}", b.len());
+    println!("C: {}", c.len());
+
+    // get
+    let response = a.send(Message::<Post>::new()).expect("There was a terrible error sending it!");
+    println!("response: {:?}", response);
+    let resp = b.recv();
+    println!("resp: {:?}", resp);
+
+    // create
+    let mut create = Message::<Post>::new();
+    create.msg_type = MessageType::Create;
+    let response = a.send(create).expect("There was a terrible error sending it!");
+    
+    println!("response: {:?}", response);
+    let resp = b.recv();
+    println!("resp: {:?}", resp);
+
+    // watch
+    let mut create = Message::<Post>::new();
+    create.msg_type = MessageType::Watch;
+    let response = a.send(create).expect("There was a terrible error sending it!");
+    
+    println!("response: {:?}", response);
+    let resp = b.recv();
+    println!("resp: {:?}", resp);
+
+    // thread::sleep(Duration::from_secs(2));
+
+    // update
+    let mut create = Message::<Post>::new();
+    create.msg_type = MessageType::Update;
+    let response = a.send(create).expect("There was a terrible error sending it!");
+    
+    println!("response: {:?}", response);
+    let resp = b.recv();
+    println!("resp: {:?}", resp);
+
+
+    // cancel
+    let cancel = Cancel{msg: String::from("CANCEL MEOOOW.")};
+    create.msg_type = MessageType::Watch;
+    let response = c.send(cancel).expect("There was a terrible error sending it!");
+    
+    println!("response: {:?}", response);
+    let resp = b.recv();
+    println!("resp: {:?}", resp);
+}
+
 // get, update, subscribe
 
 pub trait MessageSender<T> {
@@ -65,30 +268,7 @@ pub struct Cancel {
     msg: String,
 }
 
-type RcHashBox<'a, T> = Rc<&'a mut Box<HashMap<i32, Resource<T>>>>;
 
-#[allow(dead_code)]
-/// wire_up<T, U, V> uses the types to setup crossbeam channels and returns the relevant information
-fn wire_up<'a, T, U, V, F>(closure: F) -> (Sender<T>, Receiver<Resource<U>>, Sender<V>)
-where
-    T: Debug + Sized + Send + 'static,
-    U: Debug + Sized + Send + 'static,
-    V: Debug + Sized + Send + 'static,
-    F: Fn(T, &mut RcHashBox<U>) -> Resource<U> + Send + 'static,
-{
-    let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<T>();
-    let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<Resource<U>>();
-    let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<V>();
-    thread::spawn( move || {
-
-        // thread_local!(static cache: Rc::new())
-        println!("We are inside the pool.executre(||){{...}}");
-        let _sel = selector(recv_pipe, send_ret_pipe, recv_cancel, closure);
-        println!("Selector finished...");
-    });
-    println!("Selector closure finished...");
-    (send_pipe, recv_ret_pipe, send_cancel)
-}
 
 #[allow(dead_code)]
 fn handle_get<T, U>(msg: T, cash: HashMap<i32, Resource<U>>) -> Result<T, &'static str> where
@@ -146,101 +326,6 @@ fn handle_update<T, U>(msg: T, cash: HashMap<i32, Resource<U>>) -> Result<T, &'s
     
     println!("[UPDATE] ------------------------------------------------->");
     Ok(msg)
-}
-
-fn test_selector_extended<'a>() {
-    let (a, b, c): (
-        crossbeam_channel::Sender<Message<Post>>,
-        crossbeam_channel::Receiver<Resource<Post>>,
-        crossbeam_channel::Sender<Cancel>,
-    ) = wire_up(|msg: Message<Post>, cache: &mut RcHashBox<Post>| {
-        println!("MESSAGE: {:?}", msg);
-        // let m = msg.clone();
-        // let temp = &mut cache.clone();
-        // let temp2 = cache.clone();
-        // let c_create = Rc::make_mut(temp);  
-        // let c_get = temp2;
-                                
-        match msg.msg_type {
-            MessageType::Get => {
-                println!("Msg: {:?}", msg.msg_type);
-                // #![feature(ptr_internals)]
-                
-                
-                let val = cache.get(&msg.data.id());
-                if val.is_some() {
-                    println!("It exists!");
-                    let result = val.unwrap();
-                } else {
-                    println!("It doesn't exist");
-                }
-                
-            },
-            MessageType::Create => {
-                println!("Msg: {:?}", msg.msg_type);
-                // let c_create = Rc::make_mut(&mut c);
-                let inner = msg.data;
-                cache.insert(inner.id(), Resource::new(inner));
-                // let mutable_cache = &mut cache.clone();
-                // handle_create(inner, );
-            },
-            MessageType::Watch => {
-                println!("Msg: {:?}", msg.msg_type);
-                // handle_watch(msg.data, Rc::try_unwrap(cache).unwrap());
-            },
-            MessageType::Update => {
-                println!("Msg: {:?}", msg.msg_type);
-                // handle_update(msg, Rc::try_unwrap(cache).unwrap());
-            }
-        }
-        Resource::new(Post::new())
-    });
-    println!("A: {}", a.len());
-    println!("B: {}", b.len());
-    println!("C: {}", c.len());
-
-    // get
-    let response = a.send(Message::<Post>::new()).expect("There was a terrible error sending it!");
-    println!("response: {:?}", response);
-    let resp = b.recv();
-    println!("resp: {:?}", resp);
-
-    // create
-    let mut create = Message::<Post>::new();
-    create.msg_type = MessageType::Create;
-    let response = a.send(create).expect("There was a terrible error sending it!");
-    
-    println!("response: {:?}", response);
-    let resp = b.recv();
-    println!("resp: {:?}", resp);
-
-    // watch
-    let mut create = Message::<Post>::new();
-    create.msg_type = MessageType::Watch;
-    let response = a.send(create).expect("There was a terrible error sending it!");
-    
-    println!("response: {:?}", response);
-    let resp = b.recv();
-    println!("resp: {:?}", resp);
-
-    // update
-    let mut create = Message::<Post>::new();
-    create.msg_type = MessageType::Update;
-    let response = a.send(create).expect("There was a terrible error sending it!");
-    
-    println!("response: {:?}", response);
-    let resp = b.recv();
-    println!("resp: {:?}", resp);
-
-
-    // cancel
-    let cancel = Cancel{msg: String::from("CANCEL MEOOOW.")};
-    create.msg_type = MessageType::Watch;
-    let response = c.send(cancel).expect("There was a terrible error sending it!");
-    
-    println!("response: {:?}", response);
-    let resp = b.recv();
-    println!("resp: {:?}", resp);
 }
 
 

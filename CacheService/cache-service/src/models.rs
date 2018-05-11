@@ -11,7 +11,7 @@ use std::cell::RefCell;
  */
 #[derive(Clone, Debug)]
 pub struct User {
-    id: i32,
+    pub id: i32,
     password: String,
     // last_login: Option<PgTimestamp>,
     is_superuser: bool,
@@ -136,20 +136,50 @@ pub enum ModelType {
     Comment,
 }
 
+pub enum Operation {
+    Add = 0,
+}
+
+#[derive(Debug, Clone)]
+pub enum Data {
+    Post,
+    User,
+    Comment,
+}
+
+// pub trait Msg {
+//     fn data_type(&self) -> ModelType;
+//     fn msg_type(&self) -> MessageType;
+//     fn data(&self) -> Self;
+//     fn timestamp(&self) -> i32;
+//     fn version(&self) -> [i32; 3];
+// }
+
 /// Message<T> is a wrapper for defining messages for communication
 /// with this very service.
 #[allow(unused_variables)]
+
+#[derive(Debug, Clone)]
+pub struct Msg {
+    pub data: Data,
+    pub msg_type: MessageType,
+    // pub operation: Operation,
+    pub timestamp: i32,
+    pub version: [i32; 3],
+}
+
 #[derive(Debug, Clone)]
 pub struct Message<T>
 where
     T: Model + Clone,
 {
     pub data: T,
-    pub data_type: ModelType,
     pub msg_type: MessageType,
+    // pub operation: Operation,
     pub timestamp: i32,
     pub version: [i32; 3],
 }
+
 
 impl<T> Message<T> where 
     T: Model + Clone,
@@ -157,7 +187,7 @@ impl<T> Message<T> where
     pub fn new() -> Message<T> {
         Message {
             data: T::new(),
-            data_type: ModelType::Post,
+            // data_type: ModelType::Post,
             msg_type: MessageType::Get,
             timestamp: 0,
             version: [0,0,0],
@@ -322,6 +352,7 @@ pub struct Comment {
 
 mod tests {
     use models;
+    use models::*;
     use std;
     use std::any::Any;
     use std::any::TypeId;
@@ -351,5 +382,15 @@ mod tests {
     fn test_model_post() {
         let p = models::Post::new();
         // p.data();
+    }
+
+    #[test]
+    fn test_msg_struct() {
+        let msg = Msg {
+            data: Data::Post,
+            msg_type: MessageType::Get,
+            timestamp: 0,
+            version: [0, 0, 0],
+        };
     }
 }
