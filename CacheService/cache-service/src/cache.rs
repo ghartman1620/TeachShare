@@ -136,6 +136,7 @@ pub fn selector<T, U, V, F>(
 
 type RcCellHash<T> = Rc<RefCell<HashMap<i32, Resource<T>>>>;
 
+#[allow(dead_code)]
 /// wire_up<T, U, V> uses the types to setup crossbeam channels and returns the relevant information
 fn wire_up<'a, T, U, V, F>(closure: F) -> (Sender<Message<Post>>, Receiver<Resource<Post>>, Sender<V>)
 where

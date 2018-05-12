@@ -7,6 +7,8 @@ extern crate ws;
 #[macro_use]
 extern crate serde_derive;
 
+extern crate serde_json;
+extern crate dotenv;
 // #[macro_use]
 // extern crate diesel;
 // extern crate serde;
@@ -14,12 +16,20 @@ extern crate serde_derive;
 
 #[macro_use]
 extern crate crossbeam_channel;
+
+#[macro_use]
+extern crate diesel;
+
 use std::sync::*;
 use ws::{listen, CloseCode, Error, Handler, Handshake, Message, Result, Sender};
 
+
+mod models_diesel;
+mod schema;
 mod cache;
 mod models;
 mod pool;
+
 
 
 // use crossbeam_channel::{Receiver, Sender};
