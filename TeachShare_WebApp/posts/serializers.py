@@ -5,7 +5,7 @@ Created on Jan 23, 2018
 '''
 
 from rest_framework import serializers
-from posts.models import Post, Comment, Attachment
+from posts.models import Post, Comment, Attachment, Standard
 from accounts.serializers import UserSerializer
 
 class DynamicFieldsSerializer(serializers.ModelSerializer):
@@ -27,6 +27,11 @@ class DynamicFieldsSerializer(serializers.ModelSerializer):
                 for field_name in existing - allowed:
                     self.fields.pop(field_name)
 
+
+class StandardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Standard   
+        fields = ('pk', 'name', 'category', 'grade', 'description', 'subject', 'code')
 
 class CommentSerializer(serializers.ModelSerializer):
     # user = UserSerializer(required=True)
@@ -53,5 +58,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('pk', 'title', 'content', 'updated',
-                  'likes', 'timestamp', 'user', 'comments', 'attachments',
-                  'tags', 'draft', 'length', 'content_type', 'subject', 'grade')
+                  'likes', 'timestamp', 'user', 'comments',
+                  'tags', 'draft', 'length', 'content_type', 
+                  'standards', 'subject', 'grade', 'practices',
+                  'crosscutting_concepts', 'disciplinary_core_ideas')

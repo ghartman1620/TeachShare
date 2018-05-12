@@ -32,9 +32,9 @@ import {
     FormSelect,
     FormTextarea,
     Jumbotron,
-
     Layout,
-    Navbar
+    Navbar,
+    Pagination
 
 } from "bootstrap-vue/es/components";
 
@@ -42,15 +42,16 @@ import {
 import fontawesome from "@fortawesome/fontawesome";
 
 // import brands from "@fortawesome/fontawesome-free-brands";
-import * as faPlus from "@fortawesome/fontawesome-free-solid/faPlus";
-import * as faUndo from "@fortawesome/fontawesome-free-solid/faUndo";
-import * as faRedo from "@fortawesome/fontawesome-free-solid/faRedo";
-import * as faCheck from "@fortawesome/fontawesome-free-solid/faCheck";
-import * as faTimes from "@fortawesome/fontawesome-free-solid/faTimes";
-import * as faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
-import * as faUserCircle from "@fortawesome/fontawesome-free-solid/faUserCircle";
 import * as faArrowLeft from "@fortawesome/fontawesome-free-solid/faArrowLeft";
 import * as faArrowRight from "@fortawesome/fontawesome-free-solid/faArrowRight";
+import * as faCheck from "@fortawesome/fontawesome-free-solid/faCheck";
+import * as faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
+import * as faPlus from "@fortawesome/fontawesome-free-solid/faPlus";
+import * as faRedo from "@fortawesome/fontawesome-free-solid/faRedo";
+import * as faSpinner from "@fortawesome/fontawesome-free-solid/faSpinner";
+import * as faTimes from "@fortawesome/fontawesome-free-solid/faTimes";
+import * as faUndo from "@fortawesome/fontawesome-free-solid/faUndo";
+import * as faUserCircle from "@fortawesome/fontawesome-free-solid/faUserCircle";
 
 fontawesome.library.add(
     faPlus,
@@ -59,6 +60,7 @@ fontawesome.library.add(
     faCheck,
     faTimes,
     faEdit,
+    faSpinner,
     faUserCircle,
     faArrowLeft,
     faArrowRight
@@ -88,6 +90,8 @@ Vue.use(FormRadio);
 Vue.use(FormSelect);
 Vue.use(FormTextarea);
 Vue.use(FormCheckbox);
+
+Vue.use(Pagination);
 
 Vue.use(Badge);
 

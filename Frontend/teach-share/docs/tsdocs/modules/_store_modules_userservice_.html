@@ -84,10 +84,23 @@
 								<li class="tsd-kind-type-alias tsd-parent-kind-external-module tsd-is-not-exported"><a href="_store_modules_userservice_.html#usercontext" class="tsd-kind-icon">User<wbr>Context</a></li>
 							</ul>
 						</section>
-						<section class="tsd-index-section tsd-is-not-exported">
+						<section class="tsd-index-section ">
 							<h3>Variables</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_store_modules_userservice_.html#cookie" class="tsd-kind-icon">Cookie</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_store_modules_userservice_.html#adduser" class="tsd-kind-icon">add<wbr>User</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_store_modules_userservice_.html#commit" class="tsd-kind-icon">commit</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_store_modules_userservice_.html#createuser" class="tsd-kind-icon">create<wbr>User</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_store_modules_userservice_.html#dispatch" class="tsd-kind-icon">dispatch</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_store_modules_userservice_.html#fetchuser" class="tsd-kind-icon">fetch<wbr>User</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_store_modules_userservice_.html#getloggedinuser" class="tsd-kind-icon">get<wbr>Logged<wbr>InUser</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_store_modules_userservice_.html#getuserbyid" class="tsd-kind-icon">get<wbr>User<wbr>ByID</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_store_modules_userservice_.html#isloggedin" class="tsd-kind-icon">is<wbr>Logged<wbr>In</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_store_modules_userservice_.html#login" class="tsd-kind-icon">login</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_store_modules_userservice_.html#logout" class="tsd-kind-icon">logout</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_store_modules_userservice_.html#mutadduser" class="tsd-kind-icon">mut<wbr>Add<wbr>User</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_store_modules_userservice_.html#mutsetuser" class="tsd-kind-icon">mut<wbr>Set<wbr>User</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_store_modules_userservice_.html#read" class="tsd-kind-icon">read</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_store_modules_userservice_.html#setuser" class="tsd-kind-icon">set<wbr>User</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-not-exported">
@@ -116,20 +129,165 @@
 					<div class="tsd-signature tsd-kind-icon">User<wbr>Context<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ActionContext</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_store_modules_userservice_.userstate.html" class="tsd-signature-type">UserState</a><span class="tsd-signature-symbol">, </span><a href="../interfaces/_models_.irootstate.html" class="tsd-signature-type">IRootState</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L24">store_modules/UserService.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L33">store_modules/UserService.ts:33</a></li>
 						</ul>
 					</aside>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Variables</h2>
-				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-					<a name="cookie" class="tsd-anchor"></a>
-					<h3>Cookie</h3>
-					<div class="tsd-signature tsd-kind-icon">Cookie<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;require(&quot;tiny-cookie&quot;)</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="adduser" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> add<wbr>User</h3>
+					<div class="tsd-signature tsd-kind-icon">add<wbr>User<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;dispatch(UserService.actions.addUser)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L26">store_modules/UserService.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L250">store_modules/UserService.ts:250</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="commit" class="tsd-anchor"></a>
+					<h3>commit</h3>
+					<div class="tsd-signature tsd-kind-icon">commit<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L239">store_modules/UserService.ts:239</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="createuser" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> create<wbr>User</h3>
+					<div class="tsd-signature tsd-kind-icon">create<wbr>User<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;dispatch(UserService.actions.createUser)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L246">store_modules/UserService.ts:246</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="dispatch" class="tsd-anchor"></a>
+					<h3>dispatch</h3>
+					<div class="tsd-signature tsd-kind-icon">dispatch<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L239">store_modules/UserService.ts:239</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="fetchuser" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> fetch<wbr>User</h3>
+					<div class="tsd-signature tsd-kind-icon">fetch<wbr>User<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;dispatch(UserService.actions.fetchUser)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L245">store_modules/UserService.ts:245</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Actions Handlers</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="getloggedinuser" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> get<wbr>Logged<wbr>InUser</h3>
+					<div class="tsd-signature tsd-kind-icon">get<wbr>Logged<wbr>InUser<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;read(UserService.getters.getLoggedInUser)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L256">store_modules/UserService.ts:256</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="getuserbyid" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> get<wbr>User<wbr>ByID</h3>
+					<div class="tsd-signature tsd-kind-icon">get<wbr>User<wbr>ByID<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;read(UserService.getters.getUserByID)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L255">store_modules/UserService.ts:255</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Getters Handlers</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="isloggedin" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> is<wbr>Logged<wbr>In</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Logged<wbr>In<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;read(UserService.getters.isLoggedIn)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L257">store_modules/UserService.ts:257</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="login" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> login</h3>
+					<div class="tsd-signature tsd-kind-icon">login<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;dispatch(UserService.actions.login)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L249">store_modules/UserService.ts:249</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="logout" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> logout</h3>
+					<div class="tsd-signature tsd-kind-icon">logout<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;dispatch(UserService.actions.logout)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L248">store_modules/UserService.ts:248</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="mutadduser" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> mut<wbr>Add<wbr>User</h3>
+					<div class="tsd-signature tsd-kind-icon">mut<wbr>Add<wbr>User<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;commit(UserService.mutations.ADD_USER)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L262">store_modules/UserService.ts:262</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Mutations Handlers</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="mutsetuser" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> mut<wbr>Set<wbr>User</h3>
+					<div class="tsd-signature tsd-kind-icon">mut<wbr>Set<wbr>User<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;commit(UserService.mutations.SET_USER)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L263">store_modules/UserService.ts:263</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="read" class="tsd-anchor"></a>
+					<h3>read</h3>
+					<div class="tsd-signature tsd-kind-icon">read<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L239">store_modules/UserService.ts:239</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="setuser" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> set<wbr>User</h3>
+					<div class="tsd-signature tsd-kind-icon">set<wbr>User<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;dispatch(UserService.actions.setUser)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L247">store_modules/UserService.ts:247</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -146,7 +304,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L8">store_modules/UserService.ts:8</a></li>
+									<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L16">store_modules/UserService.ts:16</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -168,7 +326,8 @@
 					<div class="tsd-signature tsd-kind-icon">User<wbr>Service<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L89">store_modules/UserService.ts:89</a></li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L183">store_modules/UserService.ts:183</a></li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L226">store_modules/UserService.ts:226</a></li>
 						</ul>
 					</aside>
 					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
@@ -177,7 +336,8 @@
 						<div class="tsd-signature tsd-kind-icon">actions<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> =&nbsp;actions</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L92">store_modules/UserService.ts:92</a></li>
+								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L186">store_modules/UserService.ts:186</a></li>
+								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L231">store_modules/UserService.ts:231</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-type-declaration">
@@ -192,7 +352,7 @@
 										<li class="tsd-description">
 											<aside class="tsd-sources">
 												<ul>
-													<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L29">store_modules/UserService.ts:29</a></li>
+													<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L52">store_modules/UserService.ts:52</a></li>
 												</ul>
 											</aside>
 											<h4 class="tsd-parameters-title">Parameters</h4>
@@ -216,7 +376,7 @@
 										<li class="tsd-description">
 											<aside class="tsd-sources">
 												<ul>
-													<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L52">store_modules/UserService.ts:52</a></li>
+													<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L75">store_modules/UserService.ts:75</a></li>
 												</ul>
 											</aside>
 											<h4 class="tsd-parameters-title">Parameters</h4>
@@ -240,7 +400,7 @@
 										<li class="tsd-description">
 											<aside class="tsd-sources">
 												<ul>
-													<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L42">store_modules/UserService.ts:42</a></li>
+													<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L65">store_modules/UserService.ts:65</a></li>
 												</ul>
 											</aside>
 											<h4 class="tsd-parameters-title">Parameters</h4>
@@ -261,7 +421,7 @@
 										<li class="tsd-description">
 											<aside class="tsd-sources">
 												<ul>
-													<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L38">store_modules/UserService.ts:38</a></li>
+													<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L61">store_modules/UserService.ts:61</a></li>
 												</ul>
 											</aside>
 											<h4 class="tsd-parameters-title">Parameters</h4>
@@ -285,7 +445,8 @@
 						<div class="tsd-signature tsd-kind-icon">mutations<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> =&nbsp;mutations</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L91">store_modules/UserService.ts:91</a></li>
+								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L185">store_modules/UserService.ts:185</a></li>
+								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L230">store_modules/UserService.ts:230</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-type-declaration">
@@ -300,7 +461,7 @@
 										<li class="tsd-description">
 											<aside class="tsd-sources">
 												<ul>
-													<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L81">store_modules/UserService.ts:81</a></li>
+													<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L174">store_modules/UserService.ts:174</a></li>
 												</ul>
 											</aside>
 											<h4 class="tsd-parameters-title">Parameters</h4>
@@ -319,12 +480,33 @@
 						</div>
 					</section>
 					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="userservice.namespaced" class="tsd-anchor"></a>
+						<h3>namespaced</h3>
+						<div class="tsd-signature tsd-kind-icon">namespaced<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L228">store_modules/UserService.ts:228</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
 						<a name="userservice.state" class="tsd-anchor"></a>
 						<h3>state</h3>
 						<div class="tsd-signature tsd-kind-icon">state<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_store_modules_userservice_.userstate.html" class="tsd-signature-type">UserState</a><span class="tsd-signature-symbol"> =&nbsp;state</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L90">store_modules/UserService.ts:90</a></li>
+								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L184">store_modules/UserService.ts:184</a></li>
+								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L229">store_modules/UserService.ts:229</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="userservice.strict" class="tsd-anchor"></a>
+						<h3>strict</h3>
+						<div class="tsd-signature tsd-kind-icon">strict<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L227">store_modules/UserService.ts:227</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -334,11 +516,12 @@
 						<div class="tsd-signature tsd-kind-icon">getters<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L93">store_modules/UserService.ts:93</a></li>
+								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L187">store_modules/UserService.ts:187</a></li>
+								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L232">store_modules/UserService.ts:232</a></li>
 							</ul>
 						</aside>
 						<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-object-literal">
-							<a name="userservice.getters.getloggedinuser" class="tsd-anchor"></a>
+							<a name="userservice.getters.getloggedinuser-1" class="tsd-anchor"></a>
 							<h3>get<wbr>Logged<wbr>InUser</h3>
 							<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-object-literal">
 								<li class="tsd-signature tsd-kind-icon">get<wbr>Logged<wbr>InUser<span class="tsd-signature-symbol">(</span>state<span class="tsd-signature-symbol">: </span><a href="../interfaces/_store_modules_userservice_.userstate.html" class="tsd-signature-type">UserState</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../classes/_user_.user.html" class="tsd-signature-type">User</a></li>
@@ -347,7 +530,7 @@
 								<li class="tsd-description">
 									<aside class="tsd-sources">
 										<ul>
-											<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L94">store_modules/UserService.ts:94</a></li>
+											<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L188">store_modules/UserService.ts:188</a></li>
 										</ul>
 									</aside>
 									<h4 class="tsd-parameters-title">Parameters</h4>
@@ -364,7 +547,7 @@
 							</ul>
 						</section>
 						<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-object-literal">
-							<a name="userservice.getters.isloggedin" class="tsd-anchor"></a>
+							<a name="userservice.getters.isloggedin-1" class="tsd-anchor"></a>
 							<h3>is<wbr>Logged<wbr>In</h3>
 							<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-object-literal">
 								<li class="tsd-signature tsd-kind-icon">is<wbr>Logged<wbr>In<span class="tsd-signature-symbol">(</span>state<span class="tsd-signature-symbol">: </span><a href="../interfaces/_store_modules_userservice_.userstate.html" class="tsd-signature-type">UserState</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
@@ -373,7 +556,7 @@
 								<li class="tsd-description">
 									<aside class="tsd-sources">
 										<ul>
-											<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L98">store_modules/UserService.ts:98</a></li>
+											<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L192">store_modules/UserService.ts:192</a></li>
 										</ul>
 									</aside>
 									<h4 class="tsd-parameters-title">Parameters</h4>
@@ -394,11 +577,11 @@
 					<div class="tsd-signature tsd-kind-icon">actions<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L28">store_modules/UserService.ts:28</a></li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L51">store_modules/UserService.ts:51</a></li>
 						</ul>
 					</aside>
 					<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-object-literal">
-						<a name="actions-1.createuser-1" class="tsd-anchor"></a>
+						<a name="actions-1.createuser-2" class="tsd-anchor"></a>
 						<h3>create<wbr>User</h3>
 						<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-object-literal">
 							<li class="tsd-signature tsd-kind-icon">create<wbr>User<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><a href="_store_modules_userservice_.html#usercontext" class="tsd-signature-type">UserContext</a>, user<span class="tsd-signature-symbol">: </span><a href="../interfaces/_store_modules_userservice_.userpostobject.html" class="tsd-signature-type">UserPostObject</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
@@ -407,7 +590,7 @@
 							<li class="tsd-description">
 								<aside class="tsd-sources">
 									<ul>
-										<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L29">store_modules/UserService.ts:29</a></li>
+										<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L52">store_modules/UserService.ts:52</a></li>
 									</ul>
 								</aside>
 								<h4 class="tsd-parameters-title">Parameters</h4>
@@ -424,7 +607,7 @@
 						</ul>
 					</section>
 					<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-object-literal">
-						<a name="actions-1.login-1" class="tsd-anchor"></a>
+						<a name="actions-1.login-2" class="tsd-anchor"></a>
 						<h3>login</h3>
 						<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-object-literal">
 							<li class="tsd-signature tsd-kind-icon">login<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><a href="_store_modules_userservice_.html#usercontext" class="tsd-signature-type">UserContext</a>, credentials<span class="tsd-signature-symbol">: </span><a href="../interfaces/_store_modules_userservice_.logincredentials.html" class="tsd-signature-type">LoginCredentials</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
@@ -433,7 +616,7 @@
 							<li class="tsd-description">
 								<aside class="tsd-sources">
 									<ul>
-										<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L52">store_modules/UserService.ts:52</a></li>
+										<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L75">store_modules/UserService.ts:75</a></li>
 									</ul>
 								</aside>
 								<h4 class="tsd-parameters-title">Parameters</h4>
@@ -450,7 +633,7 @@
 						</ul>
 					</section>
 					<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-object-literal">
-						<a name="actions-1.logout-1" class="tsd-anchor"></a>
+						<a name="actions-1.logout-2" class="tsd-anchor"></a>
 						<h3>logout</h3>
 						<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-object-literal">
 							<li class="tsd-signature tsd-kind-icon">logout<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><a href="_store_modules_userservice_.html#usercontext" class="tsd-signature-type">UserContext</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
@@ -459,7 +642,7 @@
 							<li class="tsd-description">
 								<aside class="tsd-sources">
 									<ul>
-										<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L42">store_modules/UserService.ts:42</a></li>
+										<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L65">store_modules/UserService.ts:65</a></li>
 									</ul>
 								</aside>
 								<h4 class="tsd-parameters-title">Parameters</h4>
@@ -473,7 +656,7 @@
 						</ul>
 					</section>
 					<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-object-literal">
-						<a name="actions-1.setuser-1" class="tsd-anchor"></a>
+						<a name="actions-1.setuser-2" class="tsd-anchor"></a>
 						<h3>set<wbr>User</h3>
 						<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-object-literal">
 							<li class="tsd-signature tsd-kind-icon">set<wbr>User<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><a href="_store_modules_userservice_.html#usercontext" class="tsd-signature-type">UserContext</a>, user<span class="tsd-signature-symbol">: </span><a href="../classes/_user_.user.html" class="tsd-signature-type">User</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
@@ -482,7 +665,7 @@
 							<li class="tsd-description">
 								<aside class="tsd-sources">
 									<ul>
-										<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L38">store_modules/UserService.ts:38</a></li>
+										<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L61">store_modules/UserService.ts:61</a></li>
 									</ul>
 								</aside>
 								<h4 class="tsd-parameters-title">Parameters</h4>
@@ -505,7 +688,7 @@
 					<div class="tsd-signature tsd-kind-icon">mutations<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L80">store_modules/UserService.ts:80</a></li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L173">store_modules/UserService.ts:173</a></li>
 						</ul>
 					</aside>
 					<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-object-literal tsd-is-not-exported">
@@ -518,7 +701,7 @@
 							<li class="tsd-description">
 								<aside class="tsd-sources">
 									<ul>
-										<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L81">store_modules/UserService.ts:81</a></li>
+										<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L174">store_modules/UserService.ts:174</a></li>
 									</ul>
 								</aside>
 								<h4 class="tsd-parameters-title">Parameters</h4>
@@ -541,7 +724,7 @@
 					<div class="tsd-signature tsd-kind-icon">state<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L85">store_modules/UserService.ts:85</a></li>
+							<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L179">store_modules/UserService.ts:179</a></li>
 						</ul>
 					</aside>
 					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-not-exported">
@@ -550,7 +733,7 @@
 						<div class="tsd-signature tsd-kind-icon">user<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> =&nbsp;undefined</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/946bb10/Frontend/teach-share/src/store_modules/UserService.ts#L86">store_modules/UserService.ts:86</a></li>
+								<li>Defined in <a href="https://github.com/ghartman1620/TeachShare/blob/d3e532e/Frontend/teach-share/src/store_modules/UserService.ts#L180">store_modules/UserService.ts:180</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -564,7 +747,13 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-external-module">
+						<a href="_watchstore_.html">"<wbr>Watch<wbr>Store"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
 						<a href="_api_.html">"api"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_indexeddbstore_.html">"indexedDBStore"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="_logging_log_.html">"logging/log"</a>
@@ -602,11 +791,17 @@
 					<li class=" tsd-kind-external-module">
 						<a href="_store_modules_postcreateservice_.html">"store_<wbr>modules/<wbr>Post<wbr>Create<wbr>Service"</a>
 					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_store_modules_postservice_.html">"store_<wbr>modules/<wbr>Post<wbr>Service"</a>
+					</li>
 					<li class="current tsd-kind-external-module">
 						<a href="_store_modules_userservice_.html">"store_<wbr>modules/<wbr>User<wbr>Service"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="_store_modules_youtubeservice_.html">"store_<wbr>modules/<wbr>You<wbr>Tube<wbr>Service"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_supertagoptions_.html">"super<wbr>Tag<wbr>Options"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="_user_.html">"user"</a>
@@ -627,8 +822,47 @@
 					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="_store_modules_userservice_.html#usercontext" class="tsd-kind-icon">User<wbr>Context</a>
 					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_store_modules_userservice_.html#adduser" class="tsd-kind-icon">add<wbr>User</a>
+					</li>
 					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="_store_modules_userservice_.html#cookie" class="tsd-kind-icon">Cookie</a>
+						<a href="_store_modules_userservice_.html#commit" class="tsd-kind-icon">commit</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_store_modules_userservice_.html#createuser" class="tsd-kind-icon">create<wbr>User</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_store_modules_userservice_.html#dispatch" class="tsd-kind-icon">dispatch</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_store_modules_userservice_.html#fetchuser" class="tsd-kind-icon">fetch<wbr>User</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_store_modules_userservice_.html#getloggedinuser" class="tsd-kind-icon">get<wbr>Logged<wbr>InUser</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_store_modules_userservice_.html#getuserbyid" class="tsd-kind-icon">get<wbr>User<wbr>ByID</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_store_modules_userservice_.html#isloggedin" class="tsd-kind-icon">is<wbr>Logged<wbr>In</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_store_modules_userservice_.html#login" class="tsd-kind-icon">login</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_store_modules_userservice_.html#logout" class="tsd-kind-icon">logout</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_store_modules_userservice_.html#mutadduser" class="tsd-kind-icon">mut<wbr>Add<wbr>User</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_store_modules_userservice_.html#mutsetuser" class="tsd-kind-icon">mut<wbr>Set<wbr>User</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_store_modules_userservice_.html#read" class="tsd-kind-icon">read</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_store_modules_userservice_.html#setuser" class="tsd-kind-icon">set<wbr>User</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="_store_modules_userservice_.html#require" class="tsd-kind-icon">require</a>

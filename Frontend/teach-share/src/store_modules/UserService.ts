@@ -120,9 +120,9 @@ export const getters = {
     getUserByID: (state) => id => {
         return state.otherUsers.find((val, ind, obj) => val.pk === id);
     },
-    getLoggedInUser (state: UserState) {
+    getLoggedInUser(state: UserState): User{
         console.log("in  getLoggedInUser");
-        return state.user;
+        return state.user!;
     },
     isLoggedIn (state: UserState) {
         console.log("in isLoggedIn getter");

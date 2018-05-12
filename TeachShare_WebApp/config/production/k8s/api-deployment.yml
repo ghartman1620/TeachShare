@@ -15,7 +15,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels: {app: api, type: deployment}
-    spec:
+    spec: 
       containers:
       - env:
         - name: DATABASE_USER

@@ -1,21 +1,23 @@
 <template>
-
-       <p v-html="element.content"></p>
-
-
+        <p v-html="element.content"></p>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import VueQuillEditor from "vue-quill-editor";
 require("quill/dist/quill.core.css");
 import "quill/dist/quill.snow.css";
 import "quill/dist/quill.bubble.css";
 Vue.use(VueQuillEditor);
+import { Component, Prop } from "vue-property-decorator";
 
-export default Vue.component("text-element", {
+@Component({
+    name: "text-element",
     props: ["element"]
-});
+})
+export default class TextElement extends Vue{
+    @Prop({}) element: any;
+};
 </script>
 
 <style>

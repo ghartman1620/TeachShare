@@ -66,11 +66,11 @@ INSTALLED_APPS = [
 ElasticSearch-DSL Django settings
     - Signal Processor is temporary, will likely increase server load
 """
-# ELASTICSEARCH_DSL = {
-#     'default': {
-#         'hosts': 'search:9200'
-#     },
-# }
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'search:9200'
+    },
+}
 # TEMPORARY: will cause unneccesary load on the server but simplifies things for now.
 # ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = 'django_elasticsearch_dsl.signals.RealTimeSignalProcessor'
 # ELASTICSEARCH_DSL_AUTOSYNC = False
@@ -189,7 +189,7 @@ DATABASES = {
         'NAME': 'teachshare',
         'USER': 'postgres',
         'PASSWORD': 'password123',
-        'HOST': '127.0.0.1',
+        'HOST': 'db',
         'PORT': '5432',
     }
     # 'default': {

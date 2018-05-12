@@ -1,9 +1,13 @@
-import Vuex, { ActionContext } from "vuex";
-import { getStoreAccessors } from "vuex-typescript";
+
+import { InProgressPost } from "../post";
+import User from "../user";
+
+import { getStoreBuilder } from "vuex-typex"
+import Vuex, { Store, ActionContext } from "vuex"
 
 import { IRootState } from "../models";
-import InProgressPost from "../post";
-import User from "../user";
+import { getStoreAccessors } from "vuex-typescript";
+
 
 // import { storeBuilder } from "../../store";
 
@@ -21,8 +25,12 @@ interface EditedElement {
     element: any;
     index: number;
 }
+interface BeginPostObj {
+    userid: number;
+    id?: number;
+}
 
-type PostContext = ActionContext<PostState, IRootState>;
+export type PostContext = ActionContext<PostState, IRootState>;
 
 const state: PostState = {
     post: undefined,
@@ -36,17 +44,6 @@ export const mutations = {
     },
     SET_TITLE: (state: PostState, newTitle: string) => {
         state.post!.setTitle(newTitle);
-    },
-    REMOVE_ATTACHMENT: (state: PostState, attachment: any) => {
-        let ind = state.post!.attachments.findIndex(function(val) {
-            return val === attachment.id;
-        });
-        if (ind !== -1) {
-            state.post!.attachments.splice(ind, 1);
-        }
-    },
-    ADD_ATTACHMENT: (state: PostState, attachment: any) => {
-        state.post!.attachments.push(attachment.id);
     },
     UNDO: (state: PostState) => {
         state.doneMutations.pop();
@@ -130,14 +127,34 @@ export const mutations = {
     SAVE_DRAFT: (state: PostState) => {
         state.post!.saveDraft();
     },
-    BEGIN_POST: (state: PostState, user: User) => {
-        state.post = new InProgressPost(user);
-    }
+    BEGIN_POST: (state: PostState, arg: BeginPostObj) => {
+        if(arg.id == undefined){
+            state.post = new InProgressPost(arg.userid);
+        }
+        else{
+            state.post = new InProgressPost(arg.userid, <number>arg.id);
+        }
+    },
+    SET_GRADE: (state: PostState, grade: number) => {
+        state.post!.setGrade(grade);
+    },
+    SET_CONTENT_TYPE: (state: PostState, contentType: number) => {
+        state.post!.setContentType(contentType);
+    },
+    SET_SUBJECT: (state: PostState, subject: number) => {
+        state.post!.setSubject(subject);
+    },
+    SET_LENGTH: (state: PostState, length: number) => {
+        state.post!.setLength(length);
+    },
+
+
 };
 
 export const actions = {
-    beginPost: (context: PostContext, user: User) => {
-        mutBeginPost(context, user);
+    beginPost: (context: PostContext, arg: BeginPostObj) => {
+        context.state.post = undefined;
+        mutBeginPost(context, arg);
         // context.commit("BEGIN_POST", user);
     },
     setTags: (context: PostContext, tags: string[]) => {
@@ -239,19 +256,56 @@ export const actions = {
     editElement: (context: PostContext, editedElement: EditedElement) => {
         context.commit("EDIT_ELEMENT", editedElement);
         context.commit("CLEAR_REDO");
-        saveDraft(context).then((res) => console.error(res));
+        context.dispatch("saveDraft").then(res => console.error(res));
     },
     saveDraft: (ctx: PostContext) => {
         ctx.commit("SAVE_DRAFT");
     },
-    createPost: async (context: PostContext) => {
-        try {
-            const post = await context.state.post!.publishPost();
-            return post;
-        } catch (err) {
-            return err;
-        }
+    createPost: (context: PostContext) => {
+        return new Promise((resolve, reject) => {
+            context.state
+                .post!.publishPost()
+                .then(function(response) {
+                    resolve(response);
+                })
+                .catch(function(error) {
+                    reject(error);
+                });
+        });
+        /*
+        return new Promise((resolve, reject) => {
+            console.log(postObj);
+            api
+                .post("posts/", postObj)
+                .then(response => resolve(response))
+                .catch(function(error) {
+                    if (error.response) {
+                        return resolve(error.response.data);
+                    } else if (error.request) {
+                        return resolve(error.request);
+                    } else {
+                        return resolve(error.message);
+                    }
+                });
+        });*/
+    },
+    setGrade: (context: PostContext, grade: number) => {
+        context.commit("SET_GRADE", grade);
+        context.dispatch("saveDraft");
+    },
+    setContentType: (context: PostContext, contentType: number) => {
+        context.commit("SET_CONTENT_TYPE", contentType);
+        context.dispatch("saveDraft");
+    },
+    setSubject: (context: PostContext, subject: number) => {
+        context.commit("SET_SUBJECT", subject);
+        context.dispatch("saveDraft");
+    },
+    setLength: (context: PostContext, length: number) => {
+        context.commit("SET_LENGTH", length);
+        context.dispatch("saveDraft");
     }
+    
 };
 
 export const getters = {
@@ -284,11 +338,11 @@ export const getters = {
         if (typeof state.post !== "undefined") {
             return state.post!.elements;
         }
-    }
+    },
 };
 const PostCreateService = {
     namespaced: true,
-    strict: false, // process.env.NODE_ENV !== "production",
+    strict: process.env.NODE_ENV !== "production",
     state,
     mutations,
     actions,
@@ -307,6 +361,7 @@ const { commit, read, dispatch } = getStoreAccessors<PostState, IRootState>(
 /**
  * Action Handlers
  */
+
 export const addElement = dispatch(PostCreateService.actions.addElement);
 export const beginPost = dispatch(PostCreateService.actions.beginPost);
 export const setTags = dispatch(PostCreateService.actions.setTags);
@@ -318,6 +373,11 @@ export const removeElement = dispatch(PostCreateService.actions.removeElement);
 export const removeAttachments = dispatch(
     PostCreateService.actions.removeAttachments
 );
+export const setGrade = dispatch(PostCreateService.actions.setGrade);
+export const setLength = dispatch(PostCreateService.actions.setLength);
+export const setContentType = dispatch(PostCreateService.actions.setContentType);
+export const setSubject = dispatch(PostCreateService.actions.setSubject);
+
 export const addAttachments = dispatch(
     PostCreateService.actions.addAttachments
 );
@@ -342,17 +402,12 @@ export const postElements = read(PostCreateService.getters.postElements);
  *
  * This also makes them really easily testable.
  */
-export const mutAddAttachment = commit(
-    PostCreateService.mutations.ADD_ATTACHMENT
-);
+
 export const mutAddElement = commit(PostCreateService.mutations.ADD_ELEMENT);
 export const mutBeginPost = commit(PostCreateService.mutations.BEGIN_POST);
 export const mutClearRedo = commit(PostCreateService.mutations.CLEAR_REDO);
 export const mutEditElement = commit(PostCreateService.mutations.EDIT_ELEMENT);
 export const mutRedo = commit(PostCreateService.mutations.REDO);
-export const mutRemoveAttachment = commit(
-    PostCreateService.mutations.REMOVE_ATTACHMENT
-);
 export const mutRemoveElement = commit(
     PostCreateService.mutations.REMOVE_ELEMENT
 );

@@ -254,7 +254,9 @@ export const mutations = {
  */
 export const getters = {
     files: (ctx: FileState): ModelMap<GenericFile> => ctx.files,
-    filesUploadStatus: (ctx: FileState) => ctx.files.data, // @TODO: I don't like that this returns the underlying '.data'
+
+     // @TODO: I don't like that this returns the underlying '.data'
+    filesUploadStatus: (ctx: FileState) => ctx.files.data,
     allFilesUploadComplete: (ctx: FileState) => {
         if (ctx.files.length > 0) {
             const oneHundredPercent = ctx.files.keys.every(

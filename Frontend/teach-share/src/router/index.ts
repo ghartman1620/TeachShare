@@ -38,11 +38,22 @@ const Login = () =>
 const Register = () =>
     import ( /* webpackChunkName: "register" */ "../components/auth/Register.vue");
 
+const WebSocketComp = () =>
+    import ( /* webpackChunkName: "register" */ "../components/WebSocket.vue");
+const DbTest = () =>
+    import ( /* webpackChunkName: "db-test" */ "../components/DbTest.vue");
+
+
 Vue.use(Router);
 
 const router = new Router({
     mode: "history",
-    routes: [{
+    routes: [
+        {
+            path : "/websocket",
+            component: WebSocketComp
+        },
+        {
             path: "/",
             component: Base,
             children: [
@@ -123,6 +134,11 @@ const router = new Router({
             path: "/register",
             name: "register",
             component: Register
+        },
+        {
+            path: "/indexeddb",
+            name: "db-test",
+            component: DbTest
         }
     ]
 });
@@ -192,7 +208,6 @@ router.beforeEach((to, from, next) => {
             }
         });
     }
-
     // @TODO: make sure this works!!!
     if (loginProtectedRoutes.some((val) => val === to.name)) {
         verifyAndRefreshLogin().then((loggedIn) => {

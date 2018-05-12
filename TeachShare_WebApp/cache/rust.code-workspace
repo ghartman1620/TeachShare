@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "C:\\Users\\ghart\\Documents\\teachshare\\TeachShare\\Frontend\\teach-share"
+		},
+		{
+			"path": "C:\\Users\\ghart\\Documents\\teachshare\\TeachShare\\TeachShare_WebApp"
+		},
+		{
+			"path": "C:\\Users\\ghart\\Documents\\teachshare\\TeachShare\\Rust_ws"
+		},
+		{
+			"path": "C:\\Users\\ghart\\Documents\\teachshare\\TeachShare"
+		}
+	],
+	"settings": {
+		"javascript.implicitProjectConfig.experimentalDecorators": true
+
+	}
+}

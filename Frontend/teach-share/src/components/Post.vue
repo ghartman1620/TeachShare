@@ -194,7 +194,7 @@ export default class PostComp extends Vue {
                 .catch(function(ret) {
                     console.log(ret);
                     vm.$notifyDanger(
-                        "There was an unknown error with your request."
+                        `There was a problem submitting your comment.`
                     );
                 });
         }
@@ -204,7 +204,7 @@ export default class PostComp extends Vue {
         // this.$store.dispatch("fetchUser", this.post.user);
         this.$log(this.post);
     }
-}
+};
 </script>
 
 <style lang="scss" scoped>

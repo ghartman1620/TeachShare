@@ -38,6 +38,13 @@ EMAIL_HOST_PASSWORD = 'teachbears_cmps115'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 DEFAULT_FROM_EMAIL = 'teamteachbears@gmail.com'
 
+IS_PRODUCTION = False
+
+
+LOGGING_CONFIG = None #for the purpose of running a standalone django script
+LOGGING = None
+FORCE_SCRIPT_NAME = None
+
 
 # Application definition.
 

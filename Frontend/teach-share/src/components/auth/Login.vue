@@ -1,6 +1,6 @@
 <template>
 <auth-page 
-    submitFunctionName="login"
+    submitFunctionName="loginSubmit"
     redirectText="Need an account? Register instead"
     redirectName="register"
     @submitAuth="loginSubmit"
