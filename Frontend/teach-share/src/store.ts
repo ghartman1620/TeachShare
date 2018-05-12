@@ -19,7 +19,7 @@ Vue.use(Vuex);
 
 const state = {};
 
-var storeSocket = new WebSocket("ws://127.0.0.1:7000/ws/");
+var storeSocket = new WebSocket("ws://127.0.0.1:3012/");
 
 
 

@@ -9,7 +9,6 @@ mod data;
 #[macro_use]
 extern crate serde_derive;
 
-use std::collections::BTreeMap;
 use actix::*;
 use actix_web::*;
 
@@ -44,6 +43,9 @@ impl Actor for Ws {
 
 /// do websocket handshake and start `MyWebSocket` actor
 fn ws_index(r: HttpRequest) -> Result<HttpResponse, Error> {
+    let req = &mut r.clone();
+    let pool = &mut req.cpu_pool();
+    println!("{:?}", pool);
     ws::start(r, Ws)
 }
 

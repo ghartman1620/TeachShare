@@ -70,7 +70,7 @@ fontawesome.library.add(
 Vue.use(require("vue-moment"));
 
 // // vue-cookie because js cookies are awful
-var VueCookie = require("vue-cookie");
+let VueCookie = require("vue-cookie");
 Vue.use(VueCookie);
 
 Vue.use(Carousel);
@@ -120,8 +120,8 @@ Vue.use(Logger, true);
 Validator.extend("YoutubeEmbedURL", {
     getMessage: (field: any) => "The " + field + " value is not a valid YouTube link.",
     validate: (value: any) => {
-        var videoURL = new URL(value);
-        var videoID = videoURL.searchParams.get("v");
+        const videoURL = new URL(value);
+        const videoID = videoURL.searchParams.get("v");
         if (videoID) {
             return true;
         }
