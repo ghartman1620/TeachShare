@@ -147,27 +147,72 @@ pub enum Data {
     Comment,
 }
 
-// pub trait Msg {
-//     fn data_type(&self) -> ModelType;
-//     fn msg_type(&self) -> MessageType;
-//     fn data(&self) -> Self;
-//     fn timestamp(&self) -> i32;
-//     fn version(&self) -> [i32; 3];
-// }
+pub struct Wrapper<'a> {
+    pub model_type: ModelType,
+    pub msg_type: MessageType,
+    pub timestamp: i32,
+    pub items: Vec<&'a Item>, 
+}
+
+pub trait Msg<'a> {
+    fn data_type(&self) -> ModelType;
+    fn msg_type(&self) -> MessageType;
+    // fn data(&self) -> Self;
+    fn timestamp(&self) -> i32;
+    fn items(&self) -> &Vec<&Item>;
+}
+
+impl<'a> Msg<'a> {
+    // what do I do here?
+}
+
+impl<'a> Msg<'a> for Wrapper<'a> {
+    fn data_type(&self) -> ModelType {
+        return self.model_type.clone();
+    }
+    fn msg_type(&self) -> MessageType {
+        return self.msg_type.clone();
+    }
+    // fn data(&self) -> Self;
+    fn timestamp(&self) -> i32 {
+        return self.timestamp;
+    }
+    fn items(&self) -> &Vec<&Item> {
+        return &self.items;
+    }
+}
+
+pub trait Item {
+    fn get_data(&self) -> &Post;
+    fn get_data_mut(&mut self) -> &mut Post;
+    fn get_watchers(&self) -> &HashMap<i32, User>;
+    fn get_watchers_mut(&mut self) -> &mut HashMap<i32, User>;
+    fn get_version(&self) -> [u32; 3];
+}
+
+type PostResource = Resource<Post>;
+
+impl Item for PostResource {
+    fn get_data(&self) -> &Post {
+        return &self.data;
+    }
+    fn get_data_mut(&mut self) -> &mut Post {
+        return &mut self.data;
+    }
+    fn get_watchers(&self) -> &HashMap<i32, User> {
+        return &self.watchers;
+    }
+    fn get_watchers_mut(&mut self) -> &mut HashMap<i32, User> {
+        return &mut self.watchers;
+    }
+    fn get_version(&self) -> [u32; 3] {
+        return self.version;
+    }
+    
+}
 
 /// Message<T> is a wrapper for defining messages for communication
 /// with this very service.
-#[allow(unused_variables)]
-
-#[derive(Debug, Clone)]
-pub struct Msg {
-    pub data: Data,
-    pub msg_type: MessageType,
-    // pub operation: Operation,
-    pub timestamp: i32,
-    pub version: [i32; 3],
-}
-
 #[derive(Debug, Clone)]
 pub struct Message<T>
 where
@@ -297,14 +342,6 @@ pub trait Model {
     }
 }
 
-
-
-// impl Model for Comment {
-//     type model = Comment;
-//     fn id(&self) -> i32 {
-//         self.id
-//     }
-// }
 impl Model for Post {
     type model = Post;
     fn id(&self) -> i32 {
@@ -319,28 +356,6 @@ impl Model for Post {
         return self;
     }
 }
-
-// impl Model for Resource<Post> {
-//     type model = Resource<Post>;
-//     fn id(&self) -> i32 {
-//         self.data().id()
-//     }
-//     fn new() -> Resource<Post> {
-//         Resource::new(Post::new())
-//     }
-//     fn inner(self) -> Self where 
-//         Self: Sized,
-//     {
-//         return self;
-//     }
-// }
-
-// impl Model for User {
-//     type model = User;
-//     fn id(&self) -> i32 {
-//         self.id
-//     }
-// }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Comment {
@@ -386,11 +401,20 @@ mod tests {
 
     #[test]
     fn test_msg_struct() {
-        let msg = Msg {
-            data: Data::Post,
+        let mut msg = Wrapper {
+            model_type: ModelType::Post,
             msg_type: MessageType::Get,
             timestamp: 0,
+            items: vec!(),
+        };
+        let resource = PostResource{
+            data: Post::new(),
+            watchers: HashMap::new(),
             version: [0, 0, 0],
         };
+        {
+            let r = &mut resource.clone();
+            msg.items.push(r);
+        }
     }
 }
