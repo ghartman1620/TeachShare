@@ -250,41 +250,6 @@ pub struct Command<T> {
 
 type ModelTable<T> = RefCell<HashMap<i32, Resource<T>>>;
 
-#[derive(Debug, Clone)]
-pub struct Cache<T> {
-    // using classical generics and predefined models
-    pub _data: ModelTable<T>,
-}
-
-impl<'a, T> Cache<T> 
-where
-    T: Model,
-{
-    pub fn new() -> Cache<T> {
-        Cache {
-            _data: RefCell::from(HashMap::new()),
-        }
-    }
-    pub fn get(self, key: i32) /*-> Option<&'a Resource<T>>*/ {
-        let temp = self._data;
-        let selfy = temp.borrow();
-        let result = selfy.get(&key).unwrap();
-        // println!("{:?}", result.id());
-    }
-    pub fn set(&mut self, key: i32, new_post: T) -> Option<Resource<T>> {
-        let model = Resource::new(new_post);
-        let mut selfy = self._data.borrow_mut();
-        let res = selfy.insert(key, model);
-        res
-    }
-    pub fn update(&'static mut self, key: i32, new_post: T) -> bool {
-        let mut temp = self._data.borrow_mut(); 
-        let prev = temp.get_mut(&key).unwrap();
-        *prev = Resource::new(new_post);
-        true
-    }
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)] // , PartialEq, Eq
 pub struct Post {
     pub id: i32,
