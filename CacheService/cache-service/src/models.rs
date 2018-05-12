@@ -5,6 +5,7 @@ use std::cmp::{Eq, PartialEq};
 use std::collections;
 use std::collections::HashMap;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 /**
  *  This
@@ -147,11 +148,12 @@ pub enum Data {
     Comment,
 }
 
-pub struct Wrapper<'a> {
+type RcItem = Rc<Item>;
+pub struct Wrapper {
     pub model_type: ModelType,
     pub msg_type: MessageType,
     pub timestamp: i32,
-    pub items: Vec<&'a Item>, 
+    pub items: Vec<RcItem>, 
 }
 
 pub trait Msg<'a> {
@@ -159,14 +161,14 @@ pub trait Msg<'a> {
     fn msg_type(&self) -> MessageType;
     // fn data(&self) -> Self;
     fn timestamp(&self) -> i32;
-    fn items(&self) -> &Vec<&Item>;
+    fn items(&self) -> &Vec<RcItem>;
 }
 
 impl<'a> Msg<'a> {
     // what do I do here?
 }
 
-impl<'a> Msg<'a> for Wrapper<'a> {
+impl<'a> Msg<'a> for Wrapper {
     fn data_type(&self) -> ModelType {
         return self.model_type.clone();
     }
@@ -177,7 +179,7 @@ impl<'a> Msg<'a> for Wrapper<'a> {
     fn timestamp(&self) -> i32 {
         return self.timestamp;
     }
-    fn items(&self) -> &Vec<&Item> {
+    fn items(&self) -> &Vec<RcItem> {
         return &self.items;
     }
 }
@@ -407,14 +409,18 @@ mod tests {
             timestamp: 0,
             items: vec!(),
         };
-        let resource = PostResource{
+        let resource = Rc::new(PostResource{
             data: Post::new(),
             watchers: HashMap::new(),
             version: [0, 0, 0],
-        };
-        {
-            let r = &mut resource.clone();
-            msg.items.push(r);
+        });
+        
+        let r = resource.clone();
+        msg.items.push(resource);
+        msg.items.push(r);
+        for a in &msg.items {
+            println!("{:?}", a.get_data());
         }
+        // println!("{:?}", msg.items);
     }
 }
