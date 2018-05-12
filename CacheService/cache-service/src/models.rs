@@ -117,7 +117,7 @@ impl PartialEq for Resource<Post> {
 }
 impl Eq for Resource<Post> {}
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum MessageType {
     Watch = 0,
     Create,

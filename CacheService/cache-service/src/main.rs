@@ -1,3 +1,44 @@
+/*
+Message for...
+Watch 
+{
+    "message": "watch"
+    "id" : number
+}
+
+
+
+Create
+{
+    "message": "create"
+    "post" : {
+        ...
+    }
+}
+
+
+
+Update,
+{
+    "message": "update"
+    "post" : {
+        "id" : number
+        ...
+    }
+}
+
+
+Get
+{
+    "message": "get"
+    "id" : number
+}
+
+
+
+
+*/
+
 
  #![feature(ptr_internals)]
 /*!
@@ -31,6 +72,8 @@ mod models;
 mod pool;
 
 
+use models::MessageType;
+
 
 // use crossbeam_channel::{Receiver, Sender};
 
@@ -42,11 +85,23 @@ mod pool;
 // }
 
 #[derive(Clone)]
-
 struct Node<T> {
     tx: mpsc::Sender<T>,
     out: Sender,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+enum IdOrPost{
+    i32,
+    Post
+}
+
+#[derive(Serialize, Deserialize)]
+struct YoMessage {
+    message: MessageType,
+    id_or_post: IdOrPost
+}
+
 
 impl<T> Handler for Node<T> {
     fn on_open(&mut self, hs: Handshake) -> Result<()> {
@@ -59,14 +114,31 @@ impl<T> Handler for Node<T> {
 
     fn on_message(&mut self, msg: Message) -> Result<()> {
         // this is the Tx for where this data message came from
+        
         let result = match msg {
+
             Message::Binary(bin) => {
+                //println!("Received binary message")
                 println!("{:?}", bin);
-                String::from("")
-            } // ...
+                panic!("Received binary message"); 
+            } // ..
             Message::Text(text) => {
                 println!("{}", text);
-                text
+                let res = serde_json::from_str(&text);
+                if(res.is_err()){
+                    println!("Badly formatted message: {} Sending back error message", text);
+                    
+                }
+                else{
+                    let opt: Option<YoMessage> = res.ok();
+                    if(opt.is_none()){
+                        println!("Message was deserialized into a None");
+                    }
+                    else{
+                        let message: YoMessage = opt.unwrap();
+                        println!("message received: message: {:?}, id_or_post: {:?}", message.message, message.id_or_post);
+                    }
+                }
             }
         };
 
@@ -183,4 +255,14 @@ fn main() {
         // println!("{:?}", hub.watches);
         return output;
     }).unwrap();
+}
+
+
+#[cfg(test)]
+mod tests {
+    use main::Node;
+    #[test]
+    fn test_send_deserialize(){
+        
+    }
 }
