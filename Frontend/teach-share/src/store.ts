@@ -60,31 +60,52 @@ enum WSStatus {
 
 }
 
+enum MessageType {
+    Get,
+    Watch
+}
+
+interface IMessage {
+    message: MessageType;
+    id?: number;
+    post?: Post;
+}
+
 storeSocket.addEventListener("open", function(ev) {
     console.log(ev);
 });
 
 storeSocket.onopen = (val) => {
-    
+
     console.log("[WS] Websocket successfully opened!");
-    let testUser = new User(1);
-    let testPost = new Post(10)
-    let testComment = new Comment(10, testPost, testUser, "some comment text");
-    let comments = new Array<Comment>();
-    comments.push(testComment);WebSocket
+    const testUser = new User(1);
+    const testPost = new Post(10);
+    const testComment = new Comment(10, testPost, testUser, "some comment text");
+    const comments = new Array<Comment>();
+    comments.push(testComment);
     testPost.comments = comments;
     testPost.user = testUser;
     console.log("[WS] Websocket sending: ", testPost);
     const isCircular = circularRecordChecker(testPost);
     console.log(isCircular);
+
+    const msg1: IMessage = {
+        message: MessageType.Get,
+        id: 1
+    };
+
+    const msg2: IMessage = {
+        message: MessageType.Get,
+        post: testPost,
+    };
+
     if (!isCircular) {
         storeSocket.send(JSON.stringify(testPost)); // JSON.stringify(testPost)
-    }
-    else {
+    } else {
         // map all the internal structures to maps of pk's
-        testPost.comments = comments.map((val, ind, arr) => { 
+        testPost.comments = comments.map((val, ind, arr) => {
             if (typeof val.pk !== "undefined") {
-                return Number(val.pk); 
+                return Number(val.pk);
             }
             return 0;
         });
