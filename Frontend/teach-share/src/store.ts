@@ -13,12 +13,16 @@ import UserService from "./store_modules/UserService";
 import YouTubeService from "./store_modules/YouTubeService";
 import PostService from "./store_modules/PostService";
 import { WatchStore } from "./WatchStore";
+import Database from "./Database";
 
 Vue.use(Vuex);
 
 const state = {};
 
-var storeSocket = new WebSocket("ws://127.0.0.1:7000/ws/");
+var storeSocket = new WebSocket("ws://127.0.0.1:3012/");
+
+
+
 
 function circularRecordChecker(record: any, seen: any[] = []) {
 
@@ -67,7 +71,7 @@ storeSocket.onopen = (val) => {
     let testPost = new Post(10)
     let testComment = new Comment(10, testPost, testUser, "some comment text");
     let comments = new Array<Comment>();
-    comments.push(testComment);
+    comments.push(testComment);WebSocket
     testPost.comments = comments;
     testPost.user = testUser;
     console.log("[WS] Websocket sending: ", testPost);

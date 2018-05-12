@@ -46,6 +46,8 @@ const Register = () =>
 
 const WebSocketComp = () =>
     import ( /* webpackChunkName: "register" */ "../components/WebSocket.vue");
+const DbTest = () =>
+    import ( /* webpackChunkName: "db-test" */ "../components/DbTest.vue");
 
 
 Vue.use(Router);
@@ -144,6 +146,11 @@ const router = new Router({
             path: "/register",
             name: "register",
             component: Register
+        },
+        {
+            path: "/indexeddb",
+            name: "db-test",
+            component: DbTest
         }
     ]
 });

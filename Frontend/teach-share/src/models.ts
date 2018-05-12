@@ -1,3 +1,6 @@
+import Database from "./Database";
+import api from "./api";
+
 /**
  *  Model is the base implementation for a database-backed object
  */
@@ -111,6 +114,25 @@ enum ContentType {
 }
 
 export class Post extends Model {
+    static db: Database = Database.getInstance();
+    static get(pk: number): Promise<Post> {
+        return new Promise((resolve, reject) => {
+            this.db.getPost(pk).then(p => {
+                resolve(p);
+            }).catch(err => {
+                api.get("/posts/" + pk)
+                .then(resp => {
+                    this.db.putPost(resp.data);
+                    resolve( resp.data as Post);
+                }).catch(error => {
+                    reject("no such post");
+                })
+            })
+        });
+    }
+
+
+
     public comments: Comment[] | number[];
     public user: User;
     public attachments: any[];

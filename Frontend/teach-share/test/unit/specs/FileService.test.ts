@@ -193,18 +193,18 @@ describe("[FILES] CLEAR", () => {
     });
 });
 
-const actionsInjector = require("inject-loader!../../../src/store_modules/FileService");
+// const actionsInjector = require("inject-loader!../../../src/store_modules/FileService");
 
 // create the module with our mocks
-const actions = actionsInjector({
-    axios: {
-        put(resolve, reject) {
-            setTimeout(() => {
-                resolve({});
-            }, 100);
-        }
-    }
-});
+// const actions = actionsInjector({
+//     axios: {
+//         put(resolve, reject) {
+//             setTimeout(() => {
+//                 resolve({});
+//             }, 100);
+//         }
+//     }
+// });
 
 // helper for testing action with expected mutations
 const testAction = (action, payload, state, expectedMutations, done) => {
