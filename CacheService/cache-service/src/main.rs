@@ -92,14 +92,16 @@ struct Node<T> {
 
 #[derive(Serialize, Deserialize, Debug)]
 enum IdOrPost{
-    i32,
-    Post
+    Id(i32),
+    Post(models::Post)
 }
 
 #[derive(Serialize, Deserialize)]
 struct YoMessage {
     message: MessageType,
-    id_or_post: IdOrPost
+    id: Option<i32>,
+    post: Option<models::Post>
+    //id_or_post: IdOrPost
 }
 
 
@@ -126,7 +128,7 @@ impl<T> Handler for Node<T> {
                 println!("{}", text);
                 let res = serde_json::from_str(&text);
                 if(res.is_err()){
-                    println!("Badly formatted message: {} Sending back error message", text);
+                    println!("Badly formatted message: {}", text);
                     
                 }
                 else{
@@ -136,7 +138,7 @@ impl<T> Handler for Node<T> {
                     }
                     else{
                         let message: YoMessage = opt.unwrap();
-                        println!("message received: message: {:?}, id_or_post: {:?}", message.message, message.id_or_post);
+                        println!("message received: message: {:?}, id: {:?}, post: {:?}", message.message, message.id, message.post);
                     }
                 }
             }
@@ -165,7 +167,37 @@ impl<T> Handler for Node<T> {
 
 // }
 
+
 fn main() {
+    let post_s = "{\"user_id\":1,\"id\":10, \"content\": {}, \"title\" : \"abc123\"}";
+    let res = serde_json::from_str(&post_s);
+    assert!(res.is_ok());
+
+    let opt: Option<models::Post> = res.ok();
+    assert!(opt.is_some());
+
+    println!("{:?}", opt.unwrap());
+
+
+    let msg = YoMessage{message: MessageType::Get, id: Some(3), post: None};
+    let msg2 = YoMessage{message: MessageType::Create, id: None, post: Some(models::Post::new())};
+
+    let s: &'static str = "{\"message\":\"Get\"}";
+    let res = serde_json::from_str(&s);
+    assert!(res.is_ok());
+
+    let opt: Option<YoMessage> = res.ok();
+    assert!(opt.is_some());
+
+    let msg = opt.unwrap();
+    println!("Deserialized string:");
+    println!("{:?} {:?} {:?}", msg.message, msg.id, msg.post);
+
+
+    let serialized = serde_json::to_string(&msg).unwrap();
+    println!("{}", serialized);
+    let serialized2 = serde_json::to_string(&msg2).unwrap();
+    println!("{}", serialized2);
     let pool = pool::ThreadPool::new(2).unwrap();
     println!("{:?}", pool);
     pool.execute(|| {
@@ -257,12 +289,3 @@ fn main() {
     }).unwrap();
 }
 
-
-#[cfg(test)]
-mod tests {
-    use main::Node;
-    #[test]
-    fn test_send_deserialize(){
-        
-    }
-}

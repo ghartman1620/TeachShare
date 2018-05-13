@@ -6,7 +6,7 @@ use std::collections;
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::rc::Rc;
-
+use serde_json::Value;
 /**
  *  This
  */
@@ -250,24 +250,24 @@ pub struct Command<T> {
 
 type ModelTable<T> = RefCell<HashMap<i32, Resource<T>>>;
 
-#[derive(Debug, Clone, PartialEq, Eq)] // , PartialEq, Eq
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)] // , PartialEq, Eq
 pub struct Post {
     pub id: i32,
     pub title: String,
-    // pub content: Value,
+    pub content: Value,
     // pub updated: PgTimestamp,
-    pub likes: i32,
+    //pub likes: i32,
     // pub timestamp: PgTimestamp,
     // pub tags: Value,
     pub user_id: i32,
-    pub draft: bool,
-    pub content_type: i32,
-    pub grade: i32,
+    //pub draft: bool,
+    //pub content_type: i32,
+    //pub grade: i32,
     // pub length: PgInterval,
-    pub subject: i32,
-    pub crosscutting_concepts: Vec<i32>,
-    pub disciplinary_core_ideas: Vec<i32>,
-    pub practices: Vec<i32>,
+    //pub subject: i32,
+    //pub crosscutting_concepts: Vec<i32>,
+    //pub disciplinary_core_ideas: Vec<i32>,
+    //pub practices: Vec<i32>,
 }
 
 impl Post {
@@ -275,20 +275,20 @@ impl Post {
         Post {
             id: 0,
             title: String::from(""),
-            // content: Value::Null,
+            content: Value::Null,
             // updated: PgTimestamp(0),
-            likes: 0,
+            // likes: 0,
             // timestamp: PgTimestamp(0),
             // tags: Value::Array(vec!()),
             user_id: 0,
-            draft: false,
-            content_type: 0,
-            grade: 0,
+            // draft: false,
+            // content_type: 0,
+            // grade: 0,
             // length: PgInterval::new(0, 0, 0),
-            subject: 0,
-            crosscutting_concepts: vec![],
-            disciplinary_core_ideas: vec![],
-            practices: vec![],
+            // subject: 0,
+            // crosscutting_concepts: vec![],
+            // disciplinary_core_ideas: vec![],
+            // practices: vec![],
         }
     }
 }
@@ -389,3 +389,4 @@ mod tests {
         // println!("{:?}", msg.items);
     }
 }
+

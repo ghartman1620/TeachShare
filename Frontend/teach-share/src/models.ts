@@ -131,7 +131,19 @@ export class Post extends Model {
         });
     }
 
-
+    public pkify(): string {
+        var obj: any = {
+            user_id: this.user.pk,
+            id: this.pk,
+            ...this as Object,
+        }
+        delete obj.pk;
+        delete obj.user;
+        obj.comments = undefined;
+        delete obj.comments;
+        console.log(obj);
+        return obj;        
+    }
 
     public comments: Comment[] | number[];
     public user: User;

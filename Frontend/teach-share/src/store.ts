@@ -61,14 +61,16 @@ enum WSStatus {
 }
 
 enum MessageType {
-    Get,
-    Watch
+    Get = "Get",
+    Watch = "Watch",
+    Update = "Update",
+    Create = "Create"
 }
 
 interface IMessage {
     message: MessageType;
     id?: number;
-    post?: Post;
+    post?: any;
 }
 
 storeSocket.addEventListener("open", function(ev) {
@@ -96,20 +98,26 @@ storeSocket.onopen = (val) => {
 
     const msg2: IMessage = {
         message: MessageType.Get,
-        post: testPost,
+        post: testPost.pkify(),
     };
-
+    msg2.post.content = {
+        "type": "text",
+        "content" :"<b>bold</b>"
+    }
+    msg2.post.title = "that was an error";
+    console.log(msg2.post);
     if (!isCircular) {
-        storeSocket.send(JSON.stringify(testPost)); // JSON.stringify(testPost)
+        storeSocket.send(JSON.stringify(msg1)); // JSON.stringify(testPost)
     } else {
         // map all the internal structures to maps of pk's
-        testPost.comments = comments.map((val, ind, arr) => {
+        /*msg2.post!.comments = comments.map((val, ind, arr) => {
             if (typeof val.pk !== "undefined") {
                 return Number(val.pk);
             }
             return 0;
-        });
-        storeSocket.send(JSON.stringify(testPost));
+        });*/
+        console.log(JSON.stringify(msg2));
+        storeSocket.send(JSON.stringify(msg2));
     }
 };
 
