@@ -40,20 +40,20 @@ pub struct Comment {
     user_id: i32,
 }
 
-#[derive(Queryable, Clone)]
+#[derive(Queryable, Clone, Debug)]
 pub struct Post {
     pub id: i32,
     pub title: String,
     pub content: Value,
-    pub updated: PgTimestamp,
+    // pub updated: PgTimestamp,
     pub likes: i32,
-    pub timestamp: PgTimestamp,
+    // pub timestamp: PgTimestamp,
     pub tags: Value,
     pub user_id: i32,
     pub draft: bool,
     pub content_type: i32,
     pub grade: i32,
-    pub length: PgInterval,
+    // pub length: PgInterval,
     pub subject: i32,
     pub crosscutting_concepts: Vec<i32>,
     pub disciplinary_core_ideas: Vec<i32>,
@@ -135,15 +135,15 @@ impl Post {
             //copy trait is not defined for String, because it's immutable. So we must clone our strings.
             .set((title.eq(self.title.clone()),
                  content.eq(self.content.clone()),
-                 updated.eq(self.updated),
+                //  updated.eq(self.updated),
                  likes.eq(self.likes),
-                 timestamp.eq(self.timestamp),
+                //  timestamp.eq(self.timestamp),
                  tags.eq(self.tags.clone()),
                  user_id.eq(self.user_id),
                  draft.eq(self.draft),
                  content_type.eq(self.content_type),
                  grade.eq(self.grade),
-                 length.eq(self.length),
+                //  length.eq(self.length),
                  subject.eq(self.subject),
                  //Hopefully these vectors aren't very long... 
                  crosscutting_concepts.eq(self.crosscutting_concepts.clone()),

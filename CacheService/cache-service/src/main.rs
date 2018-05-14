@@ -42,6 +42,8 @@ Get
 /*!
  The websocket cache service is used for realtime communication between connected users.
 */
+#![feature(vec_remove_item)]
+
 extern crate ws;
 #[macro_use]
 extern crate serde_derive;
@@ -68,9 +70,13 @@ mod models_diesel;
 mod pool;
 mod schema;
 
+use models::*;
+use cache::*;
+
 use models::MessageType;
 use std::rc::{Rc, Weak};
 use std::cell::Cell;
+use std::sync::Arc;
 
 // use crossbeam_channel::{Receiver, Sender};
 
@@ -97,6 +103,9 @@ struct Connection {
     // parent: Weak<Cell<GrandSocketStation>>,
     id: i32,
     tx: Sender,
+    to_cache: crossbeam_channel::Sender<SafeArcMsg>,
+    from_cache: crossbeam_channel::Receiver<SafeArcMsg>,
+    kill_cache: crossbeam_channel::Sender<Cancel>,
 }
 
 impl fmt::Debug for Connection {
@@ -129,6 +138,21 @@ impl Handler for Connection {
 
     fn on_message(&mut self, msg: Message) -> Result<()> {
         // this is the Tx for where this data message came from
+        
+        let mut wrap = Wrapper::new()
+            .set_model(ModelType::Post)
+            .set_msg_type(MessageType::Get)
+            .build();
+
+        let mut p = Post::new();
+        p.id = 1;
+        wrap.items_mut().push(Arc::new(Resource::new(p)));
+
+        let response = self.to_cache.send(Arc::new(wrap))
+            .expect("There was a terrible error sending it!");
+        println!("response: {:?}", response);
+        let resp = self.from_cache.recv();
+        println!("resp: {:?}", resp);
 
         let result = match msg {
             Message::Binary(bin) => {
@@ -229,30 +253,7 @@ fn main() {
     //     // watches: Vec::new(),
     // };
 
-    let p = models::Post::new();
-    let m = &mut models::Resource::<models::Post>::new(p);
-    println!("Post: {:?}", m.data);
-
-    m.add_watch(models::User::new());
-    m.add_watch(models::User::new());
-    let all = m.all_watchers();
-    println!("All ---> {:?}", all);
-    // let t = m.data;
-
-    for (id, user) in m.watchers_to_iter() {
-        println!("User [{}] --> {:?}", id, user);
-    }
-
-    let rm = match m.remove_watch(1) {
-        Some(val) => println!("returned: {:?}", val),
-        None => println!("Nothign was returned."),
-    };
-    println!("rm: {:?}", rm);
-    println!("new watchers: {:?}", m.watchers);
-    // t.id = 2;
-    // t.username = String::from("bryandmc");
-    m.increment();
-    println!("Model: {:?}", m);
+   
 
     // let cache = &mut models::Cache::new();
     let t = models::Post::new();
@@ -286,13 +287,25 @@ fn main() {
     // let mut h = hub.clone();
     let i = &mut 0;
 
+    let (a, b, c): (
+        crossbeam_channel::Sender<SafeArcMsg>,
+        crossbeam_channel::Receiver<SafeArcMsg>,
+        crossbeam_channel::Sender<Cancel>,
+    ) = wire_up();
+
     listen("127.0.0.1:3012", |out| {
         // println!("HUB: {:?}", h.into_inner());
         
         // println!("Hub WEAK --> {:?}", Rc::downgrade(&h));
         // let parent =  Rc::downgrade(&hub);
         // println!("WEAK: {:?}", parent);
-        let res = Connection{ id: *i, tx: out, /*parent: Rc::downgrade(&hub)*/ };
+        let res = Connection{ 
+            id: *i, 
+            tx: out, /*parent: Rc::downgrade(&hub)*/ 
+            to_cache: a.clone(),
+            from_cache: b.clone(),
+            kill_cache: c.clone(),
+        };
         let output = res.clone();
         println!("Strong count: {}", Rc::strong_count(&hub));
         match Rc::get_mut(&mut hub) {
