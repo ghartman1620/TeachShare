@@ -160,9 +160,15 @@ export function asLoggedIn(promise: AxiosPromise<any>): Promise<any> {
         promise
         .then((response) => {resolve(response); })
         .catch((err) => {
-            logout(store);
-            router.push({name: "login"});
-            reject();
+            if(err.response.status === 401){
+                logout(store);
+                router.push({name: "login"});
+                reject(err);
+            }
+            else{
+                console.error(err);
+                reject(err);
+            }
         });
     });
 }

@@ -14,7 +14,6 @@ import YouTubeService from "./store_modules/YouTubeService";
 import PostService from "./store_modules/PostService";
 import { WatchStore } from "./WatchStore";
 import Database from "./Database";
-import {mutUpdate} from "./store_modules/PostService";
 
 import WebSocket from "./WebSocket";
 
@@ -144,6 +143,40 @@ let store = new Vuex.Store<IRootState>(storeOptions);
 //     mutUpdate(store, p);
 // };
 
+
+import {getMap, mutUpdate, mutCreate} from "./store_modules/PostService";
+/*
+ * After we've declared all of our store modules we can now add a message listener to the websocket.
+ * Can't do it in websocket because this function depends on our store modules, and if websocket itself had
+ * a store dependency we'd have a circular dependency and would cause all sorts of errors.
+*/
+WebSocket.getInstance().addMessageListener(function(msg) {
+    console.log(msg);
+
+    //when we're getting from websocket with id - we'll need to use Post.pkify()
+    let val = JSON.parse(msg.data);
+    console.log("got message");
+    console.log(val);
+    var db: Database = Database.getInstance();
+    console.log(val.pk);
+    val.user = new User(val.user);
+    db.getPost(val.pk as number).then(p => {
+        console.log("we've subbed to post " + val.pk + " so now we're going to update our local cache to match the message we got for it");
+        db.putPost(val);
+    }).catch(() => {
+        console.log("whyyyyyyyyyyyyyYY");
+        //don't save - that's taken care of by Post.get when its told to save/subscribe
+    })
+
+
+    
+    if(getMap(store).has(val.pk!.toString())){
+        mutUpdate(store, val);
+    }else{
+        mutCreate(store, val);
+    }
+    return undefined;
+});
 
 
 export default store;

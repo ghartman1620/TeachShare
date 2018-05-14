@@ -4,6 +4,7 @@ import api from "./api";
 import {Post} from "./models";
 import store from "./store";
 import {asLoggedIn} from "./router/index";
+import WebSocket from "./WebSocket";
 
 export enum PostStatus {Loading, Saving, Saved}
 
@@ -58,28 +59,29 @@ export class InProgressPost {
             this.coreIdeas = [];
             this.practices = [];
             post.pk = postid;
-            asLoggedIn(api.get("/posts/"+ postid)).then(function(response){
-                console.log(response);
-                post.elements = response.data.content;
-                post.title = response.data.title;
-                post.draft = response.data.draft;
-                post.tags = response.data.tags;
+            api.get(`/posts/${postid}`).then(function(response){
+                let p = response.data;
+                console.log("GOT CACHED POST");
+                post.elements = p.content;
+                post.title = p.title;
+                post.draft = p.draft;
+                post.tags = p.tags;
                 post.status = PostStatus.Saved;
-                post.grade = response.data.grade;
-                post.subject = response.data.subject;
-                post.standards = response.data.standards;
-                console.log("subject: " + response.data.subject);
+                post.grade = p.grade;
+                post.subject = p.subject;
+                post.standards = p.standards;
+                console.log("subject: " + p.subject);
                 //response: #days hh:mm:ss
-                console.log(response.data.length);
-                post.length = parseInt(response.data.length.substring(response.data.length.length-2))/60
-                            + parseInt(response.data.length.substring(response.data.length.length-5, response.data.length.length-3))
-                            + Math.floor(parseInt(response.data.length.substring(response.data.length.length-8, response.data.length.length-6))*60)
+                console.log(p.length);
+                post.length = parseInt(p.length.substring(p.length.length-2))/60
+                            + parseInt(p.length.substring(p.length.length-5, p.length.length-3))
+                            + Math.floor(parseInt(p.length.substring(p.length.length-8, p.length.length-6))*60)
 
                 console.log(post.length);
-                post.contentType = response.data.content_type;
-                post.coreIdeas = response.data.coreIdeas;
-                post.concepts = response.data.concepts;
-                post.practices = response.data.practices;
+                post.contentType = p.content_type;
+                post.coreIdeas = p.coreIdeas;
+                post.concepts = p.concepts;
+                post.practices = p.practices;
             })
             console.log("returning from post constructor");
         }
@@ -190,17 +192,24 @@ export class InProgressPost {
             practices: this.practices,
         }
     }
-    
+    toPost(): Post{
+
+        return this.json() as Post;
+    }
     saveDraft(): void{
+        
         var post: InProgressPost = this;
         this.status = PostStatus.Saving;
         console.log(this.json());
         console.log(this.standards);
-        api.put("posts/" + this.pk + "/", this.json()).then(function(response){
+        /*api.put("posts/" + this.pk + "/", this.json()).then(function(response){
             console.log("DRAFT SAVED!"); 
             console.log(response);
             post.status = PostStatus.Saved;
-        })
+        })*/
+        WebSocket.getInstance().sendUpdate(this.toPost());
+        //in the future - potentially some kind of ack message sent back to indicate to user post was saved?
+        this.status = PostStatus.Saved;
     }
     publishPost(): Promise<any>{
         this.draft = false;

@@ -1,5 +1,9 @@
-import Database from "./Database";
+
 import api from "./api";
+
+
+import Database from "./Database";
+import WebSocket from "./WebSocket";
 
 /**
  *  Model is the base implementation for a database-backed object
@@ -113,24 +117,145 @@ enum ContentType {
     Lecture
 }
 
+
+
+export enum NotifyType {
+    "success",
+    "danger",
+    "info",
+    "warning",
+    "primary",
+    "secondary",
+    "dark",
+    "light"
+}
+
+export interface INotification {
+    id?: string;
+    type: NotifyType;
+    content: string;
+}
+
+export interface IRootState {}
+
+/**
+ * ModelMap is a structure for keeping track of a group of
+ * model instances using an associative object.
+ */
+
+export class ModelMap<V> implements IterableIterator<V> {
+    private _data: { [pk: string]: V } = {};
+    private counter: number = 0;
+
+    constructor(...V) {
+        if (typeof V !== "undefined") {
+            if (V.length < 1) {
+                this._data = {};
+                return;
+            }
+            for (const v of V) {
+                this._data[v.pk] = v;
+            }
+        }
+    }
+    public next(): IteratorResult<V> {
+        const key = this.keys[this.counter];
+        this.counter++;
+        if (this.counter <= this.length) {
+            return {
+                done: false,
+                value: this._data[key]
+            };
+        } else {
+            this.counter = 0;
+        }
+        return {
+            done: true
+        };
+    }
+    public [Symbol.iterator](): IterableIterator<V> {
+        return this;
+    }
+    public has(key: string | number): boolean {
+        return typeof this.data[String(key)] !== "undefined";
+    }
+    get keys(): string[] {
+        return Object.keys(this._data);
+    }
+    get length(): number {
+        return this.keys.length;
+    }
+    get data(): { [pk: string]: V } {
+        return this._data;
+    }
+    set data(value: { [pk: string]: V }) {
+        this._data = value;
+    }
+    public set(key: string, value: V) {
+
+        this._data[key] = value;
+    }
+    public get(key: string | number): V {
+        return this._data[String(key)];
+    }
+    public remove(key: string | number): boolean {
+        return delete this._data[String(key)];
+    }
+    public list(): V[] {
+
+        let res = new Array<V>();
+        for (const k in this.data) {
+            if (typeof k !== "undefined") {
+                res.push(this.get(k));
+            }
+        }
+        return res;
+    }
+}
+
+
 export class Post extends Model {
     static db: Database = Database.getInstance();
-    static get(pk: number): Promise<Post> {
-        return new Promise((resolve, reject) => {
-            this.db.getPost(pk).then(p => {
-                resolve(p);
-            }).catch(err => {
+    static ws: WebSocket = WebSocket.getInstance();
 
+    /*
+     * Get a Post from the websocket connection or the database if contained.
+     * @param pk the post to get
+     * @param save? optionally indicate to save in the db and subscribe over websocket to this post.
+    */
+    static get(pk: number, save?: boolean): Promise<Post> {
+        console.log("Post get: getting post " + pk + " save?" + save);
+        return new Promise((resolve, reject) => {
+            console.log("trying to get from indexdb?"); 
+            this.db.getPost(pk).then(p => {
+                console.log("post " + pk  + " found in db");
+                console.log(p);
+                resolve(p);
+            }).catch( () => {
+                console.log("???");
+                if(save){
+                    console.log("post " + pk + " not found in db.");
+                    
+                    
+                    Post.db.addEmptyPost(pk);
+                    Post.ws.sendWatch(pk);
+                    Post.ws.sendGet(pk);
+                }else{
+                    console.log("sending get");
+                    Post.ws.sendGet(pk);
+                }
+                reject();
                 //decide whether we should save/subscribe to this post being gotten
-                
+                /*
                 api.get("/posts/" + pk)
                 .then(resp => {
                     this.db.putPost(resp.data);
                     resolve( resp.data as Post);
                 }).catch(error => {
                     reject("no such post");
-                })
+                })*/
             })
+            console.log("returned from db get post");
         });
     }
 
@@ -178,11 +303,16 @@ export class Post extends Model {
     public grade: number;
     public length: string;
     public likes: number;
-    public subject: string|null|undefined;
+    public subject: number;
     public tags: string[];
     public timestamp: Date;
     public title: string;
     public updated: Date;
+    public standards: number[];
+    public concepts: number[];
+    public coreIdeas: number[];
+    public practices: number[];
+
 
     constructor(pk?: number, comments?: Comment[], user?: User) {
         super(typeof pk === "undefined" ? -1 : pk);
@@ -214,106 +344,5 @@ export class GenericFile {
         if (file !== undefined) {
             this.name = file.name;
         }
-    }
-}
-
-export enum NotifyType {
-    "success",
-    "danger",
-    "info",
-    "warning",
-    "primary",
-    "secondary",
-    "dark",
-    "light"
-}
-
-export interface INotification {
-    id?: string;
-    type: NotifyType;
-    content: string;
-}
-
-export interface IRootState {}
-
-/**
- * ModelMap is a structure for keeping track of a group of
- * model instances using an associative object.
- */
-export class ModelMap<V> implements IterableIterator<V> {
-    private _data: { [pk: string]: V } = {};
-    private counter: number = 0;
-
-    constructor(...V) {
-        if (typeof V !== "undefined") {
-            if (V.length < 1) {
-                this._data = {};
-                return;
-            }
-            for (const v of V) {
-                this._data[v.pk] = v;
-            }
-        }
-    }
-    public next(): IteratorResult<V> {
-        const key = this.keys[this.counter];
-        this.counter++;
-        if (this.counter <= this.length) {
-            return {
-                done: false,
-                value: this._data[key]
-            };
-        } else {
-            this.counter = 0;
-        }
-        return {
-            done: true
-        };
-    }
-    public [Symbol.iterator](): IterableIterator<V> {
-        return this;
-    }
-    public has(key: string | number): boolean {
-        return typeof this.data[String(key)] !== "undefined";
-    }
-    get keys(): string[] {
-        return Object.keys(this._data);
-    }
-    get length(): number {
-        return this.keys.length;
-    }
-    get data(): { [pk: string]: V } {
-        return this._data;
-    }
-    set data(value: { [pk: string]: V }) {
-        console.log("modelmap setData");
-        this._data = value;
-    }
-    public set(key: string, value: V) {
-        console.log("hello from modelmap set");
-        console.log(key);
-        console.log(value);
-        this._data[key] = value;
-
-        console.log(this.list());
-    }
-    public get(key: string | number): V {
-        console.log("modelmap get");
-        return this._data[String(key)];
-    }
-    public remove(key: string | number): boolean {
-        console.log("modelmap remove");
-        return delete this._data[String(key)];
-    }
-    public list(): V[] {
-        console.log("hello from modelmap list");
-        console.log(this);
-        let res = new Array<V>();
-        for (const k in this.data) {
-            if (typeof k !== "undefined") {
-                res.push(this.get(k));
-            }
-        }
-        return res;
     }
 }

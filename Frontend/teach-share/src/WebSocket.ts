@@ -1,8 +1,14 @@
 import ReconnectingWebSocket from "reconnecting-websocket";
 import Database from "./Database";
-import store from "./store";
-import {mutUpdate, mutCreate, getMap} from "./store_modules/PostService";
 import {Post} from "./models";
+import api from "./api";
+
+enum ReadyState {
+    Connecting =  0,
+    Open = 1,
+    Closing = 2,
+    Closed = 3,
+}
 
 enum MessageType {
     Get = "Get",
@@ -17,11 +23,68 @@ enum MessageStatus {
     ConnectionOpening = 2,
 }
 
+class MockWebSocket {
+    private openListeners: ((event: any) => undefined)[];
+    public receiveListeners: ((message: any) => undefined)[];
+    public readyState: ReadyState = ReadyState.Connecting;
+    constructor(s: string){
+        this.openListeners = [];
+        this.receiveListeners = [];
+        window.setTimeout(1000, this.open());
+    }
+    open(){
+        this.readyState = ReadyState.Open;
+        for(var fn of this.openListeners) {
+            fn!({});
+        }
+    }
+    addEventListener(type: string, listener: (e) => undefined){
+        console.log("adding eventr listener to mock socket");
+        if(type === "open"){
+            console.log("adding open listener to mock socket");
+            this.openListeners.push(listener);
+        }
+        else if (type === "message"){
+            console.log("adding message listener to mock socket");
+            this.receiveListeners.push(listener);
+        }
+        else{
+            console.error("only message and open are valid listeners for MockWebSocket");
+        }
+    }
+
+    public send(msg: string): void{
+        console.log("sent message");
+        console.log(msg);
+        let val = JSON.parse(msg);
+        if(val.message !== MessageType.Get){
+            console.error("Non-get type message sent over Mock Websocket");
+        }
+        else{
+            var ws: MockWebSocket = this as MockWebSocket;
+            api.get("/posts/" + val.id).then(response => {
+                console.log("got \"reply\"");
+                console.log(response);
+                console.log(ws.receiveListeners.length);
+                for(var fn of ws.receiveListeners){
+                    console.log("calling fn");
+                    console.log(fn);
+                    //fn!.apply(null, {data: response.data});
+                    console.log("calling fn again");
+                    fn!({data: JSON.stringify(response.data)});
+                }
+            })
+        }
+        
+    }
+}
+
+
 export default class WebSocket {
     private static instance: WebSocket;
-    private rws: ReconnectingWebSocket;
+    private rws: MockWebSocket;
     private constructor() {
-        this.rws = new ReconnectingWebSocket('ws://127.0.0.1:3012');
+        this.rws = new MockWebSocket('ws://127.0.0.1:3012');
         this.addMessageListener(this.onmessage);
         console.log("constructed websocket");
         this.rws.addEventListener("open", (msg)=>{
@@ -63,6 +126,7 @@ export default class WebSocket {
         });
     }
     public sendGet(id: number): MessageStatus{
+        console.log("sending get");
         return this.send({
             message: MessageType.Get,
             id: id
@@ -72,7 +136,7 @@ export default class WebSocket {
     private send(val): MessageStatus{
         console.log(this.rws.readyState);
         let msg = JSON.stringify(val);
-        if(this.rws.readyState ===  0){
+        if(this.rws.readyState ===  ReadyState.Connecting){
             console.log("waiting");
             this.addOpenListener((event) => {
                 console.log(msg);
@@ -81,11 +145,12 @@ export default class WebSocket {
             })
             return MessageStatus.ConnectionOpening;
         }
-        else if(this.rws.readyState !== 1){
+        else if(this.rws.readyState !== ReadyState.Open){
             console.log("WebSocket error: send called on closing connection");
             return MessageStatus.ConnectionClosed;
         }
         else{
+            console.log("sent message");
             this.rws.send(msg);
             return MessageStatus.Sucess;
         }
@@ -96,23 +161,13 @@ export default class WebSocket {
     }
 
     public addMessageListener(fn: (any) => undefined){
+        console.log("added message listener");
+        console.log(fn);
         this.rws.addEventListener("message", fn);
     }
     
     private onmessage(msg): undefined {
-        let val = Post.pkify(JSON.parse(msg.data));
-        console.log(val);
-        var db: Database = Database.getInstance();
-        db.getPost(val.pk as number).then(p => {
-            db.putPost(val);
-        })
-
-
-        if(getMap(store).has(val.pk!.toString())){
-            mutUpdate(store, val);
-        }else{
-            mutCreate(store, val);
-        }
+        
         return undefined;
     }
 }

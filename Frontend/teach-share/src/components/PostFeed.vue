@@ -1,7 +1,7 @@
 <template>
 <div>
 <router-view/>
-<!-- <side-bar collapsedString="Search">
+<side-bar collapsedString="Search">
     <b-form :class="{'control' : true}" style="padding: 8px;" v-on:submit.prevent="advancedSearch()">
 
         <b-form-group label="Search for posts with:">
@@ -73,7 +73,7 @@
 
     </b-form>
 </side-bar>
- -->
+
 
 
 <div :key="post.pk" v-for="(post, index) in posts">

@@ -1,9 +1,7 @@
 
 <template>
 <div>
-    <!-- @TODO (although this is more a sidebar thign i put it here for visibility) 
-    fix an issue where the scroll bar doesn't show if the bottom of the sidebar is underneath the bottom
-    of the navbar on the bottom of post create -->
+
     <side-bar collapsedString="Your posts">
         <div v-for="post in userPosts">
             <a href="#" v-on:click.stop="editPost(post)">
@@ -227,6 +225,7 @@ import { addElement,
     setLength,
     saveDraft 
 } from "../store_modules/PostCreateService";
+import {fetchPostSubscribe, getPosts} from "../store_modules/PostService";
 import {
     getLoggedInUser,
     logout
@@ -234,7 +233,8 @@ import {
 import SideBar from "./SideBar.vue";
 import {asLoggedIn} from "../router/index";
 import TagSelect from "./TagSelect.vue";
-import {User} from "../models";
+import {User, Post} from "../models";
+
 import * as Cookie from "tiny-cookie";
 
 
@@ -283,7 +283,7 @@ export default class PostCreate extends Vue{
     title: string = ""; //@TODO: make changes to title a store mutation that is saved and can be undone/redone
     inProgressTag: string = "";
     tags: string[] = [];
-    userPosts: any[] = [];
+    //userPosts: any[] = [];
     
 
     currentPage: number = 0;
@@ -294,7 +294,27 @@ export default class PostCreate extends Vue{
 
 
 
-    
+    get userPosts(): Post[] {
+        var store = this.$store;
+        console.log(getPosts(this.$store));
+        console.log(getLoggedInUser(store).pk);
+        if(getPosts(this.$store).length > 0){
+            console.log(getPosts(this.$store)[0]);
+            console.log(getPosts(this.$store)[0].user.pk);
+        }
+        let userPosts = getPosts(this.$store).filter(function(p){
+            console.log("filter fn");
+            console.log(p.user.pk);
+            //getLoggedInUser(store).pk seems to be a string at runtime. It obviously ought to be a number, but somewhere
+            //it gets assigned to a type-unsafe thing that winds up as a string.
+            
+            console.log(parseInt(getLoggedInUser(store).pk as any));
+            console.log(p.user.pk === parseInt(getLoggedInUser(store).pk as any));
+            return p.user.pk === parseInt(getLoggedInUser(store).pk as any);
+        })
+        console.log(userPosts);
+        return userPosts;
+    }
     get currentPost(): InProgressPost | undefined {
         return getCurrentPost(this.$store);
     }
@@ -477,14 +497,21 @@ export default class PostCreate extends Vue{
             var response;
 
             response = await asLoggedIn(api.get(`/posts/?user=${this.getLoggedInUser.pk}&page=${nextPage.toString()}`));
+            console.log(response.data);
             for(var post of response.data.results){
-                vm.userPosts.push(post);
+                
+                if(post.pk != -1){
+                    console.log("I am subscribing to a post. Its pk is " + post.pk);
+                    fetchPostSubscribe(this.$store, post.pk);
+                }
+                //this.userPosts.push(post);
             }
             nextPage++;
         }while(response.data.next !== null);
     }
     created() {
         var inProgressPost = window.localStorage.getItem("inProgressPost");
+        console.log(inProgressPost);
         if(inProgressPost == undefined){
             this.beginPost( 
                 //???? how on earth is this type string | undefined

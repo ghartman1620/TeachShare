@@ -4,6 +4,7 @@ import { ActionContext } from "vuex";
 import { getStoreAccessors } from "vuex-typescript";
 import api from "../api";
 import { IRootState, ModelMap, Post } from "../models";
+import WebSocket from "../WebSocket";
 
 export interface IPostState {
     posts: ModelMap<Post>;
@@ -62,6 +63,23 @@ export const actions = {
                 postID = parseInt(postID);
             }
             var p: Post = await Post.get(postID as number);
+            //const resp: AxiosResponse<Post> = await api.get(`posts/${postID}/`);
+            mutCreate(ctx, p);
+            return p;
+        } catch (err) {
+            return err;
+        }
+    },
+    fetchPostSubscribe: async (ctx: PostContext, postID: string|number) => {
+        console.log("subscribing to a post");
+        console.log(postID);
+        try {
+
+            if(typeof postID === "string"){
+                postID = parseInt(postID);
+            }
+            console.log("awaiting Post.get in subscribe");
+            var p: Post = await Post.get(postID as number, true);
             //const resp: AxiosResponse<Post> = await api.get(`posts/${postID}/`);
             mutCreate(ctx, p);
             return p;
@@ -170,6 +188,8 @@ const { commit, read, dispatch } =
 export const fetchAllPosts = dispatch(PostService.actions.fetchAllPosts);
 export const fetchPost = dispatch(PostService.actions.fetchPost);
 export const postSearch = dispatch(PostService.actions.postSearch);
+
+export const fetchPostSubscribe = dispatch(PostService.actions.fetchPostSubscribe);
 
 /**
  * Getters Handlers
