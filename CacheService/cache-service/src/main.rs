@@ -47,7 +47,7 @@ Get
 extern crate ws;
 #[macro_use]
 extern crate serde_derive;
-
+extern crate serde;
 extern crate serde_json;
 extern crate dotenv;
 // #[macro_use]
@@ -110,7 +110,7 @@ impl<T> Handler for Node<T> {
         // We have a new connection, so we increment the connection counter
         // .get_mut(&self.count.get()).get_or_insert(&mut hs.peer_addr.unwrap().ip());  // insert(self.count.get(), hs);
         //  self.connections[self.out.connection_id()] = self.out;
-
+        println!("client connected");
         Ok(())
     }
 
@@ -127,13 +127,13 @@ impl<T> Handler for Node<T> {
             Message::Text(text) => {
                 println!("{}", text);
                 let res = serde_json::from_str(&text);
-                if(res.is_err()){
+                if res.is_err(){
                     println!("Badly formatted message: {}", text);
                     
                 }
                 else{
                     let opt: Option<YoMessage> = res.ok();
-                    if(opt.is_none()){
+                    if opt.is_none(){
                         println!("Message was deserialized into a None");
                     }
                     else{
@@ -143,8 +143,10 @@ impl<T> Handler for Node<T> {
                 }
             }
         };
-
-        self.out.send("Some text...")
+        let p = models::Post::new();
+        let s = serde_json::to_string(&p).unwrap();
+        println!("sending message: {}", s);
+        self.out.send(s)
     }
 
     fn on_close(&mut self, code: CloseCode, reason: &str) {

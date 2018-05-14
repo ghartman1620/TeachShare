@@ -10,13 +10,11 @@ export default class Database{
     private constructor() {
         
         this.dbPromise = idb.open("teachshare1", 1, upgradeDB => {
-            upgradeDB.createObjectStore("posts", {keyPath: "id"});
+            upgradeDB.createObjectStore("posts", {keyPath: "pk"});
         }) 
     }
 
-    // Is this thread safe?
-    // Probably. It's acceptable to have the instance re-instantiated, since it's the same thing anyway.
-    //If for any reason it's ever not, we should just move this to the db.
+    // Is this thread safe? no lmao
     public static getInstance(): Database {
         if(Database.instance === undefined){
             Database.instance = new Database();
@@ -32,7 +30,7 @@ export default class Database{
             this.dbPromise.then(db => {
                 const tx = db.transaction("posts", "readwrite");
                 tx.objectStore("posts").put({
-                    "id" : p.pk,
+                    "pk" : p.pk,
                     "title" : p.title,
                     "content" : p.content,
                 });
@@ -54,10 +52,7 @@ export default class Database{
                         reject();
                     }
                     else{
-                        var p: Post = new Post();
-                        p.pk = post.id;
-                        p.content = post.content;
-                        p.title = post.title;
+                        var p: Post = Post.pkify(post);
                         resolve(p);
                     }
                 })
@@ -75,4 +70,7 @@ export default class Database{
             })
         })
     }
+
+
+
 }

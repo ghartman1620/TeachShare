@@ -66,8 +66,7 @@
                     );
                 };
 
-                console.log("Length of datalabels:   ", this.dataLabels.length);
-                console.log("options: ", this.options);
+
                 this.renderChart(this.datacollection, this.options);
                 // console.log("bar graph labels: ", Object.keys(this.userData));
                 // console.log("bar graph data: ", Object.values(this.userData));

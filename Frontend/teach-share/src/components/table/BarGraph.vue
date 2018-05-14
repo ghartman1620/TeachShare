@@ -66,7 +66,6 @@
 
                 );
                 backgroundColors.splice(randomIndex,1);
-                console.log("Random index, color number and bgcolor array: ", randomIndex, colorCount, backgroundColors);
                 colorCount--;
             };
 

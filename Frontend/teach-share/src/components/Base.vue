@@ -15,7 +15,7 @@ import NavBar from "./Navbar.vue";
 import Notify from "./Notify.vue";
 import { addUser, setUser, fetchUser } from "../store_modules/UserService";
 // import Image from "./image/Image";
-import IDBStore from "../indexedDBStore";
+// import IDBStore from "../indexedDBStore";
 
 import Component from 'vue-class-component'
 
@@ -56,7 +56,7 @@ export default class Base extends Vue {
     // }
 
     mounted() {
-        let idbs = new IDBStore("default", 1);
+        /*let idbs = new IDBStore("default", 1);
         // console.log("[IDBSTORE]: ", idbs);
 
         if (document.cookie !== "") {
@@ -70,7 +70,7 @@ export default class Base extends Vue {
                     setUser(vm.$store, resp);
                 });
             }
-        }
+        }*/
         // this.$notifySuccess("please work....");
         // this is an example of how to check an images height/width without actually mounting it on the page
         // const Constructor = Vue.extend(Image);

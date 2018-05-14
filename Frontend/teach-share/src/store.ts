@@ -14,15 +14,19 @@ import YouTubeService from "./store_modules/YouTubeService";
 import PostService from "./store_modules/PostService";
 import { WatchStore } from "./WatchStore";
 import Database from "./Database";
+import {mutUpdate} from "./store_modules/PostService";
+
+import WebSocket from "./WebSocket";
 
 Vue.use(Vuex);
 
 const state = {};
 
-var storeSocket = new WebSocket("ws://127.0.0.1:3012/");
+// var storeSocket = new WebSocket("ws://127.0.0.1:3012/");
 
+var storeSocket: WebSocket = WebSocket.getInstance();
 
-
+storeSocket.sendGet(1);
 
 function circularRecordChecker(record: any, seen: any[] = []) {
 
@@ -52,80 +56,71 @@ function circularRecordChecker(record: any, seen: any[] = []) {
     }
     return false;
 }
-enum WSStatus {
-    CONNECTING=0,
-    OPEN,
-    CLOSING,
-    CLOSED
+// enum WSStatus {
+//     CONNECTING=0,
+//     OPEN,
+//     CLOSING,
+//     CLOSED
 
-}
+// }
 
-enum MessageType {
-    Get = "Get",
-    Watch = "Watch",
-    Update = "Update",
-    Create = "Create"
-}
 
-interface IMessage {
-    message: MessageType;
-    id?: number;
-    post?: any;
-}
 
-storeSocket.addEventListener("open", function(ev) {
-    console.log(ev);
-});
+// interface IMessage {
+//     message: MessageType;
+//     id?: number;
+//     post?: any;
+// }
 
-storeSocket.onopen = (val) => {
+// storeSocket.addEventListener("open", function(ev) {
+//     console.log(ev);
+// });
 
-    console.log("[WS] Websocket successfully opened!");
-    const testUser = new User(1);
-    const testPost = new Post(10);
-    const testComment = new Comment(10, testPost, testUser, "some comment text");
-    const comments = new Array<Comment>();
-    comments.push(testComment);
-    testPost.comments = comments;
-    testPost.user = testUser;
-    console.log("[WS] Websocket sending: ", testPost);
-    const isCircular = circularRecordChecker(testPost);
-    console.log(isCircular);
 
-    const msg1: IMessage = {
-        message: MessageType.Get,
-        id: 1
-    };
+// storeSocket.onopen = (val) => {
 
-    const msg2: IMessage = {
-        message: MessageType.Get,
-        post: testPost.pkify(),
-    };
-    msg2.post.content = {
-        "type": "text",
-        "content" :"<b>bold</b>"
-    }
-    msg2.post.title = "that was an error";
-    console.log(msg2.post);
-    if (!isCircular) {
-        storeSocket.send(JSON.stringify(msg1)); // JSON.stringify(testPost)
-    } else {
-        // map all the internal structures to maps of pk's
-        /*msg2.post!.comments = comments.map((val, ind, arr) => {
-            if (typeof val.pk !== "undefined") {
-                return Number(val.pk);
-            }
-            return 0;
-        });*/
-        console.log(JSON.stringify(msg2));
-        storeSocket.send(JSON.stringify(msg2));
-    }
-};
+//     console.log("[WS] Websocket successfully opened!");
+//     const testUser = new User(1);
+//     const testPost = new Post(10);
+//     const testComment = new Comment(10, testPost, testUser, "some comment text");
+//     const comments = new Array<Comment>();
+//     comments.push(testComment);
+//     testPost.comments = comments;
+//     testPost.user = testUser;
+//     console.log("[WS] Websocket sending: ", testPost);
+//     const isCircular = circularRecordChecker(testPost);
+//     console.log(isCircular);
 
-storeSocket.onmessage = (val) => {
-    console.log("[WS] Websocket recieved message: ", JSON.parse(val.data));
-};
+//     const msg1: IMessage = {
+//         message: MessageType.Get,
+//         id: 1
+//     };
 
-const store: StoreOptions<IRootState> = {
+//     const msg2: IMessage = {
+//         message: MessageType.Get,
+//         post: testPost.idify(),
+//     };
+//     msg2.post.content = {
+//         "type": "text",
+//         "content" :"<b>bold</b>"
+//     }
+//     msg2.post.title = "that was an error";
+//     console.log(msg2.post);
+//     if (!isCircular) {
+//         storeSocket.send(JSON.stringify(msg1)); // JSON.stringify(testPost)
+//     } else {
+//         // map all the internal structures to maps of pk's
+//         /*msg2.post!.comments = comments.map((val, ind, arr) => {
+//             if (typeof val.pk !== "undefined") {
+//                 return Number(val.pk);
+//             }
+//             return 0;
+//         });*/
+//         console.log(JSON.stringify(msg2));
+//         storeSocket.send(JSON.stringify(msg2));
+//     }
+// };
+const storeOptions: StoreOptions<IRootState> = {
     strict: false, // process.env.NODE_ENV !== "production",
     modules: {
         fs: FileService,
@@ -139,4 +134,16 @@ const store: StoreOptions<IRootState> = {
     plugins: [WatchStore]
 };
 
-export default new Vuex.Store<IRootState>(store);
+let store = new Vuex.Store<IRootState>(storeOptions);
+
+// storeSocket.onmessage = (msg) => {
+//     console.log("[WS] Websocket recieved message: ", msg);
+//     let val = JSON.parse(msg.data);
+//     console.log(val);
+//     let p: Post = Post.pkify(val);
+//     mutUpdate(store, p);
+// };
+
+
+
+export default store;

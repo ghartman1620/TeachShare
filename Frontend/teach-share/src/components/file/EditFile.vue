@@ -58,8 +58,6 @@ export default class EditFile extends Vue {
     }
 
     submit(): void {
-        console.log("submitting file element");
-        console.log(this.generateJSON());
         this.$parent.$emit("submitElement", this.generateJSON(), this.$route.query.index);
         /*
 		var vm = this;

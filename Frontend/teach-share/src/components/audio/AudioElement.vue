@@ -40,10 +40,7 @@ export default class AudioElement extends Vue{
     url(): string {
         return `http://localhost:8000${this.element.url}`;
     }
-    mounted() {
-        console.log(this.element);
-        console.log(this.url());
-    }
+
 
 };
 </script>

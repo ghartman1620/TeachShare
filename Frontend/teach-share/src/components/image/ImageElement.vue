@@ -84,7 +84,6 @@ export default class ImageElement extends Vue{
     }
     mounted() {
         window.setTimeout(this.changeSizeStyle, 500);
-        console.log("in mounted function");
     }
 };
 

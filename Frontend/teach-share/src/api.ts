@@ -1,6 +1,5 @@
 import axios from 'axios'
 
-console.log(process.env.API_ENDPOINT);
 
 const IS_PROUDCTION: boolean = false; 
 

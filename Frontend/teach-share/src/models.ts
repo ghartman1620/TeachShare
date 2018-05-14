@@ -120,6 +120,9 @@ export class Post extends Model {
             this.db.getPost(pk).then(p => {
                 resolve(p);
             }).catch(err => {
+
+                //decide whether we should save/subscribe to this post being gotten
+                
                 api.get("/posts/" + pk)
                 .then(resp => {
                     this.db.putPost(resp.data);
@@ -131,7 +134,29 @@ export class Post extends Model {
         });
     }
 
-    public pkify(): string {
+
+    //creates a Post model from the websocket serialized form (see idify for details)
+    public static pkify(obj: any): Post {
+        var p: any = {
+            user: new User(obj.user_id),
+            ...obj
+        }
+        delete p.user_id;
+
+        //this code just hurts to write
+        p.pk = p.id;
+        delete p.id;
+        return p as Post;
+    }
+
+
+
+    //Creates an object of the form the websocket requires for deserialization:
+
+    // pk is known as id
+    // user isn't an object, it's just a "user_id" with the pk/id of the user
+    // no comments
+    public idify(): string {
         var obj: any = {
             user_id: this.user.pk,
             id: this.pk,
@@ -139,7 +164,6 @@ export class Post extends Model {
         }
         delete obj.pk;
         delete obj.user;
-        obj.comments = undefined;
         delete obj.comments;
         console.log(obj);
         return obj;        
@@ -262,18 +286,28 @@ export class ModelMap<V> implements IterableIterator<V> {
         return this._data;
     }
     set data(value: { [pk: string]: V }) {
+        console.log("modelmap setData");
         this._data = value;
     }
     public set(key: string, value: V) {
+        console.log("hello from modelmap set");
+        console.log(key);
+        console.log(value);
         this._data[key] = value;
+
+        console.log(this.list());
     }
     public get(key: string | number): V {
+        console.log("modelmap get");
         return this._data[String(key)];
     }
     public remove(key: string | number): boolean {
+        console.log("modelmap remove");
         return delete this._data[String(key)];
     }
     public list(): V[] {
+        console.log("hello from modelmap list");
+        console.log(this);
         let res = new Array<V>();
         for (const k in this.data) {
             if (typeof k !== "undefined") {

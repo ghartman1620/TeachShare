@@ -9,6 +9,8 @@ use schema::posts_post::dsl::*;
 use dotenv::dotenv;
 use std::env;
 use std::sync::mpsc::Receiver;
+use serde::ser::{Serializer, Serialize};
+
 
 
 
@@ -43,6 +45,29 @@ pub struct Comment {
     post_id: i32,
     user_id: i32,
 }
+
+
+
+/*
+impl Serialize for PgInterval {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_i64(self.microseconds);
+    }
+}
+
+impl Serialize for PgTimestamp {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_i64(*self);
+    }
+}
+*/
+
 
 #[derive(Queryable, Clone)]
 pub struct Post {

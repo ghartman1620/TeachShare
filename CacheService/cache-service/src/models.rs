@@ -7,6 +7,7 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::rc::Rc;
 use serde_json::Value;
+use serde_json::from_str;
 /**
  *  This
  */
@@ -273,9 +274,12 @@ pub struct Post {
 impl Post {
     pub fn new() -> Post {
         Post {
-            id: 0,
-            title: String::from(""),
-            content: Value::Null,
+            id: 1,
+            title: String::from("Hello from websocket post send!"),
+            content: from_str("[{
+                \"type\" : \"text\", 
+                \"content\" : \"<i>If you're seeing this that means Gabe didn't remove his test post content from Post::new when he was done.</i>\"
+            }]").unwrap(),
             // updated: PgTimestamp(0),
             // likes: 0,
             // timestamp: PgTimestamp(0),

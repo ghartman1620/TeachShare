@@ -28,6 +28,7 @@
         "lodash.orderby": "^4.6.0",
         "node-sass": "^4.7.2",
         "popper.js": "^1.12.9",
+        "reconnecting-websocket": "^4.0.0-rc2",
         "sass-loader": "^6.0.6",
         "uuid": "^3.2.1",
         "vee-validate": "^2.0.3",
