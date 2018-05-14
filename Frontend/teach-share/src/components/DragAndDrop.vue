@@ -11,18 +11,44 @@
             :use-css-transforms="true"
             
     >
-
-    <grid-item id="gridItem" v-for="item in layout"
-                   :x="item.x"
-                   :y="item.y"
-                   :w="item.w"
-                   :h="item.h"
-                   :i="item.i"
-                   :minW="1"
-                   :minH="4">
-            {{item.i}}
-        </grid-item>
             
+            <div id="gridItem" :key="index" v-for="(element,index) in layout">
+                <grid-item
+                :x=0
+                :y=0
+                :w=2
+                :h=5
+                :i=index
+                :minW="1"
+                :minH="4"
+                :element="element"
+                :index="index">
+                    <div class="col-12 container">
+                        <div class="post-element-container">
+                            <div class="card-column column">
+                                <div class="col-12 container">
+                                    <div class="post-element card"> <a>index</a>
+                                        <post-element :element="element" :index="index"></post-element>
+                                    </div>
+                                </div>
+
+                                <div class="justify-content-start">
+                                    <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
+
+                                        <!-- <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
+                                        <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="/static/caret-square-down.png"></button>-->
+                                        <!-- <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button> -->
+                                        <!--<button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="/static/edit-icon.png"></button> -->
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                </grid-item>
+            </div>
+
 
     </grid-layout>
 </template>
@@ -32,6 +58,8 @@ import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 import VueGridLayout from "vue-grid-layout";
 import GridItem from "./drag_and_drop/GridItem.vue";
+import PostElement from "./PostElement.vue";
+
 import {
     State,
     Getter,
@@ -40,53 +68,55 @@ import {
     namespace
 } from "vuex-class";
 
+import { addElement, 
+    editElement, 
+    setGrade,
+    beginPost, 
+    getCurrentPost, 
+    createPost, 
+    undo, 
+    redo, 
+    setTags, 
+    swapElements, 
+    removeElement,
+    setSubject, 
+    setContentType, 
+    setLength,
+    saveDraft 
+} from "../store_modules/PostCreateService";
+
 var GridLayout = VueGridLayout.GridLayout;
 // var GridItem = VueGridLayout.GridItem;
 
-var testLayout = [
-	    {"x":0,"y":0,"w":1,"h":5,"i":"0"},
-	    {"x":0,"y":3,"w":1,"h":5,"i":"1"},
-	    {"x":0,"y":2,"w":2,"h":5,"i":"2"},
-	    {"x":0,"y":1,"w":2,"h":5,"i":"3"},
-	    {"x":0,"y":5,"w":2,"h":5,"i":"4"}
-	    // {"x":10,"y":0,"w":2,"h":3,"i":"5"},
-	    // {"x":0,"y":5,"w":2,"h":5,"i":"6"},
-	    // {"x":2,"y":5,"w":2,"h":5,"i":"7"},
-	    // {"x":4,"y":5,"w":2,"h":5,"i":"8"},
-	    // {"x":6,"y":4,"w":2,"h":4,"i":"9"},
-	    // {"x":8,"y":4,"w":2,"h":4,"i":"10"},
-	    // {"x":10,"y":4,"w":2,"h":4,"i":"11"},
-	    // {"x":0,"y":10,"w":2,"h":5,"i":"12"},
-	    // {"x":2,"y":10,"w":2,"h":5,"i":"13"},
-	    // {"x":4,"y":8,"w":2,"h":4,"i":"14"},
-	    // {"x":6,"y":8,"w":2,"h":4,"i":"15"},
-	    // {"x":8,"y":10,"w":2,"h":5,"i":"16"},
-	    // {"x":10,"y":4,"w":2,"h":2,"i":"17"},
-	    // {"x":0,"y":9,"w":2,"h":3,"i":"18"},
-	    // {"x":2,"y":6,"w":2,"h":2,"i":"19"}
-];
-    
-    
 @Component({
-    name: "dragndrop",
+    name: "drag-and-drop",
     components: { GridLayout, GridItem }
 })
 
-
 export default class DragAndDrop extends Vue{
-    layout: [
-        {"x":0,"y":0,"w":1,"h":5,"i":"0"},
-	    {"x":0,"y":3,"w":1,"h":5,"i":"1"},
-	    {"x":0,"y":2,"w":2,"h":5,"i":"2"},
-	    {"x":0,"y":1,"w":2,"h":5,"i":"3"},
-	    {"x":0,"y":5,"w":2,"h":5,"i":"4"}
-    ]
-};
+    elements: Object[] = [];
+    layout : Object[] = [{"x":0, "y":0, "w":2, "h":5, "i":0}];
+    mounted() {
+        var storeElements = getCurrentPost(this.$store)!.elements;
+        console.log("store elements here: ", storeElements);
+        if (storeElements.length > 0) {
+            this.elements.push(storeElements[0]);
+        }
+        if (storeElements.length > 1) {
+            for (var prev_index = 0; prev_index < storeElements.length; prev_index++) {
+                let index = prev_index + 1; //index of the element layout item we're pushing.
+                let new_position = this.layout[prev_index]["y"] + this.layout[prev_index]["h"];
+                this.layout.push({"x":0, "y":new_position, "w":2, "h":5, "i":index});
+            }
+        }
+    }
+
+};  
 
 </script>
 
 <style>
 #gridItem {
-    background-color: orangered;
+    background-color: lightblue;
 }
 </style>

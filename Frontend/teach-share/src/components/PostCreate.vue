@@ -1,4 +1,3 @@
-
 <template>
 <div>
     <!-- @TODO (although this is more a sidebar thign i put it here for visibility) 
@@ -112,31 +111,10 @@
                                 </span>
                             </div>
                         </div>
+                        <drag-and-drop>
+                        </drag-and-drop>
                     </div>
                 </div>
-            </div>
-            <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
-                <div class="post-element-container">
-                    <div class="card-column column">
-                        <div class="col-12 container">
-                            <div class="post-element card">
-                                <post-element :element="element" :index="index"></post-element>
-                            </div>
-                        </div>
-
-                        <div class="justify-content-start">
-                            <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
-
-                                <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
-                                <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="/static/caret-square-down.png"></button>
-                                <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button>
-                                <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="/static/edit-icon.png"></button>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <br>
             </div>
         </div>
         <div v-else>
@@ -232,6 +210,7 @@ import {
 } from "../store_modules/UserService.ts";
 import SideBar from "./SideBar.vue";
 import TagSelect from "./TagSelect.vue";
+import DragAndDrop from "./DragAndDrop.vue";
 import {User} from "../models";
 
 function isBlank(str) {
@@ -265,8 +244,9 @@ const bodyVisible = {
 
 @Component({
     name: "post-create",
-    components: { PostElement, FontAwesomeIcon, SideBar, TagSelect }
+    components: { PostElement, FontAwesomeIcon, SideBar, TagSelect, DragAndDrop }
 })
+
 export default class PostCreate extends Vue{
 
     get getLoggedInUser(): User {

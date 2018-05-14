@@ -26,8 +26,6 @@ const EditFile = () =>
     import ( /* webpackChunkName: "edit-file" */ "../components/file/EditFile.vue");
 const EditTable = () =>
     import ( /* webpackChunkName: "edit-file" */ "../components/table/EditTable.vue");
-const DragAndDrop = () =>
-    import ( "../components/DragAndDrop.vue" );
 const PostFeed = () =>
     import ( /* webpackChunkName: "post-feed" */ "../components/PostFeed.vue");
 const PostDetail = () =>
@@ -105,11 +103,6 @@ const router = new Router({
                     name: "posts",
                     path: "/posts/:post_id",
                     component: PostDetail
-                },
-                {
-                    name: "drag-and-drop",
-                    path: "/dragndrop",
-                    component: DragAndDrop
                 },
                 {
                     path: "/comments",

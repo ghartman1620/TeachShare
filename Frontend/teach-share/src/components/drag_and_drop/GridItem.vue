@@ -4,9 +4,26 @@
          :class="{ 'vue-resizable' : resizable, 'resizing' : isResizing, 'vue-draggable-dragging' : isDragging, 'cssTransforms' : useCssTransforms, 'render-rtl' : renderRtl, 'disable-userselect': isDragging }"
          :style="style"
     >
-        <slot></slot>
-        <span v-if="resizable" ref="handle" :class="resizableHandleClass"></span>
-        <!--<span v-if="draggable" ref="dragHandle" class="vue-draggable-handle"></span>-->
+        <div class="col-12 container">
+            <div class="post-element card">
+                <post-element :element="element" :index="index"></post-element>
+            </div>
+        </div>
+
+        <div class="justify-content-start">
+            <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
+
+                <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
+                <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="/static/caret-square-down.png"></button>
+                <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img width=20 height=20 src="/static/trash-icon.png"></button>
+                <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="/static/edit-icon.png"></button>
+
+            </div>
+        </div>
+
+        <span v-if="resizable" ref="handle" :class="resizableHandleClass">
+        </span>
+        <span v-if="draggable" ref="dragHandle" class="vue-draggable-handle"></span>
     </div>
 </template>
 <style>
@@ -81,15 +98,31 @@
     }
 </style>
 <script>
+    import TextElement from '../text/TextElement';
     import {setTopLeft, setTopRight, setTransformRtl, setTransform, createMarkup, getLayoutItem} from './utils.ts';
     import {getControlPosition, offsetXYFromParentOf, createCoreData} from './draggableUtils';
-    //    var eventBus = require('./eventBus');
+    import {
+  State,
+  Getter,
+  Action,
+  Mutation,
+  namespace
+} from "vuex-class";
 
+    import PostElement from '../PostElement.vue';
+    import {removeElement} from '../../store_modules/PostCreateService.ts';
+    //    var eventBus = require('./eventBus');
     var interact = require("interactjs");
 
     export default {
         name: "GridItem",
+        components: {
+            TextElement,
+            PostElement
+        },
         props: {
+        
+
             /*cols: {
              type: Number,
              required: true
@@ -111,6 +144,16 @@
              type: Number,
              required: true
              },*/
+            element: {
+                type: Object,
+                required: true,
+                default: {}
+            },
+            index: {
+                type: Number,
+                required: true,
+                default: 0
+            },
             isDraggable: {
                 type: Boolean,
                 required: false,
@@ -197,7 +240,6 @@
                 draggable: null,
                 resizable: null,
                 useCssTransforms: true,
-
                 isDragging: false,
                 dragging: null,
                 isResizing: false,
@@ -208,10 +250,8 @@
                 lastH: NaN,
                 style: {},
                 rtl: false,
-
                 dragEventSet: false,
                 resizeEventSet: false,
-
                 previousW: null,
                 previousH: null,
                 previousX: null,
@@ -287,6 +327,7 @@
             this.eventBus.$off('setColNum', self.setColNum);
         },
         mounted: function () {
+            console.log("Making grid item of index:   ", this.index);
             this.cols = this.$parent.colNum;
             this.rowHeight = this.$parent.rowHeight;
             this.containerWidth = this.$parent.width !== null ? this.$parent.width : 100;
@@ -409,6 +450,10 @@
             }
         },
         methods: {
+            removeElement(index) {
+                removeElement(this.$store, index);
+            },
+
             createStyle: function () {
                 if (this.x + this.w > this.cols) {
                     this.innerX = 0;

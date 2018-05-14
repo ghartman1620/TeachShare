@@ -1,4 +1,3 @@
-// @flow
 export type LayoutItemRequired = {w: number, h: number, x: number, y: number, i: string};
 export type LayoutItem = LayoutItemRequired &
                          {minW?: number, minH?: number, maxW?: number, maxH?: number,
@@ -465,7 +464,6 @@ export function validateLayout(layout: Layout, contextName: string): void {
   }
 }
 
-// Flow can't really figure this out, so we just use Object
 export function autoBindHandlers(el: Object, fns: Array<string>): void {
   fns.forEach((key) => el[key] = el[key].bind(el));
 }
