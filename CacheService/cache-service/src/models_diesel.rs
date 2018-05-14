@@ -1,23 +1,20 @@
-use diesel::pg::data_types::PgTimestamp;
-use diesel::prelude::*;
 use diesel::pg::data_types::PgInterval;
+use diesel::pg::data_types::PgTimestamp;
 use diesel::pg::PgConnection;
+use diesel::prelude::*;
 use diesel::result;
 use diesel::update;
-use serde_json::value::Value;
-use schema::posts_post::dsl::*;
 use dotenv::dotenv;
+use schema::posts_post::dsl::*;
+use serde_json::value::Value;
 use std::env;
 use std::sync::mpsc::Receiver;
-
-
 
 pub fn establish_connection() -> PgConnection {
     dotenv().ok();
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     PgConnection::establish(&database_url).expect(&format!("Error connecting to {}", database_url))
 }
-
 
 #[derive(Queryable)]
 pub struct User {
@@ -33,7 +30,6 @@ pub struct User {
     is_active: bool,
     date_joined: PgTimestamp,
 }
-
 
 #[derive(Queryable)]
 pub struct Comment {
@@ -64,9 +60,8 @@ pub struct Post {
     pub practices: Vec<i32>,
 }
 
-
 //made a brief foray into creating errors.
-//I don't use these because having Result use an Error object is 
+//I don't use these because having Result use an Error object is
 //problematic - Error, being a trait, has a nonstatic size, which Result appears to require.
 
 /*
@@ -106,42 +101,37 @@ impl error::Error for DbConnectionError{
 }
 */
 
-
-
-
-
-impl Post{
+impl Post {
     //where should connection live? maybe in a singleton class in models?
     pub fn get(pk_id: i32, conn: &PgConnection) -> Result<Post, String> {
-
         // I'm not sure about this plan to just return the first thing in the vec given by expect.
         // Does diesel have some way to expecft a single post from a filter?
-        
+
         //res is a Result<Vec<Post>, diesel::result::Error>
 
-        let res = posts_post
-            .filter(id.eq(pk_id))
-            .load::<Post>(conn);
+        let res = posts_post.filter(id.eq(pk_id)).load::<Post>(conn);
         if res.is_ok() {
             let mut vec: Vec<Post> = res.unwrap();
             if vec.len() == 0 {
                 return Err(format!("Post {} not found", pk_id));
             }
             if vec.len() > 1 {
-                return Err(format!("More than one post returned for {}.
+                return Err(format!(
+                    "More than one post returned for {}.
                    This is very unexpected and indicates an error in your database 
-                   that you have more than one post with a particular primary key.", pk_id));
+                   that you have more than one post with a particular primary key.",
+                    pk_id
+                ));
             }
             return Ok(vec.pop().unwrap());
-        }
-        else{
-            return Err(String::from("There was an issue with the supplied database connection."));
+        } else {
+            return Err(String::from(
+                "There was an issue with the supplied database connection.",
+            ));
         }
     }
-    pub fn save(&self, conn: &PgConnection) -> Result<(), String>{
-        
-
-        let updated_row:  Result<Post, result::Error> = update(posts_post.filter(id.eq(self.id)))
+    pub fn save(&self, conn: &PgConnection) -> Result<(), String> {
+        let updated_row: Result<Post, result::Error> = update(posts_post.filter(id.eq(self.id)))
             //copy trait is not defined for String, because it's immutable. So we must clone our strings.
             .set((title.eq(self.title.clone()),
                  content.eq(self.content.clone()),
@@ -161,22 +151,24 @@ impl Post{
                  practices.eq(self.practices.clone())))
             .get_result(conn);
 
-        return if updated_row.is_err() {Err(String::from("There was an issue with the supplied database connection."))}
-                else {Ok(())}
-
+        return if updated_row.is_err() {
+            Err(String::from(
+                "There was an issue with the supplied database connection.",
+            ))
+        } else {
+            Ok(())
+        };
     }
-
 }
 pub fn save_posts(rx: Receiver<Post>) {
-    let connection  = establish_connection();
+    let connection = establish_connection();
     loop {
-        use std::time::{SystemTime};
+        use std::time::SystemTime;
         let res = rx.recv();
-        if res.is_err(){
+        if res.is_err() {
             println!("Sender hung up, exiting");
             break;
-        }
-        else{
+        } else {
             let p: Post = res.unwrap();
             let res = p.save(&connection);
             res.expect("error saving post");
@@ -184,24 +176,25 @@ pub fn save_posts(rx: Receiver<Post>) {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use models_diesel::*;
     use diesel::prelude::*;
-    
-    use std::time::SystemTime;
-    use std::thread;
+    use models_diesel::*;
+
     use std::sync::mpsc::channel;
+    use std::thread;
+    use std::time::SystemTime;
     //pre: Post with pk -1 exists
     //tests that changing a post's title and calling its .save() method
     //has the change saved in the database to be yielded in future get()s
     #[test]
     fn test_change_post() {
         let conn: PgConnection = establish_connection();
-        let res: Result<Post,String> = Post::get(-1, &conn);
-        if(res.is_err()){
-            println!("test_change_post will fail: no post -1 exists (create it to have this test work!");
+        let res: Result<Post, String> = Post::get(-1, &conn);
+        if (res.is_err()) {
+            println!(
+                "test_change_post will fail: no post -1 exists (create it to have this test work!"
+            );
             assert!(res.is_ok()); //this fails
         }
         let mut p: Post = res.unwrap();
@@ -211,19 +204,17 @@ mod tests {
         p.title = String::from("changed");
         p.save(&conn);
 
-        let res1: Result<Post,String> = Post::get(-1, &conn);
+        let res1: Result<Post, String> = Post::get(-1, &conn);
         assert!(res1.is_ok());
         let mut p: Post = res1.unwrap();
         println!("{}", p.title);
         assert_eq!(p.title, String::from("changed"));
         p.title = s;
         p.save(&conn);
-    
-        
     }
     //pre: Post with pk -5 does not exist
     #[test]
-    fn test_post_dne_error () {
+    fn test_post_dne_error() {
         let conn: PgConnection = establish_connection();
         let res = Post::get(-5, &conn);
         assert!(res.is_err());
@@ -243,18 +234,22 @@ mod tests {
         //we'll set p's title back to whatever it was once we're done
         let s = p.title.clone();
         let _ = tx.send(p.clone());
-        for x in 0..1000  {
-            p.title = format!("change{}", x); 
+        for x in 0..1000 {
+            p.title = format!("change{}", x);
             tx.send(p.clone()).expect("Error sending post");
         }
         println!("i can continue doing useful work while posts are being saved!");
         p.title = s;
         tx.send(p.clone()).expect("Error sending post");
         drop(tx);
-        let delta = SystemTime::now().duration_since(begin).expect("time went backwards");
+        let delta = SystemTime::now()
+            .duration_since(begin)
+            .expect("time went backwards");
         println!("Finished sending posts in time of {:?}", delta);
         let _ = t.join();
-        let delta = SystemTime::now().duration_since(begin).expect("time went backwards");
+        let delta = SystemTime::now()
+            .duration_since(begin)
+            .expect("time went backwards");
         println!("Finished saving posts in time of {:?}", delta);
     }
 }

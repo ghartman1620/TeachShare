@@ -1,12 +1,14 @@
 // use diesel::pg::data_types::{PgTimestamp, PgInterval};
 // use serde_json::value::Value;
 
+use serde_json::Value;
+use std::cell::RefCell;
 use std::cmp::{Eq, PartialEq};
 use std::collections;
 use std::collections::HashMap;
-use std::cell::RefCell;
 use std::rc::Rc;
-use serde_json::Value;
+use std::sync::Arc;
+use std::fmt;
 /**
  *  This
  */
@@ -148,12 +150,12 @@ pub enum Data {
     Comment,
 }
 
-type RcItem = Rc<Item>;
+type ArcItem = Arc<Item + Send + Sync>;
 pub struct Wrapper {
     pub model_type: ModelType,
     pub msg_type: MessageType,
     pub timestamp: i32,
-    pub items: Vec<RcItem>, 
+    pub items: Vec<ArcItem>,
 }
 
 pub trait Msg<'a> {
@@ -161,7 +163,19 @@ pub trait Msg<'a> {
     fn msg_type(&self) -> MessageType;
     // fn data(&self) -> Self;
     fn timestamp(&self) -> i32;
-    fn items(&self) -> &Vec<RcItem>;
+    fn items(&self) -> &Vec<ArcItem>;
+}
+
+impl<'a> fmt::Debug for Msg<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[{:?}] -> {:?}", self.msg_type(), self.items())
+    }
+}
+
+impl fmt::Debug for Item + Send + Sync {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[Post] -> {:?}, [Watchers] -> {:?}", self.get_data(), self.get_watchers())
+    }
 }
 
 impl<'a> Msg<'a> {
@@ -179,7 +193,7 @@ impl<'a> Msg<'a> for Wrapper {
     fn timestamp(&self) -> i32 {
         return self.timestamp;
     }
-    fn items(&self) -> &Vec<RcItem> {
+    fn items(&self) -> &Vec<ArcItem> {
         return &self.items;
     }
 }
@@ -210,45 +224,44 @@ impl Item for PostResource {
     fn get_version(&self) -> [u32; 3] {
         return self.version;
     }
-    
 }
 
 /// Message<T> is a wrapper for defining messages for communication
 /// with this very service.
-#[derive(Debug, Clone)]
-pub struct Message<T>
-where
-    T: Model + Clone,
-{
-    pub data: T,
-    pub msg_type: MessageType,
-    // pub operation: Operation,
-    pub timestamp: i32,
-    pub version: [i32; 3],
-}
+// #[derive(Debug, Clone)]
+// pub struct Message<T>
+// where
+//     T: Model + Clone,
+// {
+//     pub data: T,
+//     pub msg_type: MessageType,
+//     // pub operation: Operation,
+//     pub timestamp: i32,
+//     pub version: [i32; 3],
+// }
 
+// impl<T> Message<T>
+// where
+//     T: Model + Clone,
+// {
+//     pub fn new() -> Message<T> {
+//         Message {
+//             data: T::new(),
+//             // data_type: ModelType::Post,
+//             msg_type: MessageType::Get,
+//             timestamp: 0,
+//             version: [0, 0, 0],
+//         }
+//     }
+// }
 
-impl<T> Message<T> where 
-    T: Model + Clone,
-{
-    pub fn new() -> Message<T> {
-        Message {
-            data: T::new(),
-            // data_type: ModelType::Post,
-            msg_type: MessageType::Get,
-            timestamp: 0,
-            version: [0,0,0],
-        }
-    }
-}
+// #[derive(Debug)]
+// pub struct Command<T> {
+//     pub cmd_type: CommandType,
+//     pub value: T,
+// }
 
-#[derive(Debug)]
-pub struct Command<T> {
-    pub cmd_type: CommandType,
-    pub value: T,
-}
-
-type ModelTable<T> = RefCell<HashMap<i32, Resource<T>>>;
+// type ModelTable<T> = RefCell<HashMap<i32, Resource<T>>>;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)] // , PartialEq, Eq
 pub struct Post {
@@ -293,42 +306,47 @@ impl Post {
     }
 }
 
-pub trait Model {
-    type model;
-    fn id(&self) -> i32;
-    fn new() -> Self;
-    fn data(self) -> Self where 
-        Self: Sized,
-    {
-        return self;
-    }
-    fn inner(self) -> Self where 
-        Self: Sized,
-    {
-        return self;
-    }
-}
+// pub trait Model {
+//     type model;
+//     fn id(&self) -> i32;
+//     fn new() -> Self;
+//     fn data(self) -> Self
+//     where
+//         Self: Sized,
+//     {
+//         return self;
+//     }
+//     fn inner(self) -> Self
+//     where
+//         Self: Sized,
+//     {
+//         return self;
+//     }
+// }
 
-impl Model for Post {
-    type model = Post;
-    fn id(&self) -> i32 {
-        self.id
-    }
-    fn new() -> Post {
-        Post::new()
-    }
-    fn inner(self) -> Self where 
-        Self: Sized,
-    {
-        return self;
-    }
-}
+// impl Model for Post {
+//     type model = Post;
+//     fn id(&self) -> i32 {
+//         self.id
+//     }
+//     fn new() -> Post {
+//         Post::new()
+//     }
+//     fn inner(self) -> Self
+//     where
+//         Self: Sized,
+//     {
+//         return self;
+//     }
+// }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Comment {
     pub id: i32,
     pub text: String,
 }
+
+
 
 #[cfg(test)]
 
@@ -372,21 +390,27 @@ mod tests {
             model_type: ModelType::Post,
             msg_type: MessageType::Get,
             timestamp: 0,
-            items: vec!(),
+            items: vec![],
         };
-        let resource = Rc::new(PostResource{
+        let resource = Arc::new(PostResource {
             data: Post::new(),
             watchers: HashMap::new(),
             version: [0, 0, 0],
         });
-        
+
         let r = resource.clone();
         msg.items.push(resource);
         msg.items.push(r);
         for a in &msg.items {
             println!("{:?}", a.get_data());
         }
+
+        // let v = vec![Rc::new(msg),];
         // println!("{:?}", msg.items);
+        fn test(input: Arc<Msg>) {
+            // println!("{:?}", input);
+        }
+
+        test(Arc::new(msg));
     }
 }
-

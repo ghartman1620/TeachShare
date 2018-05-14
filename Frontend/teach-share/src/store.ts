@@ -122,6 +122,7 @@ storeSocket.onopen = (val) => {
 };
 
 storeSocket.onmessage = (val) => {
+    console.log("[WS] Websocket recieved raw string: ", val.data);
     console.log("[WS] Websocket recieved message: ", JSON.parse(val.data));
 };
 
