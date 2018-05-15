@@ -1,9 +1,7 @@
-
 use serde_json::Value;
 use std::cmp::{Eq, PartialEq};
-use std::sync::Arc;
 use std::fmt;
-
+use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub struct Resource<T> {
@@ -33,7 +31,7 @@ impl<'a, T> Resource<T> {
     pub fn new(inner: T) -> Resource<T> {
         Resource::<T> {
             data: inner,
-            watchers: vec!(),
+            watchers: vec![],
             version: [0, 0, 0],
         }
     }
@@ -62,7 +60,7 @@ impl PartialEq for Resource<Post> {
 }
 impl Eq for Resource<Post> {}
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Eq, PartialEq, Deserialize)]
 pub enum MessageType {
     Watch,
     Create,
@@ -130,7 +128,7 @@ impl Wrapper {
     pub fn build(&mut self) -> Wrapper {
         self.clone()
     }
- }
+}
 
 pub trait Msg<'a> {
     fn data_type(&self) -> ModelType;
@@ -153,7 +151,12 @@ impl<'a> fmt::Debug for Msg<'a> + Send + Sync {
 
 impl fmt::Debug for Item + Send + Sync {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[Post] -> {:?}, [Watchers] -> {:?}", self.get_data(), self.get_watchers())
+        write!(
+            f,
+            "[Post] -> {:?}, [Watchers] -> {:?}",
+            self.get_data(),
+            self.get_watchers()
+        )
     }
 }
 
@@ -191,7 +194,6 @@ impl<'a> Msg<'a> for Wrapper {
         return self.connection_id;
     }
 }
-
 
 pub trait Item {
     fn get_data(&self) -> &Post;
@@ -351,6 +353,6 @@ mod tests {
         assert_eq!(m.watchers, vec![2]);
 
         m.increment();
-        assert_eq!(m.version, [0,1,0]);
+        assert_eq!(m.version, [0, 1, 0]);
     }
 }

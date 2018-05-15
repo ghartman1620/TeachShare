@@ -1,0 +1,10 @@
+/home/bryan/dev/cmps117/TeachShare/CacheService/cache-service/rls/debug/deps/libserde_derive_internals-0bccefd8b7e9fe15.rlib: /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/lib.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/ast.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/attr.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/ctxt.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/case.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/check.rs
+
+/home/bryan/dev/cmps117/TeachShare/CacheService/cache-service/rls/debug/deps/serde_derive_internals-0bccefd8b7e9fe15.d: /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/lib.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/ast.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/attr.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/ctxt.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/case.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/check.rs
+
+/home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/lib.rs:
+/home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/ast.rs:
+/home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/attr.rs:
+/home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/ctxt.rs:
+/home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/case.rs:
+/home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive_internals-0.23.1/src/check.rs:

@@ -95,25 +95,25 @@ storeSocket.addEventListener("open", function(ev) {
 
 function default_post(): ITestPost {
     const result: ITestPost = {
-        id: 1,
-        title: "test post title",
+        id: 2,
+        title: "post number 2",
         content: {
             type: "text",
             content : "<b>bold</b>"
         },
         // pub updated: PgTimestamp,
-        likes: 0,
+        likes: 10,
         // pub timestamp: PgTimestamp,
         tags: {},
-        user_id: 1,
+        user_id: 2,
         draft: false,
         content_type: 0,
-        grade: 0,
+        grade: 12,
         // length: PgInterval,
-        subject: 0,
-        crosscutting_concepts: [1, 2, 3],
+        subject: 2,
+        crosscutting_concepts: [1],
         disciplinary_core_ideas: [1, 3, 5],
-        practices: [2, 1],
+        practices: [2],
     };
     return result;
 }
@@ -140,6 +140,7 @@ storeSocket.onopen = (val) => {
     const msg1: IMessage = {
         message: MessageType.Create,
         post: default_post(),
+        // id: 1,
     };
     storeSocket.send(JSON.stringify(msg1));
 

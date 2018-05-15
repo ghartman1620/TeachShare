@@ -1,3 +1,4 @@
+use crossbeam_channel::Receiver;
 use diesel::pg::data_types::PgInterval;
 use diesel::pg::data_types::PgTimestamp;
 use diesel::pg::PgConnection;
@@ -5,11 +6,10 @@ use diesel::prelude::*;
 use diesel::result;
 use diesel::update;
 use dotenv::dotenv;
+use models::Post;
 use schema::posts_post::dsl::*;
 use serde_json::value::Value;
 use std::env;
-use crossbeam_channel::{Receiver};
-use models::Post;
 
 pub fn establish_connection() -> PgConnection {
     dotenv().ok();
@@ -26,7 +26,7 @@ impl Post {
             // updated: PgTimestamp(0),
             likes: 0,
             // timestamp: PgTimestamp(0),
-            tags: Value::Array(vec!()),
+            tags: Value::Array(vec![]),
             user_id: 0,
             draft: false,
             content_type: 0,
@@ -56,7 +56,7 @@ impl Post {
         //     if results.len() > 1 {
         //         return Err(format!(
         //             "More than one post returned for {}.
-        //            This is very unexpected and indicates an error in your database 
+        //            This is very unexpected and indicates an error in your database
         //            that you have more than one post with a particular primary key.",
         //             pk_id
         //         ));

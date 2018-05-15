@@ -34,6 +34,7 @@ Get
  The websocket cache service is used for realtime communication between connected users.
 */
 #![feature(vec_remove_item)]
+#![warn(clippy)]
 
 extern crate ws;
 #[macro_use]
@@ -52,17 +53,17 @@ use std::fmt;
 use ws::{listen, CloseCode, Error, Handler, Handshake, Message, Sender};
 
 mod cache;
-mod models;
 mod db;
+mod models;
 mod pool;
 mod schema;
 
-use models::*;
 use cache::*;
 use db::save_posts;
+use models::*;
 
 use models::MessageType;
-use std::rc::{Rc};
+use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
 
@@ -83,7 +84,6 @@ impl GrandSocketStation {
     pub fn push_connection(&mut self, conn: Connection) {
         return self.connections.push(conn);
     }
-
 }
 
 #[derive(Clone)]
@@ -98,7 +98,12 @@ struct Connection {
 
 impl fmt::Debug for Connection {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Connection ID: {}, sender: {}", self.id, self.tx.connection_id())
+        write!(
+            f,
+            "Connection ID: {}, sender: {}",
+            self.id,
+            self.tx.connection_id()
+        )
     }
 }
 
@@ -108,7 +113,14 @@ enum IdOrPost {
     Post(models::Post),
 }
 
-#[derive(Serialize, Deserialize)]
+/// Recieved msg:
+///
+/// WSMessage { message: Create, id: None, post: Some(Post { id: 1, title: "test post title",
+/// content: Object({"content": String("<b>bold</b>"), "type": String("text")}), likes: 0, tags: Object({}),
+/// user_id: 1, draft: false, content_type: 0, grade: 0, subject: 0, crosscutting_concepts: [1, 2, 3],
+/// disciplinary_core_ideas: [1, 3, 5], practices: [2, 1] }) }
+///
+#[derive(Serialize, Deserialize, Debug)]
 struct WSMessage {
     message: MessageType,
     id: Option<i32>,
@@ -135,7 +147,8 @@ impl Handler for Connection {
             } // ..
             Message::Text(text) => {
                 println!("{}", text);
-                let json: Result<WSMessage ,serde_json::Error> = serde_json::from_str(&text); 
+                let json: Result<WSMessage, serde_json::Error> = serde_json::from_str(&text);
+                // println!("[JSON] ----> {:?}", json.unwrap());
                 let response: Result<Vec<Post>, String> = match json {
                     Ok(msg) => {
                         let msg_result: Result<Vec<Post>, String> = match msg.message {
@@ -145,11 +158,12 @@ impl Handler for Connection {
                             MessageType::Update => self.handle_update_msg(msg),
                         };
                         msg_result
-                    },
-                    Err(e) => { Err(format!("There is a terrible error: {:?}", e )) },
+                    }
+                    Err(e) => Err(format!("There is a terrible error: {:?}", e)),
                 };
                 let resp = response.expect("There was an error!");
-                let serialized = serde_json::to_string(&resp).expect("Uh-oh... JSON serialization error!~");
+                let serialized =
+                    serde_json::to_string(&resp).expect("Uh-oh... JSON serialization error!~");
                 println!("Serialized content: {}", serialized);
                 self.tx.send(serialized)
             }
@@ -157,14 +171,13 @@ impl Handler for Connection {
         // self.tx.broadcast(msg)
         Ok(())
     }
-    
+
     fn on_close(&mut self, code: CloseCode, reason: &str) {
         match code {
             CloseCode::Normal => println!("The client is done with the connection."),
             CloseCode::Away => {
                 println!("The client is leaving the site.");
-                
-            },
+            }
             CloseCode::Abnormal => {
                 println!("Closing handshake failed! Unable to obtain closing status from client.")
             }
@@ -179,7 +192,8 @@ impl Handler for Connection {
 
 impl Connection {
     fn handle_get_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
-        let mut has_err = false;
+        println!("[MAIN] received: {:?}", msg.message);
+        assert_eq!(msg.message, MessageType::Get);
         let mut wrap = Wrapper::new()
             .set_model(ModelType::Post)
             .set_msg_type(MessageType::Get)
@@ -190,66 +204,66 @@ impl Connection {
             Some(id) => id,
             None => 0, // TODO: consider failing-fast here
         };
-        
+
         wrap.items_mut().push(Arc::new(Resource::new(p)));
 
         match self.to_cache.send(Arc::new(wrap)) {
-            Ok(val) => {},
+            Ok(val) => {}
             Err(e) => {
-                has_err = true;
                 println!("[Error] ---> {:?}", e);
-            },
+            }
         };
 
         let resp = match self.from_cache.recv() {
-            Ok(val) => { val.items().clone() }, // @TODO: figure out how to avoid clone/copy
-            Err(e) => { 
+            Ok(val) => val.items().clone(), // @TODO: figure out how to avoid clone/copy
+            Err(e) => {
                 println!("[Error] ---> {:?}", e);
                 let ret: String = format!("Error receiving from channel (from cache).");
-                // Err(e);
-                let temp: Vec<ArcItem> = vec![];
-                temp
-            },
+                return Err(ret);
+            }
         };
         println!("resp: {:?}", resp);
-        
+
         let output: Vec<Post> = resp.iter().map(|x| (*x.get_data()).clone()).collect();
         Ok(output)
     }
     fn handle_create_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
+        println!("[MAIN] received: {:?}", msg.message);
+        assert_eq!(msg.message, MessageType::Create);
         let mut wrap = Wrapper::new()
             .set_model(ModelType::Post)
-            .set_msg_type(MessageType::Get)
+            .set_msg_type(MessageType::Create)
             .build();
 
-        let mut p = match msg.post {
+        let p = match msg.post {
             Some(post) => post,
             None => {
-                // failt-fast
+                // fail-fast
                 return Err(String::from("No post was provided!"));
-            },
+            }
         };
-        
+
         wrap.items_mut().push(Arc::new(Resource::new(p)));
         match self.to_cache.send(Arc::new(wrap)) {
             Ok(val) => {
                 println!("Sucessfully sent and got in return: {:?}", val);
-            },
+            }
             Err(e) => {
-                println!("There was an error communicating with the cache! Err: {:?}", e);
-                return Err(String::from("There was an error communicating with the cache."));
-            },
+                println!(
+                    "There was an error communicating with the cache! Err: {:?}",
+                    e
+                );
+                return Err(String::from(
+                    "There was an error communicating with the cache.",
+                ));
+            }
         };
 
         let resp = match self.from_cache.recv() {
-            Ok(val) => { val.items().clone() }, // @TODO: figure out how to avoid clone/copy
-            Err(e) => { 
-                println!("[Error] ---> {:?}", e);
-                let ret: String = format!("Error receiving from channel (from cache).");
-                // Err(e);
-                let temp: Vec<ArcItem> = vec![];
+            Ok(val) => val.items().clone(), // @TODO: figure out how to avoid clone/copy
+            Err(e) => {
                 return Err(String::from("Error receiving from channel (from cache)."));
-            },
+            }
         };
         println!("resp: {:?}", resp);
 
@@ -257,28 +271,24 @@ impl Connection {
         Ok(output)
     }
     fn handle_update_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
+        println!("[MAIN] received: {:?}", msg.message);
+        assert_eq!(msg.message, MessageType::Update);
         unimplemented!()
     }
     fn handle_watch_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
+        println!("[MAIN] received: {:?}", msg.message);
+        assert_eq!(msg.message, MessageType::Watch);
         unimplemented!()
     }
 }
-
-
-
-
-// fn parse_message<T>(msg: String) ->  {
-
-// }
 
 fn main() {
     let p1 = models::Post::new();
     let resource = models::Resource::new(p1);
     let socket_station = GrandSocketStation {
-        connections: vec!(),
+        connections: vec![],
     };
     let mut hub = Rc::new(socket_station);
-    // let mut h = hub.clone();
     let i = &mut 0;
 
     // start db (SAVE only) thread
@@ -292,24 +302,22 @@ fn main() {
         crossbeam_channel::Sender<SafeArcMsg>,
         crossbeam_channel::Receiver<SafeArcMsg>,
         crossbeam_channel::Sender<Cancel>,
-    ) = wire_up(send_db); 
-
+    ) = wire_up(send_db);
 
     listen("127.0.0.1:3012", |out| {
         // println!("HUB: {:?}", h.into_inner());
-        
+
         // println!("Hub WEAK --> {:?}", Rc::downgrade(&h));
         // let parent =  Rc::downgrade(&hub);
         // println!("WEAK: {:?}", parent);
-        let res = Connection{ 
-            id: *i, 
-            tx: out, /*parent: Rc::downgrade(&hub)*/ 
+        let res = Connection {
+            id: *i,
+            tx: out, /*parent: Rc::downgrade(&hub)*/
             to_cache: a.clone(),
             from_cache: b.clone(),
             kill_cache: c.clone(),
         };
         let output = res.clone();
-        println!("Strong count: {}", Rc::strong_count(&hub));
         match Rc::get_mut(&mut hub) {
             Some(val) => val.push_connection(output),
             None => panic!("Uh ohhhhhhh"),
@@ -317,16 +325,16 @@ fn main() {
 
         // hub.connections.push(res);
         *i = *i + 1;
-        
+
         // test send on all connections
-        for conn in hub.get_connections() {
-            let c: Connection = conn.clone();
-            let result = c.tx.send("This is a test send.");
-            match result {
-                Ok(val) => val,
-                Err(e) => println!("WS Send Error: {}", e),
-            }
-        }
+        // for conn in hub.get_connections() {
+        //     let c: Connection = conn.clone();
+        //     let result = c.tx.send("This is a test send.");
+        //     match result {
+        //         Ok(val) => val,
+        //         Err(e) => println!("WS Send Error: {}", e),
+        //     }
+        // }
         res
     }).unwrap();
 

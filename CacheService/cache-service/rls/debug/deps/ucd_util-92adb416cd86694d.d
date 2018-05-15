@@ -1,0 +1,11 @@
+/home/bryan/dev/cmps117/TeachShare/CacheService/cache-service/rls/debug/deps/ucd_util-92adb416cd86694d.rmeta: /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/lib.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/hangul.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/ideograph.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/name.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/property.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/unicode_tables/mod.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/unicode_tables/jamo_short_name.rs
+
+/home/bryan/dev/cmps117/TeachShare/CacheService/cache-service/rls/debug/deps/ucd_util-92adb416cd86694d.d: /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/lib.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/hangul.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/ideograph.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/name.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/property.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/unicode_tables/mod.rs /home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/unicode_tables/jamo_short_name.rs
+
+/home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/lib.rs:
+/home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/hangul.rs:
+/home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/ideograph.rs:
+/home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/name.rs:
+/home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/property.rs:
+/home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/unicode_tables/mod.rs:
+/home/bryan/.cargo/registry/src/github.com-1ecc6299db9ec823/ucd-util-0.1.1/src/unicode_tables/jamo_short_name.rs:

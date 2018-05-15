@@ -1,0 +1,1 @@
+{"rustc":10338113873485611142,"features":"[\"default\", \"owning_ref\"]","target":15535836572714373169,"profile":14245719688690734572,"path":4682725419813290121,"deps":[["owning_ref v0.3.3","owning_ref",10444615718559702221],["parking_lot_core v0.2.14","parking_lot_core",12071567576633941526]],"local":[{"Precalculated":"0.4.8"}],"rustflags":[],"edition":"Edition2015"}
