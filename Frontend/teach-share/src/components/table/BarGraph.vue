@@ -7,14 +7,14 @@
     export default {
         extends: Bar,
         props: {
-                userData: {
-                    type: Array,
-                    required: true
-                },
-                dataLabels: {
-                    type: Array,
-                    required: true
-                }
+            userData: {
+                type: Array,
+                required: true
+            },
+            dataLabels: {
+                type: Array,
+                required: true
+            }
         },
         data () {
             return {
@@ -60,7 +60,7 @@
                             pointBackgroundColor: 'white',
                             borderWidth: 1,
                             pointBorderColor: '#249EBF',
-                            //D ata to be represented on y-axis
+                            //Data to be represented on y-axis
                             data: Object.values(this.userData[i])
                         }
 

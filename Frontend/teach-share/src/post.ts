@@ -59,6 +59,7 @@ export class InProgressPost {
             this.coreIdeas = [];
             this.practices = [];
             post.pk = postid;
+            
             api.get(`/posts/${postid}`).then(function(response){
                 let p = response.data;
                 console.log("GOT CACHED POST");

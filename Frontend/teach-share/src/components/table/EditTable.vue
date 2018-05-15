@@ -60,8 +60,8 @@
 
 <script>
 
-var handleRow = function (event, entry) {
-};
+    var handleRow = function (event, entry) {
+    };
     import Vue from "vue";
     import BootstrapVue from "bootstrap-vue";
     import VueBootstrapTable from "./Table";
