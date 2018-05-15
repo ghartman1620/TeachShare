@@ -19,7 +19,6 @@ export function offsetXYFromParentOf(evt) {
     return {x, y};
 }
 
-
 // Create an data object exposed by <DraggableCore>'s events
 export function createCoreData(lastX, lastY, x, y) {
     // State changes are often (but not always!) async. We want the latest value.

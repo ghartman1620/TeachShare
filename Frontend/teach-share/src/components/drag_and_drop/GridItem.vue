@@ -6,21 +6,62 @@
     >
     <br>
 
-        <div class="col-12 container">
+        <!-- <div class="col-12 container">
             <div class="post-element card">
                 <post-element :element="element" :index="index"></post-element>
-            </div>
-        </div>
-        <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button>
-        <span v-if="resizable" ref="handle" :class="resizableHandleClass">
-        </span>
-        <span v-if="draggable" ref="dragHandle" class="vue-draggable-handle"></span>
+            </div> -->
+
+            <div class="post-element-container">
+                    <div class="card-column column">
+                        <div class="col-12 container">
+                            <div class="post-element card">
+                                <post-element :element="element" :index="index"></post-element>
+                            </div>
+                        </div>
+
+                        <div class="justify-content-start">
+                            <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
+
+                                <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button>
+                                <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="/static/edit-icon.png"></button>
+
+                            </div>
+                        </div>
+                    </div>
+                            <slot></slot>
+                <span v-if="resizable" ref="handle" :class="resizableHandleClass">
+                </span>
+                <span v-if="draggable" ref="dragHandle" class="vue-draggable-handle"></span>
+
+                </div>
+
+
+            
+        <!-- </div> -->
+
     </div>
 </template>
-<style>
+<style lang="scss">
+
+$background-color: #e5ffee;
+$card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
+$card-color: #96e6b3;
+
+
+.post-element-container {
+    padding-top: 30px;
+    padding-right: 20px;
+    padding-left: 20px;
+    padding-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: $card-shadow;
+    background-color: $card-color;
+}
+
     .vue-grid-item {
         transition: all 200ms ease;
         transition-property: left, top, right;
+        /* background: red; */
         /* add right for rtl */
     }
 
@@ -202,7 +243,9 @@
                 required: true
             },
             i: {
+                type: String,
                 required: true
+
             },
             dragIgnoreFrom: {
                 type: String,
@@ -320,6 +363,7 @@
         mounted: function () {
             console.log("Element, Index in GridItem.vue: ", this.element, this.index);
             console.log("x,y,w,h:  ", this.x, this.y, this.w, this.h);
+            console.log("actual x, y, w, h:  ", this.innerX, this.innerY, this.innerW, this.innerH);
             this.cols = this.$parent.colNum;
             this.rowHeight = this.$parent.rowHeight;
             this.containerWidth = this.$parent.width !== null ? this.$parent.width : 100;
@@ -604,8 +648,8 @@
                             newPosition.left = clientRect.left - parentRect.left;
                         }
                         newPosition.top = clientRect.top - parentRect.top;
-//                        console.log("### drag end => " + JSON.stringify(newPosition));
-//                        console.log("### DROP: " + JSON.stringify(newPosition));
+                        console.log("### drag end => " + JSON.stringify(newPosition));
+                        console.log("### DROP: " + JSON.stringify(newPosition));
                         this.dragging = null;
                         this.isDragging = false;
                         shouldUpdate = true;
@@ -619,9 +663,9 @@
                             newPosition.left = this.dragging.left + coreEvent.deltaX;
                         }
                         newPosition.top = this.dragging.top + coreEvent.deltaY;
-//                        console.log("### drag => " + event.type + ", x=" + x + ", y=" + y);
-//                        console.log("### drag => " + event.type + ", deltaX=" + coreEvent.deltaX + ", deltaY=" + coreEvent.deltaY);
-//                        console.log("### drag end => " + JSON.stringify(newPosition));
+                        // console.log("### drag => " + event.type + ", x=" + x + ", y=" + y);
+                        // console.log("### drag => " + event.type + ", deltaX=" + coreEvent.deltaX + ", deltaY=" + coreEvent.deltaY);
+                        console.log("### drag end => " + JSON.stringify(newPosition));
                         this.dragging = newPosition;
                         break;
                 }
@@ -638,11 +682,17 @@
 
                 if (this.innerX !== pos.x || this.innerY !== pos.y) {
                     this.$emit("move", this.i, pos.x, pos.y);
+                    console.log("move", this.i, pos.x, pos.y);
+
                 }
                 if (event.type === "dragend" && (this.previousX !== this.innerX || this.previousY !== this.innerY)) {
                     this.$emit("moved", this.i, pos.x, pos.y);
+                    console.log("moved", this.i, pos.x, pos.y);
+
                 }
                 this.eventBus.$emit("dragEvent", event.type, this.i, pos.x, pos.y, this.innerH, this.innerW);
+                console.log("dragEvent", event.type, this.i, pos.x, pos.y, this.innerH, this.innerW);
+
             },
             calcPosition: function (x, y, w, h) {
                 const colWidth = this.calcColWidth();
