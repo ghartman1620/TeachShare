@@ -7,6 +7,7 @@ import Vuex, { Store, ActionContext } from "vuex"
 
 import { IRootState } from "../models";
 import { getStoreAccessors } from "vuex-typescript";
+import {Post} from "../models";
 
 
 // import { storeBuilder } from "../../store";
@@ -25,9 +26,9 @@ interface EditedElement {
     element: any;
     index: number;
 }
-interface BeginPostObj {
+interface BeginPostArg {
     userid: number;
-    id?: number;
+    p?: Post;
 }
 
 export type PostContext = ActionContext<PostState, IRootState>;
@@ -127,13 +128,9 @@ export const mutations = {
     SAVE_DRAFT: (state: PostState) => {
         state.post!.saveDraft();
     },
-    BEGIN_POST: (state: PostState, arg: BeginPostObj) => {
-        if(arg.id == undefined){
-            state.post = new InProgressPost(arg.userid);
-        }
-        else{
-            state.post = new InProgressPost(arg.userid, <number>arg.id);
-        }
+    BEGIN_POST: (state: PostState, arg: BeginPostArg) => {
+        
+        state.post = new InProgressPost(arg.userid, arg.p);
     },
     SET_GRADE: (state: PostState, grade: number) => {
         state.post!.setGrade(grade);
@@ -152,9 +149,9 @@ export const mutations = {
 };
 
 export const actions = {
-    beginPost: (context: PostContext, arg: BeginPostObj) => {
+    beginPost: (context: PostContext, p: BeginPostArg) => {
         context.state.post = undefined;
-        mutBeginPost(context, arg);
+        mutBeginPost(context, p);
         // context.commit("BEGIN_POST", user);
     },
     setTags: (context: PostContext, tags: string[]) => {

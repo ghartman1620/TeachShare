@@ -9,23 +9,23 @@ import WebSocket from "./WebSocket";
 export enum PostStatus {Loading, Saving, Saved}
 
 export class InProgressPost {
-    elements: any[];
-    title: string;
-    tags: string[];
-    userPk: number;
-    status: PostStatus;
-    draft: boolean;
-    pk: number = -1;
+    public elements: any[];
+    public title: string;
+    public tags: string[];
+    public userPk: number;
+    public status: PostStatus;
+    public draft: boolean; //remove me! --> going to PostCreate.vue
+    public pk: number = -1;
     // -1 if post is not yet saved as draft
     // supertags
-    grade: number;
-    contentType: number;
-    length: number;
-    subject: number;
-    standards: number[];
-    concepts: number[];
-    coreIdeas: number[];
-    practices: number[];
+    public grade: number;
+    public contentType: number;
+    public length: number;
+    public subject: number;
+    public standards: number[];
+    public concepts: number[];
+    public coreIdeas: number[];
+    public practices: number[];
     /*
     */ 
    
@@ -35,6 +35,44 @@ export class InProgressPost {
     //(for example, when we go to allow users to integrate elements of another user's post into their own)
     //wants to use InProgressPost?
 
+
+    //changing this to load from Post object - so then PostCreate fetches the post, and adds a message listener for when the reply
+    //happens, that sets post status to loaded and calls this ctor
+
+    public constructor( userid: number, post?: Post){
+        if(post !== undefined){
+            this.elements = post.content;
+            this.title = post.title;
+            this.tags = post.tags;
+            this.userPk = post.user.pk as number;
+            this.draft = post.draft;
+            this.grade = post.grade;
+            this.contentType = post.content_type;
+            this.length = post.length;
+            this.subject = post.subject;
+            this.standards = post.standards;
+            this.concepts = post.concepts;
+            this.coreIdeas = post.coreIdeas;
+            this.practices = post.practices;
+        }
+        else{
+            this.elements = [];
+            this.title = "";
+            this.tags = [];
+            this.userPk = userid;
+            this.draft = false;
+            this.grade = 0;
+            this.subject = 0;
+            this.contentType = 0;
+            this.length = 0;
+            this.standards = [];
+            this.concepts = [];
+            this.coreIdeas = [];
+            this.practices = [];
+        }
+    }
+
+/*
     constructor(userid: number);
     constructor(userid: number, postid: number);
     constructor(userid: number, postid?: number){
@@ -105,6 +143,7 @@ export class InProgressPost {
             this.createNewDraft();
         }
     }
+*/
     setTags(tags: string[]): void {
         this.tags = tags;
     }

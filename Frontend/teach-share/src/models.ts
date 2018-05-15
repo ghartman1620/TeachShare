@@ -230,17 +230,16 @@ export class Post extends Model {
             this.db.getPost(pk).then(p => {
                 console.log("post " + pk  + " found in db");
                 console.log(p);
+                p.pk = pk;
                 resolve(p);
             }).catch( () => {
                 console.log("???");
-                if(save){
+                if (save) {
                     console.log("post " + pk + " not found in db.");
-                    
-                    
                     Post.db.addEmptyPost(pk);
                     Post.ws.sendWatch(pk);
                     Post.ws.sendGet(pk);
-                }else{
+                } else {
                     console.log("sending get");
                     Post.ws.sendGet(pk);
                 }
@@ -301,7 +300,7 @@ export class Post extends Model {
     public content_type: ContentType;
     public draft: boolean;
     public grade: number;
-    public length: string;
+    public length: number;
     public likes: number;
     public subject: number;
     public tags: string[];

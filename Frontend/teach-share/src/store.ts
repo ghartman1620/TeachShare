@@ -150,7 +150,7 @@ import {getMap, mutUpdate, mutCreate} from "./store_modules/PostService";
  * Can't do it in websocket because this function depends on our store modules, and if websocket itself had
  * a store dependency we'd have a circular dependency and would cause all sorts of errors.
 */
-WebSocket.getInstance().addMessageListener(function(msg) {
+WebSocket.getInstance().addMessageListener( (msg) => {
     console.log(msg);
 
     //when we're getting from websocket with id - we'll need to use Post.pkify()
@@ -164,19 +164,13 @@ WebSocket.getInstance().addMessageListener(function(msg) {
         console.log("we've subbed to post " + val.pk + " so now we're going to update our local cache to match the message we got for it");
         db.putPost(val);
     }).catch(() => {
-        console.log("whyyyyyyyyyyyyyYY");
         //don't save - that's taken care of by Post.get when its told to save/subscribe
-    })
-
-
-    
-    if(getMap(store).has(val.pk!.toString())){
+    });
+    if (getMap(store).has(val.pk!.toString())) {
         mutUpdate(store, val);
-    }else{
+    } else {
         mutCreate(store, val);
     }
     return undefined;
 });
-
-
 export default store;

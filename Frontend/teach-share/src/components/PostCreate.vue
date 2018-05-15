@@ -236,6 +236,7 @@ import TagSelect from "./TagSelect.vue";
 import {User, Post} from "../models";
 
 import * as Cookie from "tiny-cookie";
+import WebSocket from "../WebSocket";
 
 
 function isBlank(str) {
@@ -279,6 +280,8 @@ export default class PostCreate extends Vue{
     SAVING = PostStatus.Saving;
     LOADING = PostStatus.Loading;
     SAVED = PostStatus.Saved;
+
+    status: PostStatus = PostStatus.Loading;
 
     title: string = ""; //@TODO: make changes to title a store mutation that is saved and can be undone/redone
     inProgressTag: string = "";
@@ -458,10 +461,17 @@ export default class PostCreate extends Vue{
         this.beginPost(<number>user.pk, <number>post.pk);
     }
     beginPost(userid: number, postid: number | undefined): void {
-        beginPost(this.$store, {
-            userid: <number>userid, 
-            id: postid,
-        });
+        let store = this.$store;
+        if(postid !== undefined){
+            fetchPostSubscribe(this.$store, postid).then(function(p){
+                beginPost(store, {userid: getLoggedInUser(store).pk, p: p})
+            });
+        }
+        else{
+            beginPost(this.$store, {
+                userid: <number>userid, 
+            });
+        }
     }
 
     moveElementUp(index: number) {
@@ -509,21 +519,37 @@ export default class PostCreate extends Vue{
             nextPage++;
         }while(response.data.next !== null);
     }
+    
     created() {
-        var inProgressPost = window.localStorage.getItem("inProgressPost");
+        var inProgressPost: string | null = window.localStorage.getItem("inProgressPost");
         console.log(inProgressPost);
-        if(inProgressPost == undefined){
+        if(inProgressPost === null){
+            
             this.beginPost( 
                 //???? how on earth is this type string | undefined
                 //It's definitely just a number. Look at user.ts.
                 <number>this.getLoggedInUser.pk,
                 undefined);
+            
         }
         else{
             this.beginPost(
                 <number>this.getLoggedInUser.pk, parseInt(<string>inProgressPost));
+            this.getUserPosts();
+            let store = this.$store;
+            let userpk = this.getLoggedInUser.pk as number;
+            WebSocket.getInstance().addMessageListener(function(message){
+                let post = Post.pkify(JSON.parse(message.data));
+                
+                
+                if(post.pk === window.localStorage.getItem("inProgressPost")){
+                    beginPost(store,{userid: userpk, p: post});
+                }
+                return undefined;
+            });
         }
-        this.getUserPosts();
+        
+
         
     }
 
