@@ -45,6 +45,9 @@ export const mutations = {
     SET_TITLE: (state: PostState, newTitle: string) => {
         state.post!.setTitle(newTitle);
     },
+    SET_COLOR: (state: PostState, color: string) => {
+        state.post!.setColor(color);
+    },
     UNDO: (state: PostState) => {
         state.doneMutations.pop();
     },
@@ -164,6 +167,9 @@ export const actions = {
     setTitle: (context: PostContext, title: string) => {
         mutSetTitle(context, title);
         // context.commit("SET_TITLE", title);
+    },
+    setColor: (context: PostContext, color: string) => {
+        context.commit("SET_COLOR", color);
     },
     undo: async (context: PostContext) => {
         if (context.state.doneMutations.length > 0) {
@@ -384,7 +390,7 @@ export const addAttachments = dispatch(
 export const editElement = dispatch(PostCreateService.actions.editElement);
 export const saveDraft = dispatch(PostCreateService.actions.saveDraft);
 export const createPost = dispatch(PostCreateService.actions.createPost);
-
+export const changeColor = dispatch(PostCreateService.actions.setColor);
 /**
  * Getter Handlers
  */
@@ -429,4 +435,7 @@ export const mutUndoRemoveElement = commit(
 );
 export const mutUndoSwapElements = commit(
     PostCreateService.mutations.UNDO_SWAP_ELEMENTS
+);
+export const mutChangeColor = commit(
+    PostCreateService.mutations.SET_COLOR
 );

@@ -6,6 +6,10 @@ import store from "./store";
 
 export enum PostStatus {Loading, Saving, Saved}
 
+interface IColorStyle {
+    selector: string;
+    color: string;
+}
 export class InProgressPost{
     elements: any[];
     title: string;
@@ -32,6 +36,8 @@ export class InProgressPost{
     //(for example, when we go to allow users to integrate elements of another user's post into their own)
     //wants to use InProgressPost?
 
+    private _background: IColorStyle;
+
     constructor(userid: number);
     constructor(userid: number, postid: number);
     constructor(userid: number, postid?: number){
@@ -55,6 +61,7 @@ export class InProgressPost{
             this.concepts = [];
             this.coreIdeas = [];
             this.practices = [];
+            this._background = {selector: "background-color", color: "#96e6b3"};
             post.pk = postid;
             api.get("/posts/"+ postid).then(function(response){
                 console.log(response);
@@ -100,6 +107,13 @@ export class InProgressPost{
             this.createNewDraft();
         }
     }
+
+    get background() {
+        return this._background;
+    }
+    set background(background: IColorStyle){
+        this._background = background;
+    }
     setTags(tags: string[]): void {
         this.tags = tags;
     }
@@ -131,6 +145,9 @@ export class InProgressPost{
         this.concepts = concepts;
     }
 
+    setColor(color: string): void{
+        this.background = {selector: "background-color", color};
+    }
     addElement(element: any): void{
         this.elements.push(element);
     }

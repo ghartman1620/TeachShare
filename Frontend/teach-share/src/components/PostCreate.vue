@@ -105,6 +105,25 @@
                             </div>
                         </div>
                     </div>
+                    <div class="card background">
+                        <div class="row">
+                            <div class="col-2">
+                                <label for="tagTextbox"><h4><strong>Post Color: </strong></h4></label>
+                            </div>
+                            <div class="col-10">
+                                <span class="dot" style="background-color: #ffafc5; outline-style: solid; outline-color: #ffff00;" @click= "changeColor('#ffafc5')"></span>
+                                <span class="dot" style="background-color: #ee6055;" @click= "changeColor('#ee6055')"></span>
+                                <span class="dot" style="background-color: #f2c078;" @click= "changeColor('#f2c078')"></span>
+                                <span class="dot" style="background-color: #96e6b3;" @click= "changeColor('#96e6b3')"></span>
+                                <span class="dot" style="background-color: #7797ff;" @click= "changeColor('#7797ff')"></span>
+                                <span class="dot" style="background-color: #7b4b94;" @click= "changeColor('#7b4b94')"></span>
+                                <span class="dot" style="background-color: #d2ab99;" @click= "changeColor('#d2ab99')"></span>
+                                <span class="dot" style="background-color: #0e3b43;" @click= "changeColor('#0e3b43')"></span>
+                                <span class="dot" style="background-color: #775253;" @click= "changeColor('#775253')"></span>
+                                <span class="dot" style="background-color: #c9cebd;" @click= "changeColor('#c9cebd')"></span> 
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
@@ -217,7 +236,8 @@ import { addElement,
     setSubject, 
     setContentType, 
     setLength,
-    saveDraft 
+    saveDraft,
+    changeColor 
 } from "../store_modules/PostCreateService";
 import {
     getLoggedInUser
@@ -430,6 +450,10 @@ export default class PostCreate extends Vue{
         var user: User = <User>this.getLoggedInUser;
         this.beginPost(<number>user.pk, <number>post.pk);
     }
+    changeColor(colors: string){
+        this.backcolor["background-color"] = colors;
+        changeColor(this.$store, colors);
+    }
     beginPost(userid: number, postid: number | undefined): void {
         beginPost(this.$store, {
             userid: <number>userid, 
@@ -521,8 +545,12 @@ $background-color: #e5ffee;
 $title-tag-card-background: darken(#bececa, 5%);
 $dark-green: #3b896a;
 $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
-$card-color: #96e6b3;
-
+.dot {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    display: inline-block;
+}
 .post-element-container {
     padding-top: 30px;
     padding-right: 20px;
@@ -530,7 +558,7 @@ $card-color: #96e6b3;
     padding-bottom: 10px;
     border-radius: 5px;
     box-shadow: $card-shadow;
-    background-color: $card-color;
+    //background-color: $card-color;
 }
 
 .tag-entry {
