@@ -4,23 +4,14 @@
          :class="{ 'vue-resizable' : resizable, 'resizing' : isResizing, 'vue-draggable-dragging' : isDragging, 'cssTransforms' : useCssTransforms, 'render-rtl' : renderRtl, 'disable-userselect': isDragging }"
          :style="style"
     >
+    <br>
+
         <div class="col-12 container">
             <div class="post-element card">
                 <post-element :element="element" :index="index"></post-element>
             </div>
         </div>
-
-        <div class="justify-content-start">
-            <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
-
-                <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
-                <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="/static/caret-square-down.png"></button>
-                <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img width=20 height=20 src="/static/trash-icon.png"></button>
-                <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="/static/edit-icon.png"></button>
-
-            </div>
-        </div>
-
+        <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button>
         <span v-if="resizable" ref="handle" :class="resizableHandleClass">
         </span>
         <span v-if="draggable" ref="dragHandle" class="vue-draggable-handle"></span>
@@ -146,18 +137,18 @@
              },*/
             element: {
                 type: Object,
-                required: true,
-                default: {}
+                required: false,
+                default: () => {}
             },
             index: {
                 type: Number,
-                required: true,
+                required: false,
                 default: 0
             },
             isDraggable: {
                 type: Boolean,
                 required: false,
-                default: null
+                default: true
             },
             isResizable: {
                 type: Boolean,
@@ -327,7 +318,8 @@
             this.eventBus.$off('setColNum', self.setColNum);
         },
         mounted: function () {
-            console.log("Making grid item of index:   ", this.index);
+            console.log("Element, Index in GridItem.vue: ", this.element, this.index);
+            console.log("x,y,w,h:  ", this.x, this.y, this.w, this.h);
             this.cols = this.$parent.colNum;
             this.rowHeight = this.$parent.rowHeight;
             this.containerWidth = this.$parent.width !== null ? this.$parent.width : 100;

@@ -111,8 +111,11 @@
                                 </span>
                             </div>
                         </div>
-                        <drag-and-drop>
+                        <drag-and-drop :key=nextStateId>
                         </drag-and-drop>
+                        <br>
+                        <br>
+                        <br>
                     </div>
                 </div>
             </div>
@@ -252,6 +255,7 @@ export default class PostCreate extends Vue{
     get getLoggedInUser(): User {
         return getLoggedInUser(this.$store);
     }
+    //computed value to update the key which rerenders drag-and-drop
     
     SAVING = PostStatus.Saving;
     LOADING = PostStatus.Loading;
@@ -500,6 +504,7 @@ export default class PostCreate extends Vue{
 
         this.$on("submitTagChanges", this.saveTagChanges)
     }
+
 };
 </script>
 
