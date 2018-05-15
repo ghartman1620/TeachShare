@@ -3,30 +3,6 @@ use serde_json::Value;
 use std::cmp::{Eq, PartialEq};
 use std::sync::Arc;
 use std::fmt;
-/**
- *  This
- */
-// #[derive(Clone, Debug)]
-// pub struct User {
-//     pub id: i32,
-//     password: String,
-//     // last_login: Option<PgTimestamp>,
-//     is_superuser: bool,
-//     pub username: String,
-//     pub first_name: String,
-//     pub last_name: String,
-//     pub email: String,
-//     pub is_staff: bool,
-//     pub is_active: bool,
-//     // date_joined: PgTimestamp,
-// }
-
-// impl PartialEq for User {
-//     fn eq(&self, other: &User) -> bool {
-//         self.id == other.id
-//     }
-// }
-// impl Eq for User {}
 
 
 #[derive(Debug, Clone)]
@@ -117,7 +93,7 @@ pub enum Data {
     Comment,
 }
 
-type ArcItem = Arc<Item + Send + Sync>;
+pub type ArcItem = Arc<Item + Send + Sync>;
 
 #[derive(Clone)]
 pub struct Wrapper {
@@ -310,72 +286,6 @@ pub struct Post {
     pub disciplinary_core_ideas: Vec<i32>,
     pub practices: Vec<i32>,
 }
-
-
-impl Post {
-    pub fn new() -> Post {
-        Post {
-            id: 0,
-            title: String::from(""),
-            content: Value::Null,
-            // updated: PgTimestamp(0),
-            likes: 0,
-            // timestamp: PgTimestamp(0),
-            tags: Value::Array(vec!()),
-            user_id: 0,
-            draft: false,
-            content_type: 0,
-            grade: 0,
-            // length: PgInterval::new(0, 0, 0),
-            subject: 0,
-            crosscutting_concepts: vec![],
-            disciplinary_core_ideas: vec![],
-            practices: vec![],
-        }
-    }
-}
-
-// pub trait Model {
-//     type model;
-//     fn id(&self) -> i32;
-//     fn new() -> Self;
-//     fn data(self) -> Self
-//     where
-//         Self: Sized,
-//     {
-//         return self;
-//     }
-//     fn inner(self) -> Self
-//     where
-//         Self: Sized,
-//     {
-//         return self;
-//     }
-// }
-
-// impl Model for Post {
-//     type model = Post;
-//     fn id(&self) -> i32 {
-//         self.id
-//     }
-//     fn new() -> Post {
-//         Post::new()
-//     }
-//     fn inner(self) -> Self
-//     where
-//         Self: Sized,
-//     {
-//         return self;
-//     }
-// }
-
-// #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
-// pub struct Comment {
-//     pub id: i32,
-//     pub text: String,
-// }
-
-
 
 #[cfg(test)]
 

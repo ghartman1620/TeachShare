@@ -21,9 +21,6 @@ const state = {};
 
 var storeSocket = new WebSocket("ws://127.0.0.1:3012/");
 
-
-
-
 function circularRecordChecker(record: any, seen: any[] = []) {
 
     // check if it's already in the provided 'seen' array.
