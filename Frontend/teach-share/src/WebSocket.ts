@@ -82,9 +82,9 @@ class MockWebSocket {
 
 export default class WebSocket {
     private static instance: WebSocket;
-    private rws: MockWebSocket;
+    private rws: ReconnectingWebSocket;
     private constructor() {
-        this.rws = new MockWebSocket('ws://127.0.0.1:3012');
+        this.rws = new ReconnectingWebSocket('ws://127.0.0.1:3012');
         this.addMessageListener(this.onmessage);
         console.log("constructed websocket");
         this.rws.addEventListener("open", (msg)=>{
@@ -120,10 +120,12 @@ export default class WebSocket {
         });
     }
     public sendWatch(id: number): MessageStatus {
-        return this.send({
+        /*return this.send({
             message: MessageType.Watch,
             id: id
-        });
+        });*/
+        return MessageStatus.ConnectionClosed;
+
     }
     public sendGet(id: number): MessageStatus{
         console.log("sending get");

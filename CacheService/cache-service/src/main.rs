@@ -6,8 +6,6 @@ Watch
     "id" : number
 }
 
-
-
 Create
 {
     "message": "create"
@@ -15,8 +13,6 @@ Create
         ...
     }
 }
-
-
 
 Update,
 {
@@ -27,36 +23,24 @@ Update,
     }
 }
 
-
 Get
 {
     "message": "get"
     "id" : number
 }
-
-
-
-
 */
 
 /*!
  The websocket cache service is used for realtime communication between connected users.
 */
+#![feature(vec_remove_item)]
+#![warn(clippy)]
+
 extern crate ws;
 #[macro_use]
 extern crate serde_derive;
-<<<<<<< HEAD
-extern crate serde;
-extern crate serde_json;
-=======
-
->>>>>>> c51c677d4b9c0dd1585891bd5fbd0354faa07756
 extern crate dotenv;
 extern crate serde_json;
-// #[macro_use]
-// extern crate diesel;
-// extern crate serde;
-// extern crate serde_json;
 
 #[macro_use]
 extern crate crossbeam_channel;
@@ -65,17 +49,22 @@ extern crate crossbeam_channel;
 extern crate diesel;
 
 use std::fmt;
-use ws::{listen, CloseCode, Error, Handler, Handshake, Message, Result, Sender};
+use ws::{listen, CloseCode, Error, Handler, Handshake, Message, Sender};
 
 mod cache;
+mod db;
 mod models;
-mod models_diesel;
 mod pool;
 mod schema;
 
+use cache::*;
+use db::save_posts;
+use models::*;
+
 use models::MessageType;
-use std::rc::{Rc, Weak};
-use std::cell::Cell;
+use std::rc::Rc;
+use std::sync::Arc;
+use std::thread;
 
 // use crossbeam_channel::{Receiver, Sender};
 
@@ -94,7 +83,6 @@ impl GrandSocketStation {
     pub fn push_connection(&mut self, conn: Connection) {
         return self.connections.push(conn);
     }
-
 }
 
 #[derive(Clone)]
@@ -102,11 +90,19 @@ struct Connection {
     // parent: Weak<Cell<GrandSocketStation>>,
     id: i32,
     tx: Sender,
+    to_cache: crossbeam_channel::Sender<SafeArcMsg>,
+    from_cache: crossbeam_channel::Receiver<SafeArcMsg>,
+    kill_cache: crossbeam_channel::Sender<Cancel>,
 }
 
 impl fmt::Debug for Connection {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Connection ID: {}, sender: {}", self.id, self.tx.connection_id())
+        write!(
+            f,
+            "Connection ID: {}, sender: {}",
+            self.id,
+            self.tx.connection_id()
+        )
     }
 }
 
@@ -116,7 +112,14 @@ enum IdOrPost {
     Post(models::Post),
 }
 
-#[derive(Serialize, Deserialize)]
+/// Recieved msg:
+///
+/// WSMessage { message: Create, id: None, post: Some(Post { id: 1, title: "test post title",
+/// content: Object({"content": String("<b>bold</b>"), "type": String("text")}), likes: 0, tags: Object({}),
+/// user_id: 1, draft: false, content_type: 0, grade: 0, subject: 0, crosscutting_concepts: [1, 2, 3],
+/// disciplinary_core_ideas: [1, 3, 5], practices: [2, 1] }) }
+///
+#[derive(Serialize, Deserialize, Debug)]
 struct WSMessage {
     message: MessageType,
     id: Option<i32>,
@@ -124,7 +127,7 @@ struct WSMessage {
 }
 
 impl Handler for Connection {
-    fn on_open(&mut self, hs: Handshake) -> Result<()> {
+    fn on_open(&mut self, hs: Handshake) -> ws::Result<()> {
         // We have a new connection, so we increment the connection counter
         // .get_mut(&self.count.get()).get_or_insert(&mut hs.peer_addr.unwrap().ip());  // insert(self.count.get(), hs);
         //  self.connections[self.out.connection_id()] = self.out;
@@ -132,7 +135,7 @@ impl Handler for Connection {
         Ok(())
     }
 
-    fn on_message(&mut self, msg: Message) -> Result<()> {
+    fn on_message(&mut self, msg: Message) -> ws::Result<()> {
         // this is the Tx for where this data message came from
 
         let result = match msg {
@@ -143,29 +146,29 @@ impl Handler for Connection {
             } // ..
             Message::Text(text) => {
                 println!("{}", text);
-                let res = serde_json::from_str(&text);
-                if res.is_err(){
-                    println!("Badly formatted message: {}", text);
-                    
-                }
-                else{
-                    let opt: Option<YoMessage> = res.ok();
-                    if opt.is_none(){
-                        println!("Message was deserialized into a None");
-                    } else {
-                        let message: WSMessage = opt.unwrap();
-                        println!(
-                            "message received: message: {:?}, id: {:?}, post: {:?}",
-                            message.message, message.id, message.post
-                        );
+                let json: Result<WSMessage, serde_json::Error> = serde_json::from_str(&text);
+                // println!("[JSON] ----> {:?}", json.unwrap());
+                let response: Result<Vec<Post>, String> = match json {
+                    Ok(msg) => {
+                        let msg_result: Result<Vec<Post>, String> = match msg.message {
+                            MessageType::Get => self.handle_get_msg(msg),
+                            MessageType::Create => self.handle_create_msg(msg),
+                            MessageType::Watch => self.handle_watch_msg(msg),
+                            MessageType::Update => self.handle_update_msg(msg),
+                        };
+                        msg_result
                     }
-                }
+                    Err(e) => Err(format!("There is a terrible error: {:?}", e)),
+                };
+                let resp = response.expect("There was an error!");
+                let serialized =
+                    serde_json::to_string(&resp).expect("Uh-oh... JSON serialization error!~");
+                println!("Serialized content: {}", serialized);
+                self.tx.send(serialized)
             }
         };
-        let p = models::Post::new();
-        let s = serde_json::to_string(&p).unwrap();
-        println!("sending message: {}", s);
-        self.out.send(s)
+        // self.tx.broadcast(msg)
+        Ok(())
     }
 
     fn on_close(&mut self, code: CloseCode, reason: &str) {
@@ -173,8 +176,7 @@ impl Handler for Connection {
             CloseCode::Normal => println!("The client is done with the connection."),
             CloseCode::Away => {
                 println!("The client is leaving the site.");
-                
-            },
+            }
             CloseCode::Abnormal => {
                 println!("Closing handshake failed! Unable to obtain closing status from client.")
             }
@@ -187,124 +189,134 @@ impl Handler for Connection {
     }
 }
 
-// fn parse_message<T>(msg: String) ->  {
+impl Connection {
+    fn handle_get_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
+        println!("[MAIN] received: {:?}", msg.message);
+        assert_eq!(msg.message, MessageType::Get);
+        let mut wrap = Wrapper::new()
+            .set_model(ModelType::Post)
+            .set_msg_type(MessageType::Get)
+            .build();
 
-// }
+        let mut p = Post::new();
+        p.id = match msg.id {
+            Some(id) => id,
+            None => 0, // TODO: consider failing-fast here
+        };
+
+        wrap.items_mut().push(Arc::new(Resource::new(p)));
+
+        match self.to_cache.send(Arc::new(wrap)) {
+            Ok(val) => {}
+            Err(e) => {
+                println!("[Error] ---> {:?}", e);
+            }
+        };
+
+        let resp = match self.from_cache.recv() {
+            Ok(val) => val.items().clone(), // @TODO: figure out how to avoid clone/copy
+            Err(e) => {
+                println!("[Error] ---> {:?}", e);
+                let ret: String = format!("Error receiving from channel (from cache).");
+                return Err(ret);
+            }
+        };
+        println!("resp: {:?}", resp);
+
+        let output: Vec<Post> = resp.iter().map(|x| (*x.get_data()).clone()).collect();
+        Ok(output)
+    }
+    fn handle_create_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
+        println!("[MAIN] received: {:?}", msg.message);
+        assert_eq!(msg.message, MessageType::Create);
+        let mut wrap = Wrapper::new()
+            .set_model(ModelType::Post)
+            .set_msg_type(MessageType::Create)
+            .build();
+
+        let p = match msg.post {
+            Some(post) => post,
+            None => {
+                // fail-fast
+                return Err(String::from("No post was provided!"));
+            }
+        };
+
+        wrap.items_mut().push(Arc::new(Resource::new(p)));
+        match self.to_cache.send(Arc::new(wrap)) {
+            Ok(val) => {
+                println!("Sucessfully sent and got in return: {:?}", val);
+            }
+            Err(e) => {
+                println!(
+                    "There was an error communicating with the cache! Err: {:?}",
+                    e
+                );
+                return Err(String::from(
+                    "There was an error communicating with the cache.",
+                ));
+            }
+        };
+
+        let resp = match self.from_cache.recv() {
+            Ok(val) => val.items().clone(), // @TODO: figure out how to avoid clone/copy
+            Err(e) => {
+                return Err(String::from("Error receiving from channel (from cache)."));
+            }
+        };
+        println!("resp: {:?}", resp);
+
+        let output: Vec<Post> = resp.iter().map(|x| (*x.get_data()).clone()).collect();
+        Ok(output)
+    }
+    fn handle_update_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
+        println!("[MAIN] received: {:?}", msg.message);
+        assert_eq!(msg.message, MessageType::Update);
+        unimplemented!()
+    }
+    fn handle_watch_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
+        println!("[MAIN] received: {:?}", msg.message);
+        assert_eq!(msg.message, MessageType::Watch);
+        unimplemented!()
+    }
+}
 
 fn main() {
-    let post_s = "{\"user_id\":1,\"id\":10, \"content\": {}, \"title\" : \"abc123\"}";
-    let res = serde_json::from_str(&post_s);
-    assert!(res.is_ok());
-
-    let opt: Option<models::Post> = res.ok();
-    assert!(opt.is_some());
-
-    println!("{:?}", opt.unwrap());
-
-    let msg = WSMessage {
-        message: MessageType::Get,
-        id: Some(3),
-        post: None,
-    };
-    let msg2 = WSMessage {
-        message: MessageType::Create,
-        id: None,
-        post: Some(models::Post::new()),
-    };
-
-    let s: &'static str = "{\"message\":\"Get\"}";
-    let res = serde_json::from_str(&s);
-    assert!(res.is_ok());
-
-    let opt: Option<WSMessage> = res.ok();
-    assert!(opt.is_some());
-
-    let msg = opt.unwrap();
-    println!("Deserialized string:");
-    println!("{:?} {:?} {:?}", msg.message, msg.id, msg.post);
-
-    let serialized = serde_json::to_string(&msg).unwrap();
-    println!("{}", serialized);
-    let serialized2 = serde_json::to_string(&msg2).unwrap();
-    println!("{}", serialized2);
-    let pool = pool::ThreadPool::new(2).unwrap();
-    println!("{:?}", pool);
-    pool.execute(|| {
-        println!("This is getting executed!");
-    });
-
-    // let users: HashMap<i32, models::User> = HashMap::new();
-    // let mut hub = GrandSocketStation {
-    //     user_pool: Cell::new(users),
-    //     // watches: Vec::new(),
-    // };
-
-    let p = models::Post::new();
-    let m = &mut models::Resource::<models::Post>::new(p);
-    println!("Post: {:?}", m.data);
-
-    m.add_watch(models::User::new());
-    m.add_watch(models::User::new());
-    let all = m.all_watchers();
-    println!("All ---> {:?}", all);
-    // let t = m.data;
-
-    for (id, user) in m.watchers_to_iter() {
-        println!("User [{}] --> {:?}", id, user);
-    }
-
-    let rm = match m.remove_watch(1) {
-        Some(val) => println!("returned: {:?}", val),
-        None => println!("Nothign was returned."),
-    };
-    println!("rm: {:?}", rm);
-    println!("new watchers: {:?}", m.watchers);
-    // t.id = 2;
-    // t.username = String::from("bryandmc");
-    m.increment();
-    println!("Model: {:?}", m);
-
-    // let cache = &mut models::Cache::new();
-    let t = models::Post::new();
-    // let old_result = cache.set_post(1, t);
-    // let exists: bool = match old_result {
-    //     None => true,
-    //     Some(_) => false,
-    // };
-    // println!("Did exist? -> {}", exists);
-
-    let t = models::Post::new();
-    // let old_result = cache.set_post(1, t);
-    // let exists: bool = match old_result {
-    //     None => true,
-    //     Some(_) => false,
-    // };
-    // println!("Did exist? -> {}", exists);
-    // {
-    //     let temp = match cache.get_post(1) {
-    //         None => Err("key does not exist"),
-    //         Some(val) => Ok(val),
-    //     };
-    //     let result = temp;
-    // }
     let p1 = models::Post::new();
     let resource = models::Resource::new(p1);
     let socket_station = GrandSocketStation {
-        connections: vec!(),
+        connections: vec![],
     };
     let mut hub = Rc::new(socket_station);
-    // let mut h = hub.clone();
     let i = &mut 0;
+
+    // start db (SAVE only) thread
+    let (send_db, recv_db) = crossbeam_channel::unbounded();
+    let db_handle = thread::spawn(move || {
+        save_posts(recv_db);
+    });
+
+    // start cache + return necessary comm. channels
+    let (a, b, c): (
+        crossbeam_channel::Sender<SafeArcMsg>,
+        crossbeam_channel::Receiver<SafeArcMsg>,
+        crossbeam_channel::Sender<Cancel>,
+    ) = wire_up(send_db);
 
     listen("127.0.0.1:3012", |out| {
         // println!("HUB: {:?}", h.into_inner());
-        
+
         // println!("Hub WEAK --> {:?}", Rc::downgrade(&h));
         // let parent =  Rc::downgrade(&hub);
         // println!("WEAK: {:?}", parent);
-        let res = Connection{ id: *i, tx: out, /*parent: Rc::downgrade(&hub)*/ };
+        let res = Connection {
+            id: *i,
+            tx: out, /*parent: Rc::downgrade(&hub)*/
+            to_cache: a.clone(),
+            from_cache: b.clone(),
+            kill_cache: c.clone(),
+        };
         let output = res.clone();
-        println!("Strong count: {}", Rc::strong_count(&hub));
         match Rc::get_mut(&mut hub) {
             Some(val) => val.push_connection(output),
             None => panic!("Uh ohhhhhhh"),
@@ -312,16 +324,19 @@ fn main() {
 
         // hub.connections.push(res);
         *i = *i + 1;
-        
+
         // test send on all connections
-        for conn in hub.get_connections() {
-            let c: Connection = conn.clone();
-            let result = c.tx.send("This is a test send.");
-            match result {
-                Ok(val) => val,
-                Err(e) => println!("WS Send Error: {}", e),
-            }
-        }
+        // for conn in hub.get_connections() {
+        //     let c: Connection = conn.clone();
+        //     let result = c.tx.send("This is a test send.");
+        //     match result {
+        //         Ok(val) => val,
+        //         Err(e) => println!("WS Send Error: {}", e),
+        //     }
+        // }
         res
     }).unwrap();
+
+    // await db thread to end...
+    db_handle.join();
 }

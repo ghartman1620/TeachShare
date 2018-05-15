@@ -154,22 +154,26 @@ WebSocket.getInstance().addMessageListener( (msg) => {
     console.log(msg);
 
     //when we're getting from websocket with id - we'll need to use Post.pkify()
-    let val = JSON.parse(msg.data);
+    let val = JSON.parse(msg.data)[0];
+    let f = Object.assign({}, val);
+    
+    console.log(f);
+    let p: Post = Post.pkify(val);
+    console.log(p);
     console.log("got message");
-    console.log(val);
+    console.log(p);
     var db: Database = Database.getInstance();
-    console.log(val.pk);
-    val.user = new User(val.user);
-    db.getPost(val.pk as number).then(p => {
-        console.log("we've subbed to post " + val.pk + " so now we're going to update our local cache to match the message we got for it");
-        db.putPost(val);
+    console.log(p.pk);
+    db.getPost(p.pk as number).then(p => {
+        console.log("we've subbed to post " + p.pk + " so now we're going to update our local cache to match the message we got for it");
+        db.putPost(p);
     }).catch(() => {
         //don't save - that's taken care of by Post.get when its told to save/subscribe
     });
-    if (getMap(store).has(val.pk!.toString())) {
-        mutUpdate(store, val);
+    if (getMap(store).has(p.pk!.toString())) {
+        mutUpdate(store, p);
     } else {
-        mutCreate(store, val);
+        mutCreate(store, p);
     }
     return undefined;
 });
