@@ -64,15 +64,59 @@ enum MessageType {
     Create = "Create"
 }
 
+interface ITestPost {
+    id: number;
+    title: string;
+    content: object;
+    // pub updated: PgTimestamp,
+    likes: number;
+    // pub timestamp: PgTimestamp,
+    tags: object;
+    user_id: number;
+    draft: boolean;
+    content_type: number;
+    grade: number;
+    // length: PgInterval,
+    subject: number;
+    crosscutting_concepts: number[];
+    disciplinary_core_ideas: number[];
+    practices: number[];
+}
+
 interface IMessage {
     message: MessageType;
     id?: number;
-    post?: any;
+    post?: ITestPost;
 }
 
 storeSocket.addEventListener("open", function(ev) {
     console.log(ev);
 });
+
+function default_post(): ITestPost {
+    const result: ITestPost = {
+        id: 1,
+        title: "test post title",
+        content: {
+            type: "text",
+            content : "<b>bold</b>"
+        },
+        // pub updated: PgTimestamp,
+        likes: 0,
+        // pub timestamp: PgTimestamp,
+        tags: {},
+        user_id: 1,
+        draft: false,
+        content_type: 0,
+        grade: 0,
+        // length: PgInterval,
+        subject: 0,
+        crosscutting_concepts: [1, 2, 3],
+        disciplinary_core_ideas: [1, 3, 5],
+        practices: [2, 1],
+    };
+    return result;
+}
 
 storeSocket.onopen = (val) => {
 
@@ -88,34 +132,31 @@ storeSocket.onopen = (val) => {
     const isCircular = circularRecordChecker(testPost);
     console.log(isCircular);
 
-    const msg1: IMessage = {
-        message: MessageType.Get,
-        id: 1
-    };
+    // const msg2: IMessage = {
+    //     message: MessageType.Get,
+    //     id: 1
+    // };
 
-    const msg2: IMessage = {
-        message: MessageType.Get,
-        post: testPost.pkify(),
+    const msg1: IMessage = {
+        message: MessageType.Create,
+        post: default_post(),
     };
-    msg2.post.content = {
-        "type": "text",
-        "content" :"<b>bold</b>"
-    }
-    msg2.post.title = "that was an error";
-    console.log(msg2.post);
-    if (!isCircular) {
-        storeSocket.send(JSON.stringify(msg1)); // JSON.stringify(testPost)
-    } else {
-        // map all the internal structures to maps of pk's
-        /*msg2.post!.comments = comments.map((val, ind, arr) => {
-            if (typeof val.pk !== "undefined") {
-                return Number(val.pk);
-            }
-            return 0;
-        });*/
-        console.log(JSON.stringify(msg2));
-        storeSocket.send(JSON.stringify(msg2));
-    }
+    storeSocket.send(JSON.stringify(msg1));
+
+    // console.log(msg1.post);
+    // if (!isCircular) {
+    //     storeSocket.send(JSON.stringify(msg1)); // JSON.stringify(testPost)
+    // } else {
+    //     // map all the internal structures to maps of pk's
+    //     /*msg2.post!.comments = comments.map((val, ind, arr) => {
+    //         if (typeof val.pk !== "undefined") {
+    //             return Number(val.pk);
+    //         }
+    //         return 0;
+    //     });*/
+    //     console.log(JSON.stringify(msg2));
+    //     storeSocket.send(JSON.stringify(msg2));
+    // }
 };
 
 storeSocket.onmessage = (val) => {

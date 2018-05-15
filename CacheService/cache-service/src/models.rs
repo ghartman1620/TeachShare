@@ -64,7 +64,7 @@ impl Eq for Resource<Post> {}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum MessageType {
-    Watch = 0,
+    Watch,
     Create,
     Update,
     Get,

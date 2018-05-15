@@ -1,5 +1,0 @@
-FROM postgres:latest
-ENV POSTGRES_DB: teachshare
-ENV POSTGRES_PASSWORD: password123
-ENV POSTGRES_USER: postgres
-EXPOSE 5432

@@ -217,7 +217,44 @@ impl Connection {
         Ok(output)
     }
     fn handle_create_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
-        unimplemented!()
+        let mut wrap = Wrapper::new()
+            .set_model(ModelType::Post)
+            .set_msg_type(MessageType::Get)
+            .build();
+
+        let mut p = match msg.post {
+            Some(post) => post,
+            None => {
+                // failt-fast
+                return Err(String::from("No post was provided!"));
+            },
+        };
+        
+        wrap.items_mut().push(Arc::new(Resource::new(p)));
+        match self.to_cache.send(Arc::new(wrap)) {
+            Ok(val) => {
+                println!("Sucessfully sent and got in return: {:?}", val);
+            },
+            Err(e) => {
+                println!("There was an error communicating with the cache! Err: {:?}", e);
+                return Err(String::from("There was an error communicating with the cache."));
+            },
+        };
+
+        let resp = match self.from_cache.recv() {
+            Ok(val) => { val.items().clone() }, // @TODO: figure out how to avoid clone/copy
+            Err(e) => { 
+                println!("[Error] ---> {:?}", e);
+                let ret: String = format!("Error receiving from channel (from cache).");
+                // Err(e);
+                let temp: Vec<ArcItem> = vec![];
+                return Err(String::from("Error receiving from channel (from cache)."));
+            },
+        };
+        println!("resp: {:?}", resp);
+
+        let output: Vec<Post> = resp.iter().map(|x| (*x.get_data()).clone()).collect();
+        Ok(output)
     }
     fn handle_update_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
         unimplemented!()
