@@ -11,5 +11,7 @@ media/
 Rust_ws/target
 TeachShare_WebApp/cache/diesel_demo/target
 static/
-TeachShare_WebApp/cache/websockets/target
+TeachShare_WebApp/cache/
 CacheService/cache-service/target
+CacheService/cache-service/rls
+CacheBackend/

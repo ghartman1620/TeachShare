@@ -42,6 +42,13 @@ extern crate serde_derive;
 extern crate dotenv;
 extern crate serde_json;
 
+extern crate actix;
+use actix::Actor;
+
+extern crate futures;
+// use futures::future::Future;
+use futures::{future, Future};
+
 #[macro_use]
 extern crate crossbeam_channel;
 
@@ -201,7 +208,7 @@ impl Connection {
         let mut p = Post::new();
         p.id = match msg.id {
             Some(id) => id,
-            None => 0, // TODO: consider failing-fast here
+            None => return Err(String::from("No Post ID provided.")),
         };
 
         wrap.items_mut().push(Arc::new(Resource::new(p)));
@@ -281,6 +288,33 @@ impl Connection {
     }
 }
 
+#[derive(Debug)]
+struct DosTuple(i64, i64);
+
+impl actix::Message for DosTuple {
+    type Result = String;
+}
+
+struct MyActor;
+
+impl actix::Actor for MyActor {
+    type Context = actix::Context<Self>;
+
+    fn started(&mut self, ctx: &mut Self::Context) {
+       println!("I am alive!");
+       actix::Arbiter::system().do_send(actix::msgs::SystemExit(0));
+    }
+}
+
+impl actix::Handler<DosTuple> for MyActor {
+    type Result = String;
+
+    fn handle(&mut self, msg: DosTuple, ctx: &mut actix::Context<Self>) -> Self::Result {
+        println!("handle: {:?}", msg);
+        String::from("this is just a test...")
+    }
+}
+
 fn main() {
     let p1 = models::Post::new();
     let resource = models::Resource::new(p1);
@@ -302,6 +336,30 @@ fn main() {
         crossbeam_channel::Receiver<SafeArcMsg>,
         crossbeam_channel::Sender<Cancel>,
     ) = wire_up(send_db);
+
+
+    /// Test actix actor framework stuff
+    
+    let system = actix::System::new("test");
+    // let thr_system = system.clone();
+
+    let addr: actix::Addr<actix::Syn, _> = MyActor.start();
+    let thread_addr = addr.clone();
+    let my_actor = addr.recipient();
+    my_actor.send(DosTuple(1, 1));
+    
+    let res = thread_addr.send(DosTuple(0, 0));
+    let res1 = thread_addr.send(DosTuple(0, 0));
+    
+    system.handle().spawn(res.then(|res| {
+            println!("RES: {:?}", res);
+            future::result(Ok(()))
+    }));
+    system.handle().spawn(res1.then(|res| {
+        println!("RES1: {:?}", res);
+        future::result(Ok(()))
+    }));    
+    system.run();
 
     listen("127.0.0.1:3012", |out| {
         // println!("HUB: {:?}", h.into_inner());
