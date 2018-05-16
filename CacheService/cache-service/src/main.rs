@@ -73,7 +73,6 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
 
-// use crossbeam_channel::{Receiver, Sender};
 
 #[derive(Debug, Clone)]
 struct GrandSocketStation {
@@ -102,7 +101,7 @@ struct Connection {
     kill_cache: crossbeam_channel::Sender<Cancel>,
 }
 
-impl fmt::Debug for Connection {
+impl fmt::Debug for Connection {                                                
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -398,3 +397,32 @@ fn main() {
     // await db thread to end...
     db_handle.join();
 }
+
+#[cfg(test)]
+
+mod tests {
+    use models::*;
+
+    #[test]
+    // a test function that returns our error result
+    fn test_raises_no_id_provided()  {
+        
+        fn inner(yes: bool) -> Result<(), NoIDProvided> {
+            if yes {
+                Err(NoIDProvided::new("this is the error msg."))
+            } else {
+                Ok(())
+            }        
+        }
+
+        // throw error
+        // let out = try!(inner(true).map_err(|e| e.to_string()));
+        // println!("OUT: {:?}", out);
+
+        // don't
+        // let out = try!(inner(false).map_err(|e| e.to_string()));
+        // println!("OUT: {:?}", out);
+    }
+
+}
+

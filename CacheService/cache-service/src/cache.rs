@@ -276,6 +276,7 @@ mod tests {
     use models;
     use models::*;
     use pool;
+    use db::*;
 
     use std::sync::{Arc, RwLock};
     use std::thread;
@@ -286,11 +287,18 @@ mod tests {
 
     #[test]
     fn test_selector_extended_get() {
+        // start db (SAVE only) thread
+        let (send_db, recv_db) = crossbeam_channel::unbounded();
+        let db_handle = thread::spawn(move || {
+            save_posts(recv_db);
+        });
+
+        // start cache + return necessary comm. channels
         let (a, b, c): (
             crossbeam_channel::Sender<SafeArcMsg>,
             crossbeam_channel::Receiver<SafeArcMsg>,
             crossbeam_channel::Sender<Cancel>,
-        ) = wire_up();
+        ) = wire_up(send_db);
 
         // get
         let mut wrap = Wrapper::new()
@@ -304,11 +312,18 @@ mod tests {
     }
     #[test]
     fn test_selector_extended_create() {
+        // start db (SAVE only) thread
+        let (send_db, recv_db) = crossbeam_channel::unbounded();
+        let db_handle = thread::spawn(move || {
+            save_posts(recv_db);
+        });
+
+        // start cache + return necessary comm. channels
         let (a, b, c): (
             crossbeam_channel::Sender<SafeArcMsg>,
             crossbeam_channel::Receiver<SafeArcMsg>,
             crossbeam_channel::Sender<Cancel>,
-        ) = wire_up();
+        ) = wire_up(send_db);
 
         let mut wrap = Wrapper::new()
             .set_model(ModelType::Post)
@@ -322,11 +337,19 @@ mod tests {
     // create
     #[test]
     fn test_selector_extended_watch() {
+        // start db (SAVE only) thread
+        let (send_db, recv_db) = crossbeam_channel::unbounded();
+        let db_handle = thread::spawn(move || {
+            save_posts(recv_db);
+        });
+
+        // start cache + return necessary comm. channels
         let (a, b, c): (
             crossbeam_channel::Sender<SafeArcMsg>,
             crossbeam_channel::Receiver<SafeArcMsg>,
             crossbeam_channel::Sender<Cancel>,
-        ) = wire_up();
+        ) = wire_up(send_db);
+
         let mut wrap = Wrapper::new()
             .set_model(ModelType::Post)
             .set_msg_type(MessageType::Watch)
@@ -339,11 +362,18 @@ mod tests {
 
     #[test]
     fn test_selector_extended_update() {
+        // start db (SAVE only) thread
+        let (send_db, recv_db) = crossbeam_channel::unbounded();
+        let db_handle = thread::spawn(move || {
+            save_posts(recv_db);
+        });
+
+        // start cache + return necessary comm. channels
         let (a, b, c): (
             crossbeam_channel::Sender<SafeArcMsg>,
             crossbeam_channel::Receiver<SafeArcMsg>,
             crossbeam_channel::Sender<Cancel>,
-        ) = wire_up();
+        ) = wire_up(send_db);
 
         let mut wrap = Wrapper::new()
             .set_model(ModelType::Post)
@@ -357,11 +387,18 @@ mod tests {
 
     #[test]
     fn test_selector_extended_cancel() {
+        // start db (SAVE only) thread
+        let (send_db, recv_db) = crossbeam_channel::unbounded();
+        let db_handle = thread::spawn(move || {
+            save_posts(recv_db);
+        });
+
+        // start cache + return necessary comm. channels
         let (a, b, c): (
             crossbeam_channel::Sender<SafeArcMsg>,
             crossbeam_channel::Receiver<SafeArcMsg>,
             crossbeam_channel::Sender<Cancel>,
-        ) = wire_up();
+        ) = wire_up(send_db);
         let cancel = Cancel {
             msg: String::from("[Cancel reason]"),
         };

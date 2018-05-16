@@ -115,7 +115,9 @@ pub fn save_posts(rx: Receiver<Post>) {
 #[cfg(test)]
 mod tests {
     use diesel::prelude::*;
-    use models_diesel::*;
+    use crossbeam_channel::*;
+    use db::*;
+    use diesel::result;
 
     use std::sync::mpsc::channel;
     use std::thread;
@@ -126,26 +128,28 @@ mod tests {
     #[test]
     fn test_change_post() {
         let conn: PgConnection = establish_connection();
-        let res: Result<Post, String> = Post::get(-1, &conn);
-        if (res.is_err()) {
+        let res: Result<Vec<Post>, result::Error> = Post::get(-1, &conn);
+        if res.is_err() {
             println!(
                 "test_change_post will fail: no post -1 exists (create it to have this test work!"
             );
             assert!(res.is_ok()); //this fails
         }
-        let mut p: Post = res.unwrap();
+        let mut posts: Vec<Post> = res.unwrap();
+        let mut p = &mut posts[0];
         println!("{}", p.title);
         //save the current title so we can put it back when test is done
-        let s: String = p.title;
+        let s: String = p.title.clone();
         p.title = String::from("changed");
         p.save(&conn);
 
-        let res1: Result<Post, String> = Post::get(-1, &conn);
+        let res1: Result<Vec<Post>, result::Error> = Post::get(-1, &conn);
         assert!(res1.is_ok());
-        let mut p: Post = res1.unwrap();
+        let mut posts: Vec<Post> = res1.unwrap();
+        let mut p = &mut posts[0];
         println!("{}", p.title);
         assert_eq!(p.title, String::from("changed"));
-        p.title = s;
+        p.title = s.clone();
         p.save(&conn);
     }
     //pre: Post with pk -5 does not exist
@@ -160,14 +164,16 @@ mod tests {
     fn test_save_posts_thread() {
         let connection = establish_connection();
 
-        let (tx, rx) = channel();
+        let (tx, rx) = unbounded();
         let begin = SystemTime::now();
 
         let t = thread::spawn(move || {
             save_posts(rx);
         });
-        let mut p: Post = Post::get(1, &connection).expect("no post 1");
+        let mut posts = Post::get(1, &connection).expect("no post 1");
         //we'll set p's title back to whatever it was once we're done
+        
+        let p = &mut posts[0];
         let s = p.title.clone();
         let _ = tx.send(p.clone());
         for x in 0..1000 {
