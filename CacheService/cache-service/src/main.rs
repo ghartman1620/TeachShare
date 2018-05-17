@@ -182,6 +182,21 @@ impl Handler for Connection {
                 // println!("WEAK --> {:?}", self.parent.strong());
                 // let mut g = &mut self.parent.expect("could not unwrap option..");
                 println!("RC: {:?}", self.parent);
+                match &mut self.parent {
+                    Some(val) => {
+                        println!("Some: {:?}", val);
+                        match val.try_borrow_mut() {
+                            Ok(parent) => {
+                                println!("OK: {:?}", parent);
+                                println!("connections: {:?}", parent.connections);
+                                println!("connection count: {}", parent.connections.len());
+                            },
+                            Err(e) => println!("Error: {:?}!", e),
+                        }
+                    
+                    },
+                    None => {println!("None. Did not unwrap.")},
+                }
                 // let gss: &mut GrandSocketStation = Rc::get_mut(g).expect("could not get mut");
                 // let mut conn = &mut gss.connections;
                 // println!("CONNECTIONS: {:?}", conn);
@@ -445,18 +460,30 @@ fn main() {
     //     future::result(Ok(()))ID:ID:
     // }));    
     // system.run();
-    let hub_inner = hub.unwrap().clone();
+    //let hub_inner = hub.unwrap().clone();
 
-    listen("127.0.0.1:3012", move |out| {
-     
-        let conn = Connection {
-            id: *i,
-            tx: out.clone(), 
-            parent: Some(hub_inner.clone()),
-            to_cache: a.clone(),
-            from_cache: b.clone(),
-            kill_cache: c.clone(),
-        };
+    listen("127.0.0.1:3012", |out| {
+        let mut value = None;
+        
+        {
+            value = Some(Connection {
+                id: *i,
+                tx: out.clone(), 
+                parent: hub,
+                to_cache: a.clone(),
+                from_cache: b.clone(),
+                kill_cache: c.clone(),
+            });
+        }
+
+        {
+            let conn = value.unwrap();
+
+            let h = &mut hub.unwrap().clone();
+            let hub_mut = Rc::get_mut(h).expect("Uh oh... Could not borrow hub");
+            hub_mut.borrow_mut().push_connection(conn.clone());
+        }
+        
         
         // {
         //     let conn = Connection {
@@ -477,7 +504,7 @@ fn main() {
         //     // hub_mut.connections[*i as usize].parent = weak;
         // }
         *i += 1;
-        conn
+        value.unwrap()
     }).unwrap();
 
     // await db thread to end...
