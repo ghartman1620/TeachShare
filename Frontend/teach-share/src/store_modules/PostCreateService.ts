@@ -168,23 +168,11 @@ export const actions = {
                 context.state.doneMutations[
                     context.state.doneMutations.length - 1
                 ];
-            if (mut.mutation === "UNDO_ADD_ELEMENT") {
-                removeAttachments(
-                    context,
-                    context.state.post!.elements[mut.arg].content
-                );
-                // context.dispatch(
-                //     "removeAttachments",
-                //     context.state.post!.elements[mut.arg].content
-                // );
-            }
             mutUndo(context);
-            // context.commit("UNDO");
 
-            // @TODO: can this one even be replaced!?
             context.commit(mut.mutation, mut.arg);
 
-            const response = await saveDraft(context).catch(err =>
+            const response = await saveDraft(context).catch((err) =>
                 console.error(err)
             );
             console.log(response);
@@ -193,30 +181,23 @@ export const actions = {
     },
     redo: (context: PostContext) => {
         if (context.state.unDoneMutations.length > 0) {
-            let mut =
+            const mut =
                 context.state.unDoneMutations[
                     context.state.unDoneMutations.length - 1
                 ];
             if (mut.mutation === "ADD_ELEMENT") {
-                console.error(
-                    "REDO ADD ELEMENT: ",
-                    context.state.unDoneMutations,
-                    mut
-                );
-
-                console.error("Add attachments", "success");
                 context.dispatch("addAttachments", mut.arg.content);
             }
             context.commit("REDO");
             context.commit(mut.mutation, mut.arg);
-            context.dispatch("saveDraft").then(res => console.error(res));
+            context.dispatch("saveDraft").then((res) => console.error(res));
         }
     },
     addElement: (context: PostContext, element: any) => {
         // clear order of actions from ADD_ELEMENT --> CLEAR_REDO --> saveDraft.
         context.commit("ADD_ELEMENT", element);
         context.commit("CLEAR_REDO");
-        context.dispatch("saveDraft").then(res => console.error(res));
+        context.dispatch("saveDraft").then((res) => console.error(res));
     },
     // Actions are only allowed to have one argument so iAndJ is
     // a list with index 0 as the first index to be swapped
@@ -228,32 +209,20 @@ export const actions = {
         context.dispatch("saveDraft").then(res => console.error(res));
     },
     removeElement: (context: PostContext, index: number) => {
-        context.dispatch(
-            "removeAttachments",
-            context.state.post!.elements[index].content
-        );
         context.commit("REMOVE_ELEMENT", index);
         context.commit("CLEAR_REDO");
 
         context.dispatch("saveDraft").then(res => console.error(res));
     },
-    removeAttachments: (context: PostContext, attachments) => {
-        for (var i in attachments) {
-            let attachment = attachments[i];
-            context.commit("REMOVE_ATTACHMENT", attachment);
-        }
-    },
     addAttachments: (state: PostContext, attachments) => {
-        for (var i in attachments) {
-            console.error(attachments[i]);
-            let attachment = attachments[i];
+        for (const attachment of attachments) {
             state.commit("ADD_ATTACHMENT", attachment);
         }
     },
     editElement: (context: PostContext, editedElement: EditedElement) => {
         context.commit("EDIT_ELEMENT", editedElement);
         context.commit("CLEAR_REDO");
-        context.dispatch("saveDraft").then(res => console.error(res));
+        context.dispatch("saveDraft").then((res) => console.error(res));
     },
     saveDraft: (ctx: PostContext) => {
         ctx.commit("SAVE_DRAFT");
@@ -368,9 +337,7 @@ export const undo = dispatch(PostCreateService.actions.undo);
 export const redo = dispatch(PostCreateService.actions.redo);
 export const swapElements = dispatch(PostCreateService.actions.swapElements);
 export const removeElement = dispatch(PostCreateService.actions.removeElement);
-export const removeAttachments = dispatch(
-    PostCreateService.actions.removeAttachments
-);
+
 export const setGrade = dispatch(PostCreateService.actions.setGrade);
 export const setLength = dispatch(PostCreateService.actions.setLength);
 export const setContentType = dispatch(PostCreateService.actions.setContentType);

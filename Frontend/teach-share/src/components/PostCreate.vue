@@ -10,7 +10,7 @@
         </div>
     </side-bar>
     <div v-if="currentPage===1">
-        <div v-if="inProgressPost !== undefined && inProgressPost.status !== LOADING" :style="getBodyStyle()">
+        <div v-if="inProgressPost !== undefined && postStatus !== LOADING" :style="getBodyStyle()">
             <div class="col-sm-12 col-lg-10 col-md-12 card card-outline-danger container icon-card-container">
                 <div class="col-8 mx-auto card-deck" id="button-bar">
 
@@ -152,7 +152,7 @@
 
     <br><br><br> <!-- this is so problems don't occur with bottom of page button presses -->
     <nav class="navbar fixed-bottom navbar-light navbar-left bottom-navbar bg-light">
-        <div id="bottomNavTitle" class="title" v-if="inProgressPost.title != ''">{{inProgressPost.title}}</div>
+        <div id="bottomNavTitle" class="title" v-if="postStatus !== LOADING && inProgressPost.title != ''">{{inProgressPost.title}}</div>
         <div class="title title-placeholder" v-else></div>
     </nav>
 
@@ -281,7 +281,7 @@ export default class PostCreate extends Vue{
     LOADING = PostStatus.Loading;
     SAVED = PostStatus.Saved;
 
-    status: PostStatus = PostStatus.Loading;
+    postStatus: PostStatus = this.LOADING;
 
     title: string = ""; //@TODO: make changes to title a store mutation that is saved and can be undone/redone
     inProgressTag: string = "";
@@ -299,32 +299,19 @@ export default class PostCreate extends Vue{
 
     get userPosts(): Post[] {
         var store = this.$store;
-        console.log(getPosts(this.$store));
-        console.log(getLoggedInUser(store).pk);
-        if(getPosts(this.$store).length > 0){
-            console.log(getPosts(this.$store)[0]);
-            console.log(getPosts(this.$store)[0].user.pk);
-        }
+        
         let userPosts = getPosts(this.$store).filter(function(p){
-            console.log("filter fn");
-            console.log(p.user.pk);
             //getLoggedInUser(store).pk seems to be a string at runtime. It obviously ought to be a number, but somewhere
             //it gets assigned to a type-unsafe thing that winds up as a string.
-            
-            console.log(parseInt(getLoggedInUser(store).pk as any));
-            console.log(p.user.pk === parseInt(getLoggedInUser(store).pk as any));
             return p.user.pk === parseInt(getLoggedInUser(store).pk as any);
         })
-        console.log(userPosts);
         return userPosts;
     }
     get currentPost(): InProgressPost | undefined {
         return getCurrentPost(this.$store);
     }
 
-    get postStatus(): PostStatus {
-        return getCurrentPost(this.$store)!.status;
-    }
+
     // getters
     get inProgressPost(): InProgressPost {
         return getCurrentPost(this.$store)!;
@@ -368,7 +355,6 @@ export default class PostCreate extends Vue{
         setLength(this.$store, parseInt(length));
     }
     getEditorStyle() {
-        this.$log(this.$route.name !== "create");
         if (this.$route.name !== "create") {
             return editorVisible;
         } else {
@@ -461,10 +447,11 @@ export default class PostCreate extends Vue{
         this.beginPost(<number>user.pk, <number>post.pk);
     }
     beginPost(userid: number, postid: number | undefined): void {
-        let store = this.$store;
+        let vm: PostCreate = this;
         if(postid !== undefined){
             fetchPostSubscribe(this.$store, postid).then(function(p){
-                beginPost(store, {userid: getLoggedInUser(store).pk, p: p})
+                beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p: p})
+                vm.postStatus = vm.SAVED;
             });
         }
         else{
@@ -507,11 +494,9 @@ export default class PostCreate extends Vue{
             var response;
 
             response = await asLoggedIn(api.get(`/posts/?user=${this.getLoggedInUser.pk}&page=${nextPage.toString()}`));
-            console.log(response.data);
             for(var post of response.data.results){
                 
                 if(post.pk != -1){
-                    console.log("I am subscribing to a post. Its pk is " + post.pk);
                     fetchPostSubscribe(this.$store, post.pk);
                 }
                 //this.userPosts.push(post);
@@ -522,7 +507,6 @@ export default class PostCreate extends Vue{
     
     created() {
         var inProgressPost: string | null = window.localStorage.getItem("inProgressPost");
-        console.log(inProgressPost);
         if(inProgressPost === null){
             
             this.beginPost( 
@@ -533,18 +517,26 @@ export default class PostCreate extends Vue{
             
         }
         else{
+            this.getUserPosts();
             this.beginPost(
                 <number>this.getLoggedInUser.pk, parseInt(<string>inProgressPost));
-            this.getUserPosts();
             let store = this.$store;
             let userpk = this.getLoggedInUser.pk as number;
+            let vm: PostCreate = this;
             WebSocket.getInstance().addMessageListener(function(message){
                 let post = Post.pkify(JSON.parse(message.data));
                 
-                
-                if(post.pk === window.localStorage.getItem("inProgressPost")){
-                    beginPost(store,{userid: userpk, p: post});
+                let inProgressPost = window.localStorage.getItem("inProgressPost");
+                if(inProgressPost){
+                    if(post.pk === parseInt(inProgressPost as string,10)){
+                        beginPost(store,{userid: userpk, p: post});
+                        vm.postStatus = PostStatus.Saved;
+                    }
                 }
+                else{
+                    console.error("no inprogressPost localStorage item exists");
+                }
+               
                 return undefined;
             });
         }

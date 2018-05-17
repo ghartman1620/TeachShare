@@ -169,7 +169,6 @@ export default class PostComp extends Vue {
         var vm = this;
         let currentUser = this.$store.getters.getLoggedInUser;
         if (currentUser === undefined) {
-            // this.$log("cookie: ", this.$cookie.get("userId"));
 
             // @TODO: fix this
             // this.$store.fetchCurrentUser();
@@ -184,7 +183,6 @@ export default class PostComp extends Vue {
     }
     actualSubmit() {
         var vm = this;
-        this.$logDanger(this.$store.state.user.profile);
         if (typeof getLoggedInUser(this.$store) !== "undefined") {
             let comment = new Comment(
                 undefined,

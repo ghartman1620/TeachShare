@@ -1,19 +1,21 @@
+import api from "./api";
+import store from "./store";
+import Cookie from "tiny-cookie";
 import Vue from "vue";
-import store from "./store"
-import api from "./api"
+
 
 declare function require(name: string): any;
-var Cookie = require("tiny-cookie");
+
 
 // In the future when we use user profiles can add their information to users as well.
 export default class User {
-    username: string;
-    pk: number;
-    email: string;
-    firstName: string;
-    lastName: string;
-    token: string;
-    expires: Date;
+    public username: string;
+    public pk: number;
+    public email: string;
+    public firstName: string;
+    public lastName: string;
+    public token: string;
+    public expires: Date;
 
     // No parameter constructor. Attempts to make a user
     // from the data in the cookie.
@@ -26,7 +28,7 @@ export default class User {
                 expires: Date, refreshToken: string);
     // No refresh token constructor. Called when user logs in without "remember me"
     constructor(username: string, pk: number, email: string, firstName: string, lastName: string, token: string,
-                 expires: Date);
+                expires: Date, refreshToken?: string);
     constructor(
         username?: string,
         pk?: number,
@@ -36,7 +38,6 @@ export default class User {
         token?: string,
         expires?: Date,
         refreshToken?: string) {
-        console.log("*********** USER CONSTRUCTOR CALLED ***********");
 
         this.username = username || Cookie.get("username");
         this.pk = pk || Cookie.get("pk");
@@ -46,17 +47,14 @@ export default class User {
         this.token = token || Cookie.get("token");
         this.expires = expires || new Date(Cookie.get("expires"));
         this.saveDataInCookie();
-        console.log("in user ctor");
-        console.log(refreshToken);
 
-        if (refreshToken){
-            console.log("setting localstorage");
+        if (refreshToken) {
             window.localStorage.setItem("refreshToken", refreshToken);
             window.localStorage.setItem("username", this.username);
         }
         Object.assign(api.defaults, {headers: {authorization: "Bearer " + this.token}});
     }
-    saveDataInCookie(): void {
+    public saveDataInCookie(): void {
         Cookie.set("token", this.token);
         Cookie.set("pk", this.pk);
         Cookie.set("username", this.username);
@@ -65,20 +63,20 @@ export default class User {
         Cookie.set("lastName", this.lastName);
         Cookie.set("expires", this.expires.toDateString());
     }
-    getUsername(): string {
+    public getUsername(): string {
         return this.username;
     }
 
-    getEmail(): string {
+    public getEmail(): string {
         return this.email;
     }
-    getPk(): number {
+    public getPk(): number {
         return this.pk;
     }
-    getFirstName(): string {
+    public getFirstName(): string {
         return this.firstName;
     }
-    getLastName(): string {
+    public getLastName(): string {
         return this.lastName;
     }
 

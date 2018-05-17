@@ -57,7 +57,6 @@ export default class AuthPage extends Vue{
     
 
     submit() {
-        this.$log("IN SUBMIT");
         this.$emit("submitAuth");
     }
 };
