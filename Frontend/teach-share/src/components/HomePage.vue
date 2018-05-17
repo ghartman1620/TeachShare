@@ -28,7 +28,6 @@ export default class HomePage extends Vue {
     showPosts: boolean = false
 
     seePosts(event) {
-        // this.$logSuccess(event);
         // this.$store.dispatch("fetchAllPostsRaw");
         // this.showPosts = true;
         this.$router.push({ name: "dashboard" });

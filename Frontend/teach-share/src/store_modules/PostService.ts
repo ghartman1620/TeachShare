@@ -16,7 +16,6 @@ const state = {
     // Post feed
     posts: new ModelMap<Post>()
 };
-console.log(state.posts);
 
 export const actions = {
     postSearch: async (ctx: PostContext, query) => {
@@ -59,11 +58,11 @@ export const actions = {
     fetchPost: async (ctx: PostContext, postID: string|number) => {
         try {
 
-            if(typeof postID === "string"){
-                postID = parseInt(postID);
+            if (typeof postID === "string") {
+                postID = parseInt(postID, 10);
             }
-            var p: Post = await Post.get(postID as number);
-            //const resp: AxiosResponse<Post> = await api.get(`posts/${postID}/`);
+            const p: Post = await Post.get(postID as number);
+            // const resp: AxiosResponse<Post> = await api.get(`posts/${postID}/`);
             mutCreate(ctx, p);
             return p;
         } catch (err) {
@@ -71,16 +70,13 @@ export const actions = {
         }
     },
     fetchPostSubscribe: async (ctx: PostContext, postID: string|number) => {
-        console.log("subscribing to a post");
-        console.log(postID);
         try {
 
-            if(typeof postID === "string"){
-                postID = parseInt(postID);
+            if (typeof postID === "string") {
+                postID = parseInt(postID, 10);
             }
-            console.log("awaiting Post.get in subscribe");
-            var p: Post = await Post.get(postID as number, true);
-            //const resp: AxiosResponse<Post> = await api.get(`posts/${postID}/`);
+            const p: Post = await Post.get(postID as number, true);
+            // const resp: AxiosResponse<Post> = await api.get(`posts/${postID}/`);
             mutCreate(ctx, p);
             return p;
         } catch (err) {
@@ -117,10 +113,7 @@ export const actions = {
 
 export const mutations = {
     LOAD_ALL_POSTS: (ctx, data: Post[]) => {
-        console.log("new ctx posts");
         ctx.posts = new ModelMap<Post>(...data);
-
-        console.log(ctx.posts);
     },
     APPEND_MANY: (ctx, data: Post[]) => {
         for (const post of data) {
@@ -138,13 +131,11 @@ export const mutations = {
         }
     },
     UPDATE: (ctx, data: Post) => {
-        console.log(data);
         const posts = ctx.posts as ModelMap<Post>;
         if (typeof data.pk !== "undefined") {
-            console.log("doing post sert")
             posts.set(String(data.pk), data);
             // Vue.set(ctx.posts!.data, Number(data.pk), data);
-        } else{
+        } else {
             console.error("PostService error: UPDATE called on post without pk");
         }
     },
@@ -158,7 +149,7 @@ export const mutations = {
 };
 
 export const getters = {
-    map: ctx => ctx.posts,
+    map: (ctx) => ctx.posts,
     allByPk: (ctx: IPostState) => ctx.posts.data,
     all: (ctx: IPostState): Post[] => ctx.posts.list(),
     getPostById: (ctx: IPostState, getters: any) => (id: string|number): Post => {

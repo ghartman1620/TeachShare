@@ -9,7 +9,7 @@ import WebSocket from "./WebSocket";
  *  Model is the base implementation for a database-backed object
  */
 export abstract class Model {
-    public pk?: number | string;
+    public pk: number;
     constructor(pk: number) {
         this.pk = pk;
     }
@@ -215,83 +215,43 @@ export class ModelMap<V> implements IterableIterator<V> {
 
 
 export class Post extends Model {
-    static db: Database = Database.getInstance();
-    static ws: WebSocket = WebSocket.getInstance();
-
     /*
      * Get a Post from the websocket connection or the database if contained.
      * @param pk the post to get
      * @param save? optionally indicate to save in the db and subscribe over websocket to this post.
     */
-    static get(pk: number, save?: boolean): Promise<Post> {
-        console.log("Post get: getting post " + pk + " save?" + save);
+    public static get(pk: number, save?: boolean): Promise<Post> {
         return new Promise((resolve, reject) => {
-            console.log("trying to get from indexdb?"); 
             this.db.getPost(pk).then(p => {
-                console.log("post " + pk  + " found in db");
-                console.log(p);
                 p.pk = pk;
                 resolve(p);
             }).catch( () => {
-                console.log("???");
                 if (save) {
-                    console.log("post " + pk + " not found in db.");
                     Post.db.addEmptyPost(pk);
                     Post.ws.sendWatch(pk);
                     Post.ws.sendGet(pk);
                 } else {
-                    console.log("sending get");
                     Post.ws.sendGet(pk);
                 }
                 reject();
-                //decide whether we should save/subscribe to this post being gotten
-                /*
-                api.get("/posts/" + pk)
-                .then(resp => {
-                    this.db.putPost(resp.data);
-                    resolve( resp.data as Post);
-                }).catch(error => {
-                    reject("no such post");
-                })*/
-            })
-            console.log("returned from db get post");
+
+            });
         });
     }
-
-
-    //creates a Post model from the websocket serialized form (see idify for details)
+    // creates a Post model from the websocket serialized form (see idify for details)
     public static pkify(obj: any): Post {
-        var p: any = {
+        let p: any = {
             user: new User(obj.user_id),
             ...obj
-        }
+        };
         delete p.user_id;
 
-        //this code just hurts to write
         p.pk = p.id;
         delete p.id;
         return p as Post;
     }
-
-
-
-    //Creates an object of the form the websocket requires for deserialization:
-
-    // pk is known as id
-    // user isn't an object, it's just a "user_id" with the pk/id of the user
-    // no comments
-    public idify(): string {
-        var obj: any = {
-            user_id: this.user.pk,
-            id: this.pk,
-            ...this as Object,
-        }
-        delete obj.pk;
-        delete obj.user;
-        delete obj.comments;
-        console.log(obj);
-        return obj;        
-    }
+    private static db: Database = Database.getInstance();
+    private static ws: WebSocket = WebSocket.getInstance();
 
     public comments: Comment[] | number[];
     public user: User;
@@ -311,13 +271,33 @@ export class Post extends Model {
     public concepts: number[];
     public coreIdeas: number[];
     public practices: number[];
-
-
     constructor(pk?: number, comments?: Comment[], user?: User) {
         super(typeof pk === "undefined" ? -1 : pk);
         this.comments = typeof comments === "undefined" ? [] : comments;
         this.user = typeof user === "undefined" ? new User() : user;
     }
+
+    // Creates an object of the form the websocket requires for deserialization:
+    // pk is known as id
+    // user isn't an object, it's just a "user_id" with the pk/id of the user
+    // no comments
+    public toApiObject(): object {
+        const obj: any = {
+            user_id: this.user.pk,
+            id: this.pk,
+            disciplinary_core_ideas: this.coreIdeas,
+            crosscutting_concepts: this.concepts,
+            likes: 0,
+            ...this as object,
+        };
+        delete obj.concepts;
+        delete obj.coreIdeas;
+        delete obj.pk;
+        delete obj.user;
+        delete obj.comments;
+        return obj;
+    }
+
 }
 
 export class GenericFile {

@@ -33,7 +33,7 @@ interface BeginPostArg {
 
 export type PostContext = ActionContext<PostState, IRootState>;
 
-const state: PostState = {
+const postState: PostState = {
     post: undefined,
     doneMutations: [],
     unDoneMutations: []
@@ -108,7 +108,7 @@ export const mutations = {
     REMOVE_ELEMENT: (state: PostState, index: number) => {
         state.doneMutations.push({
             mutation: "UNDO_REMOVE_ELEMENT",
-            arg: { element: state.post!.elements[index], index: index }
+            arg: { element: state.post!.elements[index], index }
         });
         state.post!.removeElement(index);
     },
@@ -129,7 +129,6 @@ export const mutations = {
         state.post!.saveDraft();
     },
     BEGIN_POST: (state: PostState, arg: BeginPostArg) => {
-        
         state.post = new InProgressPost(arg.userid, arg.p);
     },
     SET_GRADE: (state: PostState, grade: number) => {
@@ -144,8 +143,6 @@ export const mutations = {
     SET_LENGTH: (state: PostState, length: number) => {
         state.post!.setLength(length);
     },
-
-
 };
 
 export const actions = {
@@ -168,23 +165,11 @@ export const actions = {
                 context.state.doneMutations[
                     context.state.doneMutations.length - 1
                 ];
-            if (mut.mutation === "UNDO_ADD_ELEMENT") {
-                removeAttachments(
-                    context,
-                    context.state.post!.elements[mut.arg].content
-                );
-                // context.dispatch(
-                //     "removeAttachments",
-                //     context.state.post!.elements[mut.arg].content
-                // );
-            }
             mutUndo(context);
-            // context.commit("UNDO");
 
-            // @TODO: can this one even be replaced!?
             context.commit(mut.mutation, mut.arg);
 
-            const response = await saveDraft(context).catch(err =>
+            const response = await saveDraft(context).catch((err) =>
                 console.error(err)
             );
             console.log(response);
@@ -193,30 +178,23 @@ export const actions = {
     },
     redo: (context: PostContext) => {
         if (context.state.unDoneMutations.length > 0) {
-            let mut =
+            const mut =
                 context.state.unDoneMutations[
                     context.state.unDoneMutations.length - 1
                 ];
             if (mut.mutation === "ADD_ELEMENT") {
-                console.error(
-                    "REDO ADD ELEMENT: ",
-                    context.state.unDoneMutations,
-                    mut
-                );
-
-                console.error("Add attachments", "success");
                 context.dispatch("addAttachments", mut.arg.content);
             }
             context.commit("REDO");
             context.commit(mut.mutation, mut.arg);
-            context.dispatch("saveDraft").then(res => console.error(res));
+            context.dispatch("saveDraft").then((res) => console.error(res));
         }
     },
     addElement: (context: PostContext, element: any) => {
         // clear order of actions from ADD_ELEMENT --> CLEAR_REDO --> saveDraft.
         context.commit("ADD_ELEMENT", element);
         context.commit("CLEAR_REDO");
-        context.dispatch("saveDraft").then(res => console.error(res));
+        context.dispatch("saveDraft").then((res) => console.error(res));
     },
     // Actions are only allowed to have one argument so iAndJ is
     // a list with index 0 as the first index to be swapped
@@ -228,45 +206,31 @@ export const actions = {
         context.dispatch("saveDraft").then(res => console.error(res));
     },
     removeElement: (context: PostContext, index: number) => {
-        context.dispatch(
-            "removeAttachments",
-            context.state.post!.elements[index].content
-        );
         context.commit("REMOVE_ELEMENT", index);
         context.commit("CLEAR_REDO");
-
         context.dispatch("saveDraft").then(res => console.error(res));
     },
-    removeAttachments: (context: PostContext, attachments) => {
-        for (var i in attachments) {
-            let attachment = attachments[i];
-            context.commit("REMOVE_ATTACHMENT", attachment);
-        }
-    },
     addAttachments: (state: PostContext, attachments) => {
-        for (var i in attachments) {
-            console.error(attachments[i]);
-            let attachment = attachments[i];
+        for (const attachment of attachments) {
             state.commit("ADD_ATTACHMENT", attachment);
         }
     },
     editElement: (context: PostContext, editedElement: EditedElement) => {
         context.commit("EDIT_ELEMENT", editedElement);
         context.commit("CLEAR_REDO");
-        context.dispatch("saveDraft").then(res => console.error(res));
+        context.dispatch("saveDraft").then((res) => console.error(res));
     },
     saveDraft: (ctx: PostContext) => {
         ctx.commit("SAVE_DRAFT");
     },
     createPost: (context: PostContext) => {
-        
         return new Promise((resolve, reject) => {
             context.state
                 .post!.publishPost()
-                .then(function(response) {
+                .then((response) => {
                     resolve(response);
                 })
-                .catch(function(error) {
+                .catch((error) => {
                     reject(error);
                 });
         });
@@ -303,7 +267,6 @@ export const actions = {
         context.commit("SET_LENGTH", length);
         context.dispatch("saveDraft");
     }
-    
 };
 
 export const getters = {
@@ -325,7 +288,11 @@ export const getters = {
         }
         return undefined;
     },
-    getCurrentPost: (state: PostState) => state.post,
+    getCurrentPost: (state: PostState) => {
+        console.log("hello, i'm getting current post. that current post is:");
+        console.log(state.post);
+        return state.post;
+    },
     getCurrentPostId: (state, getters) => {
         if (state.post !== null && typeof getters.getCurrentPost !== "undefined") {
             return getters.getCurrentPost.pk;
@@ -341,7 +308,7 @@ export const getters = {
 const PostCreateService = {
     namespaced: true,
     strict: process.env.NODE_ENV !== "production",
-    state,
+    postState,
     mutations,
     actions,
     getters
@@ -368,9 +335,7 @@ export const undo = dispatch(PostCreateService.actions.undo);
 export const redo = dispatch(PostCreateService.actions.redo);
 export const swapElements = dispatch(PostCreateService.actions.swapElements);
 export const removeElement = dispatch(PostCreateService.actions.removeElement);
-export const removeAttachments = dispatch(
-    PostCreateService.actions.removeAttachments
-);
+
 export const setGrade = dispatch(PostCreateService.actions.setGrade);
 export const setLength = dispatch(PostCreateService.actions.setLength);
 export const setContentType = dispatch(PostCreateService.actions.setContentType);

@@ -24,8 +24,6 @@ export default class WebSocketComp extends Vue{
     mounted() {
         var vm: WebSocketComp = this;
         this.ws.onmessage = function(msg){
-            console.log("recieved message" + msg);
-            console.log(msg);
             vm.chat.push(msg.data);
         }
         //ws.send("hello world");

@@ -154,7 +154,7 @@ const storeOptions: StoreOptions<IRootState> = {
     plugins: [WatchStore]
 };
 
-let store = new Vuex.Store<IRootState>(storeOptions);
+const store = new Vuex.Store<IRootState>(storeOptions);
 
 // storeSocket.onmessage = (msg) => {
 //     console.log("[WS] Websocket recieved message: ", msg);
@@ -164,7 +164,6 @@ let store = new Vuex.Store<IRootState>(storeOptions);
 //     mutUpdate(store, p);
 // };
 
-
 import {getMap, mutCreate, mutUpdate} from "./store_modules/PostService";
 /*
  * After we've declared all of our store modules we can now add a message listener to the websocket.
@@ -172,25 +171,12 @@ import {getMap, mutCreate, mutUpdate} from "./store_modules/PostService";
  * a store dependency we'd have a circular dependency and would cause all sorts of errors.
 */
 WebSocket.getInstance().addMessageListener( (msg) => {
-    console.log(msg);
-
-    // when we're getting from websocket with id - we'll need to use Post.pkify()
     const val = JSON.parse(msg.data)[0];
-    const f = Object.assign({}, val);
-    
-    console.log(f);
     const p: Post = Post.pkify(val);
-    console.log(p);
-    console.log("got message");
-    console.log(p);
     const db: Database = Database.getInstance();
-    console.log(p.pk);
-    db.getPost(p.pk as number).then(p => {
-        console.log("we've subbed to post " + p.pk + " so now we're going to update our local cache to match the message we got for it");
+    db.getPost(p.pk as number).then((post) => {
         db.putPost(p);
-    }).catch(() => {
-        //don't save - that's taken care of by Post.get when its told to save/subscribe
-    });
+    }).catch();
     if (getMap(store).has(p.pk!.toString())) {
         mutUpdate(store, p);
     } else {
