@@ -69,10 +69,9 @@ use db::save_posts;
 use models::*;
 
 use models::MessageType;
-use std::rc::{Rc, Weak};
+use std::rc::{Rc};
 use std::sync::Arc;
 use std::thread;
-use std::sync::RwLock;
 use std::cell::RefCell;
 
 #[derive(Debug, Clone)]
@@ -92,21 +91,6 @@ impl GrandSocketStation {
     }
     pub fn push_connection(&mut self, conn: Connection) {
         return self.connections.push(Rc::new(conn));
-    }
-    pub fn set_parent(&mut self, conn: Connection) {
-        for a in &mut self.connections {
-            println!("mutable ref: {:?}", a);
-            // if a == &mut conn {
-            //     println!("setting {:?}...", a);
-            //     a.parent = Weak::new();
-            // }
-        }
-        // let c = self.connections.into_iter().find(|x| *x==conn);
-        // println!("set_parent: {:?}", c);
-        // match c {
-        //     Some(val) => {},
-        //     None => {},
-        // }
     }
 }
 
@@ -143,6 +127,11 @@ enum IdOrPost {
     Post(models::Post),
 }
 
+
+pub type Version = u64;
+pub type ID = i32;
+pub type ManifestEntry = (ID, Version);
+
 /// Recieved msg:
 ///
 /// WSMessage { message: Create, id: None, post: Some(Post { id: 1, title: "test post title",
@@ -155,6 +144,8 @@ struct WSMessage {
     message: MessageType,
     id: Option<i32>,
     post: Option<models::Post>, //id_or_post: IdOrPost
+    manifest: Option<Vec<ManifestEntry>>,
+    version: Option<u64>,
 }
 
 impl Handler for Connection {
@@ -162,7 +153,7 @@ impl Handler for Connection {
         // We have a new connection, so we increment the connection counter
         // .get_mut(&self.count.get()).get_or_insert(&mut hs.peer_addr.unwrap().ip());  // insert(self.count.get(), hs);
         //  self.connections[self.out.connection_id()] = self.out;
-        println!("HANDSHAKE --> {:?}", hs);
+        // println!("HANDSHAKE --> {:?}", hs);
         println!("client connected");
         Ok(())
     }
@@ -361,6 +352,23 @@ impl Connection {
         
         println!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Update);
+        let mut wrap = Wrapper::new()
+            .set_model(ModelType::Post)
+            .set_msg_type(MessageType::Update)
+            .build();
+
+        // does the request have a Post ID?
+        let post = match msg.post {
+            Some(post) => post,
+            None => {
+                // fail-fast
+                return Err(String::from("No post ID was provided!"));
+            }
+        };
+        {
+            wrap.items_mut().push(Arc::new(Resource::new(post)));
+        }
+        println!("WRAP: {:?}", wrap.items());
         unimplemented!()
     }
     fn handle_watch_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {

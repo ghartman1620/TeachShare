@@ -111,7 +111,7 @@ export class User extends Model {
     }
 }
 
-enum ContentType {
+export enum ContentType {
     Game = 0,
     Lab,
     Lecture

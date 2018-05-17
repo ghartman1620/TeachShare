@@ -1,10 +1,10 @@
 import { AxiosResponse } from "axios";
 import Vue from "vue";
 import Vuex, { ActionContext, ActionTree, StoreOptions } from "vuex";
-import { getStoreAccessors, ActionHandlerNoPayload } from "vuex-typescript";
+import { ActionHandlerNoPayload, getStoreAccessors } from "vuex-typescript";
 
 import api from "../src/api";
-import { IRootState, Post, User, Comment } from "./models";
+import { IRootState, Post, User, Comment, ContentType } from "./models";
 import CommentService from "./store_modules/CommentService";
 import FileService from "./store_modules/FileService";
 import NotificationService from "./store_modules/NotificationService";
@@ -28,6 +28,25 @@ var storeSocket: WebSocket = WebSocket.getInstance();
 storeSocket.sendGet(1);
 storeSocket.sendWatch(1);
 storeSocket.sendWatch(1);
+
+const p = new Post(1, [], new User(1));
+p.attachments = [];
+p.concepts = [];
+p.content = [];
+p.content_type = ContentType.Game;
+p.coreIdeas = [];
+p.draft = false;
+p.grade = 1;
+p.likes = 0;
+p.practices = [];
+p.standards = [];
+p.subject = 0;
+p.tags = [];
+p.title = "This is a post title";
+p.updated = new Date();
+
+
+storeSocket.sendUpdate(p);
 
 function circularRecordChecker(record: any, seen: any[] = []) {
 
