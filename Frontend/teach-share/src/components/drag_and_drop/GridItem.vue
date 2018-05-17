@@ -4,16 +4,20 @@
          :class="{ 'vue-resizable' : resizable, 'resizing' : isResizing, 'vue-draggable-dragging' : isDragging, 'cssTransforms' : useCssTransforms, 'render-rtl' : renderRtl, 'disable-userselect': isDragging }"
          :style="style"
     >
-    <br>
-
         <!-- <div class="col-12 container">
             <div class="post-element card">
                 <post-element :element="element" :index="index"></post-element>
             </div> -->
 
-            <div class="post-element-container">
+            <div id="post-element-container">
                     <div class="card-column column">
-                        <div class="col-12 container">
+                        <span v-if="draggable" ref="dragHandle" class="vue-draggable-handle">
+                            <img class="grab-image" src="/static/th.svg">
+                        </span>
+
+                        <div class="col-1">
+                        </div>
+                        <div class="col-11 container">
                             <div class="post-element card">
                                 <post-element :element="this.element" :index="this.index"></post-element>
                             </div>
@@ -22,11 +26,9 @@
                         <div class="justify-content-start">
                             <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
 
-                                <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button>
-                                <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="/static/edit-icon.png"></button>
-                                <span v-if="draggable" ref="dragHandle" class="vue-draggable-handle">
-                                    <img class="float-right" style="margin-top:10px;width:20px; height:20px;" src="/static/arrows-vertical.svg"></img>
-                                </span>
+                                <button class="btn btn-danger btn-sm" id="garbage-button" @click="removeElement(index)"><img height=17 width=17 src="/static/trash-icon.png"></button>
+                                <button class="btn btn-primary btn-sm" id="edit-button" @click="openEditor(index)"><img height=17 width=17 src="/static/edit-icon.png"></button>
+                                
 
                             </div>
                         </div>
@@ -35,7 +37,7 @@
                 <span v-if="resizable" ref="handle" :class="resizableHandleClass">
                 </span>
 
-                </div>
+            </div>
 
 
             
@@ -50,17 +52,46 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
 $card-color: #96e6b3;
 
 
-    .post-element-container {
-        padding-top: 30px;
-        padding-right: 20px;
-        padding-left: 20px;
+    .grab-image {
+        opacity: 0.3;
+        width: 20px;
+        height: 20px;
+        transition: 0.2s;
+    }
+
+    .grab-image:hover {
+        opacity: 1;
+    }
+
+    .grab-image:active {
+        opacity: 1;
+    }
+
+    #garbage-button {
+        margin-left: 10px;
+        margin-top: 10px;
+    }
+
+    #edit-button {
+        margin-top: 10px;
+    }
+
+    #post-element-container {
+        padding-top: 15px;
+        padding-right: 0px;
+        padding-left: 0px;
         padding-bottom: 10px;
         border-radius: 5px;
         box-shadow: $card-shadow;
         background-color: $card-color;
     }
 
+    .vue-draggable-handle {
+        padding-left: 10px;
+    }
+
     .vue-grid-item {
+        display: block;
         transition: all 200ms ease;
         transition-property: left, top, right;
         /* background: red; */
@@ -132,6 +163,7 @@ $card-color: #96e6b3;
     }
 </style>
 <script>
+    import * as $ from 'jquery';
     import TextElement from '../text/TextElement';
     import {setTopLeft, setTopRight, setTransformRtl, setTransform, createMarkup, getLayoutItem} from './utils.ts';
     import {getControlPosition, offsetXYFromParentOf, createCoreData} from './draggableUtils';
@@ -268,6 +300,8 @@ $card-color: #96e6b3;
         inject: ["eventBus"],
         data: function () {
             return {
+                dimensionsEmitted: false,
+                elementDimensions: {},
                 cols: 1,
                 containerWidth: 100,
                 rowHeight: 30,
@@ -383,6 +417,19 @@ $card-color: #96e6b3;
             }
             this.useCssTransforms = this.$parent.useCssTransforms;
             this.createStyle();
+        },
+        updated: function () {
+            if (this.dimensionsEmitted === false) {
+                this.$nextTick(function () {
+                    var cardHeight = document.getElementById('post-element-container');
+                    console.log("Grid item: ", cardHeight)
+                    this.elementDimensions["index"] = this.i;
+                    this.elementDimensions["height"] = cardHeight;
+                    this.dimensionsEmitted = true;
+                    this.$emit('update-height', this.elementDimensions);
+                })
+            }
+
         },
         watch: {
             isDraggable: function () {
@@ -650,8 +697,8 @@ $card-color: #96e6b3;
                             newPosition.left = clientRect.left - parentRect.left;
                         }
                         newPosition.top = clientRect.top - parentRect.top;
-                        console.log("### drag end => " + JSON.stringify(newPosition));
-                        console.log("### DROP: " + JSON.stringify(newPosition));
+                        // console.log("### drag end => " + JSON.stringify(newPosition));
+                        // console.log("### DROP: " + JSON.stringify(newPosition));
                         this.dragging = null;
                         this.isDragging = false;
                         shouldUpdate = true;
@@ -667,7 +714,7 @@ $card-color: #96e6b3;
                         newPosition.top = this.dragging.top + coreEvent.deltaY;
                         // console.log("### drag => " + event.type + ", x=" + x + ", y=" + y);
                         // console.log("### drag => " + event.type + ", deltaX=" + coreEvent.deltaX + ", deltaY=" + coreEvent.deltaY);
-                        console.log("### drag end => " + JSON.stringify(newPosition));
+                        // console.log("### drag end => " + JSON.stringify(newPosition));
                         this.dragging = newPosition;
                         break;
                 }
@@ -684,16 +731,16 @@ $card-color: #96e6b3;
 
                 if (this.innerX !== pos.x || this.innerY !== pos.y) {
                     this.$emit("move", this.i, pos.x, pos.y);
-                    console.log("move", this.i, pos.x, pos.y);
+                    // console.log("move", this.i, pos.x, pos.y);
 
                 }
                 if (event.type === "dragend" && (this.previousX !== this.innerX || this.previousY !== this.innerY)) {
                     this.$emit("moved", this.i, pos.x, pos.y);
-                    console.log("moved", this.i, pos.x, pos.y);
+                    // console.log("moved", this.i, pos.x, pos.y);
 
                 }
                 this.eventBus.$emit("dragEvent", event.type, this.i, pos.x, pos.y, this.innerH, this.innerW);
-                console.log("dragEvent", event.type, this.i, pos.x, pos.y, this.innerH, this.innerW);
+                // console.log("dragEvent", event.type, this.i, pos.x, pos.y, this.innerH, this.innerW);
 
             },
             calcPosition: function (x, y, w, h) {
