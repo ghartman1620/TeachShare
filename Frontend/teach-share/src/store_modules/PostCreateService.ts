@@ -33,7 +33,7 @@ interface BeginPostArg {
 
 export type PostContext = ActionContext<PostState, IRootState>;
 
-const state: PostState = {
+const postState: PostState = {
     post: undefined,
     doneMutations: [],
     unDoneMutations: []
@@ -108,7 +108,7 @@ export const mutations = {
     REMOVE_ELEMENT: (state: PostState, index: number) => {
         state.doneMutations.push({
             mutation: "UNDO_REMOVE_ELEMENT",
-            arg: { element: state.post!.elements[index], index: index }
+            arg: { element: state.post!.elements[index], index }
         });
         state.post!.removeElement(index);
     },
@@ -129,7 +129,6 @@ export const mutations = {
         state.post!.saveDraft();
     },
     BEGIN_POST: (state: PostState, arg: BeginPostArg) => {
-        
         state.post = new InProgressPost(arg.userid, arg.p);
     },
     SET_GRADE: (state: PostState, grade: number) => {
@@ -144,8 +143,6 @@ export const mutations = {
     SET_LENGTH: (state: PostState, length: number) => {
         state.post!.setLength(length);
     },
-
-
 };
 
 export const actions = {
@@ -211,7 +208,6 @@ export const actions = {
     removeElement: (context: PostContext, index: number) => {
         context.commit("REMOVE_ELEMENT", index);
         context.commit("CLEAR_REDO");
-
         context.dispatch("saveDraft").then(res => console.error(res));
     },
     addAttachments: (state: PostContext, attachments) => {
@@ -228,14 +224,13 @@ export const actions = {
         ctx.commit("SAVE_DRAFT");
     },
     createPost: (context: PostContext) => {
-        
         return new Promise((resolve, reject) => {
             context.state
                 .post!.publishPost()
-                .then(function(response) {
+                .then((response) => {
                     resolve(response);
                 })
-                .catch(function(error) {
+                .catch((error) => {
                     reject(error);
                 });
         });
@@ -310,7 +305,7 @@ export const getters = {
 const PostCreateService = {
     namespaced: true,
     strict: process.env.NODE_ENV !== "production",
-    state,
+    postState,
     mutations,
     actions,
     getters

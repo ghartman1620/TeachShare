@@ -1,7 +1,7 @@
 import ReconnectingWebSocket from "reconnecting-websocket";
+import api from "./api";
 import Database from "./Database";
 import {Post} from "./models";
-import api from "./api";
 
 enum ReadyState {
     Connecting =  0,
@@ -38,7 +38,7 @@ class MockWebSocket {
             fn!({});
         }
     }
-    public addEventListener(type: string, listener: (e) => undefined){
+    public addEventListener(type: string, listener: (e) => undefined) {
         if (type === "open") {
             console.log("adding open listener to mock socket");
             this.openListeners.push(listener);
@@ -76,9 +76,7 @@ export default class WebSocket {
     private rws: ReconnectingWebSocket;
     private constructor() {
         this.rws = new ReconnectingWebSocket("ws://127.0.0.1:3012");
-        this.rws.addEventListener("open", (msg) => {
-            return undefined;
-        });
+
     }
 
     // in all sender functions, if the websocket is still connecting we'll add
@@ -92,8 +90,7 @@ export default class WebSocket {
         });
     }
     public sendUpdate(p: Post): MessageStatus {
-        /*console.log("sending update");
-        console.log(p.toApiObject());
+        /*
         return this.send({
             message: MessageType.Update,
             post: p.toApiObject()
@@ -104,23 +101,23 @@ export default class WebSocket {
     public sendWatch(id: number): MessageStatus {
         /*return this.send({
             message: MessageType.Watch,
-            id: id
+            id
         });*/
         console.error("Watch message sent - not yet implemented!");
         return MessageStatus.ConnectionClosed;
 
     }
-    public sendGet(id: number): MessageStatus{
+    public sendGet(id: number): MessageStatus {
         return this.send({
             message: MessageType.Get,
             id,
         });
     }
-    public addOpenListener(fn: (any) => undefined){
+    public addOpenListener(fn: (any) => undefined) {
         this.rws.addEventListener("open", fn);
     }
 
-    public addMessageListener(fn: (any) => undefined){
+    public addMessageListener(fn: (any) => undefined) {
         this.rws.addEventListener("message", fn);
     }
     private send(val): MessageStatus{

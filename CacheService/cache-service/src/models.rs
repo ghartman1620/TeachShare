@@ -6,9 +6,50 @@ use serde_json::Value;
 use serde_json::from_str;
 use std::sync::Arc;
 use std::fmt;
+use std::error;
 
 
+#[derive(Debug)]
+pub struct NoIDProvided {
+    details: String, 
+}
 
+impl NoIDProvided {
+    pub fn new(msg: &str) -> NoIDProvided {
+        NoIDProvided{
+            details: msg.to_string(),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum CacheError {
+    NoIDProvided(),
+
+}
+
+/// Error Trait definition:
+/// 
+/// pub trait Error: Debug + Display {
+///     fn description(&self) -> &str;
+///     fn cause(&self) -> Option<&Error> { ... }
+/// }
+impl error::Error for NoIDProvided {
+    fn description(&self) -> &str {
+        println!("No ID (pk) provided for request");
+        "No ID (pk) provided for request"
+    }
+    // fn cause(&self) -> Option<&error::Error> {
+    //     let res = NoIDProvided::new("No ID (pk) was provided");
+    //     Some(&res)
+    // }
+}
+
+impl fmt::Display for NoIDProvided {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "No ID provided.")
+    }
+}
 
 
 #[derive(Debug, Clone)]
@@ -71,6 +112,7 @@ impl Eq for Resource<Post> {}
 #[derive(Debug, Clone, Serialize, Eq, PartialEq, Deserialize)]
 pub enum MessageType {
     Watch,
+    Manifest,
     Create,
     Update,
     Get,
@@ -234,6 +276,7 @@ impl Item for PostResource {
         return self.version;
     }
 }
+
 
 #[derive(Queryable, Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct User {

@@ -26,6 +26,8 @@ const state = {};
 var storeSocket: WebSocket = WebSocket.getInstance();
 
 storeSocket.sendGet(1);
+storeSocket.sendWatch(1);
+storeSocket.sendWatch(1);
 
 function circularRecordChecker(record: any, seen: any[] = []) {
 
@@ -143,7 +145,7 @@ const store = new Vuex.Store<IRootState>(storeOptions);
 //     mutUpdate(store, p);
 // };
 
-import {getMap,  mutCreate, mutUpdate} from "./store_modules/PostService";
+import {getMap, mutCreate, mutUpdate} from "./store_modules/PostService";
 /*
  * After we've declared all of our store modules we can now add a message listener to the websocket.
  * Can't do it in websocket because this function depends on our store modules, and if websocket itself had
