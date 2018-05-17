@@ -78,20 +78,20 @@ use std::cell::RefCell;
 #[derive(Debug, Clone)]
 struct GrandSocketStation {
     // represents the list of users
-    connections: Vec<Connection>,
+    connections: Vec<Rc<Connection>>,
     // represents the resource that are being watched by users
     // watches: Vec<models::Resource>,
 }
 
 impl GrandSocketStation {
-    pub fn get_connections(&self) -> &Vec<Connection> {
+    pub fn get_connections(&self) -> &Vec<Rc<Connection>> {
         return &self.connections;
     }
-    pub fn get_connections_mut(&mut self) -> &mut Vec<Connection> {
+    pub fn get_connections_mut(&mut self) -> &mut Vec<Rc<Connection>> {
         return &mut self.connections;
     }
     pub fn push_connection(&mut self, conn: Connection) {
-        return self.connections.push(conn);
+        return self.connections.push(Rc::new(conn));
     }
     pub fn set_parent(&mut self, conn: Connection) {
         for a in &mut self.connections {
@@ -190,6 +190,9 @@ impl Handler for Connection {
                                 println!("OK: {:?}", parent);
                                 println!("connections: {:?}", parent.connections);
                                 println!("connection count: {}", parent.connections.len());
+                                for c in &parent.connections {
+                                    println!("Connection --> {:?}", c);
+                                }
                             },
                             Err(e) => println!("Error: {:?}!", e),
                         }
@@ -210,6 +213,7 @@ impl Handler for Connection {
                             MessageType::Create => self.handle_create_msg(msg),
                             MessageType::Watch => self.handle_watch_msg(msg),
                             MessageType::Update => self.handle_update_msg(msg),
+                            MessageType::Manifest => self.handle_manifest_msg(msg),
                         };
                         msg_result
                     }
@@ -231,6 +235,31 @@ impl Handler for Connection {
             CloseCode::Normal => println!("The client is done with the connection."),
             CloseCode::Away => {
                 println!("The client is leaving the site.");
+                match &mut self.parent {
+                    Some(val) => {
+                        println!("Some: {:?}", val);
+                        match val.try_borrow_mut() {
+                            Ok(ref mut parent) => {
+                                println!("OK: {:?}", parent);
+                                println!("connections: {:?}", parent.connections);
+                                let mut exiting_connection_id = 0;
+                                let old_connection_id = self.tx.connection_id();
+                                println!("connection count: {}", parent.connections.len());
+                                {
+                                    exiting_connection_id = parent.connections.clone().into_iter().position(|x| x.tx.connection_id()==old_connection_id).unwrap();
+                                }
+                                parent.connections.remove(exiting_connection_id);
+                                for c in &parent.connections {
+                                    println!("Connection --> {:?}", c);
+                                }
+                            },
+                            Err(e) => println!("Error: {:?}!", e),
+                        }
+                    
+                    },
+                    None => {println!("None. Did not unwrap.")},
+                }
+                
             }
             CloseCode::Abnormal => {
                 println!("Closing handshake failed! Unable to obtain closing status from client.")
@@ -323,6 +352,10 @@ impl Connection {
 
         let output: Vec<Post> = resp.iter().map(|x| (*x.get_data()).clone()).collect();
         Ok(output)
+    }
+
+    fn handle_manifest_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
+        unimplemented!()
     }
     fn handle_update_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
         
@@ -417,11 +450,9 @@ impl Connection {
 // }
 
 fn main() {
-    let p1 = models::Post::new();
-    let resource = models::Resource::new(p1);
-    let hub = Some(Rc::new(RefCell::new(GrandSocketStation {
+    let hub = Rc::new(RefCell::new(GrandSocketStation {
         connections: vec![],
-    })));
+    }));
     let i = &mut 0;
     
     // start db (SAVE only) thread
@@ -462,27 +493,30 @@ fn main() {
     // system.run();
     //let hub_inner = hub.unwrap().clone();
 
-    listen("127.0.0.1:3012", |out| {
+    listen("127.0.0.1:3012", move |out| {
         let mut value = None;
         
         {
             value = Some(Connection {
                 id: *i,
                 tx: out.clone(), 
-                parent: hub,
+                parent: Some(hub.clone()),
                 to_cache: a.clone(),
                 from_cache: b.clone(),
                 kill_cache: c.clone(),
             });
         }
 
-        {
-            let conn = value.unwrap();
+        
+        let conn = value.unwrap();
 
-            let h = &mut hub.unwrap().clone();
-            let hub_mut = Rc::get_mut(h).expect("Uh oh... Could not borrow hub");
-            hub_mut.borrow_mut().push_connection(conn.clone());
-        }
+        let h = &mut hub.borrow_mut();
+        // let h = &mut hub.unwrap().clone();
+        // let hub_mut = Rc::get_mut(h).expect("Uh oh... Could not borrow hub");
+        h.push_connection(conn.clone());
+
+        let value: Option<Connection> = Some(conn.clone());
+        
         
         
         // {

@@ -66,7 +66,11 @@ pub fn cache_thread(
                                 let res = handle_update(msg, c, &ret_pipe);
                             }
                             
-                        }
+                        },
+                        MessageType::Manifest => {
+                            println!("[CACHE] RECEIVED => {:?}", msg.msg_type());
+                            assert_eq!(msg.msg_type(), MessageType::Manifest);
+                        },
                     };
 
                 println!("[CACHE] (current) -> {:?}", cache);

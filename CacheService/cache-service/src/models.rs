@@ -112,6 +112,7 @@ impl Eq for Resource<Post> {}
 #[derive(Debug, Clone, Serialize, Eq, PartialEq, Deserialize)]
 pub enum MessageType {
     Watch,
+    Manifest,
     Create,
     Update,
     Get,
