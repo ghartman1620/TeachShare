@@ -1,7 +1,7 @@
 
 <template>
 <div>
-
+    
     <side-bar collapsedString="Your posts">
         <div v-for="post in userPosts">
             <a href="#" v-on:click.stop="editPost(post)">
@@ -10,7 +10,8 @@
         </div>
     </side-bar>
     <div v-if="currentPage===1">
-        <div v-if="inProgressPost !== undefined && postStatus !== LOADING" :style="getBodyStyle()">
+       
+        <div v-if=" inProgressPost !== undefined && postStatus !== LOADING" :style="getBodyStyle()">
             <div class="col-sm-12 col-lg-10 col-md-12 card card-outline-danger container icon-card-container">
                 <div class="col-8 mx-auto card-deck" id="button-bar">
 
@@ -141,6 +142,8 @@
             <h1>
                 Loading post...
             </h1>
+            <h1>foiajfiaewjfqweijfjqewifqewjqefwji</h1>
+            <h1>{{createState.post}}</h1>
             <font-awesome-icon icon="spinner" spin></font-awesome-icon>
         </div>
     </div>
@@ -149,6 +152,7 @@
 
         </tag-select>
     </div>
+    
 
     <br><br><br> <!-- this is so problems don't occur with bottom of page button presses -->
     <nav class="navbar fixed-bottom navbar-light navbar-left bottom-navbar bg-light">
@@ -272,7 +276,7 @@ const bodyVisible = {
     components: { PostElement, FontAwesomeIcon, SideBar, TagSelect }
 })
 export default class PostCreate extends Vue{
-
+    @State(state => state.create) createState;
     get getLoggedInUser(): User {
         return getLoggedInUser(this.$store);
     }
@@ -313,8 +317,12 @@ export default class PostCreate extends Vue{
 
 
     // getters
-    get inProgressPost(): InProgressPost {
-        return getCurrentPost(this.$store)!;
+    get inProgressPost(): InProgressPost | undefined{
+        console.log("getting in progresspost");
+        console.log(getCurrentPost(this.$store));
+        console.log(this.createState.post);
+        return this.createState.post;
+        
     }
 
     get storeElements() {
@@ -329,14 +337,19 @@ export default class PostCreate extends Vue{
 
     saveTagChanges(grade: number, length: number, subject: number, contentType: number, standards: number[],
             concepts, practices, coreIdeas): void {
-        this.inProgressPost.setStandards(standards);
-        this.inProgressPost.setGrade(grade);
-        this.inProgressPost.setSubject(subject);
-        this.inProgressPost.setContentType(contentType);
-        this.inProgressPost.setLength(length);
-        this.inProgressPost.setConcepts(concepts);
-        this.inProgressPost.setPractices(practices);
-        this.saveDraft();
+        if(this.inProgressPost !== undefined){
+            this.inProgressPost!.setStandards(standards);
+            this.inProgressPost!.setGrade(grade);
+            this.inProgressPost!.setSubject(subject);
+            this.inProgressPost!.setContentType(contentType);
+            this.inProgressPost!.setLength(length);
+            this.inProgressPost!.setConcepts(concepts);
+            this.inProgressPost!.setPractices(practices);
+            this.saveDraft();
+        } else {
+            console.error("Error: saveTagChanges() called when inprogresspost does not exist");
+        }
+
     }
     
     saveDraft() {
@@ -450,7 +463,10 @@ export default class PostCreate extends Vue{
         let vm: PostCreate = this;
         if(postid !== undefined){
             fetchPostSubscribe(this.$store, postid).then(function(p){
-                beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p: p})
+                beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p: p});
+                console.log("begun post:")
+                console.log(getCurrentPost(vm.$store));
+                console.log(vm.createState.post);
                 vm.postStatus = vm.SAVED;
             });
         }
@@ -524,11 +540,16 @@ export default class PostCreate extends Vue{
             let userpk = this.getLoggedInUser.pk as number;
             let vm: PostCreate = this;
             WebSocket.getInstance().addMessageListener(function(message){
-                let post = Post.pkify(JSON.parse(message.data));
+                console.log("im getting a message in postcreate");
+                console.log(JSON.parse(message.data));
+                let post = Post.pkify(JSON.parse(message.data)[0]);
+                console.log(post);
                 
                 let inProgressPost = window.localStorage.getItem("inProgressPost");
                 if(inProgressPost){
+                    console.log(inProgressPost);
                     if(post.pk === parseInt(inProgressPost as string,10)){
+                        console.log("beginning post");
                         beginPost(store,{userid: userpk, p: post});
                         vm.postStatus = PostStatus.Saved;
                     }

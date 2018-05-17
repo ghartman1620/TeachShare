@@ -267,7 +267,6 @@ export const actions = {
         context.commit("SET_LENGTH", length);
         context.dispatch("saveDraft");
     }
-    
 };
 
 export const getters = {
@@ -289,7 +288,11 @@ export const getters = {
         }
         return undefined;
     },
-    getCurrentPost: (state: PostState) => state.post,
+    getCurrentPost: (state: PostState) => {
+        console.log("hello, i'm getting current post. that current post is:");
+        console.log(state.post);
+        return state.post;
+    },
     getCurrentPostId: (state, getters) => {
         if (state.post !== null && typeof getters.getCurrentPost !== "undefined") {
             return getters.getCurrentPost.pk;

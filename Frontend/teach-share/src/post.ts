@@ -32,7 +32,10 @@ export class InProgressPost {
      * Otherwise, loads in data from the Post.
     */
     public constructor( userid: number, post?: Post) {
+        console.log("begin post ctor: ");
+        console.log(post);
         if (post !== undefined) {
+
             this.elements = post.content ? post.content : [];
             this.title = post.title ? post.title : "";
             this.tags = post.tags ? post.tags : [];
@@ -52,6 +55,8 @@ export class InProgressPost {
             } else {
                 this.pk = post.pk;
             }
+            console.log("returning from in progress post ctor: post is");
+            console.log(this);
         } else {
             this.elements = [];
             this.title = "";

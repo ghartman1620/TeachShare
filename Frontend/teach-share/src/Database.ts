@@ -81,7 +81,6 @@ export default class Database{
             });
         });
     }
-
-
-
 }
+
+Database.getInstance().deletePost(1);
