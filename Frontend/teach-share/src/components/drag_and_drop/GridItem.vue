@@ -9,10 +9,10 @@
                 <post-element :element="element" :index="index"></post-element>
             </div> -->
 
-            <div id="post-element-container">
+            <div class="post-element-container" v-bind:id="'element-'+this.i">
                     <div class="card-column column">
                         <span v-if="draggable" ref="dragHandle" class="vue-draggable-handle">
-                            <img class="grab-image" src="/static/th.svg">
+                            <img class="grab-image" src="/static/grid.png">
                         </span>
 
                         <div class="col-1">
@@ -52,11 +52,20 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
 $card-color: #96e6b3;
 
 
+    #garbage-button {
+        margin-left: 10px;
+        margin-top: 10px;
+    }
+
+    #edit-button {
+        margin-top: 10px;
+    }
+
     .grab-image {
-        opacity: 0.3;
+        opacity: 0.7;
         width: 20px;
         height: 20px;
-        transition: 0.2s;
+        transition: 0.4s;
     }
 
     .grab-image:hover {
@@ -67,17 +76,8 @@ $card-color: #96e6b3;
         opacity: 1;
     }
 
-    #garbage-button {
-        margin-left: 10px;
-        margin-top: 10px;
-    }
-
-    #edit-button {
-        margin-top: 10px;
-    }
-
-    #post-element-container {
-        padding-top: 15px;
+    .post-element-container {
+        padding-top: 10px;
         padding-right: 0px;
         padding-left: 0px;
         padding-bottom: 10px;
@@ -418,18 +418,18 @@ $card-color: #96e6b3;
             this.useCssTransforms = this.$parent.useCssTransforms;
             this.createStyle();
         },
-        updated: function () {
-            if (this.dimensionsEmitted === false) {
+        updated: function () {//This is a check that we only emit the rendered height once upon update,
+            if (this.dimensionsEmitted === false) { //not over hundreds of updates to the grid
                 this.$nextTick(function () {
-                    var cardHeight = document.getElementById('post-element-container');
-                    console.log("Grid item: ", cardHeight)
+
+                    var cardHeight = document.getElementById('element-'+this.i).offsetHeight;
+                    console.log("Post element height: ", cardHeight)
                     this.elementDimensions["index"] = this.i;
                     this.elementDimensions["height"] = cardHeight;
                     this.dimensionsEmitted = true;
                     this.$emit('update-height', this.elementDimensions);
                 })
             }
-
         },
         watch: {
             isDraggable: function () {

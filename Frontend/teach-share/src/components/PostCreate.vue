@@ -111,6 +111,9 @@
                                 </span>
                             </div>
                         </div>
+                        <br>
+                        <br>
+                        <br>
                         <drag-and-drop v-if="currentPost.elements.length > 0" :key=nextStateId>
                         </drag-and-drop>
                         <br>
