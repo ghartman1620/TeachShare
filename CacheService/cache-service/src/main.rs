@@ -72,7 +72,8 @@ use models::MessageType;
 use std::rc::{Rc, Weak};
 use std::sync::Arc;
 use std::thread;
-
+use std::sync::RwLock;
+use std::cell::RefCell;
 
 #[derive(Debug, Clone)]
 struct GrandSocketStation {
@@ -117,7 +118,7 @@ impl std::cmp::PartialEq for Connection {
 
 #[derive(Clone)]
 struct Connection {
-    parent: Weak<GrandSocketStation>,
+    parent: Option<Rc<RefCell<GrandSocketStation>>>,
     id: i32,
     tx: Sender,
     to_cache: crossbeam_channel::Sender<SafeArcMsg>,
@@ -177,6 +178,14 @@ impl Handler for Connection {
             } // ..
             Message::Text(text) => {
                 println!("{}", text);
+
+                // println!("WEAK --> {:?}", self.parent.strong());
+                // let mut g = &mut self.parent.expect("could not unwrap option..");
+                println!("RC: {:?}", self.parent);
+                // let gss: &mut GrandSocketStation = Rc::get_mut(g).expect("could not get mut");
+                // let mut conn = &mut gss.connections;
+                // println!("CONNECTIONS: {:?}", conn);
+
                 let json: Result<WSMessage, serde_json::Error> = serde_json::from_str(&text);
                 // println!("[JSON] ----> {:?}", json.unwrap());
                 let response: Result<Vec<Post>, String> = match json {
@@ -301,6 +310,7 @@ impl Connection {
         Ok(output)
     }
     fn handle_update_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
+        
         println!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Update);
         unimplemented!()
@@ -329,9 +339,11 @@ impl Connection {
         let conn_id = self.tx.connection_id();
         println!("TOKEN: {:?}", token.0);
         println!("Connection ID: {:?}", conn_id);
+        println!("Post ID: {:?}", post_id);
 
         // add watch to resource
         resource.add_watch(conn_id as i32);
+        wrap.connection_id = conn_id as i32;
 
         // wrap it up and send
         wrap.items_mut().push(Arc::new(resource));
@@ -392,12 +404,11 @@ impl Connection {
 fn main() {
     let p1 = models::Post::new();
     let resource = models::Resource::new(p1);
-    let socket_station = GrandSocketStation {
+    let hub = Some(Rc::new(RefCell::new(GrandSocketStation {
         connections: vec![],
-    };
-    let mut hub = Rc::new(socket_station);
+    })));
     let i = &mut 0;
-
+    
     // start db (SAVE only) thread
     let (send_db, recv_db) = crossbeam_channel::unbounded();
     let db_handle = thread::spawn(move || {
@@ -434,66 +445,38 @@ fn main() {
     //     future::result(Ok(()))ID:ID:
     // }));    
     // system.run();
+    let hub_inner = hub.unwrap().clone();
 
-    listen("127.0.0.1:3012", |out| {
-        // println!("HUB: {:?}", h.into_inner());
-
-        // println!("Hub WEAK --> {:?}", Rc::downgrade(&h));
-        // let parent =  Rc::downgrade(&hub);
-        // println!("WEAK: {:?}", parent);
-        let placeholder: Weak<GrandSocketStation> = Weak::default();
+    listen("127.0.0.1:3012", move |out| {
+     
         let conn = Connection {
             id: *i,
-            tx: out, 
-            parent: placeholder,
+            tx: out.clone(), 
+            parent: Some(hub_inner.clone()),
             to_cache: a.clone(),
             from_cache: b.clone(),
             kill_cache: c.clone(),
         };
-
-        {
-            let hub_mut = Rc::get_mut(&mut hub).expect("Uh oh... Could not borrow hub");
-            hub_mut.push_connection(conn.clone());
-            // hub_mut.set_parent(conn.clone());
-            // hub_mut.connections[*i as usize].parent = Rc::downgrade(hub_mut);
-        }
-        {
-            // let hub_mut = Rc::get_mut(&mut hub).expect("Uh oh... Could not borrow hub");
-            // let c1 = &mut hub.get_connections_mut();
-
-            
-            // hub_mut.connections[*i as usize].parent = Rc::downgrade(hub_mut);
-        }
-        // hub.connections.get_mut()[*i as usize].parent = Rc::downgrade(&hub);
-        // hub_mut.push_connection(output);
-        // let res: Connection = Connection{};
+        
         // {
-        //     let res = Connection {
+        //     let conn = Connection {
         //         id: *i,
         //         tx: out, 
-        //         parent: Rc::downgrade(&hub),
+        //         parent: Rc::downgrade(*hub.read().unwrap()),
         //         to_cache: a.clone(),
         //         from_cache: b.clone(),
         //         kill_cache: c.clone(),
         //     };
-        //     let output = res.clone();
         // }
+        
+
         // {
+        //     let hub_mut = Rc::get_mut(&mut hub.unwrap()).expect("Uh oh... Could not borrow hub");
             
+        //     hub_mut.into_inner().push_connection(conn.clone());
+        //     // hub_mut.connections[*i as usize].parent = weak;
         // }
-        // hub.connections.push(res);
-        *i = *i + 1;
-
-        // test send on all connections
-        // for conn in hub.get_connections() {
-        //     let c: Connection = conn.clone();
-        //     let result = c.tx.send("This is a test send.");
-        //     match result {
-        //         Ok(val) => val,
-        //         Err(e) => println!("WS Send Error: {}", e),
-        //     }
-        // }
-
+        *i += 1;
         conn
     }).unwrap();
 

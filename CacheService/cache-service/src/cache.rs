@@ -33,7 +33,7 @@ pub fn cache_thread(
             select_loop! {
                 recv(in_pipe, msg) => {
                     let m = msg.clone();
-                    let response = match msg.msg_type() {
+                    match msg.msg_type() {
                         MessageType::Get => {
                             println!("[CACHE] RECEIVED => {:?}", msg.msg_type());
                             assert_eq!(msg.msg_type(), MessageType::Get);
