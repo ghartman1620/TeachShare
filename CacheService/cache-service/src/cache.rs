@@ -117,6 +117,8 @@ fn handle_get(
         {
             let mut borrowed_val = cash.borrow();
 
+            // let user_id_val = 1;
+            // let result: Vec<&Post> = borrowed_val.iter().filter(|(_, y)| y.data.user_id==user_id_val).map(|(_, y)| &y.data).collect();
             match borrowed_val.get(&m.get_data().id) {
                 Some(val) => {
                     println!("[CACHE] For key: {:?} ----> {:?}", &m.get_data().id, val);
@@ -136,16 +138,22 @@ fn handle_get(
             if post_result.is_err() {
                 println!("[CACHE] Error: {:?}", post_result.unwrap_err());
             } else {
-                let post = post_result.unwrap();
+                let mut post = post_result.unwrap();
                 println!("[CACHE] Post recieved from DB: {:?}", post);
 
                 if post.len() > 1 {
                     println!("[CACHE] Too many posts returned! --> #{} instead of 1.", post.len());
-                } else {
+                } else if post.len() == 1 {
                     // save in cache
                     {
                         // cash.try_borrow_mut();
                         let mut mutable_cache = cash.borrow_mut();
+                        // {
+                        //     let slice: &mut [Post] = post.as_mut_slice();
+                        //     for a in slice {
+                        //         println!("A: {:?}", a);
+                        //     }
+                        // }
                         let post_resource = Resource::new(post[0].clone());
                         let inserted = mutable_cache.insert(post[0].id, post_resource.clone());
                         match inserted {
@@ -159,6 +167,8 @@ fn handle_get(
                         }
                         wrap.items_mut().push(Arc::new(post_resource));
                     }
+                } else {
+                    // throw an error
                 }
             }
         }

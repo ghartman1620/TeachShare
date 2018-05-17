@@ -276,6 +276,7 @@ impl Item for PostResource {
     }
 }
 
+
 #[derive(Queryable, Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct User {
     id: i32,

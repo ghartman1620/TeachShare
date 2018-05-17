@@ -69,7 +69,7 @@ use db::save_posts;
 use models::*;
 
 use models::MessageType;
-use std::rc::Rc;
+use std::rc::{Rc, Weak};
 use std::sync::Arc;
 use std::thread;
 
@@ -86,14 +86,38 @@ impl GrandSocketStation {
     pub fn get_connections(&self) -> &Vec<Connection> {
         return &self.connections;
     }
+    pub fn get_connections_mut(&mut self) -> &mut Vec<Connection> {
+        return &mut self.connections;
+    }
     pub fn push_connection(&mut self, conn: Connection) {
         return self.connections.push(conn);
+    }
+    pub fn set_parent(&mut self, conn: Connection) {
+        for a in &mut self.connections {
+            println!("mutable ref: {:?}", a);
+            // if a == &mut conn {
+            //     println!("setting {:?}...", a);
+            //     a.parent = Weak::new();
+            // }
+        }
+        // let c = self.connections.into_iter().find(|x| *x==conn);
+        // println!("set_parent: {:?}", c);
+        // match c {
+        //     Some(val) => {},
+        //     None => {},
+        // }
+    }
+}
+
+impl std::cmp::PartialEq for Connection {
+    fn eq(&self, rhs: &Connection) -> bool {
+        self.id == rhs.id
     }
 }
 
 #[derive(Clone)]
 struct Connection {
-    // parent: Weak<Cell<GrandSocketStation>>,
+    parent: Weak<GrandSocketStation>,
     id: i32,
     tx: Sender,
     to_cache: crossbeam_channel::Sender<SafeArcMsg>,
@@ -137,6 +161,7 @@ impl Handler for Connection {
         // We have a new connection, so we increment the connection counter
         // .get_mut(&self.count.get()).get_or_insert(&mut hs.peer_addr.unwrap().ip());  // insert(self.count.get(), hs);
         //  self.connections[self.out.connection_id()] = self.out;
+        println!("HANDSHAKE --> {:?}", hs);
         println!("client connected");
         Ok(())
     }
@@ -283,36 +308,86 @@ impl Connection {
     fn handle_watch_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
         println!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Watch);
-        unimplemented!()
+        let mut wrap = Wrapper::new()
+            .set_model(ModelType::Post)
+            .set_msg_type(MessageType::Watch)
+            .build();
+
+        // does the request have a Post ID?
+        let post_id = match msg.id {
+            Some(post_id) => post_id,
+            None => {
+                // fail-fast
+                return Err(String::from("No post ID was provided!"));
+            }
+        };
+        let mut post = Post::new();
+        post.id = post_id;
+        let mut resource = Resource::new(post);
+
+        let token = self.tx.token();
+        let conn_id = self.tx.connection_id();
+        println!("TOKEN: {:?}", token.0);
+        println!("Connection ID: {:?}", conn_id);
+
+        // add watch to resource
+        resource.add_watch(conn_id as i32);
+
+        // wrap it up and send
+        wrap.items_mut().push(Arc::new(resource));
+        match self.to_cache.send(Arc::new(wrap)) {
+            Ok(val) => {
+                println!("Sucessfully sent and got in return: {:?}", val);
+            }
+            Err(e) => {
+                println!(
+                    "There was an error communicating with the cache! Err: {:?}",
+                    e
+                );
+                return Err(String::from(
+                    "There was an error communicating with the cache.",
+                ));
+            }
+        };
+
+        let resp = match self.from_cache.recv() {
+            Ok(val) => val.items().clone(), // @TODO: figure out how to avoid clone/copy
+            Err(e) => {
+                return Err(String::from("Error receiving from channel (from cache)."));
+            }
+        };
+        println!("resp: {:?}", resp);
+
+        Ok(vec![])
     }
 }
 
-#[derive(Debug)]
-struct DosTuple(i64, i64);
+// #[derive(Debug)]
+// struct DosTuple(i64, i64);
 
-impl actix::Message for DosTuple {
-    type Result = String;
-}
+// impl actix::Message for DosTuple {
+//     type Result = String;
+// }
 
-struct MyActor;
+// struct MyActor;
 
-impl actix::Actor for MyActor {
-    type Context = actix::Context<Self>;
+// impl actix::Actor for MyActor {
+//     type Context = actix::Context<Self>;
 
-    fn started(&mut self, ctx: &mut Self::Context) {
-       println!("I am alive!");
-       actix::Arbiter::system().do_send(actix::msgs::SystemExit(0));
-    }
-}
+//     fn started(&mut self, ctx: &mut Self::Context) {
+//        println!("I am alive!");
+//        actix::Arbiter::system().do_send(actix::msgs::SystemExit(0));
+//     }
+// }
 
-impl actix::Handler<DosTuple> for MyActor {
-    type Result = String;
+// impl actix::Handler<DosTuple> for MyActor {
+//     type Result = String;
 
-    fn handle(&mut self, msg: DosTuple, ctx: &mut actix::Context<Self>) -> Self::Result {
-        println!("handle: {:?}", msg);
-        String::from("this is just a test...")
-    }
-}
+//     fn handle(&mut self, msg: DosTuple, ctx: &mut actix::Context<Self>) -> Self::Result {
+//         println!("handle: {:?}", msg);
+//         String::from("this is just a test...")
+//     }
+// }
 
 fn main() {
     let p1 = models::Post::new();
@@ -337,28 +412,28 @@ fn main() {
     ) = wire_up(send_db);
 
 
-    /// Test actix actor framework stuff
+    /// Test actix actor framework stuff (again)
     
-    let system = actix::System::new("test");
-    // let thr_system = system.clone();
+    // let system = actix::System::new("test");
+    // // let thr_system = system.clone();
 
-    let addr: actix::Addr<actix::Syn, _> = MyActor.start();
-    let thread_addr = addr.clone();
-    let my_actor = addr.recipient();
-    my_actor.send(DosTuple(1, 1));
+    // let addr: actix::Addr<actix::Syn, _> = MyActor.start();
+    // let thread_addr = addr.clone();
+    // let my_actor = addr.recipient();
+    // my_actor.send(DosTuple(1, 1));
     
-    let res = thread_addr.send(DosTuple(0, 0));
-    let res1 = thread_addr.send(DosTuple(0, 0));
+    // let res = thread_addr.send(DosTuple(0, 0));
+    // let res1 = thread_addr.send(DosTuple(0, 0));
     
-    system.handle().spawn(res.then(|res| {
-            println!("RES: {:?}", res);
-            future::result(Ok(()))
-    }));
-    system.handle().spawn(res1.then(|res| {
-        println!("RES1: {:?}", res);
-        future::result(Ok(()))
-    }));    
-    system.run();
+    // system.handle().spawn(res.then(|res| {
+    //         println!("RES: {:?}", res);
+    //         future::result(Ok(()))
+    // }));
+    // system.handle().spawn(res1.then(|res| {
+    //     println!("RES1: {:?}", res);
+    //     future::result(Ok(()))ID:ID:
+    // }));    
+    // system.run();
 
     listen("127.0.0.1:3012", |out| {
         // println!("HUB: {:?}", h.into_inner());
@@ -366,19 +441,46 @@ fn main() {
         // println!("Hub WEAK --> {:?}", Rc::downgrade(&h));
         // let parent =  Rc::downgrade(&hub);
         // println!("WEAK: {:?}", parent);
-        let res = Connection {
+        let placeholder: Weak<GrandSocketStation> = Weak::default();
+        let conn = Connection {
             id: *i,
-            tx: out, /*parent: Rc::downgrade(&hub)*/
+            tx: out, 
+            parent: placeholder,
             to_cache: a.clone(),
             from_cache: b.clone(),
             kill_cache: c.clone(),
         };
-        let output = res.clone();
-        match Rc::get_mut(&mut hub) {
-            Some(val) => val.push_connection(output),
-            None => panic!("Uh ohhhhhhh"),
-        };
 
+        {
+            let hub_mut = Rc::get_mut(&mut hub).expect("Uh oh... Could not borrow hub");
+            hub_mut.push_connection(conn.clone());
+            // hub_mut.set_parent(conn.clone());
+            // hub_mut.connections[*i as usize].parent = Rc::downgrade(hub_mut);
+        }
+        {
+            // let hub_mut = Rc::get_mut(&mut hub).expect("Uh oh... Could not borrow hub");
+            // let c1 = &mut hub.get_connections_mut();
+
+            
+            // hub_mut.connections[*i as usize].parent = Rc::downgrade(hub_mut);
+        }
+        // hub.connections.get_mut()[*i as usize].parent = Rc::downgrade(&hub);
+        // hub_mut.push_connection(output);
+        // let res: Connection = Connection{};
+        // {
+        //     let res = Connection {
+        //         id: *i,
+        //         tx: out, 
+        //         parent: Rc::downgrade(&hub),
+        //         to_cache: a.clone(),
+        //         from_cache: b.clone(),
+        //         kill_cache: c.clone(),
+        //     };
+        //     let output = res.clone();
+        // }
+        // {
+            
+        // }
         // hub.connections.push(res);
         *i = *i + 1;
 
@@ -391,7 +493,8 @@ fn main() {
         //         Err(e) => println!("WS Send Error: {}", e),
         //     }
         // }
-        res
+
+        conn
     }).unwrap();
 
     // await db thread to end...

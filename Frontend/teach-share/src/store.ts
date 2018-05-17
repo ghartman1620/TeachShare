@@ -26,6 +26,8 @@ const state = {};
 var storeSocket: WebSocket = WebSocket.getInstance();
 
 storeSocket.sendGet(1);
+storeSocket.sendWatch(1);
+storeSocket.sendWatch(1);
 
 function circularRecordChecker(record: any, seen: any[] = []) {
 
@@ -144,7 +146,7 @@ let store = new Vuex.Store<IRootState>(storeOptions);
 // };
 
 
-import {getMap, mutUpdate, mutCreate} from "./store_modules/PostService";
+import {getMap, mutCreate, mutUpdate} from "./store_modules/PostService";
 /*
  * After we've declared all of our store modules we can now add a message listener to the websocket.
  * Can't do it in websocket because this function depends on our store modules, and if websocket itself had
@@ -153,16 +155,16 @@ import {getMap, mutUpdate, mutCreate} from "./store_modules/PostService";
 WebSocket.getInstance().addMessageListener( (msg) => {
     console.log(msg);
 
-    //when we're getting from websocket with id - we'll need to use Post.pkify()
-    let val = JSON.parse(msg.data)[0];
-    let f = Object.assign({}, val);
+    // when we're getting from websocket with id - we'll need to use Post.pkify()
+    const val = JSON.parse(msg.data)[0];
+    const f = Object.assign({}, val);
     
     console.log(f);
-    let p: Post = Post.pkify(val);
+    const p: Post = Post.pkify(val);
     console.log(p);
     console.log("got message");
     console.log(p);
-    var db: Database = Database.getInstance();
+    const db: Database = Database.getInstance();
     console.log(p.pk);
     db.getPost(p.pk as number).then(p => {
         console.log("we've subbed to post " + p.pk + " so now we're going to update our local cache to match the message we got for it");
