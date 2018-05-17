@@ -122,6 +122,7 @@
             window.removeEventListener("resize", self.onWindowResize)
         },
         mounted: function() {
+        if (this) {
             this.$nextTick(function () {
                 validateLayout(this.layout);
                 var self = this;
@@ -163,6 +164,7 @@
 
                 };
             });
+        }   
         },
         watch: {
             width: function () {

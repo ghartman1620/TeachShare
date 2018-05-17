@@ -397,9 +397,7 @@ $card-color: #96e6b3;
             this.eventBus.$off('setColNum', self.setColNum);
         },
         mounted: function () {
-            console.log("Element, Index in GridItem.vue: ", this.element, this.index);
-            console.log("x,y,w,h:  ", this.x, this.y, this.w, this.h);
-            console.log("actual x, y, w, h:  ", this.innerX, this.innerY, this.innerW, this.innerH);
+            // logDimensions();
             this.cols = this.$parent.colNum;
             this.rowHeight = this.$parent.rowHeight;
             this.containerWidth = this.$parent.width !== null ? this.$parent.width : 100;
@@ -418,17 +416,10 @@ $card-color: #96e6b3;
             this.useCssTransforms = this.$parent.useCssTransforms;
             this.createStyle();
         },
-        updated: function () {//This is a check that we only emit the rendered height once upon update,
+        updated: function () {
+            //This is to check that we only emit the rendered height once upon update,
             if (this.dimensionsEmitted === false) { //not over hundreds of updates to the grid
-                this.$nextTick(function () {
-
-                    var cardHeight = document.getElementById('element-'+this.i).offsetHeight;
-                    console.log("Post element height: ", cardHeight)
-                    this.elementDimensions["index"] = this.i;
-                    this.elementDimensions["height"] = cardHeight;
-                    this.dimensionsEmitted = true;
-                    this.$emit('update-height', this.elementDimensions);
-                })
+                    this.$nextTick(function () { this.emitDimensions(); })
             }
         },
         watch: {
@@ -535,7 +526,21 @@ $card-color: #96e6b3;
             }
         },
         methods: {
-            removeElement(index) {
+            logDimensions: function(){
+                console.log("Element, Index in GridItem.vue: ", this.element, this.index);
+                console.log("x,y,w,h:  ", this.x, this.y, this.w, this.h);
+                console.log("actual x, y, w, h:  ", this.innerX, this.innerY, this.innerW, this.innerH);
+            },
+            emitDimensions: function(){
+                        var cardHeight = document.getElementById('element-'+this.i).offsetHeight;
+                        // console.log("Post element height: ", cardHeight)
+                        this.elementDimensions["index"] = this.i;
+                        this.elementDimensions["height"] = cardHeight;
+                        this.dimensionsEmitted = true;
+                        this.$emit('update-height', this.elementDimensions);
+                    
+            },
+            removeElement: function (index) {
                 removeElement(this.$store, index);
             },
 

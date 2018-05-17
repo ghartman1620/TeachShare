@@ -75,17 +75,29 @@ import { addElement,
 export default class DragAndDrop extends Vue{
     allElementsUpdated : Boolean = false;
     childEventsReceived : number = 0;
-    rowHeight : number = 10;
+    rowHeight : number = 5;
+    defaultHeight : number = 30;
     newHeight : number = 0;
     storeElements: Object[] = getCurrentPost(this.$store)!.elements;
-    layout : Object[] = [{"x":0, "y":0, "w":2, "h":15, "i":"0"}];
+    layout : Object[] = [{"x":0, "y":0, "w":2, "h":this.defaultHeight, "i":"0"}];
+
     removeElement(index: number, element: Object) {
         console.log("Element to be removed:  ", element);
         removeElement(this.$store, index);
     }
+
+    updateLayout ()
+    {
+        if (this.childEventsReceived === this.layout.length) { //each post element emits its layout twice...
+            this.allElementsUpdated = true;
+        }                                                   //I'm currently looking into whether    
+    }                                                       //or not that should be happening.
+    
+    
     updateHeight (elementDim) {
-        var index : String = elementDim.index;
-        var height : number = elementDim.height;
+        let index : String = elementDim.index;
+        let height : number = elementDim.height;
+
         console.log("Element dimensions in Drag and Drop caught by event listener:    ", elementDim);
         for(var x = 0; x < this.layout.length; x++) {
             let item : String = this.layout[x]["i"];
@@ -93,25 +105,24 @@ export default class DragAndDrop extends Vue{
                 this.childEventsReceived = this.childEventsReceived + 1;
                 console.log("Item found in updateHeight()! Here's its height at the moment",  this.layout[x]["h"]);
                 if (height > this.layout[x]["h"]*this.rowHeight) {
-                    this.newHeight = Math.ceil(height/this.rowHeight);
+                    this.newHeight = (height/this.rowHeight);
                     console.log("Not high enough! resize to ", this.newHeight);
                     this.layout[x]["h"] = this.newHeight;
                 }
                 console.log("Events received:  ", this.childEventsReceived);
             }
         }
-        if (this.childEventsReceived === this.layout.length) {
-            this.allElementsUpdated = true;}
-        }
+        this.updateLayout();
+    }
 
     mounted() {
         console.log("store elements here: ", this.storeElements);
         if (this.storeElements.length > 1) {
             for (var prev_index = 0; prev_index < this.storeElements.length - 1; prev_index++) {
                 let index = prev_index + 1; //index of the element layout item we're pushing.
-                console.log("Increment for new index ", this.layout[prev_index]["h"]/15)
-                var new_position = this.layout[prev_index]["y"] + this.layout[prev_index]["h"]/15;
-                this.layout.push({"x":0, "y":new_position, "w":2, "h":15, "i":index.toString()});
+                console.log("Increment for new index ", this.layout[prev_index]["h"]/this.defaultHeight)
+                var new_position = this.layout[prev_index]["y"] + this.layout[prev_index]["h"]/this.defaultHeight;
+                this.layout.push({"x":0, "y":new_position, "w":2, "h":this.defaultHeight, "i":index.toString()});
             }
         }
         console.log("DragAndDrop.vue updated layout: ", this.layout)
