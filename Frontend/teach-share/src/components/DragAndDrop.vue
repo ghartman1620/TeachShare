@@ -1,10 +1,10 @@
 <template>
-    <grid-layout v-if="this.storeElements.length > 0"
+    <grid-layout v-if="storeElements.length > 0"
             :layout="layout"
             :col-num="2"
             :row-height="100"
             :is-draggable="true"
-            :is-resizable="true"
+            :is-resizable="false"
             :is-mirrored="false"
             :vertical-compact="true"
             :margin="[10, 60]"
@@ -16,7 +16,7 @@
                     :y='layout[index]["y"]'
                     :w='layout[index]["w"]'
                     :h='layout[index]["h"]'
-                    :i="index.toString()"
+                    :i='layout[index]["i"]'
                     :minW="1"
                     :minH="1"
                     :element="storeElements[index]"
@@ -71,19 +71,15 @@ import { addElement,
 })
 
 export default class DragAndDrop extends Vue{
+    
     storeElements: Object[] = getCurrentPost(this.$store)!.elements;
     layout : Object[] = [{"x":0, "y":0, "w":2, "h":1, "i":"0"}];
-    test_layout: Object[] = [
-            {"x":0, "y":1, "w":2, "h":5, "i":"0"},
-            {"x":0, "y":2, "w":2, "h":5, "i":"1"},
-            {"x":0, "y":3, "w":2, "h":5, "i":"2"}
-        ]
     removeElement(index: number, element: Object) {
         console.log("Element to be removed:  ", element);
         removeElement(this.$store, index);
     }
     mounted() {
-        // console.log("store elements here: ", this.storeElements);
+        console.log("store elements here: ", this.storeElements);
         if (this.storeElements.length > 1) {
             for (var prev_index = 0; prev_index < this.storeElements.length - 1; prev_index++) {
                 let index = prev_index + 1; //index of the element layout item we're pushing.

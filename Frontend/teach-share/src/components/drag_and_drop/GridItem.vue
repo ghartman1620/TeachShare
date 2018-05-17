@@ -15,7 +15,7 @@
                     <div class="card-column column">
                         <div class="col-12 container">
                             <div class="post-element card">
-                                <post-element :element="element" :index="index"></post-element>
+                                <post-element :element="this.element" :index="this.index"></post-element>
                             </div>
                         </div>
 
@@ -24,6 +24,9 @@
 
                                 <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button>
                                 <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="/static/edit-icon.png"></button>
+                                <span v-if="draggable" ref="dragHandle" class="vue-draggable-handle">
+                                    <img class="float-right" style="margin-top:10px;width:20px; height:20px;" src="/static/arrows-vertical.svg"></img>
+                                </span>
 
                             </div>
                         </div>
@@ -31,7 +34,6 @@
                             <slot></slot>
                 <span v-if="resizable" ref="handle" :class="resizableHandleClass">
                 </span>
-                <span v-if="draggable" ref="dragHandle" class="vue-draggable-handle"></span>
 
                 </div>
 
@@ -48,15 +50,15 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
 $card-color: #96e6b3;
 
 
-.post-element-container {
-    padding-top: 30px;
-    padding-right: 20px;
-    padding-left: 20px;
-    padding-bottom: 10px;
-    border-radius: 5px;
-    box-shadow: $card-shadow;
-    background-color: $card-color;
-}
+    .post-element-container {
+        padding-top: 30px;
+        padding-right: 20px;
+        padding-left: 20px;
+        padding-bottom: 10px;
+        border-radius: 5px;
+        box-shadow: $card-shadow;
+        background-color: $card-color;
+    }
 
     .vue-grid-item {
         transition: all 200ms ease;
@@ -397,7 +399,7 @@ $card-color: #96e6b3;
                         allowFrom: this.dragAllowFrom
                     }
                     this.interactObj.draggable(opts);
-                    /*this.interactObj.draggable({allowFrom: '.vue-draggable-handle'});*/
+                    this.interactObj.draggable({allowFrom: '.vue-draggable-handle'});
                     if (!this.dragEventSet) {
                         this.dragEventSet = true;
                         this.interactObj.on('dragstart dragmove dragend', function (event) {
@@ -539,7 +541,7 @@ $card-color: #96e6b3;
             handleResize: function (event) {
                 const position = getControlPosition(event);
                 // Get the current drag point from the event. This is used as the offset.
-                if (position == null) return; // not possible but satisfies flow
+                //if (position == null) return; not possible but satisfies flow
                 const {x, y} = position;
 
                 const newSize = {width: 0, height: 0};
