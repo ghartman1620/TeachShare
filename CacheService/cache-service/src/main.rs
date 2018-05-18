@@ -369,7 +369,31 @@ impl Connection {
             wrap.items_mut().push(Arc::new(Resource::new(post)));
         }
         println!("WRAP: {:?}", wrap.items());
-        unimplemented!()
+
+        match self.to_cache.send(Arc::new(wrap)) {
+            Ok(val) => {
+                println!("Sucessfully sent and got in return: {:?}", val);
+            }
+            Err(e) => {
+                println!(
+                    "There was an error communicating with the cache! Err: {:?}",
+                    e
+                );
+                return Err(String::from(
+                    "There was an error communicating with the cache.",
+                ));
+            }
+        };
+        let resp = match self.from_cache.recv() {
+            Ok(val) => val.items().clone(), // @TODO: figure out how to avoid clone/copy
+            Err(e) => {
+                return Err(String::from("Error receiving from channel (from cache)."));
+            }
+        };
+        // resp.items_mut()
+        println!("*********** resp: {:?}", resp);
+
+        Ok(resp.iter().map(|x| (*x.get_data()).clone()).collect())
     }
     fn handle_watch_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
         println!("[MAIN] received: {:?}", msg.message);

@@ -90,21 +90,20 @@ export default class WebSocket {
         });
     }
     public sendUpdate(p: Post): MessageStatus {
-        /*
         return this.send({
             message: MessageType.Update,
             post: p.toApiObject()
-        });*/
-        console.error("Update message sent - not yet implemented!");
-        return MessageStatus.ConnectionClosed;
+        });
+        // console.error("Update message sent - not yet implemented!");
+        // return MessageStatus.ConnectionClosed;
     }
     public sendWatch(id: number): MessageStatus {
-        /*return this.send({
+        return this.send({
             message: MessageType.Watch,
             id
-        });*/
-        console.error("Watch message sent - not yet implemented!");
-        return MessageStatus.ConnectionClosed;
+        });
+        // console.error("Watch message sent - not yet implemented!");
+        // return MessageStatus.ConnectionClosed;
 
     }
     public sendGet(id: number): MessageStatus {

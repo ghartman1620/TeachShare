@@ -25,13 +25,11 @@ const state = {};
 
 var storeSocket: WebSocket = WebSocket.getInstance();
 
-storeSocket.sendGet(1);
-storeSocket.sendWatch(1);
-storeSocket.sendWatch(1);
-
 const p = new Post(1, [], new User(1));
 p.attachments = [];
 p.concepts = [];
+// return MessageStatus.ConnectionClosed;
+p.comments = [new Comment(1, 1, 1, "")];
 p.content = [];
 p.content_type = ContentType.Game;
 p.coreIdeas = [];
@@ -43,9 +41,12 @@ p.standards = [];
 p.subject = 0;
 p.tags = [];
 p.title = "This is a post title";
-p.updated = new Date();
+// p.updated = new Date();
 
-
+storeSocket.sendCreate(p);
+storeSocket.sendGet(1);
+storeSocket.sendWatch(1);
+storeSocket.sendWatch(1);
 storeSocket.sendUpdate(p);
 
 function circularRecordChecker(record: any, seen: any[] = []) {

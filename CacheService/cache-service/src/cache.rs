@@ -55,7 +55,7 @@ pub fn cache_thread(
                             assert_eq!(msg.msg_type(), MessageType::Watch);
                             {
                                 let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                                let res = handle_watch(msg, c, &ret_pipe);
+                                let res = handle_watch(msg, c, &ret_pipe, &conn);
                             }
                         },
                         MessageType::Update => {
@@ -231,25 +231,64 @@ fn handle_watch(
     msg: SafeArcMsg,
     cash: &mut RefCell<HashMap<i32, Resource<Post>>>,
     ret_pipe: &Sender<SafeArcMsg>,
+    db: &PgConnection,
 ) {
-    let mut borrowed_val = cash.borrow_mut();
+    // let mut borrowed_val = cash.borrow_mut();
     let mut wrap = Wrapper::new()
         .set_model(ModelType::Post)
         .set_msg_type(MessageType::Create)
         .build();
 
     for m in msg.items() {
-        let res = borrowed_val.get_mut(&m.get_data().id);
-        if res.is_some() {
-            let val: &mut Resource<Post> = res.unwrap();
-            val.add_watch(msg.get_connection_id());
-            let watchers = &mut val.all_watchers();
-            println!("[CACHE] Current watchers: {:?}", watchers);
-        } else {
-            println!("[CACHE] Key ({:?}) did not exist.", m.get_data().id);
-            wrap.errors_mut().push(String::from("[CACHE] Key did not exist"));
+        
+        let mut exists = false;
+        let mut need_create = false;
+        {
+            let mut borrowed_cash = cash.borrow_mut();
+            let res = borrowed_cash.get(&m.get_data().id);
+            match res {
+                Some(val) => {
+                    exists = val.all_watchers().iter().any(|&x| x == msg.get_connection_id());
+                },
+                None => {
+                    // no value to watch, grab from DB?
+                    match Post::get(m.get_data().id, db) {
+                        Ok(val) => {
+                            if val.len() == 1 {
+                                println!("Post: {:?}", val);
+                                need_create = true;
+                                let post_resource = Resource::new(val[0].clone());
+                                // TODO: finish this section where we pull in the post from the DB.
+                                // borrowed_cash.insert(val[0].id, post_resource);
+                            } else {
+                                // incorrect number of posts returned. Either too
+                                // many or none at all.
+                            }
+                        },
+                        Err(e) => {
+                            println!("Error: {:?}", e);
+                        },
+                    }
+                }
+            }
+        }
+
+            
+        if !exists {
+            let mut borrowed_again = cash.borrow_mut();
+            let response = borrowed_again.get_mut(&m.get_data().id);
+            match response {
+                Some(val) => {
+                    val.add_watch(msg.get_connection_id());
+                    println!("[CACHE] Current watchers: {:?}", val.watchers);
+                },
+                None => {
+                    println!("ERROR: There was no valid entry for that Post ID.");
+                },
+            }
         }
     }
+    // println!("RESOURCE ====> {:?}", wrap.items_mut());
     match ret_pipe.send(Arc::new(wrap)) {
         Ok(val) => println!("[CACHE] Result: {:?}", val),
         Err(e) => println!("[CACHE] Error: {:?}", e),
@@ -262,21 +301,37 @@ fn handle_update(
     cash: &mut RefCell<HashMap<i32, Resource<Post>>>,
     ret_pipe: &Sender<SafeArcMsg>,
 ) {
-    let mut borrowed_val = cash.borrow_mut();
     let mut wrap = Wrapper::new()
         .set_model(ModelType::Post)
         .set_msg_type(MessageType::Create)
         .build();
-
+    let mut cache_mut = cash.borrow_mut();
+    
+    // let mut watchers: Vec<i32> = vec![];
     for m in msg.items() {
-        let res = borrowed_val.insert(m.get_data().id, Resource::new(m.get_data_clone()));
-        if res.is_some() {
-            let val = res.unwrap();
-        } else {
-            println!("[CACHE] Key ({:?}) did not exist.", m.get_data().id);
-            wrap.errors_mut().push(String::from("[CACHE] Key did not exist!"));
-        }
+        let w = match cache_mut.get(&m.get_data().id) {
+            Some(val) => val.get_watchers().to_vec().clone(),
+            None => vec![], // return empty vector
+        };
+        println!("Watchers --> {:?}", w);
+        // let data = match cache_mut.get(&m.get_data().id) {
+        //     Some(val) => val.clone(),
+        //     None => Resource::new(Post::new()),
+        // };
+        // let value = &mut vec![Arc::new(data),];
+        // let mut i = wrap.items_mut()[0].get_watchers_mut();
+        // *i = w;
+        // let res = borrowed_val.insert(m.get_data().id, Resource::new(m.get_data_clone()));
+        // if res.is_some() {
+        //     let val = res.unwrap();
+        // } else {
+        //     println!("[CACHE] Key ({:?}) did not exist.", m.get_data().id);
+        //     wrap.errors_mut().push(String::from("[CACHE] Key did not exist!"));
+        // }
     }
+
+
+    // return the watchers ID's
     match ret_pipe.send(Arc::new(wrap)) {
         Ok(val) => println!("[CACHE] Result: {:?}", val),
         Err(e) => println!("[CACHE] Error: {:?}", e),

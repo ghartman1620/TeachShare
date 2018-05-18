@@ -73,7 +73,7 @@ pub struct Resource<T> {
     /// version = [1, 0, 0];
     /// ```
     ///
-    version: [u32; 3],
+    version: u64,
 }
 
 impl<'a, T> Resource<T> {
@@ -81,11 +81,11 @@ impl<'a, T> Resource<T> {
         Resource::<T> {
             data: inner,
             watchers: vec![],
-            version: [0, 0, 0],
+            version: 0,
         }
     }
     pub fn increment(&mut self) {
-        self.version[1] = self.version[1] + 1;
+        self.version += 1;
     }
     pub fn add_watch(&mut self, id: i32) {
         self.watchers.push(id)
@@ -142,6 +142,7 @@ pub enum Data {
 }
 
 pub type ArcItem = Arc<Item + Send + Sync>;
+pub type ArcType<T: Item + Send + Sync> = Arc<T>;
 
 #[derive(Clone)]
 pub struct Wrapper {
@@ -175,9 +176,26 @@ impl Wrapper {
         self.msg_type = msg_type;
         self
     }
+    
+    pub fn set_watchers(&mut self, post_id: i32, watches: Vec<i32>) {
+        
+        // let filtered: &mut Vec<ArcItem> = &mut self.items.iter().filter(|ref x| x.get_data().id == post_id).collect();
+        // println!("Filtered: {:?}", filtered);
+        // let mut items = self.items_mut();
+        
+        // for b in self.items_mut() {
+        //     if b.get_data().id == post_id {
+        //         let mut c = b.get_watchers_mut();
+        //         *c = watches.clone();
+        //     }
+        // }
+            // a.set_watchers(watchers.clone());
+        
+    }
     pub fn build(&mut self) -> Wrapper {
         self.clone()
     }
+    
 }
 
 pub trait Msg<'a> {
@@ -246,17 +264,24 @@ impl<'a> Msg<'a> for Wrapper {
 }
 
 pub trait Item {
+    fn new(&self, post: Post, watchers: Vec<i32>) -> Resource<Post>;
     fn get_data(&self) -> &Post;
     fn get_data_mut(&mut self) -> &mut Post;
     fn get_data_clone(&self) -> Post;
     fn get_watchers(&self) -> &Vec<i32>;
     fn get_watchers_mut(&mut self) -> &mut Vec<i32>;
-    fn get_version(&self) -> [u32; 3];
+    fn get_version(&self) -> u64;
+    // fn set_watchers(&mut self, watchers: &Vec<i32>);
 }
 
 pub type PostResource = Resource<Post>;
 
 impl Item for PostResource {
+    fn new(&self, post: Post, watchers: Vec<i32>) -> Resource<Post> {
+        let mut resource =  Resource::new(post);
+        resource.watchers = watchers;
+        return resource;
+    }
     fn get_data(&self) -> &Post {
         return &self.data;
     }
@@ -272,7 +297,10 @@ impl Item for PostResource {
     fn get_watchers_mut(&mut self) -> &mut Vec<i32> {
         return &mut self.watchers;
     }
-    fn get_version(&self) -> [u32; 3] {
+    // fn set_watchers(&mut self, watchers: &Vec<i32>) {
+    //     self.watchers = watchers.clone();
+    // }
+    fn get_version(&self) -> u64 {
         return self.version;
     }
 }
