@@ -63,7 +63,7 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'django_filters',
-    'django_elasticsearch_dsl',
+    # 'django_elasticsearch_dsl',
 
     'accounts',
     'posts',
@@ -86,11 +86,11 @@ CACHES = {
 }
 DJANGO_REDIS_IGNORE_EXCEPTIONS = True
 
-ELASTICSEARCH_DSL = {
-    'default': {
-        'hosts': 'localhost:9200'
-    },
-}
+# ELASTICSEARCH_DSL = {
+#     'default': {
+#         'hosts': 'localhost:9200'
+#     },
+# }
 
 """
 Django Cache Backend Settings (Redis):

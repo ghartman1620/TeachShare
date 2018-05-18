@@ -25,7 +25,7 @@ const state = {};
 
 var storeSocket: WebSocket = WebSocket.getInstance();
 
-const p = new Post(1, [], new User(1));
+const p = new Post(3, [], new User(1));
 p.attachments = [];
 p.concepts = [];
 // return MessageStatus.ConnectionClosed;
@@ -43,9 +43,9 @@ p.tags = [];
 p.title = "This is a post title";
 // p.updated = new Date();
 
-// storeSocket.sendCreate(p);
-// storeSocket.sendGet(1);
-storeSocket.sendWatch(1);
+storeSocket.sendCreate(p);
+storeSocket.sendGet(1);
+// storeSocket.sendWatch(1);
 storeSocket.sendWatch(1);
 storeSocket.sendUpdate(p);
 

@@ -1,13 +1,15 @@
 extern crate crossbeam_channel;
-use crossbeam_channel::{Receiver, Sender};
+use crossbeam_channel::{Receiver, SendTimeoutError, Sender};
 use db::*;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::result;
+// use diesel::
 use models::{Item, MessageType, ModelType, Msg, Post, PostResource, Resource, Wrapper};
 use pool;
 use std::cell::{BorrowMutError, Ref, RefCell};
 use std::collections::HashMap;
+use std::iter::Map;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
@@ -203,35 +205,24 @@ fn handle_create(
     ret_pipe: &Sender<SafeArcMsg>,
     db: &Sender<Post>,
 ) {
-    let mut borrowed_val = cash.borrow_mut();
-    let mut wrap = Wrapper::new()
+    let wrap = Wrapper::new()
         .set_model(ModelType::Post)
         .set_msg_type(MessageType::Create)
         .build();
 
     for m in msg.items() {
-        match borrowed_val.insert(m.get_data().id, Resource::new(m.get_data_clone())) {
-            Some(val) => {
-                println!(
-                    "[CACHE] Previous key/value: {:?} ----> {:?}",
-                    m.get_data().id,
-                    val
-                );
-                let resource = Arc::new(val.clone());
-                wrap.items_mut().push(resource);
-            }
-            None => {
-                println!("[CACHE] Key did not previously exist: {}", m.get_data().id);
-            }
+        let (resource, need_db) = create_post_cache(m.get_data(), cash);
+        println!("[CREATE] Resource: {:?}", resource);
+        match resource {
+            Ok(val) => match val {
+                Some(old) => println!("Replaced value {:?}", old),
+                None => println!("Did not previously exist."),
+            },
+            Err(e) => println!("There was an error borrowing the cache. {:?}", e),
         }
-        match db.send_timeout(m.get_data().clone(), MAX_DB_SAVE_TIMEOUT) {
-            Ok(val) => {}
-            Err(e) => {
-                println!(
-                    "[CACHE] Save to DB took too long!! Ended with error: {:?}. (Timeout: {:?} ms.)",
-                    e, MAX_DB_SAVE_TIMEOUT
-                );
-            }
+        if need_db {
+            let errors = create_post_db(m.get_data(), db, true);
+            println!("[CREATE] <Errors> --> {:?}", errors);
         }
     }
     match ret_pipe.send(Arc::new(wrap)) {
@@ -249,17 +240,18 @@ fn handle_watch(
     db_write: &Sender<Post>,
 ) {
     // let mut borrowed_val = cash.borrow_mut();
-    let mut wrap = Wrapper::new()
+    let wrap = Wrapper::new()
         .set_model(ModelType::Post)
         .set_msg_type(MessageType::Create)
         .build();
+
     let output: &mut Vec<Post> = &mut vec![];
     for m in msg.items() {
         println!("************************ {:?}", m);
         let mut exists = false;
         let mut need_create = false;
         {
-            let mut borrowed_cash = cash.borrow_mut();
+            let mut borrowed_cash = cash.borrow();
             let res = borrowed_cash.get(&m.get_data().id);
             match res {
                 Some(val) => {
@@ -294,22 +286,7 @@ fn handle_watch(
             }
         }
         if need_create {
-            let result = create_posts(output, cash);
-            if result.is_some() {
-                // actually create them
-                let ids = result.unwrap();
-                let rs = ids.into_iter().map(|x| Post::get(x, db_read));
-                println!("RESULT SET: {:?}", rs);
-                match db_write.send_timeout(m.get_data().clone(), MAX_DB_SAVE_TIMEOUT) {
-                    Ok(val) => {}
-                    Err(e) => {
-                        println!(
-                            "[CACHE] Save to DB took too long!! Ended with error: {:?}. (Timeout: {:?} ms.)",
-                            e, MAX_DB_SAVE_TIMEOUT
-                        );
-                    }
-                }
-            }
+            let errors = create_posts(output, cash, db_read, db_write);
         }
 
         if !exists {
@@ -326,7 +303,6 @@ fn handle_watch(
             }
         }
     }
-    // println!("RESOURCE ====> {:?}", wrap.items_mut());
     match ret_pipe.send(Arc::new(wrap)) {
         Ok(val) => println!("[CACHE] Result: {:?}", val),
         Err(e) => println!("[CACHE] Error: {:?}", e),
@@ -334,12 +310,81 @@ fn handle_watch(
 }
 
 #[allow(dead_code)]
-fn create_posts(output: &mut Vec<Post>, cache: RefCache) -> Option<Vec<i32>> {
+fn create_posts(
+    output: &mut Vec<Post>,
+    cache: RefCache,
+    db_read: &PgConnection,
+    db_write: &Sender<Post>,
+) -> Vec<String> {
+    let need_db = create_posts_cache(output, cache);
+    let mut errors = vec![];
+    if need_db.is_some() {
+        // actually create them
+        let ids = need_db.unwrap();
+        let rs: Vec<Post> = ids.into_iter()
+            .flat_map(|x| {
+                let ret = Post::get(x, db_read);
+
+                // @FIX: This throws away legitimate errors potentially
+                // also will treat duplicate PK values as legitimate by
+                // flattening the results. This could cause undefined behavior.
+                if ret.is_ok() {
+                    return ret.unwrap();
+                } else {
+                    errors.push(ret.map_err(|e| format!("{:?}", e)).unwrap_err());
+                    return vec![]; // empty
+                }
+                // ret
+            })
+            .collect();
+        println!("RESULT SET: {:?}", rs);
+        let errors_inner: Vec<String> = create_posts_db(rs, db_write, true)
+            .into_iter()
+            .map(|val| val.unwrap_err())
+            .collect();
+        println!("ERRORS_INNER: {:?}", errors_inner);
+        errors.extend(errors_inner);
+    }
+    println!("ALL_ERRORS: {:?}", errors);
+    errors
+}
+
+#[allow(dead_code)]
+fn create_posts_db(
+    posts: Vec<Post>,
+    db_write: &Sender<Post>,
+    async: bool,
+) -> Vec<Result<(), String>> {
+    // @TODO: Consider fire+forget on saves for performance. This is a good way
+    // during development, though.
+    posts
+        .into_iter()
+        .map(|post| create_post_db(&post, db_write, async))
+        .collect()
+}
+
+#[allow(dead_code)]
+fn create_post_db(post: &Post, db_write: &Sender<Post>, async: bool) -> Result<(), String> {
+    println!("[CACHE] Sending Post ID# {} to be written to DB.", post.id);
+
+    if !async {
+        db_write
+            .send_timeout(post.clone(), MAX_DB_SAVE_TIMEOUT)
+            .map_err(|err| format!("[CACHE] Save to DB took too long!! Error: {:?}", err))
+    } else {
+        db_write
+            .try_send(post.clone())
+            .map_err(|err| format!("[CACHE] Async save to DB failed!! Error: {:?}", err))
+    }
+}
+
+#[allow(dead_code)]
+fn create_posts_cache(output: &mut Vec<Post>, cache: RefCache) -> Option<Vec<i32>> {
     // let need_fetch = &mut vec![];
     let mapped: Vec<i32> = output
         .into_iter()
         .map(|x| {
-            let (last, get) = create_post(x.clone(), cache);
+            let (last, get) = create_post_cache(&x, cache);
             last.expect("There was an error Borrowing the cache!");
             return (x.id, get);
         })
@@ -351,15 +396,15 @@ fn create_posts(output: &mut Vec<Post>, cache: RefCache) -> Option<Vec<i32>> {
     return Some(mapped);
 }
 
-fn create_post(
-    post: Post,
+fn create_post_cache(
+    post: &Post,
     cache: RefCache,
 ) -> (Result<Option<Resource<Post>>, BorrowMutError>, bool) {
     let mut mut_cache = cache.try_borrow_mut();
     // mut_cache.or(res).insert(post.id, Resource::new(post))? // .insert(post.id, Resource::new(post));
     match mut_cache {
         Ok(ref mut val) => {
-            match val.insert(post.id, Resource::new(post)) {
+            match val.insert(post.id, Resource::new(post.clone())) {
                 Some(result) => {
                     println!("Key existed, old value was: {:?}", result);
                     // key existed
@@ -375,7 +420,7 @@ fn create_post(
         }
         Err(e) => {
             println!("There was an error borrowing the cache.");
-            (Err(e), false)
+            (Err(e), true) // pull from db just in case?
         }
     }
 }
