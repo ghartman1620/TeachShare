@@ -1,22 +1,21 @@
+use serde_json::from_str;
+use serde_json::Value;
 use std::cmp::{Eq, PartialEq};
 use std::collections;
 use std::collections::HashMap;
-use std::rc::Rc;
-use serde_json::Value;
-use serde_json::from_str;
-use std::sync::Arc;
-use std::fmt;
 use std::error;
-
+use std::fmt;
+use std::rc::Rc;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct NoIDProvided {
-    details: String, 
+    details: String,
 }
 
 impl NoIDProvided {
     pub fn new(msg: &str) -> NoIDProvided {
-        NoIDProvided{
+        NoIDProvided {
             details: msg.to_string(),
         }
     }
@@ -25,11 +24,10 @@ impl NoIDProvided {
 #[derive(Debug)]
 pub enum CacheError {
     NoIDProvided(),
-
 }
 
 /// Error Trait definition:
-/// 
+///
 /// pub trait Error: Debug + Display {
 ///     fn description(&self) -> &str;
 ///     fn cause(&self) -> Option<&Error> { ... }
@@ -50,7 +48,6 @@ impl fmt::Display for NoIDProvided {
         write!(f, "No ID provided.")
     }
 }
-
 
 #[derive(Debug, Clone)]
 pub struct Resource<T> {
@@ -176,26 +173,25 @@ impl Wrapper {
         self.msg_type = msg_type;
         self
     }
-    
+
     pub fn set_watchers(&mut self, post_id: i32, watches: Vec<i32>) {
-        
+
         // let filtered: &mut Vec<ArcItem> = &mut self.items.iter().filter(|ref x| x.get_data().id == post_id).collect();
         // println!("Filtered: {:?}", filtered);
         // let mut items = self.items_mut();
-        
+
         // for b in self.items_mut() {
         //     if b.get_data().id == post_id {
         //         let mut c = b.get_watchers_mut();
         //         *c = watches.clone();
         //     }
         // }
-            // a.set_watchers(watchers.clone());
-        
+        // a.set_watchers(watchers.clone());
+
     }
     pub fn build(&mut self) -> Wrapper {
         self.clone()
     }
-    
 }
 
 pub trait Msg<'a> {
@@ -278,7 +274,7 @@ pub type PostResource = Resource<Post>;
 
 impl Item for PostResource {
     fn new(&self, post: Post, watchers: Vec<i32>) -> Resource<Post> {
-        let mut resource =  Resource::new(post);
+        let mut resource = Resource::new(post);
         resource.watchers = watchers;
         return resource;
     }
@@ -304,7 +300,6 @@ impl Item for PostResource {
         return self.version;
     }
 }
-
 
 #[derive(Queryable, Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct User {

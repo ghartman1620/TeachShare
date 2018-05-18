@@ -69,10 +69,10 @@ use db::save_posts;
 use models::*;
 
 use models::MessageType;
-use std::rc::{Rc};
+use std::cell::RefCell;
+use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
-use std::cell::RefCell;
 
 #[derive(Debug, Clone)]
 struct GrandSocketStation {
@@ -110,7 +110,7 @@ struct Connection {
     kill_cache: crossbeam_channel::Sender<Cancel>,
 }
 
-impl fmt::Debug for Connection {                                                
+impl fmt::Debug for Connection {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -126,7 +126,6 @@ enum IdOrPost {
     Id(i32),
     Post(models::Post),
 }
-
 
 pub type Version = u64;
 pub type ID = i32;
@@ -184,12 +183,11 @@ impl Handler for Connection {
                                 for c in &parent.connections {
                                     println!("Connection --> {:?}", c);
                                 }
-                            },
+                            }
                             Err(e) => println!("Error: {:?}!", e),
                         }
-                    
-                    },
-                    None => {println!("None. Did not unwrap.")},
+                    }
+                    None => println!("None. Did not unwrap."),
                 }
                 // let gss: &mut GrandSocketStation = Rc::get_mut(g).expect("could not get mut");
                 // let mut conn = &mut gss.connections;
@@ -237,20 +235,23 @@ impl Handler for Connection {
                                 let old_connection_id = self.tx.connection_id();
                                 println!("connection count: {}", parent.connections.len());
                                 {
-                                    exiting_connection_id = parent.connections.clone().into_iter().position(|x| x.tx.connection_id()==old_connection_id).unwrap();
+                                    exiting_connection_id = parent
+                                        .connections
+                                        .clone()
+                                        .into_iter()
+                                        .position(|x| x.tx.connection_id() == old_connection_id)
+                                        .unwrap();
                                 }
                                 parent.connections.remove(exiting_connection_id);
                                 for c in &parent.connections {
                                     println!("Connection --> {:?}", c);
                                 }
-                            },
+                            }
                             Err(e) => println!("Error: {:?}!", e),
                         }
-                    
-                    },
-                    None => {println!("None. Did not unwrap.")},
+                    }
+                    None => println!("None. Did not unwrap."),
                 }
-                
             }
             CloseCode::Abnormal => {
                 println!("Closing handshake failed! Unable to obtain closing status from client.")
@@ -349,7 +350,6 @@ impl Connection {
         unimplemented!()
     }
     fn handle_update_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
-        
         println!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Update);
         let mut wrap = Wrapper::new()
@@ -486,7 +486,7 @@ fn main() {
         connections: vec![],
     }));
     let i = &mut 0;
-    
+
     // start db (SAVE only) thread
     let (send_db, recv_db) = crossbeam_channel::unbounded();
     let db_handle = thread::spawn(move || {
@@ -500,9 +500,7 @@ fn main() {
         crossbeam_channel::Sender<Cancel>,
     ) = wire_up(send_db);
 
-
     /// Test actix actor framework stuff (again)
-    
     // let system = actix::System::new("test");
     // // let thr_system = system.clone();
 
@@ -524,14 +522,13 @@ fn main() {
     // }));    
     // system.run();
     //let hub_inner = hub.unwrap().clone();
-
     listen("127.0.0.1:3012", move |out| {
         let mut value = None;
-        
+
         {
             value = Some(Connection {
                 id: *i,
-                tx: out.clone(), 
+                tx: out.clone(),
                 parent: Some(hub.clone()),
                 to_cache: a.clone(),
                 from_cache: b.clone(),
@@ -539,7 +536,6 @@ fn main() {
             });
         }
 
-        
         let conn = value.unwrap();
 
         let h = &mut hub.borrow_mut();
@@ -548,24 +544,21 @@ fn main() {
         h.push_connection(conn.clone());
 
         let value: Option<Connection> = Some(conn.clone());
-        
-        
-        
+
         // {
         //     let conn = Connection {
         //         id: *i,
-        //         tx: out, 
+        //         tx: out,
         //         parent: Rc::downgrade(*hub.read().unwrap()),
         //         to_cache: a.clone(),
         //         from_cache: b.clone(),
         //         kill_cache: c.clone(),
         //     };
         // }
-        
 
         // {
         //     let hub_mut = Rc::get_mut(&mut hub.unwrap()).expect("Uh oh... Could not borrow hub");
-            
+
         //     hub_mut.into_inner().push_connection(conn.clone());
         //     // hub_mut.connections[*i as usize].parent = weak;
         // }
@@ -584,14 +577,13 @@ mod tests {
 
     #[test]
     // a test function that returns our error result
-    fn test_raises_no_id_provided()  {
-        
+    fn test_raises_no_id_provided() {
         fn inner(yes: bool) -> Result<(), NoIDProvided> {
             if yes {
                 Err(NoIDProvided::new("this is the error msg."))
             } else {
                 Ok(())
-            }        
+            }
         }
 
         // throw error
@@ -604,4 +596,3 @@ mod tests {
     }
 
 }
-
