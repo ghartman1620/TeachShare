@@ -218,6 +218,7 @@ fn handle_create(
                 Some(old) => println!("Replaced value {:?}", old),
                 None => println!("Did not previously exist."),
             },
+            // This would be a huge problem, and a systemic failure
             Err(e) => println!("There was an error borrowing the cache. {:?}", e),
         }
         if need_db {
@@ -225,7 +226,12 @@ fn handle_create(
             println!("[CREATE] <Errors> --> {:?}", errors);
         }
     }
-    match ret_pipe.send(Arc::new(wrap)) {
+    send_back(ret_pipe, wrap);
+}
+
+#[allow(dead_code)]
+fn send_back(return_pipe: &Sender<SafeArcMsg>, wrap: Wrapper) {
+    match return_pipe.send(Arc::new(wrap)) {
         Ok(val) => println!("[CACHE] Successfully sent return value: {:?}", val),
         Err(e) => println!("[CACHE] Error sending on return pipe: {:?}", e),
     };
@@ -248,50 +254,58 @@ fn handle_watch(
     let output: &mut Vec<Post> = &mut vec![];
     for m in msg.items() {
         println!("************************ {:?}", m);
+        let mut exists_cache = Option::default();
         let mut exists = false;
         let mut need_create = false;
+        
+        // @TODO: Fix this function first!!!
         {
-            let mut borrowed_cash = cash.borrow();
-            let res = borrowed_cash.get(&m.get_data().id);
-            match res {
-                Some(val) => {
-                    println!("Some(val) ---> {:?}", val);
-                    exists = val.all_watchers()
-                        .iter()
-                        .any(|&x| x == msg.get_connection_id());
-                }
-                None => {
-                    println!("None ---> ");
-                    // no value to watch, grab from DB?
-                    match Post::get(m.get_data().id, db_read) {
-                        Ok(val) => {
-                            println!("Ok(val) ----> {:?}", val);
-                            if val.len() > 0 {
-                                println!("Post: {:?}", val);
-                                need_create = true;
-                                // let post_resource = Resource::new();
-                                output.push(val[0].clone());
-                            // TODO: finish this section where we pull in the post from the DB.
-                            // borrowed_cash.insert(val[0].id, post_resource);
-                            } else {
-                                // there is no post with that ID
-                                println!("THAT POST DOES NOT EXIST IN DB.");
-                            }
-                        }
-                        Err(e) => {
-                            println!("Error: {:?}", e);
+            let c = cash.borrow();
+            exists_cache = c.get(&m.get_data().id).clone();
+        }
+        // let mut borrowed_cash = cash.borrow();
+        // let res = borrowed_cash.get(&m.get_data().id);
+        match exists_cache {
+            Some(val) => {
+                println!("Some(val) ---> {:?}", val);
+                exists = val.all_watchers()
+                    .iter()
+                    .any(|&x| x == msg.get_connection_id());
+            }
+            None => {
+                println!("None ---> ");
+                // no value to watch, grab from DB?
+                let posts: Option<Vec<Post>> = match Post::get(m.get_data().id, db_read) {
+                    Ok(val) => Some(val),
+                    Err(e) => None,
+                };
+                if posts.is_some() {
+                    let t = posts.filter(|x| x.len() == 1);
+                    if t.is_some() {
+                        let mut resulting_value = t.unwrap();
+                        {
+                            create_posts_cache(&mut resulting_value, cash);
                         }
                     }
+                    // insert into cache, add watch
+                    {
+                        posts.map( |x| {
+                            let a = x.into_iter().map(|y| create_post_cache(&y, cash));
+                            println!("x: {:?}", x);
+                        });
+                    }
+                    // create_post_cache(&post.unwrap(), cash);
                 }
             }
         }
+        
         if need_create {
             let errors = create_posts(output, cash, db_read, db_write);
         }
 
         if !exists {
-            let mut borrowed_again = cash.borrow_mut();
-            let response = borrowed_again.get_mut(&m.get_data().id);
+            let mut cache = cash.borrow_mut();
+            let response = cache.get_mut(&m.get_data().id);
             match response {
                 Some(val) => {
                     val.add_watch(msg.get_connection_id());
@@ -303,10 +317,7 @@ fn handle_watch(
             }
         }
     }
-    match ret_pipe.send(Arc::new(wrap)) {
-        Ok(val) => println!("[CACHE] Result: {:?}", val),
-        Err(e) => println!("[CACHE] Error: {:?}", e),
-    };
+    send_back(ret_pipe, wrap);
 }
 
 #[allow(dead_code)]
