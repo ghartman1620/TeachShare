@@ -238,9 +238,9 @@ fn handle_watch(
         .set_model(ModelType::Post)
         .set_msg_type(MessageType::Create)
         .build();
-
+    let output: &mut Vec<Post> = &mut vec![];
     for m in msg.items() {
-        
+        println!("************************ {:?}", m);
         let mut exists = false;
         let mut need_create = false;
         {
@@ -248,21 +248,25 @@ fn handle_watch(
             let res = borrowed_cash.get(&m.get_data().id);
             match res {
                 Some(val) => {
+                    println!("Some(val) ---> {:?}", val);
                     exists = val.all_watchers().iter().any(|&x| x == msg.get_connection_id());
                 },
                 None => {
+                    println!("None ---> ");
                     // no value to watch, grab from DB?
                     match Post::get(m.get_data().id, db) {
                         Ok(val) => {
-                            if val.len() == 1 {
+                            println!("Ok(val) ----> {:?}", val);
+                            if val.len() > 0 {
                                 println!("Post: {:?}", val);
                                 need_create = true;
-                                let post_resource = Resource::new(val[0].clone());
+                                // let post_resource = Resource::new();
+                                output.push(val[0].clone());
                                 // TODO: finish this section where we pull in the post from the DB.
                                 // borrowed_cash.insert(val[0].id, post_resource);
                             } else {
-                                // incorrect number of posts returned. Either too
-                                // many or none at all.
+                                // there is no post with that ID
+                                println!("THAT POST DOES NOT EXIST IN DB.");
                             }
                         },
                         Err(e) => {
@@ -271,6 +275,30 @@ fn handle_watch(
                     }
                 }
             }
+        }
+        if need_create {
+            for p in output.into_iter() {
+                let mut mut_cache = cash.try_borrow_mut();
+                match mut_cache {
+                    Ok(ref mut val) => {
+                        match val.insert(p.id, Resource::new(p.clone())) {
+                            Some(result) => {
+                                println!("Key existed, old value was: {:?}", result);
+                                // key existed
+                                // result = old value
+                            },
+                            None => {
+                                println!("Key did not exist in pull from DB");
+                                // key did not exist
+                            },
+                        }
+                    },
+                    Err(e) => {
+                        println!("There was an error borrowing the cache.");
+                    },
+                }
+            }
+
         }
 
             
