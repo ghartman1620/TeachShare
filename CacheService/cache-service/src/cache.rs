@@ -70,6 +70,13 @@ pub fn cache_thread(
                         MessageType::Manifest => {
                             println!("[CACHE] RECEIVED => {:?}", msg.msg_type());
                             assert_eq!(msg.msg_type(), MessageType::Manifest);
+                            let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
+                            match msg.manifest {
+                                None => ret_pipe.send(Arc::new(Wrapper::new().add_error(String::from("No manifest sent to cache thread".build()))))
+                                Some(manifest) => {
+                                    handle_manifest(msg, c, &ret_pipe, &conn);
+                                }
+                            }
                         },
                     };
 
@@ -102,6 +109,16 @@ pub fn wire_up<'a>(
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Cancel {
     msg: String,
+}
+
+fn handle_get(
+    msg: SafeArcMsg,
+    cash: &mut RefCell<HashMap<i32, Resource<Post>>>,
+    ret_pipe: &Sender<SafeArcMsg>,
+    db: &PgConnection,
+) {
+
+    
 }
 
 #[allow(dead_code)]

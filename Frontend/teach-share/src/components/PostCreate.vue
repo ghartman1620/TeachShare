@@ -11,7 +11,7 @@
     </side-bar>
     <div v-if="currentPage===1">
        
-        <div v-if=" inProgressPost !== undefined && postStatus !== LOADING" :style="getBodyStyle()">
+        <div v-if="this.createState.post !== undefined && this.postStatus !== this.LOADING" :style="getBodyStyle()">
             <div class="col-sm-12 col-lg-10 col-md-12 card card-outline-danger container icon-card-container">
                 <div class="col-8 mx-auto card-deck" id="button-bar">
 
@@ -142,8 +142,6 @@
             <h1>
                 Loading post...
             </h1>
-            <h1>foiajfiaewjfqweijfjqewifqewjqefwji</h1>
-            <h1>{{createState.post}}</h1>
             <font-awesome-icon icon="spinner" spin></font-awesome-icon>
         </div>
     </div>
@@ -299,7 +297,10 @@ export default class PostCreate extends Vue{
     //of loading in a post's current info when you load up a post.
     
 
-
+    public BAH_HUMBUG(){
+        console.log(this.createState.post !== undefined && this.postStatus !== this.LOADING);
+        console.log(this.createState.post);
+    }
 
     get userPosts(): Post[] {
         var store = this.$store;

@@ -143,6 +143,7 @@ enum IdOrPost {
     Post(models::Post),
 }
 
+
 /// Recieved msg:
 ///
 /// WSMessage { message: Create, id: None, post: Some(Post { id: 1, title: "test post title",
@@ -150,11 +151,13 @@ enum IdOrPost {
 /// user_id: 1, draft: false, content_type: 0, grade: 0, subject: 0, crosscutting_concepts: [1, 2, 3],
 /// disciplinary_core_ideas: [1, 3, 5], practices: [2, 1] }) }
 ///
+/// 
 #[derive(Serialize, Deserialize, Debug)]
 struct WSMessage {
     message: MessageType,
     id: Option<i32>,
     post: Option<models::Post>, //id_or_post: IdOrPost
+    manifest: Option<Vec<IdAndVersion>>,
 }
 
 impl Handler for Connection {
@@ -217,7 +220,7 @@ impl Handler for Connection {
                         };
                         msg_result
                     }
-                    Err(e) => Err(format!("There is a terrible error: {:?}", e)),
+                    Err(e) => Err(format!("There is a terrible error parsing {:?}: {:?}", text, e)),
                 };
                 let resp = response.expect("There was an error!");
                 let serialized =
@@ -355,7 +358,51 @@ impl Connection {
     }
 
     fn handle_manifest_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
-        unimplemented!()
+        println!("[MAIN] received: {:?}", msg.message);
+        assert_eq!(msg.message, MessageType::Manifest);
+
+        let post_versions = match msg.manifest {
+            Some(post_versions) => post_versions,
+            None => {
+                return Err(String::from("No manifest was provided"))
+            }
+        };
+        if post_versions.len() == 0{
+            Ok(vec![])
+        }
+        else{
+            println!("manifest: {:?}", post_versions);
+            let mut wrap = Wrapper::new()
+                .set_model(ModelType::Post)
+                .set_msg_type(MessageType::Watch)
+                .set_manifest(post_versions)
+                .build();
+            
+            match self.to_cache.send(Arc::new(wrap)) {
+                Ok(val) => {
+                    println!("Sucessfully sent and got in return: {:?}", val);
+                }
+                Err(e) => {
+                    println!(
+                        "There was an error communicating with the cache! Err: {:?}",
+                        e
+                    );
+                    return Err(String::from(
+                        "There was an error communicating with the cache.",
+                    ));
+                }
+            };
+
+            let resp = match self.from_cache.recv() {
+                Ok(val) => val.items().clone(), // @TODO: figure out how to avoid clone/copy
+                Err(e) => {
+                    return Err(String::from("Error receiving from channel (from cache)."));
+                }
+            };
+            println!("resp: {:?}", resp);
+
+            Ok(resp)
+        }
     }
     fn handle_update_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
         

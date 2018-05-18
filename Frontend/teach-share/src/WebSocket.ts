@@ -14,7 +14,8 @@ enum MessageType {
     Get = "Get",
     Watch = "Watch",
     Update = "Update",
-    Create = "Create"
+    Create = "Create",
+    Manifest = "Manifest",
 }
 
 enum MessageStatus {
@@ -90,21 +91,19 @@ export default class WebSocket {
         });
     }
     public sendUpdate(p: Post): MessageStatus {
-        /*
         return this.send({
             message: MessageType.Update,
             post: p.toApiObject()
-        });*/
-        console.error("Update message sent - not yet implemented!");
-        return MessageStatus.ConnectionClosed;
+        });
+        // console.error("Update message sent - not yet implemented!");
+        // return MessageStatus.ConnectionClosed;
     }
     public sendWatch(id: number): MessageStatus {
-        /*return this.send({
+        return this.send({
             message: MessageType.Watch,
             id
-        });*/
-        console.error("Watch message sent - not yet implemented!");
-        return MessageStatus.ConnectionClosed;
+        });
+        // return MessageStatus.ConnectionClosed;
 
     }
     public sendGet(id: number): MessageStatus {
@@ -113,6 +112,26 @@ export default class WebSocket {
             id,
         });
     }
+    public async sendManifest() {
+        Database.getInstance().manifest().then((manifest) => {
+            console.log("manifest: " );
+            console.log(manifest);
+            this.send({
+                message: MessageType.Manifest,
+                manifest,
+            });
+        });
+        if (this.rws.readyState === ReadyState.Connecting) {
+            return MessageStatus.ConnectionOpening;
+        } else if (this.rws.readyState === ReadyState.Open) {
+            return MessageStatus.Sucess;
+        } else {
+            return MessageStatus.ConnectionClosed;
+        }
+
+    }
+
+
     public addOpenListener(fn: (any) => undefined) {
         this.rws.addEventListener("open", fn);
     }
@@ -120,8 +139,10 @@ export default class WebSocket {
     public addMessageListener(fn: (any) => undefined) {
         this.rws.addEventListener("message", fn);
     }
-    private send(val): MessageStatus{
+    private send(val): MessageStatus {
+        console.log(val.manifest);
         const msg = JSON.stringify(val);
+        console.log("sending... " + msg);
         if (this.rws.readyState ===  ReadyState.Connecting) {
             this.addOpenListener((event) => {
                 this.rws.send(msg);
@@ -137,3 +158,4 @@ export default class WebSocket {
         }
     }
 }
+WebSocket.getInstance().sendManifest();
