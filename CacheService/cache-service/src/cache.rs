@@ -19,6 +19,37 @@ const MAX_DB_SAVE_TIMEOUT: Duration = Duration::from_millis(200);
 pub type SafeArcMsg = Arc<Msg<'static> + Send + Sync>;
 // type PostResource = Resource<Post>;
 
+// pub type Cache = Rc<RefCell<HashMap<i32, Resource<Post>>>>;
+#[allow(dead_code)]
+pub type SmartCache = Rc<RefCell<HashMap<i32, Resource<Post>>>>;
+
+#[allow(dead_code)]
+struct Cache {
+    _inner: Rc<RefCell<HashMap<i32, Resource<Post>>>>,
+}
+
+#[allow(dead_code)]
+impl Cache {
+    pub fn new() -> Cache {
+        Cache{
+            _inner: Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new())),
+        }
+    }
+    pub fn create() {
+
+    }
+    pub fn update() {
+
+    }
+    pub fn get() {
+
+    }
+    pub fn delete() {
+
+    }
+}
+
+#[allow(dead_code)]
 pub fn cache_thread(
     in_pipe: Receiver<SafeArcMsg>,
     ret_pipe: Sender<SafeArcMsg>,
@@ -365,6 +396,8 @@ fn handle_update(
         Err(e) => println!("[CACHE] Error: {:?}", e),
     };
 }
+
+
 
 #[cfg(test)]
 mod tests {
