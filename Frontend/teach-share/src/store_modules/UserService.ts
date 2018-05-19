@@ -127,7 +127,8 @@ export const getters = {
     isLoggedIn (state: UserState) {
         console.log("in isLoggedIn getter");
         return state.user !== undefined;
-    }
+    },
+    allUsers: (state) => state.otherUsers,
 };
 
 const UserService = {
@@ -162,6 +163,7 @@ export const addUser = dispatch(UserService.actions.addUser);
 export const getUserByID = read(UserService.getters.getUserByID);
 export const getLoggedInUser = read(UserService.getters.getLoggedInUser);
 export const isLoggedIn = read(UserService.getters.isLoggedIn);
+export const allUsers = read(UserService.getters.allUsers);
 
 /**
  * Mutations Handlers

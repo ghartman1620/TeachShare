@@ -104,11 +104,15 @@
                                     </div>
                                 </div>
                                 <hr>
-                                <span id="tag-container" :key="index" v-for="(tag,index) in inProgressPost.tags">
+                                <span :key="index" v-for="(tag,index) in inProgressPost.tags">
                                     <span @click="removeTag(index)" class="tag-entry badge badge-dark">{{tag}} <span aria-hidden="true">&times;</span>
                                         <!-- <button id="tag-delete-button" type="button" class="btn btn-sm btn-dark" >{{"x"}}</button> -->
                                     </span>
                                 </span>
+                                <hr>
+                                 <div v-if="inProgressPost.original_user" style="text-align: center;">
+                                    This post was derived from a post authored by {{inProgressPost.original_user}}
+                                </div>
                             </div>
                         </div>
                         <br>

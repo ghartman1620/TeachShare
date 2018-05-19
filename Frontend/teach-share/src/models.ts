@@ -125,6 +125,7 @@ export class Post extends Model {
     public timestamp: Date;
     public title: string;
     public updated: Date;
+    public original_user: number|undefined;
 
     constructor(pk?: number, comments?: Comment[], user?: User) {
         super(typeof pk === "undefined" ? -1 : pk);

@@ -173,6 +173,9 @@ class Post(models.Model):
 
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="posts")
+    original_user = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.CASCADE
+    )
     title = models.CharField(max_length=100, default='', blank=True)
     content = JSONField()
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)

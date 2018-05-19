@@ -16,6 +16,10 @@
                         </span>
                     </h4>
                     <hr>
+                    <div v-if="post.original_user" style="text-align: center;">
+                        This post was derived from a post authored by {{getOriginalUser().username}}
+                    </div>
+                    <hr>
                     <div>
                         <div :key="element.pk" v-for="element in post.content">
                             <post-element :element="element" :index="index"/>
@@ -125,6 +129,10 @@ export default class PostComp extends Vue {
         super();
     }
 
+    getOriginalUser(){
+        return getUserByID(this.$store)(this.post.original_user);
+    }
+
     getComments() {
         var vm = this;
         getByPost(this.$store, Number(this.post.pk)).then(function(res) {
@@ -202,7 +210,11 @@ export default class PostComp extends Vue {
 
     created() {
         // this.$store.dispatch("fetchUser", this.post.user);
-        this.$log(this.post);
+        if(this.post.original_user){
+            console.log("hi");
+            console.log(this.post.original_user);
+            fetchUser(this.$store, this.post.original_user);
+        }
     }
 };
 </script>

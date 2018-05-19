@@ -23,6 +23,7 @@ export class InProgressPost{
     concepts: number[];
     coreIdeas: number[];
     practices: number[];
+    original_user: number | undefined;
     /*
     */ 
    
@@ -55,6 +56,7 @@ export class InProgressPost{
             this.concepts = [];
             this.coreIdeas = [];
             this.practices = [];
+            this.original_user = undefined;
             post.pk = postid;
             api.get("/posts/"+ postid).then(function(response){
                 console.log(response);
@@ -78,6 +80,7 @@ export class InProgressPost{
                 post.coreIdeas = response.data.coreIdeas;
                 post.concepts = response.data.concepts;
                 post.practices = response.data.practices;
+                post.original_user = response.data.original_user;
             })
             console.log("returning from post constructor");
         }
@@ -97,6 +100,7 @@ export class InProgressPost{
             this.concepts = [];
             this.practices = [];
             this.coreIdeas = [];
+            this.original_user = undefined;
             this.createNewDraft();
         }
     }
