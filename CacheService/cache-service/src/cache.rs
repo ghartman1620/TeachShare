@@ -245,62 +245,79 @@ fn handle_watch(
     db_read: &PgConnection,
     db_write: &Sender<Post>,
 ) {
-    // let mut borrowed_val = cash.borrow_mut();
+    // create a wrapper for the response
     let wrap = Wrapper::new()
         .set_model(ModelType::Post)
         .set_msg_type(MessageType::Create)
         .build();
 
-    let output: &mut Vec<Post> = &mut vec![];
     for m in msg.items() {
-        println!("************************ {:?}", m);
         let mut exists_cache = Option::default();
         let mut exists = false;
-        let mut need_create = false;
-        
-        // @TODO: Fix this function first!!!
+
+        // Check cache if it already exists
         {
             let c = cash.borrow();
-            exists_cache = c.get(&m.get_data().id).clone();
+            match c.get(&m.get_data().id) {
+                Some(val) => {
+                    exists_cache = Some(val.clone());
+                }
+                _ => {}
+            };
         }
-        // let mut borrowed_cash = cash.borrow();
-        // let res = borrowed_cash.get(&m.get_data().id);
+
+        // This next section does a few things:
+        // 1.) Check if there's a value already in the cache.
+        // 2.) Already in the cache
+        //     a.) check if it's already in the watch list
+        // 3.) Not already in cache
+        //     a.) get the posts from the db
+        //     b.) put them in the cache
+        //     c.) add to watch list
+        //
         match exists_cache {
             Some(val) => {
-                println!("Some(val) ---> {:?}", val);
                 exists = val.all_watchers()
                     .iter()
                     .any(|&x| x == msg.get_connection_id());
             }
             None => {
-                println!("None ---> ");
                 // no value to watch, grab from DB?
                 let posts: Option<Vec<Post>> = match Post::get(m.get_data().id, db_read) {
                     Ok(val) => Some(val),
                     Err(e) => None,
                 };
                 if posts.is_some() {
-                    let t = posts.filter(|x| x.len() == 1);
-                    if t.is_some() {
-                        let mut resulting_value = t.unwrap();
-                        {
-                            create_posts_cache(&mut resulting_value, cash);
-                        }
-                    }
+                    let cleaned_posts_response: Vec<Resource<Post>> = posts
+                        .unwrap()
+                        .into_iter()
+                        .map(|mut x| create_post_cache(&mut x, cash))
+                        .filter(|(y, need_db)| *need_db && y.is_ok())
+                        .map(|(z, _)| z.unwrap())
+                        .filter(|a| a.is_some())
+                        .map(|b| b.unwrap())
+                        .collect();
+                    println!(
+                        "*********************** cleaned_posts_response: {:?}",
+                        cleaned_posts_response
+                    );
+                    // if t.is_some() {
+                    //     let errors = create_post_cache(&mut t.unwrap(), cash);
+                    // }
+                    // let mut resulting_value = t.unwrap();
+                    // let errors = create_posts(&mut resulting_value, cash, db_read, db_write);
+                    // let fetch_ids = create_posts_cache(&mut resulting_value, cash);
+
                     // insert into cache, add watch
-                    {
-                        posts.map( |x| {
-                            let a = x.into_iter().map(|y| create_post_cache(&y, cash));
-                            println!("x: {:?}", x);
-                        });
-                    }
+                    // {
+                    //     posts.map( |x| {
+                    //         let a = x.into_iter().map(|y| create_post_cache(&y, cash));
+                    //         println!("x: {:?}", x);
+                    //     });
+                    // }
                     // create_post_cache(&post.unwrap(), cash);
                 }
             }
-        }
-        
-        if need_create {
-            let errors = create_posts(output, cash, db_read, db_write);
         }
 
         if !exists {
