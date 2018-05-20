@@ -172,18 +172,30 @@ import {getMap, mutCreate, mutUpdate} from "./store_modules/PostService";
  * a store dependency we'd have a circular dependency and would cause all sorts of errors.
 */
 WebSocket.getInstance().addMessageListener( (msg) => {
-    console.log(msg);
-    const val = JSON.parse(msg.data)[0];
-    console.log(`[DEBUG --> JSON]: ${val}`);
-    const p: Post = Post.pkify(val);
+    console.log("Got a message!: " + msg.data.toString());
+    const val = JSON.parse(msg.data);
+    console.log("Value is: ");
+    console.log(val);
+
     const db: Database = Database.getInstance();
-    db.getPost(p.pk as number).then((post) => {
-        db.putPost(p);
-    }).catch();
-    if (getMap(store).has(p.pk!.toString())) {
-        mutUpdate(store, p);
-    } else {
-        mutCreate(store, p);
+    for (const post of val) {
+        const p: Post = Post.pkify(post);
+        console.log("saving post from ws: " + p.pk);
+        console.log(p);
+        // check if the post we got from the WS is saved in the DB.
+        db.getPost(p.pk as number).then((dbCurrentPost) => {
+            // If it is, we should save the post we got - because it's a post we've decided in the past to cache
+            db.putPost(p);
+        }).catch(); // If not, DON'T save it, because we're not saving every single post that arrives.
+
+        // for all posts - db saved and otherwise, send it over to the store to get rendered by components.
+        if (getMap(store).has(p.pk!.toString())) {
+            // it already exists in the store
+            mutUpdate(store, p);
+        } else {
+            // it didn't already exist in the store - now it does!
+            mutCreate(store, p);
+        }
     }
     return undefined;
 });

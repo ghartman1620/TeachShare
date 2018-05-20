@@ -4,7 +4,12 @@ import {DB} from "idb/lib/idb.d"
 
 //A singleton Database connection class. 
 //Users should call the static get_instance() function
-export default class Database{
+
+export interface IPostVersion {
+    id: number;
+    version: number;
+}
+export default class Database {
     // Is this thread safe? no lmao
     public static getInstance(): Database {
         if (Database.instance === undefined){
@@ -81,6 +86,33 @@ export default class Database{
             });
         });
     }
+    /*
+        Returns a summary of all the posts saved in the db in the form {id: number, version: number}
+    */
+    public manifest(): Promise<IPostVersion[]> {
+        return new Promise((resolve, reject) => {
+            this.dbPromise.then((db) => {
+                const tx = db.transaction("posts", "readonly");
+                const keys: IPostVersion[] = [];
+                const store = tx.objectStore("posts");
+                store.iterateCursor((cursor) => {
+                    if (!cursor) {
+                        return;
+                    }
+                    // this is ok, because we only save Post objects, and their pk/id is always number
+                    // also, if no version that we know of exists, we'll send that we have version 0 (the first version)
+                    // so whatever we have gets replaced if any version is newer
+                    keys.push({id: cursor.key as number, version: cursor.value.version ? cursor.value.version : 0});
+                    cursor.continue();
+                    console.log("i bet this part is async isn't it");
+                });
+                tx.complete.then(() => {
+                    console.log("AHA THIS IS AFTER THE ASYNC BIT");
+                    resolve(keys);
+                });
+            });
+        });
+    }
 }
+Database.getInstance().manifest().then(keys => console.log(keys));
 
-Database.getInstance().deletePost(1);

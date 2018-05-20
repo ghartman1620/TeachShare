@@ -52,22 +52,12 @@ pub struct Resource<T> {
     /// peice of data.
     ///
     pub watchers: Vec<i32>,
-
     /// Data: Where the data is actually stored. Generically, of course.
     ///
     pub data: T,
 
-    /// Version is something along the lines of [browser, cache, db]
-    /// to keep track of which version this current data is.
-    /// Although it could be done using a single integer, having actual
-    /// 'mutators' identified allows for a finer grained decision making
-    /// process when it comes to WHICH value to keep/save as most 'current'.
-    ///
-    /// ```
-    /// version = [1, 0, 0];
-    /// ```
-    ///
-    version: u64,
+    /// Version: the id of the most recent update to a post.
+    pub version: u64,
 }
 
 impl<'a, T> Resource<T> {
@@ -79,7 +69,7 @@ impl<'a, T> Resource<T> {
         }
     }
     pub fn increment(&mut self) {
-        self.version += 1;
+        self.version = self.version + 1;
     }
     pub fn add_watch(&mut self, id: i32) {
         self.watchers.push(id)
@@ -102,6 +92,13 @@ impl PartialEq for Resource<Post> {
     }
 }
 impl Eq for Resource<Post> {}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct IdAndVersion {
+    pub id: i32,
+    pub version: u64
+}
+
 
 #[derive(Debug, Clone, Serialize, Eq, PartialEq, Deserialize)]
 pub enum MessageType {
@@ -170,7 +167,10 @@ impl Wrapper {
         self.msg_type = msg_type;
         self
     }
-
+    pub fn add_error(&mut self, err: String) -> &mut Self{
+        self.errors.push(err);
+        self
+    }
     pub fn set_items(&mut self, items: &Vec<ArcItem>, watchers: &[Vec<i32>]) -> &mut Self {
         // self.items
         println!("items: {:?}", items);
@@ -277,7 +277,6 @@ pub trait Item {
     fn get_watchers(&self) -> &Vec<i32>;
     fn get_watchers_mut(&mut self) -> &mut Vec<i32>;
     fn get_version(&self) -> u64;
-    // fn set_watchers(&mut self, watchers: &Vec<i32>);
 }
 
 pub type PostResource = Resource<Post>;
