@@ -99,10 +99,10 @@ impl PartialEq for Resource<Post> {
 }
 impl Eq for Resource<Post> {}
 
-#[derive(Serialize, Deserialize, Debug)]
-struct IdAndVersion {
-    id: i32,
-    version: u64
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct IdAndVersion {
+    pub id: i32,
+    pub version: u64
 }
 
 
@@ -146,7 +146,6 @@ pub struct Wrapper {
     pub msg_type: MessageType,
     pub timestamp: i32,
     pub items: Vec<ArcItem>,
-    pub manifest: Option<Vec<IdAndVersion>>,
     pub errors: Vec<String>,
     pub connection_id: i32,
 }
@@ -162,7 +161,6 @@ impl Wrapper {
             timestamp: 0,
             items: vec![],
             errors: vec![],
-            manifest: None,
             connection_id: 0,
         }
     }
@@ -172,10 +170,6 @@ impl Wrapper {
     }
     pub fn set_msg_type(&mut self, msg_type: MessageType) -> &mut Self {
         self.msg_type = msg_type;
-        self
-    }
-    pub fn set_manifest(&mut self, manifest: Vec<IdAndVersion>) -> &mut Self{
-        self.manifest = Some(manifest);
         self
     }
     pub fn add_error(&mut self, err: String) -> &mut Self{

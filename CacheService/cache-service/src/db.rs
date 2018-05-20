@@ -38,6 +38,9 @@ impl Post {
             practices: vec![],
         }
     }
+    pub fn get_all(ids: Vec<i32>, conn: &PgConnection) -> Result<Vec<Post>, result::Error> {
+        return posts_post.filter(id.eq_any(ids)).load::<Post>(conn);
+    }
 
     //where should connection live? maybe in a singleton class in models?
     pub fn get(pk_id: i32, conn: &PgConnection) -> Result<Vec<Post>, result::Error> {

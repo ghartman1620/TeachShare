@@ -70,12 +70,9 @@ pub fn cache_thread(
                         MessageType::Manifest => {
                             println!("[CACHE] RECEIVED => {:?}", msg.msg_type());
                             assert_eq!(msg.msg_type(), MessageType::Manifest);
-                            let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                            match msg.manifest {
-                                None => ret_pipe.send(Arc::new(Wrapper::new().add_error(String::from("No manifest sent to cache thread".build()))))
-                                Some(manifest) => {
-                                    handle_manifest(msg, c, &ret_pipe, &conn);
-                                }
+                            {
+                                let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
+                                let res = handle_manifest(msg, c, &ret_pipe, &conn);
                             }
                         },
                     };
@@ -111,15 +108,77 @@ pub struct Cancel {
     msg: String,
 }
 
-fn handle_get(
+fn handle_manifest(
     msg: SafeArcMsg,
     cash: &mut RefCell<HashMap<i32, Resource<Post>>>,
     ret_pipe: &Sender<SafeArcMsg>,
     db: &PgConnection,
 ) {
+    //to be sent back -> will contain post content on any post whose version is out of date
+    let mut wrap = Wrapper::new()
+        .set_model(ModelType::Post)
+        .set_msg_type(MessageType::Manifest)
+        .build();
+
+    let mut db_posts: Vec<i32> = Vec::new();
+    println!("[CACHE] Manifest: begin");
+    
+    for m in msg.items() {
+        let mut borrowed_val = cash.borrow();
+        match borrowed_val.get(&m.get_data().id) {
+            //1. if cache has this post id:
+            Some(val) => {
+                println!("[CACHE] Manifest: For key: {:?} ----> {:?}", &m.get_data().id, val);
+                //2. If the version provided does not match the version in the cache
+                if val.version != m.get_version() {
+                    //3. Add the entire post's content to the return wrapper's items
+                    println!("[CACHE] manifest: adding post {} to return list", val.get_data().id);
+                    let resource = Arc::new(val.clone());
+                    wrap.items_mut().push(resource);
+                }
+                //otherwise, the sender has the correct post and doesn't need it updated
+            }
+            //4. If cache does not have this post id:
+            None => {
+                println!("[CACHE] Manifest Key ({:?}) did not exist.", msg);
+                //5. Add it to the list of the db post gets we'll need to make
+                db_posts.push(m.get_data().id.clone());
+            }
+        }
+    }
+    println!("[CACHE] Manifest: making db hits for posts {:?}", db_posts);
+    //6. Get all the posts in the manifest list that weren't in the cache
+
+    let mut posts: Vec<Post> = Post::get_all(db_posts, db).expect("Getting from database failed");
+
+    println!("[CACHE] Manifest: got posts from db: {:?}", posts);
 
     
+    let mut mutable_cache = cash.borrow_mut();
+    // For each post returned by db
+    while !posts.is_empty() {
+        //pop() is only none when posts is empty; never because of loop condition
+        let post: Post = posts.pop().unwrap();
+
+        //7. add those posts to the cache with version 0
+        let mut resource = Resource::new(post);
+        resource.version = 0;
+        mutable_cache.insert(resource.get_data().id.clone(), resource.clone());
+
+        //8. Add them all to the return list.
+        println!("[CACHE] manifest: adding post {} to return list", resource.get_data().id);
+        wrap.items_mut().push(Arc::new(resource));
+
+
+
+    }
+    //9. Send back the return list.
+    
+    ret_pipe.send(Arc::new(wrap));
+    
+    println!("[CACHE] Manifest: end");
 }
+
 
 #[allow(dead_code)]
 fn handle_get(

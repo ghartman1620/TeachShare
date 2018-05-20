@@ -157,7 +157,7 @@ struct WSMessage {
     message: MessageType,
     id: Option<i32>,
     post: Option<models::Post>, //id_or_post: IdOrPost
-    manifest: Option<Vec<IdAndVersion>>,
+    manifest: Option<Vec<models::IdAndVersion>>,
 }
 
 impl Handler for Connection {
@@ -374,10 +374,17 @@ impl Connection {
             println!("manifest: {:?}", post_versions);
             let mut wrap = Wrapper::new()
                 .set_model(ModelType::Post)
-                .set_msg_type(MessageType::Watch)
-                .set_manifest(post_versions)
+                .set_msg_type(MessageType::Manifest)
                 .build();
-            
+            for post_version in post_versions {
+                println!("[MAIN] manifest handler: adding post id {} version {} to cache list", post_version.id, post_version.version);
+                let mut p = Post::new();
+                p.id = post_version.id;
+                let mut resource = Resource::new(p);
+                resource.version = post_version.version;
+                wrap.items.push(Arc::new(resource));
+            }
+            println!("{:?}", wrap.items());
             match self.to_cache.send(Arc::new(wrap)) {
                 Ok(val) => {
                     println!("Sucessfully sent and got in return: {:?}", val);
@@ -394,14 +401,14 @@ impl Connection {
             };
 
             let resp = match self.from_cache.recv() {
-                Ok(val) => val.items().clone(), // @TODO: figure out how to avoid clone/copy
+                Ok(val) => val.items().clone(),
                 Err(e) => {
                     return Err(String::from("Error receiving from channel (from cache)."));
                 }
             };
-            println!("resp: {:?}", resp);
-
-            Ok(resp)
+            println!("[MAIN] resp: {:?}", resp);
+            let output: Vec<Post> = resp.iter().map(|x| (*x.get_data()).clone()).collect();
+            Ok(output)
         }
     }
     fn handle_update_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
