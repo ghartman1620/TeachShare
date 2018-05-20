@@ -169,7 +169,8 @@ impl Wrapper {
     }
     pub fn add_error(&mut self, err: String) -> &mut Self{
         self.errors.push(err);
-
+        self
+    }
     pub fn set_items(&mut self, items: &Vec<ArcItem>, watchers: &[Vec<i32>]) -> &mut Self {
         // self.items
         println!("items: {:?}", items);

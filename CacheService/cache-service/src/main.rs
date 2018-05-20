@@ -121,14 +121,13 @@ enum IdOrPost {
 
 pub type Version = u64;
 pub type ID = i32;
-pub type ManifestEntry = (ID, Version);
 
 #[derive(Serialize, Deserialize, Debug)]
 struct WSMessage {
     message: MessageType,
     id: Option<i32>,
     post: Option<models::Post>, //id_or_post: IdOrPost
-    manifest: Option<Vec<ManifestEntry>>,
+    manifest: Option<Vec<IdAndVersion>>,
     version: Option<u64>,
 }
 

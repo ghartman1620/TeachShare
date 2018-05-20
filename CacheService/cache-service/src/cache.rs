@@ -822,8 +822,5 @@ mod tests {
             }
         };
     }
-    #[test]
-    fn test_vec_cache_get() {
-        let vc = AssociativeVecCache<Resource<Post>>
-    }
+
 }
