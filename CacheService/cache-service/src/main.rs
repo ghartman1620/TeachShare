@@ -29,7 +29,6 @@ Get
     "id" : number
 }
 */
-
 /*!
  The websocket cache service is used for realtime communication between connected users.
 */
@@ -41,13 +40,6 @@ extern crate ws;
 extern crate serde_derive;
 extern crate dotenv;
 extern crate serde_json;
-
-extern crate actix;
-use actix::Actor;
-
-extern crate futures;
-// use futures::future::Future;
-use futures::{future, Future};
 
 #[macro_use]
 extern crate crossbeam_channel;
@@ -84,13 +76,13 @@ struct GrandSocketStation {
 
 impl GrandSocketStation {
     pub fn get_connections(&self) -> &Vec<Rc<Connection>> {
-        return &self.connections;
+        &self.connections
     }
     pub fn get_connections_mut(&mut self) -> &mut Vec<Rc<Connection>> {
-        return &mut self.connections;
+        &mut self.connections
     }
     pub fn push_connection(&mut self, conn: Connection) {
-        return self.connections.push(Rc::new(conn));
+        self.connections.push(Rc::new(conn))
     }
 }
 
@@ -131,13 +123,7 @@ pub type Version = u64;
 pub type ID = i32;
 pub type ManifestEntry = (ID, Version);
 
-/// Recieved msg:
-///
-/// WSMessage { message: Create, id: None, post: Some(Post { id: 1, title: "test post title",
-/// content: Object({"content": String("<b>bold</b>"), "type": String("text")}), likes: 0, tags: Object({}),
-/// user_id: 1, draft: false, content_type: 0, grade: 0, subject: 0, crosscutting_concepts: [1, 2, 3],
-/// disciplinary_core_ideas: [1, 3, 5], practices: [2, 1] }) }
-///
+
 #[derive(Serialize, Deserialize, Debug)]
 struct WSMessage {
     message: MessageType,
@@ -149,32 +135,20 @@ struct WSMessage {
 
 impl Handler for Connection {
     fn on_open(&mut self, hs: Handshake) -> ws::Result<()> {
-        // We have a new connection, so we increment the connection counter
-        // .get_mut(&self.count.get()).get_or_insert(&mut hs.peer_addr.unwrap().ip());  // insert(self.count.get(), hs);
-        //  self.connections[self.out.connection_id()] = self.out;
-        // println!("HANDSHAKE --> {:?}", hs);
         println!("client connected");
         Ok(())
     }
 
     fn on_message(&mut self, msg: Message) -> ws::Result<()> {
-        // this is the Tx for where this data message came from
-
         let result = match msg {
             Message::Binary(bin) => {
-                //println!("Received binary message")
                 println!("{:?}", bin);
                 panic!("Received binary message");
             } // ..
             Message::Text(text) => {
-                println!("{}", text);
-
-                // println!("WEAK --> {:?}", self.parent.strong());
-                // let mut g = &mut self.parent.expect("could not unwrap option..");
                 println!("RC: {:?}", self.parent);
                 match &mut self.parent {
                     Some(val) => {
-                        println!("Some: {:?}", val);
                         match val.try_borrow_mut() {
                             Ok(parent) => {
                                 println!("OK: {:?}", parent);
@@ -190,12 +164,7 @@ impl Handler for Connection {
                     }
                     None => println!("None. Did not unwrap."),
                 }
-                // let gss: &mut GrandSocketStation = Rc::get_mut(g).expect("could not get mut");
-                // let mut conn = &mut gss.connections;
-                // println!("CONNECTIONS: {:?}", conn);
-
                 let json: Result<WSMessage, serde_json::Error> = serde_json::from_str(&text);
-                // println!("[JSON] ----> {:?}", json.unwrap());
                 let response: Result<Vec<Post>, String> = match json {
                     Ok(msg) => {
                         let msg_result: Result<Vec<Post>, String> = match msg.message {
@@ -387,6 +356,7 @@ impl Connection {
             Err(e) => Err(String::from("Error receiving from channel (from cache).")),
         };
 
+        // @TODO: This is the actual update sending code. Could be optimized greatly.
         if let Ok(updated_data) = changes {
             let (watchers, posts): (Vec<Vec<i32>>, Vec<Post>) = updated_data
                 .iter()
@@ -417,22 +387,6 @@ impl Connection {
                 None => println!("None. Did not unwrap."),
             }
         }
-
-        // @TODO: finish working on this, instead of actually sending the watchers
-        // back to the client, send the updated posts TO those clients.
-        // match watchers {
-        //     Ok(val) => {
-        //         let serialized = serde_json::to_string(&val)
-        //                     .expect("Uh-oh... JSON serialization error!~");
-
-        //         println!("Serialized content (Update): {}", serialized);
-        //         match self.tx.send(serialized) {
-        //             Ok(val) => println!("Serialized: {:?}", val),
-        //             Err(e) => println!("Error: {:?}", e),
-        //         }
-        //     },
-        //     Err(e) => println!("ERROR: {:?}", e),
-        // }
 
         Ok(vec![])
     }
@@ -495,33 +449,6 @@ impl Connection {
     }
 }
 
-// #[derive(Debug)]
-// struct DosTuple(i64, i64);
-
-// impl actix::Message for DosTuple {
-//     type Result = String;
-// }
-
-// struct MyActor;
-
-// impl actix::Actor for MyActor {
-//     type Context = actix::Context<Self>;
-
-//     fn started(&mut self, ctx: &mut Self::Context) {
-//        println!("I am alive!");
-//        actix::Arbiter::system().do_send(actix::msgs::SystemExit(0));
-//     }
-// }
-
-// impl actix::Handler<DosTuple> for MyActor {
-//     type Result = String;
-
-//     fn handle(&mut self, msg: DosTuple, ctx: &mut actix::Context<Self>) -> Self::Result {
-//         println!("handle: {:?}", msg);
-//         String::from("this is just a test...")
-//     }
-// }
-
 fn main() {
     let hub = Rc::new(RefCell::new(GrandSocketStation {
         connections: vec![],
@@ -541,29 +468,8 @@ fn main() {
         crossbeam_channel::Sender<Cancel>,
     ) = wire_up(send_db);
 
-    /// Test actix actor framework stuff (again)
-    // let system = actix::System::new("test");
-    // // let thr_system = system.clone();
-
-    // let addr: actix::Addr<actix::Syn, _> = MyActor.start();
-    // let thread_addr = addr.clone();
-    // let my_actor = addr.recipient();
-    // my_actor.send(DosTuple(1, 1));    
-    // let res = thread_addr.send(DosTuple(0, 0));
-    // let res1 = thread_addr.send(DosTuple(0, 0));    
-    // system.handle().spawn(res.then(|res| {
-    //         println!("RES: {:?}", res);
-    //         future::result(Ok(()))
-    // }));
-    // system.handle().spawn(res1.then(|res| {
-    //     println!("RES1: {:?}", res);
-    //     future::result(Ok(()))ID:ID:
-    // }));    
-    // system.run();
-    //let hub_inner = hub.unwrap().clone();
     listen("127.0.0.1:3012", move |out| {
         let mut value = None;
-
         {
             value = Some(Connection {
                 id: *i,
@@ -574,33 +480,10 @@ fn main() {
                 kill_cache: c.clone(),
             });
         }
-
         let conn = value.unwrap();
-
         let h = &mut hub.borrow_mut();
-        // let h = &mut hub.unwrap().clone();
-        // let hub_mut = Rc::get_mut(h).expect("Uh oh... Could not borrow hub");
         h.push_connection(conn.clone());
-
         let value: Option<Connection> = Some(conn.clone());
-
-        // {
-        //     let conn = Connection {
-        //         id: *i,
-        //         tx: out,
-        //         parent: Rc::downgrade(*hub.read().unwrap()),
-        //         to_cache: a.clone(),
-        //         from_cache: b.clone(),
-        //         kill_cache: c.clone(),
-        //     };
-        // }
-
-        // {
-        //     let hub_mut = Rc::get_mut(&mut hub.unwrap()).expect("Uh oh... Could not borrow hub");
-
-        //     hub_mut.into_inner().push_connection(conn.clone());
-        //     // hub_mut.connections[*i as usize].parent = weak;
-        // }
         *i += 1;
         value.unwrap()
     }).unwrap();

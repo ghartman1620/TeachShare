@@ -1,12 +1,8 @@
 use serde_json::from_str;
 use serde_json::Value;
 use std::cmp::{Eq, PartialEq};
-use std::collections;
-use std::collections::HashMap;
 use std::error;
 use std::fmt;
-use std::fmt::Debug;
-use std::rc::Rc;
 use std::sync::Arc;
 
 #[derive(Debug)]
@@ -202,22 +198,6 @@ impl Wrapper {
         println!("OMG ITEMS: {:?}", actual);
         self.items = actual;
         self
-    }
-
-    pub fn set_watchers(&mut self, post_id: i32, watches: Vec<i32>) {
-
-        // let filtered: &mut Vec<ArcItem> = &mut self.items.iter().filter(|ref x| x.get_data().id == post_id).collect();
-        // println!("Filtered: {:?}", filtered);
-        // let mut items = self.items_mut();
-
-        // for b in self.items_mut() {
-        //     if b.get_data().id == post_id {
-        //         let mut c = b.get_watchers_mut();
-        //         *c = watches.clone();
-        //     }
-        // }
-        // a.set_watchers(watchers.clone());
-
     }
     pub fn build(&mut self) -> Wrapper {
         self.clone()
