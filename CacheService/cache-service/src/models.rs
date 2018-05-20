@@ -1,56 +1,50 @@
-use std::cmp::{Eq, PartialEq};
-use std::collections;
-use std::collections::HashMap;
-use std::rc::Rc;
-use serde_json::Value;
 use serde_json::from_str;
-use std::sync::Arc;
-use std::fmt;
+use serde_json::Value;
+use std::cmp::{Eq, PartialEq};
 use std::error;
+use std::fmt;
+use std::sync::Arc;
 
+// #[derive(Debug)]
+// pub struct NoIDProvided {
+//     details: String,
+// }
 
-#[derive(Debug)]
-pub struct NoIDProvided {
-    details: String, 
-}
+// impl NoIDProvided {
+//     pub fn new(msg: &str) -> NoIDProvided {
+//         NoIDProvided {
+//             details: msg.to_string(),
+//         }
+//     }
+// }
 
-impl NoIDProvided {
-    pub fn new(msg: &str) -> NoIDProvided {
-        NoIDProvided{
-            details: msg.to_string(),
-        }
-    }
-}
-
-#[derive(Debug)]
-pub enum CacheError {
-    NoIDProvided(),
-
-}
+// #[derive(Debug)]
+// pub enum CacheError {
+//     NoIDProvided(),
+// }
 
 /// Error Trait definition:
-/// 
+///
 /// pub trait Error: Debug + Display {
 ///     fn description(&self) -> &str;
 ///     fn cause(&self) -> Option<&Error> { ... }
 /// }
-impl error::Error for NoIDProvided {
-    fn description(&self) -> &str {
-        println!("No ID (pk) provided for request");
-        "No ID (pk) provided for request"
-    }
-    // fn cause(&self) -> Option<&error::Error> {
-    //     let res = NoIDProvided::new("No ID (pk) was provided");
-    //     Some(&res)
-    // }
-}
+// impl error::Error for NoIDProvided {
+//     fn description(&self) -> &str {
+//         println!("No ID (pk) provided for request");
+//         "No ID (pk) provided for request"
+//     }
+//     // fn cause(&self) -> Option<&error::Error> {
+//     //     let res = NoIDProvided::new("No ID (pk) was provided");
+//     //     Some(&res)
+//     // }
+// }
 
-impl fmt::Display for NoIDProvided {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "No ID provided.")
-    }
-}
-
+// impl fmt::Display for NoIDProvided {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         write!(f, "No ID provided.")
+//     }
+// }
 
 #[derive(Debug, Clone)]
 pub struct Resource<T> {
@@ -139,6 +133,7 @@ pub enum Data {
 }
 
 pub type ArcItem = Arc<Item + Send + Sync>;
+pub type ArcType<T: Item + Send + Sync> = Arc<T>;
 
 #[derive(Clone)]
 pub struct Wrapper {
@@ -174,6 +169,33 @@ impl Wrapper {
     }
     pub fn add_error(&mut self, err: String) -> &mut Self{
         self.errors.push(err);
+
+    pub fn set_items(&mut self, items: &Vec<ArcItem>, watchers: &[Vec<i32>]) -> &mut Self {
+        // self.items
+        println!("items: {:?}", items);
+        println!("watchers: {:?}", watchers);
+        let temp = items
+            .iter()
+            .zip(watchers.iter())
+            .map(|(post, watchers)| {
+                let temp = &mut Arc::new(Resource::new(post.get_data_clone()));
+                let resource = Arc::get_mut(temp).expect("Could not borrow mutably.");
+
+                watchers.iter().for_each(|watch| {
+                    resource.add_watch(watch.clone());
+                });
+                Arc::new(resource.clone())
+            })
+            .collect::<Vec<_>>();
+
+        let mut actual: Vec<ArcItem> = vec![];
+        for a in temp {
+            actual.push(a.clone());
+        }
+        // actual.extend(temp.into_iter());
+
+        println!("OMG ITEMS: {:?}", actual);
+        self.items = actual;
         self
     }
     pub fn build(&mut self) -> Wrapper {
@@ -217,36 +239,37 @@ impl<'a> Msg<'a> {
 
 impl<'a> Msg<'a> for Wrapper {
     fn data_type(&self) -> ModelType {
-        return self.model_type.clone();
+        self.model_type.clone()
     }
     fn msg_type(&self) -> MessageType {
-        return self.msg_type.clone();
+        self.msg_type.clone()
     }
     // fn data(&self) -> Self;
     fn timestamp(&self) -> i32 {
-        return self.timestamp;
+        self.timestamp
     }
     fn items(&self) -> &Vec<ArcItem> {
-        return &self.items;
+        &self.items
     }
     fn items_mut(&mut self) -> &mut Vec<ArcItem> {
-        return &mut self.items;
+        &mut self.items
     }
     fn hasErr(&self) -> bool {
-        return self.errors.len() > 0;
+        self.errors.len() > 0
     }
     fn errors(&self) -> &Vec<String> {
-        return &self.errors;
+        &self.errors
     }
     fn errors_mut(&mut self) -> &mut Vec<String> {
-        return &mut self.errors;
+        &mut self.errors
     }
     fn get_connection_id(&self) -> i32 {
-        return self.connection_id;
+        self.connection_id
     }
 }
 
 pub trait Item {
+    fn new(&self, post: Post, watchers: Vec<i32>) -> Resource<Post>;
     fn get_data(&self) -> &Post;
     fn get_data_mut(&mut self) -> &mut Post;
     fn get_data_clone(&self) -> Post;
@@ -257,27 +280,34 @@ pub trait Item {
 
 pub type PostResource = Resource<Post>;
 
-impl Item for PostResource {
+impl Item for Resource<Post> {
+    fn new(&self, post: Post, watchers: Vec<i32>) -> Resource<Post> {
+        let mut resource = Resource::new(post);
+        resource.watchers = watchers;
+        resource
+    }
     fn get_data(&self) -> &Post {
-        return &self.data;
+        &self.data
     }
     fn get_data_mut(&mut self) -> &mut Post {
-        return &mut self.data;
+        &mut self.data
     }
     fn get_data_clone(&self) -> Post {
-        return self.data.clone();
+        self.data.clone()
     }
     fn get_watchers(&self) -> &Vec<i32> {
-        return &self.watchers;
+        &self.watchers
     }
     fn get_watchers_mut(&mut self) -> &mut Vec<i32> {
-        return &mut self.watchers;
+        &mut self.watchers
     }
+    // fn set_watchers(&mut self, watchers: &Vec<i32>) {
+    //     self.watchers = watchers.clone();
+    // }
     fn get_version(&self) -> u64 {
-        return self.version;
+        self.version
     }
 }
-
 
 #[derive(Queryable, Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct User {
@@ -405,6 +435,6 @@ mod tests {
         assert_eq!(m.watchers, vec![2]);
 
         m.increment();
-        assert_eq!(m.version, [0, 1, 0]);
+        assert_eq!(m.version, 1);
     }
 }

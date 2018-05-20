@@ -29,7 +29,6 @@ Get
     "id" : number
 }
 */
-
 /*!
  The websocket cache service is used for realtime communication between connected users.
 */
@@ -41,13 +40,6 @@ extern crate ws;
 extern crate serde_derive;
 extern crate dotenv;
 extern crate serde_json;
-
-extern crate actix;
-use actix::Actor;
-
-extern crate futures;
-// use futures::future::Future;
-use futures::{future, Future};
 
 #[macro_use]
 extern crate crossbeam_channel;
@@ -69,11 +61,10 @@ use db::save_posts;
 use models::*;
 
 use models::MessageType;
-use std::rc::{Rc, Weak};
+use std::cell::RefCell;
+use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
-use std::sync::RwLock;
-use std::cell::RefCell;
 
 #[derive(Debug, Clone)]
 struct GrandSocketStation {
@@ -85,28 +76,13 @@ struct GrandSocketStation {
 
 impl GrandSocketStation {
     pub fn get_connections(&self) -> &Vec<Rc<Connection>> {
-        return &self.connections;
+        &self.connections
     }
     pub fn get_connections_mut(&mut self) -> &mut Vec<Rc<Connection>> {
-        return &mut self.connections;
+        &mut self.connections
     }
     pub fn push_connection(&mut self, conn: Connection) {
-        return self.connections.push(Rc::new(conn));
-    }
-    pub fn set_parent(&mut self, conn: Connection) {
-        for a in &mut self.connections {
-            println!("mutable ref: {:?}", a);
-            // if a == &mut conn {
-            //     println!("setting {:?}...", a);
-            //     a.parent = Weak::new();
-            // }
-        }
-        // let c = self.connections.into_iter().find(|x| *x==conn);
-        // println!("set_parent: {:?}", c);
-        // match c {
-        //     Some(val) => {},
-        //     None => {},
-        // }
+        self.connections.push(Rc::new(conn))
     }
 }
 
@@ -126,7 +102,7 @@ struct Connection {
     kill_cache: crossbeam_channel::Sender<Cancel>,
 }
 
-impl fmt::Debug for Connection {                                                
+impl fmt::Debug for Connection {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -143,51 +119,35 @@ enum IdOrPost {
     Post(models::Post),
 }
 
+pub type Version = u64;
+pub type ID = i32;
+pub type ManifestEntry = (ID, Version);
 
-/// Recieved msg:
-///
-/// WSMessage { message: Create, id: None, post: Some(Post { id: 1, title: "test post title",
-/// content: Object({"content": String("<b>bold</b>"), "type": String("text")}), likes: 0, tags: Object({}),
-/// user_id: 1, draft: false, content_type: 0, grade: 0, subject: 0, crosscutting_concepts: [1, 2, 3],
-/// disciplinary_core_ideas: [1, 3, 5], practices: [2, 1] }) }
-///
-/// 
 #[derive(Serialize, Deserialize, Debug)]
 struct WSMessage {
     message: MessageType,
     id: Option<i32>,
     post: Option<models::Post>, //id_or_post: IdOrPost
-    manifest: Option<Vec<models::IdAndVersion>>,
+    manifest: Option<Vec<ManifestEntry>>,
+    version: Option<u64>,
 }
 
 impl Handler for Connection {
     fn on_open(&mut self, hs: Handshake) -> ws::Result<()> {
-        // We have a new connection, so we increment the connection counter
-        // .get_mut(&self.count.get()).get_or_insert(&mut hs.peer_addr.unwrap().ip());  // insert(self.count.get(), hs);
-        //  self.connections[self.out.connection_id()] = self.out;
-        println!("HANDSHAKE --> {:?}", hs);
         println!("client connected");
         Ok(())
     }
 
     fn on_message(&mut self, msg: Message) -> ws::Result<()> {
-        // this is the Tx for where this data message came from
-
         let result = match msg {
             Message::Binary(bin) => {
-                //println!("Received binary message")
                 println!("{:?}", bin);
                 panic!("Received binary message");
             } // ..
             Message::Text(text) => {
-                println!("{}", text);
-
-                // println!("WEAK --> {:?}", self.parent.strong());
-                // let mut g = &mut self.parent.expect("could not unwrap option..");
                 println!("RC: {:?}", self.parent);
                 match &mut self.parent {
                     Some(val) => {
-                        println!("Some: {:?}", val);
                         match val.try_borrow_mut() {
                             Ok(parent) => {
                                 println!("OK: {:?}", parent);
@@ -195,20 +155,15 @@ impl Handler for Connection {
                                 println!("connection count: {}", parent.connections.len());
                                 for c in &parent.connections {
                                     println!("Connection --> {:?}", c);
+                                    // println!("Sender: {:?}", c.tx);
                                 }
-                            },
+                            }
                             Err(e) => println!("Error: {:?}!", e),
                         }
-                    
-                    },
-                    None => {println!("None. Did not unwrap.")},
+                    }
+                    None => println!("None. Did not unwrap."),
                 }
-                // let gss: &mut GrandSocketStation = Rc::get_mut(g).expect("could not get mut");
-                // let mut conn = &mut gss.connections;
-                // println!("CONNECTIONS: {:?}", conn);
-
                 let json: Result<WSMessage, serde_json::Error> = serde_json::from_str(&text);
-                // println!("[JSON] ----> {:?}", json.unwrap());
                 let response: Result<Vec<Post>, String> = match json {
                     Ok(msg) => {
                         let msg_result: Result<Vec<Post>, String> = match msg.message {
@@ -249,20 +204,23 @@ impl Handler for Connection {
                                 let old_connection_id = self.tx.connection_id();
                                 println!("connection count: {}", parent.connections.len());
                                 {
-                                    exiting_connection_id = parent.connections.clone().into_iter().position(|x| x.tx.connection_id()==old_connection_id).unwrap();
+                                    exiting_connection_id = parent
+                                        .connections
+                                        .clone()
+                                        .into_iter()
+                                        .position(|x| x.tx.connection_id() == old_connection_id)
+                                        .unwrap();
                                 }
                                 parent.connections.remove(exiting_connection_id);
                                 for c in &parent.connections {
                                     println!("Connection --> {:?}", c);
                                 }
-                            },
+                            }
                             Err(e) => println!("Error: {:?}!", e),
                         }
-                    
-                    },
-                    None => {println!("None. Did not unwrap.")},
+                    }
+                    None => println!("None. Did not unwrap."),
                 }
-                
             }
             CloseCode::Abnormal => {
                 println!("Closing handshake failed! Unable to obtain closing status from client.")
@@ -411,11 +369,76 @@ impl Connection {
             Ok(output)
         }
     }
-    fn handle_update_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
-        
+    fn handle_update_msg(&mut self, msg: WSMessage) -> Result<Vec<Post>, String> {
         println!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Update);
-        unimplemented!()
+        let mut wrap = Wrapper::new()
+            .set_model(ModelType::Post)
+            .set_msg_type(MessageType::Update)
+            .build();
+
+        // does the request have a Post ID?
+        let post = match msg.post {
+            Some(post) => post,
+            None => {
+                // fail-fast
+                return Err(String::from("No post ID was provided!"));
+            }
+        };
+        {
+            wrap.items_mut().push(Arc::new(Resource::new(post)));
+        }
+        println!("WRAP: {:?}", wrap.items());
+
+        match self.to_cache.send(Arc::new(wrap)) {
+            Ok(val) => {
+                println!("Sucessfully sent and got in return: {:?}", val);
+            }
+            Err(e) => {
+                println!(
+                    "There was an error communicating with the cache! Err: {:?}",
+                    e
+                );
+            }
+        };
+        let changes = match self.from_cache.recv() {
+            Ok(val) => Ok(val.items().clone()),
+            Err(e) => Err(String::from("Error receiving from channel (from cache).")),
+        };
+
+        // @TODO: This is the actual update sending code. Could be optimized greatly.
+        if let Ok(updated_data) = changes {
+            let (watchers, posts): (Vec<Vec<i32>>, Vec<Post>) = updated_data
+                .iter()
+                .map(|x| (x.get_watchers().clone(), x.get_data().clone()))
+                .unzip();
+
+            match &mut self.parent {
+                Some(val) => match val.try_borrow_mut() {
+                    Ok(parent) => {
+                        for c in &parent.connections {
+                            println!("Connection --> {:?}", c);
+                            let id = c.tx.connection_id();
+                            if let Some(matched_connection) =
+                                watchers.iter().flat_map(|y| y).find(|x| **x == id as i32)
+                            {
+                                let serialized = serde_json::to_string(&posts)
+                                    .expect("Uh-oh... JSON serialization error!~");
+
+                                println!("Serialized content (Update): {}", serialized);
+                                let send_result = c.tx.send(serialized);
+                            } else {
+                                println!("There was no matched connection for: {}. It does not need to be updated.", id);
+                            }
+                        }
+                    }
+                    Err(e) => println!("Error: {:?}!", e),
+                },
+                None => println!("None. Did not unwrap."),
+            }
+        }
+
+        Ok(vec![])
     }
     fn handle_watch_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
         println!("[MAIN] received: {:?}", msg.message);
@@ -476,39 +499,12 @@ impl Connection {
     }
 }
 
-// #[derive(Debug)]
-// struct DosTuple(i64, i64);
-
-// impl actix::Message for DosTuple {
-//     type Result = String;
-// }
-
-// struct MyActor;
-
-// impl actix::Actor for MyActor {
-//     type Context = actix::Context<Self>;
-
-//     fn started(&mut self, ctx: &mut Self::Context) {
-//        println!("I am alive!");
-//        actix::Arbiter::system().do_send(actix::msgs::SystemExit(0));
-//     }
-// }
-
-// impl actix::Handler<DosTuple> for MyActor {
-//     type Result = String;
-
-//     fn handle(&mut self, msg: DosTuple, ctx: &mut actix::Context<Self>) -> Self::Result {
-//         println!("handle: {:?}", msg);
-//         String::from("this is just a test...")
-//     }
-// }
-
 fn main() {
     let hub = Rc::new(RefCell::new(GrandSocketStation {
         connections: vec![],
     }));
     let i = &mut 0;
-    
+
     // start db (SAVE only) thread
     let (send_db, recv_db) = crossbeam_channel::unbounded();
     let db_handle = thread::spawn(move || {
@@ -522,75 +518,22 @@ fn main() {
         crossbeam_channel::Sender<Cancel>,
     ) = wire_up(send_db);
 
-
-    /// Test actix actor framework stuff (again)
-    
-    // let system = actix::System::new("test");
-    // // let thr_system = system.clone();
-
-    // let addr: actix::Addr<actix::Syn, _> = MyActor.start();
-    // let thread_addr = addr.clone();
-    // let my_actor = addr.recipient();
-    // my_actor.send(DosTuple(1, 1));
-    
-    // let res = thread_addr.send(DosTuple(0, 0));
-    // let res1 = thread_addr.send(DosTuple(0, 0));
-    
-    // system.handle().spawn(res.then(|res| {
-    //         println!("RES: {:?}", res);
-    //         future::result(Ok(()))
-    // }));
-    // system.handle().spawn(res1.then(|res| {
-    //     println!("RES1: {:?}", res);
-    //     future::result(Ok(()))ID:ID:
-    // }));    
-    // system.run();
-    //let hub_inner = hub.unwrap().clone();
-
     listen("127.0.0.1:3012", move |out| {
         let mut value = None;
-        
         {
             value = Some(Connection {
                 id: *i,
-                tx: out.clone(), 
+                tx: out.clone(),
                 parent: Some(hub.clone()),
                 to_cache: a.clone(),
                 from_cache: b.clone(),
                 kill_cache: c.clone(),
             });
         }
-
-        
         let conn = value.unwrap();
-
         let h = &mut hub.borrow_mut();
-        // let h = &mut hub.unwrap().clone();
-        // let hub_mut = Rc::get_mut(h).expect("Uh oh... Could not borrow hub");
         h.push_connection(conn.clone());
-
         let value: Option<Connection> = Some(conn.clone());
-        
-        
-        
-        // {
-        //     let conn = Connection {
-        //         id: *i,
-        //         tx: out, 
-        //         parent: Rc::downgrade(*hub.read().unwrap()),
-        //         to_cache: a.clone(),
-        //         from_cache: b.clone(),
-        //         kill_cache: c.clone(),
-        //     };
-        // }
-        
-
-        // {
-        //     let hub_mut = Rc::get_mut(&mut hub.unwrap()).expect("Uh oh... Could not borrow hub");
-            
-        //     hub_mut.into_inner().push_connection(conn.clone());
-        //     // hub_mut.connections[*i as usize].parent = weak;
-        // }
         *i += 1;
         value.unwrap()
     }).unwrap();
@@ -606,24 +549,14 @@ mod tests {
 
     #[test]
     // a test function that returns our error result
-    fn test_raises_no_id_provided()  {
-        
+    fn test_raises_no_id_provided() {
         fn inner(yes: bool) -> Result<(), NoIDProvided> {
             if yes {
                 Err(NoIDProvided::new("this is the error msg."))
             } else {
                 Ok(())
-            }        
+            }
         }
-
-        // throw error
-        // let out = try!(inner(true).map_err(|e| e.to_string()));
-        // println!("OUT: {:?}", out);
-
-        // don't
-        // let out = try!(inner(false).map_err(|e| e.to_string()));
-        // println!("OUT: {:?}", out);
     }
 
 }
-

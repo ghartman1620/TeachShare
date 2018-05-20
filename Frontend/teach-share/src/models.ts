@@ -111,7 +111,7 @@ export class User extends Model {
     }
 }
 
-enum ContentType {
+export enum ContentType {
     Game = 0,
     Lab,
     Lecture
@@ -240,6 +240,7 @@ export class Post extends Model {
     }
     // creates a Post model from the websocket serialized form (see idify for details)
     public static pkify(obj: any): Post {
+        console.log(obj);
         let p: any = {
             user: new User(obj.user_id),
             ...obj

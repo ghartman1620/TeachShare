@@ -10,11 +10,32 @@ use models::Post;
 use schema::posts_post::dsl::*;
 use serde_json::value::Value;
 use std::env;
+use std::rc::Rc;
 
 pub fn establish_connection() -> PgConnection {
     dotenv().ok();
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     PgConnection::establish(&database_url).expect(&format!("Error connecting to {}", database_url))
+}
+
+#[allow(dead_code)]
+pub struct DB {
+    _conn: Rc<PgConnection>,
+}
+
+#[allow(dead_code)]
+impl DB {
+    pub fn new() -> DB {
+        DB {
+            _conn: Rc::new(establish_connection()),
+        }
+    }
+    pub fn get(&self) -> Rc<PgConnection> {
+        self._conn.clone()
+    }
+    pub fn get_mut(&mut self) -> Option<&mut PgConnection> {
+        Rc::get_mut(&mut self._conn)
+    }
 }
 
 impl Post {
@@ -117,9 +138,9 @@ pub fn save_posts(rx: Receiver<Post>) {
 
 #[cfg(test)]
 mod tests {
-    use diesel::prelude::*;
     use crossbeam_channel::*;
     use db::*;
+    use diesel::prelude::*;
     use diesel::result;
 
     use std::sync::mpsc::channel;
@@ -175,7 +196,7 @@ mod tests {
         });
         let mut posts = Post::get(1, &connection).expect("no post 1");
         //we'll set p's title back to whatever it was once we're done
-        
+
         let p = &mut posts[0];
         let s = p.title.clone();
         let _ = tx.send(p.clone());

@@ -1,17 +1,15 @@
 extern crate crossbeam_channel;
 use crossbeam_channel::{Receiver, Sender};
-use db;
+use db::*;
 use diesel::pg::PgConnection;
-use diesel::prelude::*;
 use diesel::result;
-use models::{Item, MessageType, ModelType, Msg, Post, PostResource, Resource, Wrapper};
-use pool;
-use std::cell::RefCell;
+use models::{Item, MessageType, ModelType, Msg, Post, Resource, Wrapper};
+use std::cell::{BorrowMutError, RefCell};
 use std::collections::HashMap;
-use std::rc::Rc;
+use std::hash::Hash;
 use std::sync::Arc;
+use std::rc::Rc;
 use std::thread;
-use std::thread::JoinHandle;
 use std::time::Duration;
 
 const MAX_DB_SAVE_TIMEOUT: Duration = Duration::from_millis(200);
@@ -19,17 +17,152 @@ const MAX_DB_SAVE_TIMEOUT: Duration = Duration::from_millis(200);
 pub type SafeArcMsg = Arc<Msg<'static> + Send + Sync>;
 // type PostResource = Resource<Post>;
 
+pub trait Cache {
+    type Key;
+    type Entry;
+    type Err;
+
+    fn get(&self, key: Self::Key) -> Result<&Self::Entry, Self::Err>;
+    fn get_mut(&mut self, key: Self::Key) -> Result<&mut Self::Entry, Self::Err>;
+    fn put(&mut self, key: Self::Key, value: Self::Entry) -> Result<Option<Self::Entry>, Self::Err>;
+}
+
+#[derive(Debug)]
+pub struct AssociativeVecCache<V> {
+    _inner: Vec<V>,
+}
+
+#[derive(Debug)]
+pub enum CacheError {
+    Get(&'static str),
+    GetMut(&'static str),
+    Put(&'static str),
+}
+
+trait IntegerKey {}
+
+impl IntegerKey for u8 {}
+impl IntegerKey for u16 {}
+impl IntegerKey for u32 {}
+impl IntegerKey for u64 {}
+
+impl IntegerKey for i8 {}
+impl IntegerKey for i16 {}
+impl IntegerKey for i32 {}
+impl IntegerKey for i64 {}
+
+impl Cache for AssociativeVecCache<Resource<Post>> {
+    type Key = i32;
+    type Entry = Resource<Post>;
+    type Err = CacheError;
+
+    fn get(&self, key: i32) -> Result<&Resource<Post>, CacheError> {
+        Ok(&self._inner[key as usize])
+    }
+
+    fn get_mut(&mut self, key: i32) -> Result<&mut Resource<Post>, CacheError> {
+        Ok(&mut self._inner[key as usize])
+    }
+
+    fn put(&mut self, key: i32, value: Resource<Post>) -> Result<Option<Resource<Post>>, CacheError> {
+        if key as usize > self._inner.len() {
+            self._inner.resize(2 * key as usize, value);
+        } else {
+            self._inner[key as usize] = value;
+        }
+        Ok(None)
+    }
+}
+
+// impl AssociativeVecCache<V> {
+//     pub fn new() -> Vec<V> {
+//         AssociativeVecCache<V> {
+//             _inner: Vec::new(),
+//         }
+//     }
+// }
+
+#[derive(Debug)]
+pub struct HashMapCache<K: Eq + Hash, V> {
+    _inner: HashMap<K, V>,
+}
+
+impl<K, V> HashMapCache<K, V>
+where
+    K: Eq + Hash,
+{
+    pub fn new() -> HashMapCache<K, V> {
+        HashMapCache {
+            _inner: HashMap::new(),
+        }
+    }
+}
+
+impl Cache for HashMapCache<i32, Resource<Post>> {
+    type Key = i32;
+    type Entry = Resource<Post>;
+    type Err = CacheError;
+
+    fn get(&self, key: i32) -> Result<&Resource<Post>, CacheError> {
+        match self._inner.get(&key) {
+            Some(val) => Ok(val),
+            None => Err(CacheError::Get("Does not exist")),
+        }
+    }
+
+    fn get_mut(&mut self, key: i32) -> Result<&mut Resource<Post>, CacheError> {
+        match self._inner.get_mut(&key) {
+            Some(val) => Ok(val),
+            None => Err(CacheError::GetMut(
+                "Does not exist... or can't be gotten as mutable?",
+            )),
+        }
+    }
+
+    fn put(&mut self, key: i32, value: Resource<Post>) -> Result<Option<Resource<Post>>, CacheError> {
+        match self._inner.insert(key, value) {
+            Some(val) => Ok(Some(val)),
+            None => Err(CacheError::Put(
+                "Not an error, just did not previously exist.",
+            )),
+        }
+    }
+}
+
+// pub type Cache = Rc<RefCell<HashMap<i32, Resource<Post>>>>;
+#[allow(dead_code)]
+pub type SmartCache = Rc<RefCell<HashMap<i32, Resource<Post>>>>;
+
+#[allow(dead_code)]
 pub fn cache_thread(
     in_pipe: Receiver<SafeArcMsg>,
     ret_pipe: Sender<SafeArcMsg>,
     cancel: Receiver<Cancel>,
     db_send: Sender<Post>,
 ) {
+    let mut h = HashMapCache::new();
+    let res = h.put(1, Resource::new(Post::new()));
+
+    println!("Result of HashMapCache: {:?}", res);
+    match res {
+        Ok(val) => println!("Ok(val) ---> {:?}", val),
+        Err(e) => println!("Err(e) ---> {:?}", e),
+    }
+
+    match h.get(1) {
+        Ok(val) => println!("Ok(val) ---> {:?}", val),
+        Err(e) => println!("Err(e) ---> {:?}", e),
+    }
+
+    println!("Cache NOW: {:?}", h);
+
     thread::spawn(move || {
+        let db = DB::new();
+
         let mut cache = Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new())); // Rc::new(Cache::new());
         loop {
             // println!("Strong count: {}.", Rc::strong_count(&cache));
-            let conn: PgConnection = db::establish_connection();
+            let conn = db.get();
             select_loop! {
                 recv(in_pipe, msg) => {
                     let m = msg.clone();
@@ -39,7 +172,7 @@ pub fn cache_thread(
                             assert_eq!(msg.msg_type(), MessageType::Get);
                             // println!("Msg: {:?}", msg.msg_type());
                             let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                            let res = handle_get(msg, c, &ret_pipe, &conn);
+                            handle_get(&msg, c, &ret_pipe, &conn);
 
                         },
                         MessageType::Create => {
@@ -47,7 +180,7 @@ pub fn cache_thread(
                             assert_eq!(msg.msg_type(), MessageType::Create);
                             {
                                 let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                                let res = handle_create(msg, c, &ret_pipe, &db_send);
+                                handle_create(msg, c, &ret_pipe, &db_send);
                             }
                         },
                         MessageType::Watch => {
@@ -55,7 +188,7 @@ pub fn cache_thread(
                             assert_eq!(msg.msg_type(), MessageType::Watch);
                             {
                                 let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                                let res = handle_watch(msg, c, &ret_pipe);
+                                handle_watch(&msg, c, &ret_pipe, &conn, &db_send);
                             }
                         },
                         MessageType::Update => {
@@ -63,9 +196,9 @@ pub fn cache_thread(
                             assert_eq!(msg.msg_type(), MessageType::Update);
                             {
                                 let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                                let res = handle_update(msg, c, &ret_pipe);
+                                handle_update(&msg, c, &ret_pipe);
                             }
-                            
+
                         },
                         MessageType::Manifest => {
                             println!("[CACHE] RECEIVED => {:?}", msg.msg_type());
@@ -88,6 +221,7 @@ pub fn cache_thread(
     });
 }
 
+#[allow(dead_code)]
 type RcCellHash<T> = Rc<RefCell<HashMap<i32, Resource<T>>>>;
 
 #[allow(dead_code)]
@@ -98,10 +232,14 @@ pub fn wire_up<'a>(
     let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<SafeArcMsg>();
     let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<SafeArcMsg>();
     let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<Cancel>();
-    let _sel = cache_thread(recv_pipe, send_ret_pipe, recv_cancel, db_send);
+
+    cache_thread(recv_pipe, send_ret_pipe, recv_cancel, db_send);
+
     println!("Server started..");
     (send_pipe, recv_ret_pipe, send_cancel)
 }
+
+type RefCache<'a> = &'a mut RefCell<HashMap<i32, Resource<Post>>>;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Cancel {
@@ -176,12 +314,7 @@ fn handle_manifest(
 
 
 #[allow(dead_code)]
-fn handle_get(
-    msg: SafeArcMsg,
-    cash: &mut RefCell<HashMap<i32, Resource<Post>>>,
-    ret_pipe: &Sender<SafeArcMsg>,
-    db: &PgConnection,
-) {
+fn handle_get(msg: &SafeArcMsg, cash: RefCache, ret_pipe: &Sender<SafeArcMsg>, db: &PgConnection) {
     let mut wrap = Wrapper::new()
         .set_model(ModelType::Post)
         .set_msg_type(MessageType::Get)
@@ -191,9 +324,6 @@ fn handle_get(
         let mut dne_flag = false;
         {
             let mut borrowed_val = cash.borrow();
-
-            // let user_id_val = 1;
-            // let result: Vec<&Post> = borrowed_val.iter().filter(|(_, y)| y.data.user_id==user_id_val).map(|(_, y)| &y.data).collect();
             match borrowed_val.get(&m.get_data().id) {
                 Some(val) => {
                     println!("[CACHE] For key: {:?} ----> {:?}", &m.get_data().id, val);
@@ -208,7 +338,6 @@ fn handle_get(
         }
         if dne_flag {
             // get from database
-            // let conn: PgConnection = db::establish_connection();
             let post_result: Result<Vec<Post>, result::Error> = Post::get(m.get_data().id, db);
             if post_result.is_err() {
                 println!("[CACHE] Error: {:?}", post_result.unwrap_err());
@@ -217,24 +346,23 @@ fn handle_get(
                 println!("[CACHE] Post recieved from DB: {:?}", post);
 
                 if post.len() > 1 {
-                    println!("[CACHE] Too many posts returned! --> #{} instead of 1.", post.len());
+                    println!(
+                        "[CACHE] Too many posts returned! --> #{} instead of 1.",
+                        post.len()
+                    );
                 } else if post.len() == 1 {
                     // save in cache
                     {
-                        // cash.try_borrow_mut();
                         let mut mutable_cache = cash.borrow_mut();
-                        // {
-                        //     let slice: &mut [Post] = post.as_mut_slice();
-                        //     for a in slice {
-                        //         println!("A: {:?}", a);
-                        //     }
-                        // }
                         let post_resource = Resource::new(post[0].clone());
                         let inserted = mutable_cache.insert(post[0].id, post_resource.clone());
                         match inserted {
                             Some(val) => {
                                 //
-                                println!("[CACHE] ******* Key already existed. Previous --> {:?}", val);
+                                println!(
+                                    "[CACHE] ******* Key already existed. Previous --> {:?}",
+                                    val
+                                );
                             }
                             None => {
                                 println!("[CACHE] Key did not currently exist.");
@@ -247,9 +375,6 @@ fn handle_get(
                 }
             }
         }
- 
-        // // respond to client
-        // wrap.errors_mut().push(String::from("The key did not exists"));
     }
     match ret_pipe.send(Arc::new(wrap)) {
         Ok(val) => println!("[CACHE] Successfully sent return value: {:?}", val),
@@ -260,38 +385,37 @@ fn handle_get(
 #[allow(dead_code)]
 fn handle_create(
     msg: SafeArcMsg,
-    cash: &mut RefCell<HashMap<i32, Resource<Post>>>,
+    cash: RefCache,
     ret_pipe: &Sender<SafeArcMsg>,
     db: &Sender<Post>,
 ) {
-    let mut borrowed_val = cash.borrow_mut();
-    let mut wrap = Wrapper::new()
+    let wrap = Wrapper::new()
         .set_model(ModelType::Post)
         .set_msg_type(MessageType::Create)
         .build();
 
     for m in msg.items() {
-        match borrowed_val.insert(m.get_data().id, Resource::new(m.get_data_clone())) {
-            Some(val) => {
-                println!("[CACHE] Previous key/value: {:?} ----> {:?}", m.get_data().id, val);
-                let resource = Arc::new(val.clone());
-                wrap.items_mut().push(resource);
-            }
-            None => {
-                println!("[CACHE] Key did not previously exist: {}", m.get_data().id);
-            }
+        let (resource, need_db) = create_post_cache(m.get_data(), cash);
+        println!("[CREATE] Resource: {:?}", resource);
+        match resource {
+            Ok(val) => match val {
+                Some(old) => println!("Replaced value {:?}", old),
+                None => println!("Did not previously exist."),
+            },
+            // This would be a huge problem, and a systemic failure
+            Err(e) => println!("There was an error borrowing the cache. {:?}", e),
         }
-        match db.send_timeout(m.get_data().clone(), MAX_DB_SAVE_TIMEOUT) {
-            Ok(val) => {}
-            Err(e) => {
-                println!(
-                    "[CACHE] Save to DB took too long!! Ended with error: {:?}. (Timeout: {:?} ms.)",
-                    e, MAX_DB_SAVE_TIMEOUT
-                );
-            }
+        if need_db {
+            let errors = create_post_db(m.get_data(), db, true);
+            println!("[CREATE] <Errors> --> {:?}", errors);
         }
     }
-    match ret_pipe.send(Arc::new(wrap)) {
+    send_back(ret_pipe, wrap);
+}
+
+#[allow(dead_code)]
+fn send_back(return_pipe: &Sender<SafeArcMsg>, wrap: Wrapper) {
+    match return_pipe.send(Arc::new(wrap)) {
         Ok(val) => println!("[CACHE] Successfully sent return value: {:?}", val),
         Err(e) => println!("[CACHE] Error sending on return pipe: {:?}", e),
     };
@@ -299,55 +423,225 @@ fn handle_create(
 
 #[allow(dead_code)]
 fn handle_watch(
-    msg: SafeArcMsg,
-    cash: &mut RefCell<HashMap<i32, Resource<Post>>>,
+    msg: &SafeArcMsg,
+    cash: RefCache,
     ret_pipe: &Sender<SafeArcMsg>,
+    db_read: &PgConnection,
+    db_write: &Sender<Post>,
 ) {
-    let mut borrowed_val = cash.borrow_mut();
-    let mut wrap = Wrapper::new()
+    // create a wrapper for the response
+    let wrap = Wrapper::new()
         .set_model(ModelType::Post)
         .set_msg_type(MessageType::Create)
         .build();
 
     for m in msg.items() {
-        let res = borrowed_val.get_mut(&m.get_data().id);
-        if res.is_some() {
-            let val: &mut Resource<Post> = res.unwrap();
-            val.add_watch(msg.get_connection_id());
-            let watchers = &mut val.all_watchers();
-            println!("[CACHE] Current watchers: {:?}", watchers);
-        } else {
-            println!("[CACHE] Key ({:?}) did not exist.", m.get_data().id);
-            wrap.errors_mut().push(String::from("[CACHE] Key did not exist"));
+        let mut exists_cache = Option::default();
+        let mut exists = false;
+
+        // Check cache if it already exists
+        {
+            let c = cash.borrow();
+            if let Some(val) = c.get(&m.get_data().id) {
+                exists_cache = Some(val.clone());
+            };
+        }
+
+        // This next section does a few things:
+        // [1] Check if there's a value already in the cache.
+        // [2] Already in the cache
+        //     [a] check if it's already in the watch list
+        // [3] Not already in cache
+        //     [a] get the posts from the db
+        //     [b] put them in the cache
+        //     [c] add to watch list
+        //
+        match exists_cache {
+            Some(val) => {
+                exists = val.all_watchers()
+                    .iter()
+                    .any(|&x| x == msg.get_connection_id());
+            }
+            None => {
+                // no value to watch, grab from DB?
+                let posts: Option<Vec<Post>> = match Post::get(m.get_data().id, db_read) {
+                    Ok(val) => Some(val),
+                    Err(e) => None,
+                };
+                if posts.is_some() {
+                    let cleaned_posts_response: Vec<Resource<Post>> = posts
+                        .unwrap()
+                        .into_iter()
+                        .map(|post| create_post_cache(&post, cash))
+                        .filter(|(resource, need_db)| *need_db && resource.is_ok())
+                        .map(|(resource, _)| resource.unwrap())
+                        .filter(|resource| resource.is_some())
+                        .map(|resource| resource.unwrap())
+                        .collect();
+                    println!("cleaned_posts_response: {:?}", cleaned_posts_response);
+                }
+            }
+        }
+
+        if !exists {
+            let mut cache = cash.borrow_mut();
+            let response = cache.get_mut(&m.get_data().id);
+            match response {
+                Some(val) => {
+                    val.add_watch(msg.get_connection_id());
+                    println!("[CACHE] Current watchers: {:?}", val.watchers);
+                }
+                None => {
+                    println!("ERROR: There was no valid entry for that Post ID.");
+                }
+            }
         }
     }
-    match ret_pipe.send(Arc::new(wrap)) {
-        Ok(val) => println!("[CACHE] Result: {:?}", val),
-        Err(e) => println!("[CACHE] Error: {:?}", e),
-    };
+    send_back(ret_pipe, wrap);
 }
 
 #[allow(dead_code)]
-fn handle_update(
-    msg: SafeArcMsg,
-    cash: &mut RefCell<HashMap<i32, Resource<Post>>>,
-    ret_pipe: &Sender<SafeArcMsg>,
-) {
-    let mut borrowed_val = cash.borrow_mut();
-    let mut wrap = Wrapper::new()
-        .set_model(ModelType::Post)
-        .set_msg_type(MessageType::Create)
-        .build();
+fn create_posts(
+    output: &mut Vec<Post>,
+    cache: RefCache,
+    db_read: &PgConnection,
+    db_write: &Sender<Post>,
+) -> Vec<String> {
+    let need_db = create_posts_cache(output, cache);
+    let mut errors = vec![];
+    if need_db.is_some() {
+        // actually create them
+        let ids = need_db.unwrap();
+        let rs: Vec<Post> = ids.into_iter()
+            .flat_map(|x| {
+                let ret = Post::get(x, db_read);
 
-    for m in msg.items() {
-        let res = borrowed_val.insert(m.get_data().id, Resource::new(m.get_data_clone()));
-        if res.is_some() {
-            let val = res.unwrap();
-        } else {
-            println!("[CACHE] Key ({:?}) did not exist.", m.get_data().id);
-            wrap.errors_mut().push(String::from("[CACHE] Key did not exist!"));
+                // @FIX: This throws away legitimate errors potentially
+                // also will treat duplicate PK values as legitimate by
+                // flattening the results. This could cause undefined behavior.
+                if ret.is_ok() {
+                    ret.unwrap()
+                } else {
+                    errors.push(ret.map_err(|e| format!("{:?}", e)).unwrap_err());
+                    return vec![]; // empty
+                }
+                // ret
+            })
+            .collect();
+        println!("RESULT SET: {:?}", rs);
+        let errors_inner: Vec<String> = create_posts_db(rs, db_write, true)
+            .into_iter()
+            .map(|val| val.unwrap_err())
+            .collect();
+        println!("ERRORS_INNER: {:?}", errors_inner);
+        errors.extend(errors_inner);
+    }
+    println!("ALL_ERRORS: {:?}", errors);
+    errors
+}
+
+#[allow(dead_code)]
+fn create_posts_db(
+    posts: Vec<Post>,
+    db_write: &Sender<Post>,
+    async: bool,
+) -> Vec<Result<(), String>> {
+    // @TODO: Consider fire+forget on saves for performance. This is a good way
+    // during development, though.
+    posts
+        .into_iter()
+        .map(|post| create_post_db(&post, db_write, async))
+        .collect()
+}
+
+#[allow(dead_code)]
+fn create_post_db(post: &Post, db_write: &Sender<Post>, async: bool) -> Result<(), String> {
+    println!("[CACHE] Sending Post ID# {} to be written to DB.", post.id);
+
+    if !async {
+        db_write
+            .send_timeout(post.clone(), MAX_DB_SAVE_TIMEOUT)
+            .map_err(|err| format!("[CACHE] Save to DB took too long!! Error: {:?}", err))
+    } else {
+        db_write
+            .try_send(post.clone())
+            .map_err(|err| format!("[CACHE] Async save to DB failed!! Error: {:?}", err))
+    }
+}
+
+#[allow(dead_code)]
+fn create_posts_cache(output: &mut Vec<Post>, cache: RefCache) -> Option<Vec<i32>> {
+    // let need_fetch = &mut vec![];
+    let mapped: Vec<i32> = output
+        .into_iter()
+        .map(|x| {
+            let (last, get) = create_post_cache(&x, cache);
+            last.expect("There was an error Borrowing the cache!");
+            return (x.id, get);
+        })
+        .filter(|(_, fetch)| *fetch)
+        .map(|(a, _)| a)
+        .collect();
+
+    println!("{:?}", mapped);
+    return Some(mapped);
+}
+
+fn create_post_cache(
+    post: &Post,
+    cache: RefCache,
+) -> (Result<Option<Resource<Post>>, BorrowMutError>, bool) {
+    let mut mut_cache = cache.try_borrow_mut();
+    match mut_cache {
+        Ok(ref mut val) => {
+            match val.insert(post.id, Resource::new(post.clone())) {
+                Some(result) => {
+                    (Ok(Some(result)), false) // key existed
+                }
+                None => {
+                    (Ok(None), true) // key did not exist
+                }
+            }
+        }
+        Err(e) => {
+            println!("There was an error borrowing the cache.");
+            (Err(e), true) // @TODO: pull from db just in case?
         }
     }
+}
+
+#[allow(dead_code)]
+fn handle_update(msg: &SafeArcMsg, cash: RefCache, ret_pipe: &Sender<SafeArcMsg>) {
+    let mut cache_mut = cash.borrow_mut();
+    let all_watchers = &mut vec![];
+    for m in msg.items() {
+        {
+            let resource = cache_mut.get(&m.get_data().id);
+            if resource.is_some() {
+                // current watchers from Cache
+                let w = resource.unwrap().get_watchers().to_vec();
+                println!("Watchers --> {:?}", w);
+                all_watchers.push(w);
+            }
+        }
+        // insert updates
+        if let Some(entry) = cache_mut.get_mut(&m.get_data().id) {
+            let old_watchers = entry.get_watchers().clone();
+            *entry = Resource::new(m.get_data().clone());
+            entry.watchers.clear();
+            entry.watchers.extend(old_watchers);
+        }
+    }
+    // create response with...
+    //  [1] updated data
+    //  [2] watchers list to send updates to
+    let wrap = Wrapper::new()
+        .set_model(ModelType::Post)
+        .set_msg_type(MessageType::Create)
+        .set_items(msg.items(), all_watchers.as_slice())
+        .build();
+
+    // return the watchers ID's
     match ret_pipe.send(Arc::new(wrap)) {
         Ok(val) => println!("[CACHE] Result: {:?}", val),
         Err(e) => println!("[CACHE] Error: {:?}", e),
@@ -358,10 +652,10 @@ fn handle_update(
 mod tests {
     use cache;
     use cache::*;
+    use db::*;
     use models;
     use models::*;
     use pool;
-    use db::*;
 
     use std::sync::{Arc, RwLock};
     use std::thread;
@@ -489,5 +783,47 @@ mod tests {
         };
         let response = c.send(cancel).unwrap();
         let resp = b.recv();
+    }
+
+    #[test]
+    fn test_cache_get() {
+        let (send_db, recv_db) = crossbeam_channel::unbounded();
+        let db_handle = thread::spawn(move || {
+            save_posts(recv_db);
+        });
+        let (a, b, c): (
+            crossbeam_channel::Sender<SafeArcMsg>,
+            crossbeam_channel::Receiver<SafeArcMsg>,
+            crossbeam_channel::Sender<Cancel>,
+        ) = wire_up(send_db);
+
+        let mut wrap = Wrapper::new()
+            .set_model(ModelType::Post)
+            .set_msg_type(MessageType::Get)
+            .build();
+
+        let mut p = Post::new();
+        p.id = 1;
+
+        wrap.items_mut().push(Arc::new(Resource::new(p)));
+
+        match a.send(Arc::new(wrap)) {
+            Ok(val) => {}
+            Err(e) => {
+                println!("[Error] ---> {:?}", e);
+            }
+        };
+
+        match b.recv() {
+            Ok(val) => println!("{:?}", val.items()),
+            Err(e) => {
+                println!("[Error] ---> {:?}", e);
+                let ret: String = format!("Error receiving from channel (from cache).");
+            }
+        };
+    }
+    #[test]
+    fn test_vec_cache_get() {
+        let vc = AssociativeVecCache<Resource<Post>>
     }
 }
