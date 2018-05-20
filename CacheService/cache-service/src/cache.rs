@@ -168,14 +168,9 @@ fn handle_manifest(
         //8. Add them all to the return list.
         println!("[CACHE] manifest: adding post {} to return list", resource.get_data().id);
         wrap.items_mut().push(Arc::new(resource));
-
-
-
     }
     //9. Send back the return list.
-    
     ret_pipe.send(Arc::new(wrap));
-    
     println!("[CACHE] Manifest: end");
 }
 
