@@ -5,23 +5,23 @@ use std::error;
 use std::fmt;
 use std::sync::Arc;
 
-#[derive(Debug)]
-pub struct NoIDProvided {
-    details: String,
-}
+// #[derive(Debug)]
+// pub struct NoIDProvided {
+//     details: String,
+// }
 
-impl NoIDProvided {
-    pub fn new(msg: &str) -> NoIDProvided {
-        NoIDProvided {
-            details: msg.to_string(),
-        }
-    }
-}
+// impl NoIDProvided {
+//     pub fn new(msg: &str) -> NoIDProvided {
+//         NoIDProvided {
+//             details: msg.to_string(),
+//         }
+//     }
+// }
 
-#[derive(Debug)]
-pub enum CacheError {
-    NoIDProvided(),
-}
+// #[derive(Debug)]
+// pub enum CacheError {
+//     NoIDProvided(),
+// }
 
 /// Error Trait definition:
 ///
@@ -29,22 +29,22 @@ pub enum CacheError {
 ///     fn description(&self) -> &str;
 ///     fn cause(&self) -> Option<&Error> { ... }
 /// }
-impl error::Error for NoIDProvided {
-    fn description(&self) -> &str {
-        println!("No ID (pk) provided for request");
-        "No ID (pk) provided for request"
-    }
-    // fn cause(&self) -> Option<&error::Error> {
-    //     let res = NoIDProvided::new("No ID (pk) was provided");
-    //     Some(&res)
-    // }
-}
+// impl error::Error for NoIDProvided {
+//     fn description(&self) -> &str {
+//         println!("No ID (pk) provided for request");
+//         "No ID (pk) provided for request"
+//     }
+//     // fn cause(&self) -> Option<&error::Error> {
+//     //     let res = NoIDProvided::new("No ID (pk) was provided");
+//     //     Some(&res)
+//     // }
+// }
 
-impl fmt::Display for NoIDProvided {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "No ID provided.")
-    }
-}
+// impl fmt::Display for NoIDProvided {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         write!(f, "No ID provided.")
+//     }
+// }
 
 #[derive(Debug, Clone)]
 pub struct Resource<T> {

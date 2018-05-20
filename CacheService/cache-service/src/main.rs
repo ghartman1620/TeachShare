@@ -506,14 +506,6 @@ mod tests {
                 Ok(())
             }
         }
-
-        // throw error
-        // let out = try!(inner(true).map_err(|e| e.to_string()));
-        // println!("OUT: {:?}", out);
-
-        // don't
-        // let out = try!(inner(false).map_err(|e| e.to_string()));
-        // println!("OUT: {:?}", out);
     }
 
 }

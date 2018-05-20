@@ -24,12 +24,12 @@ pub trait Cache {
 
     fn get(&self, key: Self::Key) -> Result<&Self::Entry, Self::Err>;
     fn get_mut(&mut self, key: Self::Key) -> Result<&mut Self::Entry, Self::Err>;
-    fn put(&mut self, key: Self::Key, value: Self::Entry) -> Result<Self::Entry, Self::Err>;
+    fn put(&mut self, key: Self::Key, value: Self::Entry) -> Result<Option<Self::Entry>, Self::Err>;
 }
 
 #[derive(Debug)]
-pub struct HashMapCache<K: Eq + Hash, V> {
-    _inner: HashMap<K, V>,
+pub struct AssociativeVecCache<V> {
+    _inner: Vec<V>,
 }
 
 #[derive(Debug)]
@@ -37,6 +37,54 @@ pub enum CacheError {
     Get(&'static str),
     GetMut(&'static str),
     Put(&'static str),
+}
+
+trait IntegerKey {}
+
+impl IntegerKey for u8 {}
+impl IntegerKey for u16 {}
+impl IntegerKey for u32 {}
+impl IntegerKey for u64 {}
+
+impl IntegerKey for i8 {}
+impl IntegerKey for i16 {}
+impl IntegerKey for i32 {}
+impl IntegerKey for i64 {}
+
+impl Cache for AssociativeVecCache<Resource<Post>> {
+    type Key = i32;
+    type Entry = Resource<Post>;
+    type Err = CacheError;
+
+    fn get(&self, key: i32) -> Result<&Resource<Post>, CacheError> {
+        Ok(&self._inner[key as usize])
+    }
+
+    fn get_mut(&mut self, key: i32) -> Result<&mut Resource<Post>, CacheError> {
+        Ok(&mut self._inner[key as usize])
+    }
+
+    fn put(&mut self, key: i32, value: Resource<Post>) -> Result<Option<Resource<Post>>, CacheError> {
+        if key as usize > self._inner.len() {
+            self._inner.resize(2 * key as usize, value);
+        } else {
+            self._inner[key as usize] = value;
+        }
+        Ok(None)
+    }
+}
+
+// impl AssociativeVecCache<V> {
+//     pub fn new() -> Vec<V> {
+//         AssociativeVecCache<V> {
+//             _inner: Vec::new(),
+//         }
+//     }
+// }
+
+#[derive(Debug)]
+pub struct HashMapCache<K: Eq + Hash, V> {
+    _inner: HashMap<K, V>,
 }
 
 impl<K, V> HashMapCache<K, V>
@@ -71,9 +119,9 @@ impl Cache for HashMapCache<i32, Resource<Post>> {
         }
     }
 
-    fn put(&mut self, key: i32, value: Resource<Post>) -> Result<Resource<Post>, CacheError> {
+    fn put(&mut self, key: i32, value: Resource<Post>) -> Result<Option<Resource<Post>>, CacheError> {
         match self._inner.insert(key, value) {
-            Some(val) => Ok(val),
+            Some(val) => Ok(Some(val)),
             None => Err(CacheError::Put(
                 "Not an error, just did not previously exist.",
             )),
@@ -702,5 +750,9 @@ mod tests {
                 let ret: String = format!("Error receiving from channel (from cache).");
             }
         };
+    }
+    #[test]
+    fn test_vec_cache_get() {
+        let vc = AssociativeVecCache<Resource<Post>>
     }
 }
