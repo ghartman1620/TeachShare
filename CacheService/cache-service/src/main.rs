@@ -123,7 +123,6 @@ pub type Version = u64;
 pub type ID = i32;
 pub type ManifestEntry = (ID, Version);
 
-
 #[derive(Serialize, Deserialize, Debug)]
 struct WSMessage {
     message: MessageType,

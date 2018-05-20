@@ -8,6 +8,7 @@ use std::cell::{BorrowMutError, RefCell};
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::sync::Arc;
+use std::rc::Rc;
 use std::thread;
 use std::time::Duration;
 
@@ -176,13 +177,12 @@ type RcCellHash<T> = Rc<RefCell<HashMap<i32, Resource<T>>>>;
 pub fn wire_up<'a>(
     db_send: Sender<Post>,
 ) -> (Sender<SafeArcMsg>, Receiver<SafeArcMsg>, Sender<Cancel>) {
-
     let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<SafeArcMsg>();
     let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<SafeArcMsg>();
     let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<Cancel>();
 
     cache_thread(recv_pipe, send_ret_pipe, recv_cancel, db_send);
-    
+
     println!("Server started..");
     (send_pipe, recv_ret_pipe, send_cancel)
 }
@@ -359,10 +359,7 @@ fn handle_watch(
                         .filter(|resource| resource.is_some())
                         .map(|resource| resource.unwrap())
                         .collect();
-                    println!(
-                        "cleaned_posts_response: {:?}",
-                        cleaned_posts_response
-                    );
+                    println!("cleaned_posts_response: {:?}", cleaned_posts_response);
                 }
             }
         }
@@ -480,7 +477,7 @@ fn create_post_cache(
         Ok(ref mut val) => {
             match val.insert(post.id, Resource::new(post.clone())) {
                 Some(result) => {
-                    (Ok(Some(result)), false)  // key existed
+                    (Ok(Some(result)), false) // key existed
                 }
                 None => {
                     (Ok(None), true) // key did not exist
@@ -489,7 +486,7 @@ fn create_post_cache(
         }
         Err(e) => {
             println!("There was an error borrowing the cache.");
-            (Err(e), true) // @TODO: pull from db just in case? 
+            (Err(e), true) // @TODO: pull from db just in case?
         }
     }
 }
@@ -531,9 +528,6 @@ fn handle_update(msg: &SafeArcMsg, cash: RefCache, ret_pipe: &Sender<SafeArcMsg>
         Err(e) => println!("[CACHE] Error: {:?}", e),
     };
 }
-
-
-
 
 #[cfg(test)]
 mod tests {
