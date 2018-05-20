@@ -5,6 +5,7 @@ use std::collections;
 use std::collections::HashMap;
 use std::error;
 use std::fmt;
+use std::fmt::Debug;
 use std::rc::Rc;
 use std::sync::Arc;
 
@@ -174,6 +175,35 @@ impl Wrapper {
         self
     }
 
+    pub fn set_items(&mut self, items: &Vec<ArcItem>, watchers: &[Vec<i32>]) -> &mut Self {
+        // self.items
+        println!("items: {:?}", items);
+        println!("watchers: {:?}", watchers);
+        let temp = items
+            .iter()
+            .zip(watchers.iter())
+            .map(|(post, watchers)| {
+                let temp = &mut Arc::new(Resource::new(post.get_data_clone()));
+                let resource = Arc::get_mut(temp).expect("Could not borrow mutably.");
+
+                watchers.iter().for_each(|watch| {
+                    resource.add_watch(watch.clone());
+                });
+                Arc::new(resource.clone())
+            })
+            .collect::<Vec<_>>();
+
+        let mut actual: Vec<ArcItem> = vec![];
+        for a in temp {
+            actual.push(a.clone());
+        }
+        // actual.extend(temp.into_iter());
+
+        println!("OMG ITEMS: {:?}", actual);
+        self.items = actual;
+        self
+    }
+
     pub fn set_watchers(&mut self, post_id: i32, watches: Vec<i32>) {
 
         // let filtered: &mut Vec<ArcItem> = &mut self.items.iter().filter(|ref x| x.get_data().id == post_id).collect();
@@ -230,32 +260,32 @@ impl<'a> Msg<'a> {
 
 impl<'a> Msg<'a> for Wrapper {
     fn data_type(&self) -> ModelType {
-        return self.model_type.clone();
+        self.model_type.clone()
     }
     fn msg_type(&self) -> MessageType {
-        return self.msg_type.clone();
+        self.msg_type.clone()
     }
     // fn data(&self) -> Self;
     fn timestamp(&self) -> i32 {
-        return self.timestamp;
+        self.timestamp
     }
     fn items(&self) -> &Vec<ArcItem> {
-        return &self.items;
+        &self.items
     }
     fn items_mut(&mut self) -> &mut Vec<ArcItem> {
-        return &mut self.items;
+        &mut self.items
     }
     fn hasErr(&self) -> bool {
-        return self.errors.len() > 0;
+        self.errors.len() > 0
     }
     fn errors(&self) -> &Vec<String> {
-        return &self.errors;
+        &self.errors
     }
     fn errors_mut(&mut self) -> &mut Vec<String> {
-        return &mut self.errors;
+        &mut self.errors
     }
     fn get_connection_id(&self) -> i32 {
-        return self.connection_id;
+        self.connection_id
     }
 }
 
@@ -272,32 +302,32 @@ pub trait Item {
 
 pub type PostResource = Resource<Post>;
 
-impl Item for PostResource {
+impl Item for Resource<Post> {
     fn new(&self, post: Post, watchers: Vec<i32>) -> Resource<Post> {
         let mut resource = Resource::new(post);
         resource.watchers = watchers;
-        return resource;
+        resource
     }
     fn get_data(&self) -> &Post {
-        return &self.data;
+        &self.data
     }
     fn get_data_mut(&mut self) -> &mut Post {
-        return &mut self.data;
+        &mut self.data
     }
     fn get_data_clone(&self) -> Post {
-        return self.data.clone();
+        self.data.clone()
     }
     fn get_watchers(&self) -> &Vec<i32> {
-        return &self.watchers;
+        &self.watchers
     }
     fn get_watchers_mut(&mut self) -> &mut Vec<i32> {
-        return &mut self.watchers;
+        &mut self.watchers
     }
     // fn set_watchers(&mut self, watchers: &Vec<i32>) {
     //     self.watchers = watchers.clone();
     // }
     fn get_version(&self) -> u64 {
-        return self.version;
+        self.version
     }
 }
 
@@ -427,6 +457,6 @@ mod tests {
         assert_eq!(m.watchers, vec![2]);
 
         m.increment();
-        assert_eq!(m.version, [0, 1, 0]);
+        assert_eq!(m.version, 1);
     }
 }

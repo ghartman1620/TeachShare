@@ -9,6 +9,7 @@ use models::{Item, MessageType, ModelType, Msg, Post, PostResource, Resource, Wr
 use pool;
 use std::cell::{BorrowMutError, Ref, RefCell};
 use std::collections::HashMap;
+use std::hash::Hash;
 use std::iter::Map;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -21,6 +22,71 @@ const MAX_DB_SAVE_TIMEOUT: Duration = Duration::from_millis(200);
 pub type SafeArcMsg = Arc<Msg<'static> + Send + Sync>;
 // type PostResource = Resource<Post>;
 
+pub trait Cache {
+    type Key;
+    type Entry;
+    type Err;
+
+    fn get(&self, key: Self::Key) -> Result<&Self::Entry, Self::Err>;
+    fn get_mut(&mut self, key: Self::Key) -> Result<&mut Self::Entry, Self::Err>;
+
+    fn put(&mut self, key: Self::Key, value: Self::Entry) -> Result<Self::Entry, Self::Err>;
+}
+
+#[derive(Debug)]
+pub struct HashMapCache<K: Eq + Hash, V> {
+    _inner: HashMap<K, V>,
+}
+
+#[derive(Debug)]
+pub enum CacheError {
+    Get(&'static str),
+    GetMut(&'static str),
+    Put(&'static str),
+}
+
+impl<K, V> HashMapCache<K, V>
+where
+    K: Eq + Hash,
+{
+    pub fn new() -> HashMapCache<K, V> {
+        HashMapCache {
+            _inner: HashMap::new(),
+        }
+    }
+}
+
+impl Cache for HashMapCache<i32, Resource<Post>> {
+    type Key = i32;
+    type Entry = Resource<Post>;
+    type Err = CacheError;
+
+    fn get(&self, key: i32) -> Result<&Resource<Post>, CacheError> {
+        match self._inner.get(&key) {
+            Some(val) => Ok(val),
+            None => Err(CacheError::Get("Does not exist")),
+        }
+    }
+
+    fn get_mut(&mut self, key: i32) -> Result<&mut Resource<Post>, CacheError> {
+        match self._inner.get_mut(&key) {
+            Some(val) => Ok(val),
+            None => Err(CacheError::GetMut(
+                "Does not exist... or can't be gotten as mutable?",
+            )),
+        }
+    }
+
+    fn put(&mut self, key: i32, value: Resource<Post>) -> Result<Resource<Post>, CacheError> {
+        match self._inner.insert(key, value) {
+            Some(val) => Ok(val),
+            None => Err(CacheError::Put(
+                "Not an error, just did not previously exist.",
+            )),
+        }
+    }
+}
+
 // pub type Cache = Rc<RefCell<HashMap<i32, Resource<Post>>>>;
 #[allow(dead_code)]
 pub type SmartCache = Rc<RefCell<HashMap<i32, Resource<Post>>>>;
@@ -32,6 +98,22 @@ pub fn cache_thread(
     cancel: Receiver<Cancel>,
     db_send: Sender<Post>,
 ) {
+    let mut h = HashMapCache::new();
+    let res = h.put(1, Resource::new(Post::new()));
+
+    println!("Result of HashMapCache: {:?}", res);
+    match res {
+        Ok(val) => println!("Ok(val) ---> {:?}", val),
+        Err(e) => println!("Err(e) ---> {:?}", e),
+    }
+
+    match h.get(1) {
+        Ok(val) => println!("Ok(val) ---> {:?}", val),
+        Err(e) => println!("Err(e) ---> {:?}", e),
+    }
+
+    println!("Cache NOW: {:?}", h);
+
     thread::spawn(move || {
         let db = DB::new();
 
@@ -48,7 +130,7 @@ pub fn cache_thread(
                             assert_eq!(msg.msg_type(), MessageType::Get);
                             // println!("Msg: {:?}", msg.msg_type());
                             let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                            let res = handle_get(msg, c, &ret_pipe, &conn);
+                            handle_get(msg, c, &ret_pipe, &conn);
 
                         },
                         MessageType::Create => {
@@ -56,7 +138,7 @@ pub fn cache_thread(
                             assert_eq!(msg.msg_type(), MessageType::Create);
                             {
                                 let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                                let res = handle_create(msg, c, &ret_pipe, &db_send);
+                                handle_create(msg, c, &ret_pipe, &db_send);
                             }
                         },
                         MessageType::Watch => {
@@ -64,7 +146,7 @@ pub fn cache_thread(
                             assert_eq!(msg.msg_type(), MessageType::Watch);
                             {
                                 let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                                let res = handle_watch(msg, c, &ret_pipe, &conn, &db_send);
+                                handle_watch(msg, c, &ret_pipe, &conn, &db_send);
                             }
                         },
                         MessageType::Update => {
@@ -72,7 +154,7 @@ pub fn cache_thread(
                             assert_eq!(msg.msg_type(), MessageType::Update);
                             {
                                 let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                                let res = handle_update(msg, c, &ret_pipe);
+                                handle_update(&msg, c, &ret_pipe);
                             }
 
                         },
@@ -267,13 +349,13 @@ fn handle_watch(
         }
 
         // This next section does a few things:
-        // 1.) Check if there's a value already in the cache.
-        // 2.) Already in the cache
-        //     a.) check if it's already in the watch list
-        // 3.) Not already in cache
-        //     a.) get the posts from the db
-        //     b.) put them in the cache
-        //     c.) add to watch list
+        // [1] Check if there's a value already in the cache.
+        // [2] Already in the cache
+        //     [a] check if it's already in the watch list
+        // [3] Not already in cache
+        //     [a] get the posts from the db
+        //     [b] put them in the cache
+        //     [c] add to watch list
         //
         match exists_cache {
             Some(val) => {
@@ -301,21 +383,6 @@ fn handle_watch(
                         "*********************** cleaned_posts_response: {:?}",
                         cleaned_posts_response
                     );
-                    // if t.is_some() {
-                    //     let errors = create_post_cache(&mut t.unwrap(), cash);
-                    // }
-                    // let mut resulting_value = t.unwrap();
-                    // let errors = create_posts(&mut resulting_value, cash, db_read, db_write);
-                    // let fetch_ids = create_posts_cache(&mut resulting_value, cash);
-
-                    // insert into cache, add watch
-                    // {
-                    //     posts.map( |x| {
-                    //         let a = x.into_iter().map(|y| create_post_cache(&y, cash));
-                    //         println!("x: {:?}", x);
-                    //     });
-                    // }
-                    // create_post_cache(&post.unwrap(), cash);
                 }
             }
         }
@@ -454,35 +521,40 @@ fn create_post_cache(
 }
 
 #[allow(dead_code)]
-fn handle_update(msg: SafeArcMsg, cash: RefCache, ret_pipe: &Sender<SafeArcMsg>) {
+fn handle_update(msg: &SafeArcMsg, cash: RefCache, ret_pipe: &Sender<SafeArcMsg>) {
+    let mut cache_mut = cash.borrow_mut();
+    let all_watchers = &mut vec![];
+    for m in msg.items() {
+        {
+            let resource = cache_mut.get(&m.get_data().id);
+            if resource.is_some() {
+                // current watchers from Cache
+                let w = resource.unwrap().get_watchers().to_vec();
+                println!("Watchers --> {:?}", w);
+                all_watchers.push(w);
+            }
+        }
+        // insert updates
+        if let Some(entry) = cache_mut.get_mut(&m.get_data().id) {
+            let old_watchers = entry.get_watchers().clone();
+            *entry = Resource::new(m.get_data().clone());
+            entry.watchers.clear();
+            entry.watchers.extend(old_watchers);
+        }
+
+        // Resource::new(m.get_data_clone())) {
+        //     println!("previous value: {:?}", previous);
+        // }
+    }
+
+    // create response with...
+    //  [1] updated data
+    //  [2] watchers list to send updates to
     let wrap = Wrapper::new()
         .set_model(ModelType::Post)
         .set_msg_type(MessageType::Create)
+        .set_items(msg.items(), all_watchers.as_slice())
         .build();
-    let cache_mut = cash.borrow_mut();
-
-    // let mut watchers: Vec<i32> = vec![];
-    for m in msg.items() {
-        let w = match cache_mut.get(&m.get_data().id) {
-            Some(val) => val.get_watchers().to_vec().clone(),
-            None => vec![], // return empty vector
-        };
-        println!("Watchers --> {:?}", w);
-        // let data = match cache_mut.get(&m.get_data().id) {
-        //     Some(val) => val.clone(),
-        //     None => Resource::new(Post::new()),
-        // };
-        // let value = &mut vec![Arc::new(data),];
-        // let mut i = wrap.items_mut()[0].get_watchers_mut();
-        // *i = w;
-        // let res = borrowed_val.insert(m.get_data().id, Resource::new(m.get_data_clone()));
-        // if res.is_some() {
-        //     let val = res.unwrap();
-        // } else {
-        //     println!("[CACHE] Key ({:?}) did not exist.", m.get_data().id);
-        //     wrap.errors_mut().push(String::from("[CACHE] Key did not exist!"));
-        // }
-    }
 
     // return the watchers ID's
     match ret_pipe.send(Arc::new(wrap)) {
@@ -626,5 +698,43 @@ mod tests {
         };
         let response = c.send(cancel).unwrap();
         let resp = b.recv();
+    }
+
+    #[test]
+    fn test_cache_get() {
+        let (send_db, recv_db) = crossbeam_channel::unbounded();
+        let db_handle = thread::spawn(move || {
+            save_posts(recv_db);
+        });
+        let (a, b, c): (
+            crossbeam_channel::Sender<SafeArcMsg>,
+            crossbeam_channel::Receiver<SafeArcMsg>,
+            crossbeam_channel::Sender<Cancel>,
+        ) = wire_up(send_db);
+
+        let mut wrap = Wrapper::new()
+            .set_model(ModelType::Post)
+            .set_msg_type(MessageType::Get)
+            .build();
+
+        let mut p = Post::new();
+        p.id = 1;
+
+        wrap.items_mut().push(Arc::new(Resource::new(p)));
+
+        match a.send(Arc::new(wrap)) {
+            Ok(val) => {}
+            Err(e) => {
+                println!("[Error] ---> {:?}", e);
+            }
+        };
+
+        match b.recv() {
+            Ok(val) => println!("{:?}", val.items()),
+            Err(e) => {
+                println!("[Error] ---> {:?}", e);
+                let ret: String = format!("Error receiving from channel (from cache).");
+            }
+        };
     }
 }

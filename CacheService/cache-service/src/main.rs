@@ -182,6 +182,7 @@ impl Handler for Connection {
                                 println!("connection count: {}", parent.connections.len());
                                 for c in &parent.connections {
                                     println!("Connection --> {:?}", c);
+                                    // println!("Sender: {:?}", c.tx);
                                 }
                             }
                             Err(e) => println!("Error: {:?}!", e),
@@ -349,7 +350,7 @@ impl Connection {
     fn handle_manifest_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
         unimplemented!()
     }
-    fn handle_update_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
+    fn handle_update_msg(&mut self, msg: WSMessage) -> Result<Vec<Post>, String> {
         println!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Update);
         let mut wrap = Wrapper::new()
@@ -379,21 +380,61 @@ impl Connection {
                     "There was an error communicating with the cache! Err: {:?}",
                     e
                 );
-                return Err(String::from(
-                    "There was an error communicating with the cache.",
-                ));
             }
         };
-        let resp = match self.from_cache.recv() {
-            Ok(val) => val.items().clone(), // @TODO: figure out how to avoid clone/copy
-            Err(e) => {
-                return Err(String::from("Error receiving from channel (from cache)."));
-            }
+        let changes = match self.from_cache.recv() {
+            Ok(val) => Ok(val.items().clone()),
+            Err(e) => Err(String::from("Error receiving from channel (from cache).")),
         };
-        // resp.items_mut()
-        println!("*********** resp: {:?}", resp);
 
-        Ok(resp.iter().map(|x| (*x.get_data()).clone()).collect())
+        if let Ok(updated_data) = changes {
+            let (watchers, posts): (Vec<Vec<i32>>, Vec<Post>) = updated_data
+                .iter()
+                .map(|x| (x.get_watchers().clone(), x.get_data().clone()))
+                .unzip();
+
+            match &mut self.parent {
+                Some(val) => match val.try_borrow_mut() {
+                    Ok(parent) => {
+                        for c in &parent.connections {
+                            println!("Connection --> {:?}", c);
+                            let id = c.tx.connection_id();
+                            if let Some(matched_connection) =
+                                watchers.iter().flat_map(|y| y).find(|x| **x == id as i32)
+                            {
+                                let serialized = serde_json::to_string(&posts)
+                                    .expect("Uh-oh... JSON serialization error!~");
+
+                                println!("Serialized content (Update): {}", serialized);
+                                let send_result = c.tx.send(serialized);
+                            } else {
+                                println!("There was no matched connection for: {}. It does not need to be updated.", id);
+                            }
+                        }
+                    }
+                    Err(e) => println!("Error: {:?}!", e),
+                },
+                None => println!("None. Did not unwrap."),
+            }
+        }
+
+        // @TODO: finish working on this, instead of actually sending the watchers
+        // back to the client, send the updated posts TO those clients.
+        // match watchers {
+        //     Ok(val) => {
+        //         let serialized = serde_json::to_string(&val)
+        //                     .expect("Uh-oh... JSON serialization error!~");
+
+        //         println!("Serialized content (Update): {}", serialized);
+        //         match self.tx.send(serialized) {
+        //             Ok(val) => println!("Serialized: {:?}", val),
+        //             Err(e) => println!("Error: {:?}", e),
+        //         }
+        //     },
+        //     Err(e) => println!("ERROR: {:?}", e),
+        // }
+
+        Ok(vec![])
     }
     fn handle_watch_msg(&self, msg: WSMessage) -> Result<Vec<Post>, String> {
         println!("[MAIN] received: {:?}", msg.message);
@@ -507,11 +548,9 @@ fn main() {
     // let addr: actix::Addr<actix::Syn, _> = MyActor.start();
     // let thread_addr = addr.clone();
     // let my_actor = addr.recipient();
-    // my_actor.send(DosTuple(1, 1));
-    
+    // my_actor.send(DosTuple(1, 1));    
     // let res = thread_addr.send(DosTuple(0, 0));
-    // let res1 = thread_addr.send(DosTuple(0, 0));
-    
+    // let res1 = thread_addr.send(DosTuple(0, 0));    
     // system.handle().spawn(res.then(|res| {
     //         println!("RES: {:?}", res);
     //         future::result(Ok(()))

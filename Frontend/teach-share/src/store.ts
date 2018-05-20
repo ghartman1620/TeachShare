@@ -25,7 +25,7 @@ const state = {};
 
 var storeSocket: WebSocket = WebSocket.getInstance();
 
-const p = new Post(3, [], new User(1));
+const p = new Post(2, [], new User(1));
 p.attachments = [];
 p.concepts = [];
 // return MessageStatus.ConnectionClosed;
@@ -44,10 +44,10 @@ p.title = "This is a post title";
 // p.updated = new Date();
 
 // storeSocket.sendCreate(p);
-// storeSocket.sendGet(1);
+storeSocket.sendGet(1);
 // storeSocket.sendWatch(1);
 storeSocket.sendWatch(2);
-// storeSocket.sendUpdate(p);
+storeSocket.sendUpdate(p);
 
 function circularRecordChecker(record: any, seen: any[] = []) {
 
@@ -172,7 +172,9 @@ import {getMap, mutCreate, mutUpdate} from "./store_modules/PostService";
  * a store dependency we'd have a circular dependency and would cause all sorts of errors.
 */
 WebSocket.getInstance().addMessageListener( (msg) => {
+    console.log(msg);
     const val = JSON.parse(msg.data)[0];
+    console.log(`[DEBUG --> JSON]: ${val}`);
     const p: Post = Post.pkify(val);
     const db: Database = Database.getInstance();
     db.getPost(p.pk as number).then((post) => {

@@ -2,11 +2,11 @@
 import { InProgressPost } from "../post";
 import User from "../user";
 
+import Vuex, { ActionContext, Store } from "vuex"
 import { getStoreBuilder } from "vuex-typex"
-import Vuex, { Store, ActionContext } from "vuex"
 
-import { IRootState } from "../models";
 import { getStoreAccessors } from "vuex-typescript";
+import { IRootState } from "../models";
 import {Post} from "../models";
 
 
