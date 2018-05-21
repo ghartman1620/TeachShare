@@ -249,7 +249,7 @@ class PostViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Post model
     """
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     filter_class = PostFilter
@@ -257,6 +257,12 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset
+    
+    def get_object(self):
+        print(self.request.user)
+        print(self.request.auth)
+
+        return super(PostViewSet, self).get_object()
 
 
 class CommentViewSet(viewsets.ModelViewSet):
