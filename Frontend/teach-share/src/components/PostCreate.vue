@@ -110,6 +110,26 @@
                                     </span>
                                 </span>
                             </div>
+                            <div class="card background">
+                            <div class="row">
+                            <div class="col-2">
+                                <label for="tagTextbox"><h4><strong>Post Color: </strong></h4></label>
+                            </div>
+                            <div class="col-10">
+                                <span class="dot" style="background-color: #ffafc5;" @click= "changeColor('#ffafc5')"></span>
+                                <span class="dot" style="background-color: #ee6055;" @click= "changeColor('#ee6055')"></span>
+                                <span class="dot" style="background-color: #f2c078;" @click= "changeColor('#f2c078')"></span>
+                                <span class="dot" style="background-color: #96e6b3;" @click= "changeColor('#96e6b3')"></span>
+                                <span class="dot" style="background-color: #7797ff;" @click= "changeColor('#7797ff')"></span>
+                                <span class="dot" style="background-color: #7b4b94;" @click= "changeColor('#7b4b94')"></span>
+                                <span class="dot" style="background-color: #d2ab99;" @click= "changeColor('#d2ab99')"></span>
+                                <span class="dot" style="background-color: #0e3b43;" @click= "changeColor('#0e3b43')"></span>
+                                <span class="dot" style="background-color: #775253;" @click= "changeColor('#775253')"></span>
+                                <span class="dot" style="background-color: #c9cebd;" @click= "changeColor('#c9cebd')"></span> 
+                            </div>
+                        </div>
+                    </div>
+
                         </div>
                         <br>
                         <br>
@@ -195,7 +215,7 @@ import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 import { Component, Prop } from "vue-property-decorator";
 import {Location, Dictionary} from "vue-router/types/router.d";
 import api from "../api";
-import { addElement, 
+import { addElement,
     editElement, 
     setGrade,
     beginPost, 
@@ -204,6 +224,10 @@ import { addElement,
     undo, 
     redo, 
     setTags, 
+    setLayout,
+    setColor,
+    getColor,
+    getLayout,
     swapElements, 
     removeElement,
     setSubject, 
@@ -213,7 +237,7 @@ import { addElement,
 } from "../store_modules/PostCreateService";
 import {
     getLoggedInUser
-} from "../store_modules/UserService.ts";
+} from "../store_modules/UserService";
 import SideBar from "./SideBar.vue";
 import TagSelect from "./TagSelect.vue";
 import DragAndDrop from "./DragAndDrop.vue";
@@ -258,26 +282,20 @@ export default class PostCreate extends Vue{
     get getLoggedInUser(): User {
         return getLoggedInUser(this.$store);
     }
-    //computed value to update the key which rerenders drag-and-drop
     
     SAVING = PostStatus.Saving;
     LOADING = PostStatus.Loading;
     SAVED = PostStatus.Saved;
-
     title: string = ""; //@TODO: make changes to title a store mutation that is saved and can be undone/redone
     inProgressTag: string = "";
     tags: string[] = [];
     userPosts: any[] = [];
-    
+    layout: Object[] = [];
 
     currentPage: number = 0;
 
     //these aren't ever saved into InProgressPost, they're here for the purpose
     //of loading in a post's current info when you load up a post.
-    
-
-
-
     
     get currentPost(): InProgressPost | undefined {
         return getCurrentPost(this.$store);
@@ -301,8 +319,20 @@ export default class PostCreate extends Vue{
         return getCurrentPost(this.$store)!.title.length > 0;
     }
 
+    get color() {
+        if (getColor(this.$store) === null){
+            console.log("getColor undefined!!!");
+            return "#96e6b3";
+        }
+        return getColor(this.$store);
+    }
+
+    changeColor(color: string){
+        setColor(this.$store, color);
+    }
+
     saveTagChanges(grade: number, length: number, subject: number, contentType: number, standards: number[],
-            concepts, practices, coreIdeas): void {
+            concepts, practices, coreIdeas, layout): void {
         console.log(standards);
         this.inProgressPost.setStandards(standards);
         this.inProgressPost.setGrade(grade);
@@ -311,6 +341,7 @@ export default class PostCreate extends Vue{
         this.inProgressPost.setLength(length);
         this.inProgressPost.setConcepts(concepts);
         this.inProgressPost.setPractices(practices);
+        this.inProgressPost.setLayout(layout);
         this.saveDraft();
     }
     
@@ -431,7 +462,9 @@ export default class PostCreate extends Vue{
             id: postid,
         });
     }
-
+    saveLayout() {
+        setLayout(this.$store, this.layout);
+    }
     moveElementUp(index: number) {
         console.log("move element up" + index);
         if (index != 0) {
@@ -471,6 +504,7 @@ export default class PostCreate extends Vue{
         }while(response.data.next !== null);
     }
     created() {
+
         console.log(this.getLoggedInUser);
         var inProgressPost = window.localStorage.getItem("inProgressPost");
         console.log(inProgressPost);
@@ -486,12 +520,13 @@ export default class PostCreate extends Vue{
                 <number>this.getLoggedInUser.pk, parseInt(<string>inProgressPost));
         }
         this.getUserPosts();
-        
     }
 
     mounted() {
+        console.log("New layout: ", this.layout);
         console.log("mounted post create");
         var vm: PostCreate = this;
+        console.log("Post color: ", this.color);
         this.$on("submitElement", function(element: any, index: number){
             console.log("submitting element");
             console.log(element);
@@ -517,17 +552,6 @@ $background-color: #e5ffee;
 $title-tag-card-background: darken(#bececa, 5%);
 $dark-green: #3b896a;
 $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
-$card-color: #96e6b3;
-
-.post-element-container {
-    padding-top: 30px;
-    padding-right: 20px;
-    padding-left: 20px;
-    padding-bottom: 10px;
-    border-radius: 5px;
-    box-shadow: $card-shadow;
-    background-color: $card-color;
-}
 
 .tag-entry {
     font-size: 12pt;
@@ -644,6 +668,14 @@ $card-color: #96e6b3;
     margin-top: 10px;
     float: right;
 }
+
+.dot {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
 
 .round-button img {
     display: block;

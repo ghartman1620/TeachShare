@@ -180,7 +180,8 @@ class Post(models.Model):
     draft = models.BooleanField(default=True)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
     tags = JSONField()
-    
+    color = models.CharField(max_length=7, blank=True, default="#96e6b3")
+    layout = JSONField(default={"x":0, "y":0, "w":2, "h":30, "i":"0"})
     grade = models.IntegerField(choices=GRADES, default=0)
     subject = models.IntegerField(choices=SUBJECTS, default=0)
     length = models.DurationField()

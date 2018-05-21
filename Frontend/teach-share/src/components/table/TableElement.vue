@@ -11,7 +11,7 @@ import ChartData from "./ChartData";
 Vue.use(BootstrapVue);
 
 export default Vue.component("table-element", {
-    data () {
+    data: function () {
         values: []
     },
     props: {

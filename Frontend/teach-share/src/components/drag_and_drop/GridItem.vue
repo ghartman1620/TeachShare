@@ -9,7 +9,7 @@
                 <post-element :element="element" :index="index"></post-element>
             </div> -->
 
-            <div class="post-element-container" v-bind:id="'element-'+this.i">
+            <div class="post-element-container" :key="this.colorChanged" v-bind:id="'element-'+this.i" v-bind:style="{'background-color' : this.color}">
                     <div class="card-column column">
                         <span v-if="draggable" ref="dragHandle" class="vue-draggable-handle">
                             <img class="grab-image" src="/static/grid.png">
@@ -49,7 +49,6 @@
 
 $background-color: #e5ffee;
 $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
-$card-color: #96e6b3;
 
 
     #garbage-button {
@@ -76,6 +75,17 @@ $card-color: #96e6b3;
         opacity: 1;
     }
 
+    // .post-element-container {
+
+    //     padding-top: 10px;
+    //     padding-right: 0px;
+    //     padding-left: 0px;
+    //     padding-bottom: 10px;
+    //     border-radius: 5px;
+    //     box-shadow: $card-shadow;
+    //     image-rendering: pixelated;
+    // }
+
     .post-element-container {
         padding-top: 10px;
         padding-right: 0px;
@@ -83,7 +93,12 @@ $card-color: #96e6b3;
         padding-bottom: 10px;
         border-radius: 5px;
         box-shadow: $card-shadow;
-        background-color: $card-color;
+        image-rendering: pixelated;
+
+    }
+
+    .post-element {
+        image-rendering: pixelated;
     }
 
     .vue-draggable-handle {
@@ -162,6 +177,7 @@ $card-color: #96e6b3;
         user-select: none;
     }
 </style>
+
 <script>
     import * as $ from 'jquery';
     import TextElement from '../text/TextElement';
@@ -176,7 +192,7 @@ $card-color: #96e6b3;
 } from "vuex-class";
 
     import PostElement from '../PostElement.vue';
-    import {removeElement} from '../../store_modules/PostCreateService.ts';
+    import {removeElement, setColor, getColor} from '../../store_modules/PostCreateService.ts';
     //    var eventBus = require('./eventBus');
     var interact = require("interactjs");
 
@@ -300,6 +316,7 @@ $card-color: #96e6b3;
         inject: ["eventBus"],
         data: function () {
             return {
+                colorChanged: false,
                 dimensionsEmitted: false,
                 elementDimensions: {},
                 cols: 1,
@@ -330,6 +347,7 @@ $card-color: #96e6b3;
                 innerY: this.y,
                 innerW: this.w,
                 innerH: this.h
+
             }
         },
         created () {
@@ -398,6 +416,7 @@ $card-color: #96e6b3;
         },
         mounted: function () {
             // logDimensions();
+            // this.styleObject["background-color"] = "#FFFFFF";
             this.cols = this.$parent.colNum;
             this.rowHeight = this.$parent.rowHeight;
             this.containerWidth = this.$parent.width !== null ? this.$parent.width : 100;
@@ -514,6 +533,15 @@ $card-color: #96e6b3;
             }
         },
         computed: {
+            color() {
+                if (getColor(this.$store) === undefined) {
+                    console.log("getColor undefined!!!!");
+                    return "#96e6b3";
+                }
+                console.log("getting color from store, " + this.$store.state.create.post.color);
+                this.colorChanged = true;
+                return this.$store.state.create.post.color;
+            },
             renderRtl() {
                 return (this.$parent.isMirrored) ? !this.rtl : this.rtl;
             },
@@ -538,7 +566,6 @@ $card-color: #96e6b3;
                         this.elementDimensions["height"] = cardHeight;
                         this.dimensionsEmitted = true;
                         this.$emit('update-height', this.elementDimensions);
-                    
             },
             removeElement: function (index) {
                 removeElement(this.$store, index);

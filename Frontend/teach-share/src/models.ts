@@ -17,7 +17,7 @@ export enum FieldEnum {
     "table",
     "video_file",
     "video_link",
-    "audio_file"
+    "audio_file",
 
 }
 
@@ -122,6 +122,8 @@ export class Post extends Model {
     public likes: number;
     public subject: string|null|undefined;
     public tags: string[];
+    public layout: Object[];
+    public color: string;
     public timestamp: Date;
     public title: string;
     public updated: Date;

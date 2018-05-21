@@ -121,7 +121,8 @@ export default class DragAndDrop extends Vue{
             for (var prev_index = 0; prev_index < this.storeElements.length - 1; prev_index++) {
                 let index = prev_index + 1; //index of the element layout item we're pushing.
                 console.log("Increment for new index ", this.layout[prev_index]["h"]/this.defaultHeight)
-                var new_position = this.layout[prev_index]["y"] + this.layout[prev_index]["h"]/this.defaultHeight;
+                // var new_position = this.layout[prev_index]["y"] + this.layout[prev_index]["h"]/this.defaultHeight;
+                var new_position = this.layout[prev_index]["y"] + 1;
                 this.layout.push({"x":0, "y":new_position, "w":2, "h":this.defaultHeight, "i":index.toString()});
             }
         }
