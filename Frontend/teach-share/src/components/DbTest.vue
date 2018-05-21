@@ -24,7 +24,7 @@ import Database from "../Database";
 export default class DbTest extends Vue{
     posts: Post[] = [];
     d: Database = Database.getInstance();
-    num: number = -1;1
+    num: number = -1;
     mounted() {
         // const dbPromise: Promise<DB> = idb.open("teachshare-demo", 1, upgradeDB => {
         //     upgradeDB.createObjectStore("posts", {keyPath: "id"});

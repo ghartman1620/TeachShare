@@ -257,6 +257,12 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset
+    
+    def get_object(self):
+        print("User is: " + str(self.request.user))
+        print("Auth is: " + str(self.request.auth))
+
+        return super(PostViewSet, self).get_object()
 
 
 class CommentViewSet(viewsets.ModelViewSet):
