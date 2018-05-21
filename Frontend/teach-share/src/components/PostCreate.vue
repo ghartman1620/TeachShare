@@ -3,11 +3,7 @@
 <div>
     
     <side-bar collapsedString="Your posts">
-         <div :style="{'color' : this.color}">
-            <p>
-                foobarbuzz
-            </p>
-        </div>
+
         <div v-for="post in userPosts">
             <a href="#" v-on:click.stop="editPost(post)">
                 {{post.title}}
@@ -290,7 +286,6 @@ export default class PostCreate extends Vue{
     SAVED = PostStatus.Saved;
 
     postStatus: PostStatus = this.LOADING;
-    color: String = "#FFFFFF";
 
     title: string = ""; //@TODO: make changes to title a store mutation that is saved and can be undone/redone
     inProgressTag: string = "";
@@ -563,8 +558,6 @@ export default class PostCreate extends Vue{
     }
 
     mounted() {
-        var vm: PostCreate = this;
-        window.setTimeout( () => vm.color = "#1111FF", 5000);
         var vm: PostCreate = this;
         this.$on("submitElement", function(element: any, index: number){
 
