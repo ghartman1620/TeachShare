@@ -11,6 +11,7 @@ use std::sync::Arc;
 use std::rc::Rc;
 use std::thread;
 use std::time::Duration;
+use std::ops::{Index, IndexMut};
 
 const MAX_DB_SAVE_TIMEOUT: Duration = Duration::from_millis(200);
 
@@ -51,6 +52,19 @@ impl IntegerKey for i16 {}
 impl IntegerKey for i32 {}
 impl IntegerKey for i64 {}
 
+impl<V> Index<i32> for AssociativeVecCache<V> {
+    type Output = V;
+    fn index(&self, index: i32) -> &V {
+        &self._inner[index as usize]
+    }
+}
+
+impl<V> IndexMut<i32> for AssociativeVecCache<V> {
+    fn index_mut(&mut self, index: i32) -> &mut V {
+        &mut self._inner[index as usize]
+    }
+}
+
 impl Cache for AssociativeVecCache<Resource<Post>> {
     type Key = i32;
     type Entry = Resource<Post>;
@@ -66,21 +80,20 @@ impl Cache for AssociativeVecCache<Resource<Post>> {
 
     fn put(&mut self, key: i32, value: Resource<Post>) -> Result<Option<Resource<Post>>, CacheError> {
         if key as usize > self._inner.len() {
-            self._inner.resize(2 * key as usize, value);
-        } else {
-            self._inner[key as usize] = value;
+            self._inner.resize(2 * key as usize, Resource::new(Post::new()));
         }
+        self._inner[key as usize] = value;
         Ok(None)
     }
 }
 
-// impl AssociativeVecCache<V> {
-//     pub fn new() -> Vec<V> {
-//         AssociativeVecCache<V> {
-//             _inner: Vec::new(),
-//         }
-//     }
-// }
+impl<V> AssociativeVecCache<V> {
+    pub fn new() -> AssociativeVecCache<V> {
+        AssociativeVecCache::<V> {
+            _inner: vec![],
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct HashMapCache<K: Eq + Hash, V> {
@@ -822,5 +835,41 @@ mod tests {
             }
         };
     }
+    #[test]
+    fn test_vec_cache_get() {
+        let mut vc = AssociativeVecCache::<Resource<Post>>::new();
+        match vc.put(1, Resource::new(Post::new())) {
+            Ok(val) => match val {
+                    Some(some) => println!("SOME: {:?}", some),
+                    None => println!("None."),
+            },
+            Err(e) => {
+                println!("There was an error: {:?}", e);
+            }
+        }
+        println!("VC: {:?}", vc);
 
+        let mut p = Post::new();
+        p.id = 1000;
+        p.likes = 100;
+        match vc.put(1000, Resource::new(p)) {
+            Ok(val) => match val {
+                    Some(some) => println!("SOME: {:?}", some),
+                    None => println!("None."),
+            },
+            Err(e) => {
+                println!("There was an error: {:?}", e);
+            }
+        }
+        // println!("VC: {:?}", vc);
+        println!("***********************************");
+        println!("GET: {:?}", vc.get(1000));
+        println!("GET: {:?}", vc[1000]);
+
+        {
+            let mutable_vc_entry = &mut vc[1];
+            mutable_vc_entry.get_data_mut().id = 9999;
+        }
+        println!("Mutable_VC_ENTRY.ID: {:?}", vc[1]);
+    }
 }

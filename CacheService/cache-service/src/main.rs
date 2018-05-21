@@ -546,16 +546,16 @@ fn main() {
 mod tests {
     use models::*;
 
-    #[test]
+    // #[test]
     // a test function that returns our error result
-    fn test_raises_no_id_provided() {
-        fn inner(yes: bool) -> Result<(), NoIDProvided> {
-            if yes {
-                Err(NoIDProvided::new("this is the error msg."))
-            } else {
-                Ok(())
-            }
-        }
-    }
+    // fn test_raises_no_id_provided() {
+    //     fn inner(yes: bool) -> Result<(), NoIDProvided> {
+    //         if yes {
+    //             Err(NoIDProvided::new("this is the error msg."))
+    //         } else {
+    //             Ok(())
+    //         }
+    //     }
+    // }
 
 }
