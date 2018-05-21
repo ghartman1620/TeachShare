@@ -1,6 +1,6 @@
 import ReconnectingWebSocket from "reconnecting-websocket";
 import api from "./api";
-import Database from "./Database";
+import Database, { IPostVersion } from "./Database";
 import {Post} from "./models";
 
 enum ReadyState {
@@ -99,6 +99,7 @@ export default class WebSocket {
         // return MessageStatus.ConnectionClosed;
     }
     public sendWatch(id: number): MessageStatus {
+        console.log("WEBSOCKET: sending watch for post " + id);
         return this.send({
             message: MessageType.Watch,
             id
@@ -159,3 +160,11 @@ export default class WebSocket {
     }
 }
 WebSocket.getInstance().sendManifest();
+Database.getInstance().manifest().then((idAndVersions: IPostVersion[]) => {
+    const ws = WebSocket.getInstance();
+    for (const idAndVersion of idAndVersions) {
+        if (idAndVersion !== undefined) {
+            ws!.sendWatch(idAndVersion!.id);
+        }
+    }
+});

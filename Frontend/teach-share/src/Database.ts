@@ -19,9 +19,13 @@ export default class Database {
     }
 
     private static instance: Database;
+    
+
     private dbPromise: Promise<DB>;
     private constructor() {
+        console.log("Constructing idb");
         this.dbPromise = idb.open("teachshare", 1, (upgradeDB) => {
+            console.log("opening complete, creating object store");
             upgradeDB.createObjectStore("posts", {keyPath: "pk"});
         });
     }
@@ -75,7 +79,7 @@ export default class Database {
             });
         });
     }
-    public deletePost(pk: number): Promise<void>{
+    public deletePost(pk: number): Promise<void> {
         return new Promise((resolve, reject) => {
             this.dbPromise.then((db) => {
                 db.transaction("posts", "readwrite")
@@ -86,6 +90,7 @@ export default class Database {
             });
         });
     }
+
     /*
         Returns a summary of all the posts saved in the db in the form {id: number, version: number}
     */
@@ -104,15 +109,11 @@ export default class Database {
                     // so whatever we have gets replaced if any version is newer
                     keys.push({id: cursor.key as number, version: cursor.value.version ? cursor.value.version : 0});
                     cursor.continue();
-                    console.log("i bet this part is async isn't it");
                 });
                 tx.complete.then(() => {
-                    console.log("AHA THIS IS AFTER THE ASYNC BIT");
                     resolve(keys);
                 });
             });
         });
     }
 }
-Database.getInstance().manifest().then(keys => console.log(keys));
-

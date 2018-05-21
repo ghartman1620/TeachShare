@@ -44,10 +44,10 @@ p.title = "This is a post title";
 // p.updated = new Date();
 
 // storeSocket.sendCreate(p);
-storeSocket.sendGet(1);
+//storeSocket.sendGet(1);
 // storeSocket.sendWatch(1);
-storeSocket.sendWatch(2);
-storeSocket.sendUpdate(p);
+//storeSocket.sendWatch(2);
+//storeSocket.sendUpdate(p);
 
 function circularRecordChecker(record: any, seen: any[] = []) {
 
@@ -180,8 +180,6 @@ WebSocket.getInstance().addMessageListener( (msg) => {
     const db: Database = Database.getInstance();
     for (const post of val) {
         const p: Post = Post.pkify(post);
-        console.log("saving post from ws: " + p.pk);
-        console.log(p);
         // check if the post we got from the WS is saved in the DB.
         db.getPost(p.pk as number).then((dbCurrentPost) => {
             // If it is, we should save the post we got - because it's a post we've decided in the past to cache
