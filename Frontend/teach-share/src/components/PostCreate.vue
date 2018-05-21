@@ -504,36 +504,31 @@ export default class PostCreate extends Vue{
     }
     async getUserPosts(){
         var vm: PostCreate = this;
-        //@TODO: use store and Post model for this work
-        //This is also all reloaded every time somebody reloads the page.. which is really quite no good.
+        // @TODO: use store and Post model for this work
+        // This is also all reloaded every time somebody reloads the page.. which is really quite no good.
         var nextPage = 1;
-        do{
+        do {
             var response;
 
             response = await asLoggedIn(api.get(`/posts/?user=${this.getLoggedInUser.pk}&page=${nextPage.toString()}`));
-            for(var post of response.data.results){
-                
+            for (const post of response.data.results){
                 if(post.pk != -1){
                     fetchPostSubscribe(this.$store, post.pk);
                 }
                 //this.userPosts.push(post);
             }
             nextPage++;
-        }while(response.data.next !== null);
+        }while (response.data.next !== null);
     }
-    
     created() {
         var inProgressPost: string | null = window.localStorage.getItem("inProgressPost");
-        if(inProgressPost === null){
-            
+        if(inProgressPost === null) {
             this.beginPost( 
                 //???? how on earth is this type string | undefined
                 //It's definitely just a number. Look at user.ts.
                 <number>this.getLoggedInUser.pk,
                 undefined);
-            
-        }
-        else{
+        } else {
             this.getUserPosts();
             this.beginPost(
                 <number>this.getLoggedInUser.pk, parseInt(<string>inProgressPost));
@@ -545,7 +540,6 @@ export default class PostCreate extends Vue{
                 console.log(JSON.parse(message.data));
                 let post = Post.pkify(JSON.parse(message.data)[0]);
                 console.log(post);
-                
                 let inProgressPost = window.localStorage.getItem("inProgressPost");
                 if(inProgressPost){
                     console.log(inProgressPost);
@@ -558,13 +552,9 @@ export default class PostCreate extends Vue{
                 else{
                     console.error("no inprogressPost localStorage item exists");
                 }
-               
                 return undefined;
             });
         }
-        
-
-        
     }
 
     mounted() {

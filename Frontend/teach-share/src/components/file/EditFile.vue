@@ -42,8 +42,6 @@ import {
 })
 export default class EditFile extends Vue {
 
-	@Action("addElement") addElement;
-
     get hasFiles() {
         return hasFiles(this.$store);
     }

@@ -87,6 +87,9 @@ export const mutations = {
     },
     // Mutations for the currently edited post data:  and postElements
     ADD_ELEMENT: (state: PostState, element: any) => {
+        console.log(state);
+        console.log(element);
+        console.log(state.doneMutations);
         state.doneMutations.push({
             mutation: "UNDO_ADD_ELEMENT",
             arg: state.post!.elements.length
@@ -308,7 +311,7 @@ export const getters = {
 const PostCreateService = {
     namespaced: true,
     strict: process.env.NODE_ENV !== "production",
-    postState,
+    state: postState,
     mutations,
     actions,
     getters

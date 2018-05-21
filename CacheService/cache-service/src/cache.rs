@@ -643,7 +643,12 @@ fn handle_update(msg: &SafeArcMsg, cash: RefCache, ret_pipe: &Sender<SafeArcMsg>
             *entry = Resource::new(m.get_data().clone());
             entry.watchers.clear();
             entry.watchers.extend(old_watchers);
+            println!("Before version: {}", entry.version);
+            entry.increment();
+            println!("After version: {}", entry.version);
+            println!("After FULL ----> {:?}", entry);
         }
+       
     }
     // create response with...
     //  [1] updated data

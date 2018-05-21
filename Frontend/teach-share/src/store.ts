@@ -141,6 +141,8 @@ function circularRecordChecker(record: any, seen: any[] = []) {
 //         storeSocket.send(JSON.stringify(msg2));
 //     }
 // };
+
+console.log(PostCreateService);
 const storeOptions: StoreOptions<IRootState> = {
     strict: false, // process.env.NODE_ENV !== "production",
     modules: {
@@ -152,11 +154,11 @@ const storeOptions: StoreOptions<IRootState> = {
         comment: CommentService,
         user: UserService
     },
-    plugins: [WatchStore]
+    // plugins: [WatchStore]
 };
 
-const store = new Vuex.Store<IRootState>(storeOptions);
 
+const store = new Vuex.Store<IRootState>(storeOptions);
 // storeSocket.onmessage = (msg) => {
 //     console.log("[WS] Websocket recieved message: ", msg);
 //     let val = JSON.parse(msg.data);
