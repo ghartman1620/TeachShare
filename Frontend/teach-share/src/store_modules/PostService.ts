@@ -71,7 +71,7 @@ export const actions = {
     },
     fetchPostSubscribe: async (ctx: PostContext, postID: string|number) => {
         try {
-
+            console.log("fetch post subscribing to post" + postID);
             if (typeof postID === "string") {
                 postID = parseInt(postID, 10);
             }

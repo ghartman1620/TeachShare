@@ -225,7 +225,7 @@ import { addElement,
     setSubject, 
     setContentType, 
     setLength,
-    saveDraft 
+    saveDraft, 
 } from "../store_modules/PostCreateService";
 import {fetchPostSubscribe, getPosts} from "../store_modules/PostService";
 import {
@@ -297,10 +297,6 @@ export default class PostCreate extends Vue{
     //of loading in a post's current info when you load up a post.
     
 
-    public BAH_HUMBUG(){
-        console.log(this.createState.post !== undefined && this.postStatus !== this.LOADING);
-        console.log(this.createState.post);
-    }
 
     get userPosts(): Post[] {
         var store = this.$store;
@@ -319,9 +315,7 @@ export default class PostCreate extends Vue{
 
     // getters
     get inProgressPost(): InProgressPost | undefined{
-        console.log("getting in progresspost");
-        console.log(getCurrentPost(this.$store));
-        console.log(this.createState.post);
+
         return this.createState.post;
         
     }
@@ -465,9 +459,6 @@ export default class PostCreate extends Vue{
         if(postid !== undefined){
             fetchPostSubscribe(this.$store, postid).then(function(p){
                 beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p: p});
-                console.log("begun post:")
-                console.log(getCurrentPost(vm.$store));
-                console.log(vm.createState.post);
                 vm.postStatus = vm.SAVED;
             });
         }
@@ -512,7 +503,7 @@ export default class PostCreate extends Vue{
 
             response = await asLoggedIn(api.get(`/posts/?user=${this.getLoggedInUser.pk}&page=${nextPage.toString()}`));
             for (const post of response.data.results){
-                if(post.pk != -1){
+                if (post.pk !== -1){
                     fetchPostSubscribe(this.$store, post.pk);
                 }
                 //this.userPosts.push(post);
@@ -536,15 +527,12 @@ export default class PostCreate extends Vue{
             let userpk = this.getLoggedInUser.pk as number;
             let vm: PostCreate = this;
             WebSocket.getInstance().addMessageListener(function(message){
-                console.log("im getting a message in postcreate");
-                console.log(JSON.parse(message.data));
+                console.log("Post create pkifying a post");
+                console.log(JSON.parse(message.data)[0]);
                 let post = Post.pkify(JSON.parse(message.data)[0]);
-                console.log(post);
                 let inProgressPost = window.localStorage.getItem("inProgressPost");
-                if(inProgressPost){
-                    console.log(inProgressPost);
-                    if(post.pk === parseInt(inProgressPost as string,10)){
-                        console.log("beginning post");
+                if (inProgressPost){
+                    if (post.pk === parseInt(inProgressPost as string,10)){
                         beginPost(store,{userid: userpk, p: post});
                         vm.postStatus = PostStatus.Saved;
                     }

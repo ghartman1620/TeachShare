@@ -97,7 +97,6 @@ export const mutations = {
         state.post!.addElement(element);
     },
     SWAP_ELEMENTS: (state: PostState, iAndJ: number[]) => {
-        console.log("swap elements");
         // I wrote this code because i'm triggered by being limited
         // to one function argument so I'm going to pretend I can pass two.
         state.doneMutations.push({
@@ -307,6 +306,8 @@ export const getters = {
             return state.post!.elements;
         }
     },
+    doneMutations: (state) => state.doneMutations,
+    unDoneMutations: (state) => state.unDoneMutations,
 };
 const PostCreateService = {
     namespaced: true,

@@ -221,11 +221,16 @@ export class Post extends Model {
      * @param save? optionally indicate to save in the db and subscribe over websocket to this post.
     */
     public static get(pk: number, save?: boolean): Promise<Post> {
+        console.log("getting a post: " + pk);
+        console.log("Saving that post? " + save);
         return new Promise((resolve, reject) => {
+            console.log("is in db?");
             this.db.getPost(pk).then(p => {
+                console.log("it is in db!");
                 p.pk = pk;
                 resolve(p);
             }).catch( () => {
+                console.log("it is not in db");
                 if (save) {
                     Post.db.addEmptyPost(pk);
                     Post.ws.sendWatch(pk);
@@ -240,16 +245,21 @@ export class Post extends Model {
     }
     // creates a Post model from the websocket serialized form (see idify for details)
     public static pkify(obj: any): Post {
-        console.log(obj);
-        let p: any = {
-            user: new User(obj.user_id),
-            ...obj
-        };
-        delete p.user_id;
+        if (obj !== undefined) {
+            console.log(obj);
+            let p: any = {
+                user: new User(obj.user_id),
+                ...obj
+            };
+            delete p.user_id;
 
-        p.pk = p.id;
-        delete p.id;
-        return p as Post;
+            p.pk = p.id;
+            delete p.id;
+            return p as Post;
+        } else {
+            console.error("pkify error: Post.pkify() called on undefined post");
+            return new Post();
+        }
     }
     private static db: Database = Database.getInstance();
     private static ws: WebSocket = WebSocket.getInstance();
