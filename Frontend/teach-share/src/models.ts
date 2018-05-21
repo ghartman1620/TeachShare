@@ -245,7 +245,7 @@ export class Post extends Model {
     }
     // creates a Post model from the websocket serialized form (see idify for details)
     public static pkify(obj: any): Post {
-        if (obj === undefined) {
+        if (obj !== undefined) {
             console.log(obj);
             let p: any = {
                 user: new User(obj.user_id),

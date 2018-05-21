@@ -72,6 +72,8 @@ export default class Database {
                     if (post === undefined) {
                         reject();
                     } else {
+                        console.log("Database pkifying post: ");
+                        console.log(post);
                         let p: Post = Post.pkify(post);
                         resolve(p);
                     }

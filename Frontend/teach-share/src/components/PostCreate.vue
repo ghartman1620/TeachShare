@@ -532,6 +532,8 @@ export default class PostCreate extends Vue{
             let userpk = this.getLoggedInUser.pk as number;
             let vm: PostCreate = this;
             WebSocket.getInstance().addMessageListener(function(message){
+                console.log("Post create pkifying a post");
+                console.log(JSON.parse(message.data)[0]);
                 let post = Post.pkify(JSON.parse(message.data)[0]);
                 
                 let inProgressPost = window.localStorage.getItem("inProgressPost");

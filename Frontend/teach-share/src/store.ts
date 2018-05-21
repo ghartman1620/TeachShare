@@ -179,6 +179,8 @@ WebSocket.getInstance().addMessageListener( (msg) => {
 
     const db: Database = Database.getInstance();
     for (const post of val) {
+        console.log("Store listener pkifying a post");
+        console.log(post);
         const p: Post = Post.pkify(post);
         // check if the post we got from the WS is saved in the DB.
         db.getPost(p.pk as number).then((dbCurrentPost) => {
