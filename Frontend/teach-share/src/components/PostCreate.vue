@@ -111,16 +111,16 @@
                                 <label for="tagTextbox"><h4><strong>Post Color: </strong></h4></label>
                             </div>
                             <div class="col-10">
-                                <span class="dot" style="background-color: #ffafc5; outline-style: solid; outline-color: #ffff00;" @click= "changeColor('#ffafc5')"></span>
-                                <span class="dot" style="background-color: #ee6055;" @click= "changeColor('#ee6055')"></span>
-                                <span class="dot" style="background-color: #f2c078;" @click= "changeColor('#f2c078')"></span>
-                                <span class="dot" style="background-color: #96e6b3;" @click= "changeColor('#96e6b3')"></span>
-                                <span class="dot" style="background-color: #7797ff;" @click= "changeColor('#7797ff')"></span>
-                                <span class="dot" style="background-color: #7b4b94;" @click= "changeColor('#7b4b94')"></span>
-                                <span class="dot" style="background-color: #d2ab99;" @click= "changeColor('#d2ab99')"></span>
-                                <span class="dot" style="background-color: #0e3b43;" @click= "changeColor('#0e3b43')"></span>
-                                <span class="dot" style="background-color: #775253;" @click= "changeColor('#775253')"></span>
-                                <span class="dot" style="background-color: #c9cebd;" @click= "changeColor('#c9cebd')"></span> 
+                                <span class="dot" style="background-color: #ffafc5;" @click= "changeColor('#ffafc5', $event)"></span>
+                                <span class="dot" style="background-color: #ee6055;" @click= "changeColor('#ee6055', $event)"></span>
+                                <span class="dot" style="background-color: #ffae03;" @click= "changeColor('#ffae03', $event)"></span>
+                                <span class="dot" style="background-color: #96e6b3;" @click= "changeColor('#96e6b3', $event)"></span>
+                                <span class="dot" style="background-color: #7797ff;" @click= "changeColor('#7797ff', $event)"></span>
+                                <span class="dot" style="background-color: #7b4b94;" @click= "changeColor('#7b4b94', $event)"></span>
+                                <span class="dot" style="background-color: #dbcdc6;" @click= "changeColor('#dbcdc6', $event)"></span>
+                                <span class="dot" style="background-color: #0e3b43;" @click= "changeColor('#0e3b43', $event)"></span>
+                                <span class="dot" style="background-color: #775253;" @click= "changeColor('#775253', $event)"></span>
+                                <span class="dot" style="background-color: #596f62;" @click= "changeColor('#596f62', $event)"></span> 
                             </div>
                         </div>
                     </div>
@@ -293,6 +293,8 @@ export default class PostCreate extends Vue{
     inProgressTag: string = "";
     tags: string[] = [];
     userPosts: any[] = [];
+    backcolor: any = {"background-color": "#96e6b3"};
+    prevCol: any;
     
 
     currentPage: number = 0;
@@ -450,8 +452,21 @@ export default class PostCreate extends Vue{
         var user: User = <User>this.getLoggedInUser;
         this.beginPost(<number>user.pk, <number>post.pk);
     }
-    changeColor(colors: string){
+    changeColor(colors: string, event: any){
         this.backcolor["background-color"] = colors;
+        //console.log(colors);
+        //console.log(event);
+        //console.log(this.prevCol);
+        const temp = event;
+        //console.log("TEMP: s", temp);
+        
+        if (this.prevCol != undefined) {
+            this.prevCol.target.classList.remove("sel-color");
+            console.log("it was removed");
+        } 
+        
+        this.prevCol = temp;
+        this.prevCol.target.classList.add("sel-color");
         changeColor(this.$store, colors);
     }
     beginPost(userid: number, postid: number | undefined): void {
@@ -754,5 +769,9 @@ card-row {
         15%
     ) !important;
     border-top: 1px solid darken($title-tag-card-background, 10%);
+}
+
+.sel-color {
+    border: 2px solid red;
 }
 </style>
