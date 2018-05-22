@@ -9,7 +9,7 @@
                 <post-element :element="element" :index="index"></post-element>
             </div> -->
 
-            <div class="post-element-container" :key="this.colorChanged" v-bind:id="'element-'+this.i" v-bind:style="{'background-color' : this.color}">
+            <div class="post-element-container" v-bind:id="'element-'+this.i" v-bind:style="{'background-color' : this.color}">
                     <div class="card-column column">
                         <span v-if="draggable" ref="dragHandle" class="vue-draggable-handle">
                             <img class="grab-image" src="/static/grid.png">
@@ -316,7 +316,6 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
         inject: ["eventBus"],
         data: function () {
             return {
-                colorChanged: false,
                 dimensionsEmitted: false,
                 elementDimensions: {},
                 cols: 1,
