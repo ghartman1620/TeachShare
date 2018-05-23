@@ -7,6 +7,7 @@ import random
 import string
 from uuid import uuid4
 import os
+from datetime import timedelta
 
 #django channels
 #tornado
@@ -155,6 +156,10 @@ class Post(models.Model):
         (1, 'Lab'),
         (2, 'Lecture')
     )
+    class Meta:
+        permissions = (
+            ('view_post', 'Can view post'),
+        )
 
     practices = ArrayField(
         models.IntegerField(blank=True, 
@@ -182,11 +187,11 @@ class Post(models.Model):
     likes = models.IntegerField(default=0)
     draft = models.BooleanField(default=True)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
-    tags = JSONField()
+    tags = JSONField(blank=True, default=[])
     
     grade = models.IntegerField(choices=GRADES, default=0)
     subject = models.IntegerField(choices=SUBJECTS, default=0)
-    length = models.DurationField()
+    length = models.DurationField(blank=True, default=timedelta(0))
     content_type = models.IntegerField(choices=CONTENT_TYPE,default=0)
 
     standards = models.ManyToManyField(Standard, blank=True)    

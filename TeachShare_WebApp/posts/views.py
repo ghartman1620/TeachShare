@@ -5,6 +5,7 @@ import django_filters
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
+from django.core.exceptions import PermissionDenied
 from .models import Post, Comment, Attachment, Standard
 from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer, StandardSerializer
 from .documents import PostDocument
@@ -12,6 +13,7 @@ from .documents import PostDocument
 # test
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.contrib.auth.models import Permission
 from django.db.models import Q
 from urllib.parse import unquote
 from enum import Enum
@@ -31,6 +33,7 @@ from .tasks import add
 import os
 import google.cloud.storage
 from django.conf import settings
+from guardian.shortcuts import assign_perm
 
 
 #Post search parameters
@@ -259,10 +262,13 @@ class PostViewSet(viewsets.ModelViewSet):
         return self.queryset
     
     def get_object(self):
-        print(self.request.user)
-        print(self.request.auth)
+        post = super(PostViewSet, self).get_object()
+        if not self.request.user.has_perm('view_post', post):
+            print("Auth failed! returning 401")
+            raise PermissionDenied("You are not allowed to view that post.")
+            #return Response({'error': 'You are not allowed to view that post.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        return super(PostViewSet, self).get_object()
+        return post
 
 
 class CommentViewSet(viewsets.ModelViewSet):

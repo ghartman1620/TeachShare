@@ -145,6 +145,7 @@ const router = new Router({
 
 var Cookie = require("tiny-cookie");
 function verifyAndRefreshLogin(): Promise<any> {
+    console.log("I'm verifying and refreshing login!");
     if (store.getters.isLoggedIn){
         console.log("is logged in with store");
         return new Promise((resolve) => {resolve(true);});
@@ -167,6 +168,7 @@ function verifyAndRefreshLogin(): Promise<any> {
             };
             console.log(body);
             const head = { headers: { "content-type": "application/json" } };
+            console.log("ASSIGNING API DEFAULTS TO EMPTY");
             Object.assign(api.defaults, {});
             api.post("get_token/", body, head).then((response: any) => {
                 console.log(response);
@@ -195,7 +197,7 @@ function verifyAndRefreshLogin(): Promise<any> {
     }
 }
 
-const loginProtectedRoutes = ["create"];
+const loginProtectedRoutes = ["create", "posts"];
 const loggedOutRoutes = ["login", "register"];
 router.beforeEach((to, from, next) => {
     console.log(window.localStorage.getItem("refreshToken"));

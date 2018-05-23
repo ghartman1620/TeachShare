@@ -64,6 +64,7 @@ export const actions = {
         Cookie.remove("loggedIn");
         Cookie.remove("userId");
         Cookie.remove("username");
+        console.log("ASSIGNING API DEFAULT HEADERS TO EMPTY");
         Object.assign(api.defaults, {headers: {}});
 
         window.localStorage.removeItem("refreshToken");
