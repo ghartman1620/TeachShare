@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-12">
                     <br>
-                    <h2 class="text-center"><strong v-html="postTitle"></strong> {{post.pk}}</h2>
+                    <h2 class="text-center"><strong v-html="postTitle"></strong></h2>
                     <h5 class="text-center">posted: {{ post.updated | moment("from") }}</h5>
                     <h6 class="text-center">by <b-badge variant="dark">{{fullUsername}}</b-badge></h6>
                     <h4 class="text-right">

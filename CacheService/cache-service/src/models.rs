@@ -96,9 +96,8 @@ impl Eq for Resource<Post> {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct IdAndVersion {
     pub id: i32,
-    pub version: u64
+    pub version: u64,
 }
-
 
 #[derive(Debug, Clone, Serialize, Eq, PartialEq, Deserialize)]
 pub enum MessageType {
@@ -167,14 +166,15 @@ impl Wrapper {
         self.msg_type = msg_type;
         self
     }
-    pub fn add_error(&mut self, err: String) -> &mut Self{
+    pub fn add_error(&mut self, err: String) -> &mut Self {
         self.errors.push(err);
         self
     }
     pub fn set_items(&mut self, items: &Vec<ArcItem>, watchers: &[Vec<i32>]) -> &mut Self {
-        // self.items
-        println!("items: {:?}", items);
-        println!("watchers: {:?}", watchers);
+        // Generate a temporary value, iterate though it, zipping it together
+        // with the watchers, mapping them both to generate a new Resource
+        // with the correct watchers. This sort of data-gymnastics was necessary
+        // to be able to set the items of a wrapper, including watchers in one go.
         let temp = items
             .iter()
             .zip(watchers.iter())
@@ -189,16 +189,21 @@ impl Wrapper {
             })
             .collect::<Vec<_>>();
 
+        // @TODO: avoid this extra loop if possible.
         let mut actual: Vec<ArcItem> = vec![];
         for a in temp {
             actual.push(a.clone());
         }
-        // actual.extend(temp.into_iter());
 
-        println!("OMG ITEMS: {:?}", actual);
+        // finally, actually assign the generated vector of Resource<_> to the
+        // self.items of this .. object..? What would you call an instantiation
+        // of a struct in rust..? Not an object, surely...
         self.items = actual;
         self
     }
+
+    /// Termination of the builder-pattern to return a fully owned clone of the
+    /// built up wrapper.
     pub fn build(&mut self) -> Wrapper {
         self.clone()
     }
@@ -207,11 +212,10 @@ impl Wrapper {
 pub trait Msg<'a> {
     fn data_type(&self) -> ModelType;
     fn msg_type(&self) -> MessageType;
-    // fn data(&self) -> Self;
     fn timestamp(&self) -> i32;
     fn items(&self) -> &Vec<ArcItem>;
     fn items_mut(&mut self) -> &mut Vec<ArcItem>;
-    fn hasErr(&self) -> bool;
+    fn has_error(&self) -> bool;
     fn errors(&self) -> &Vec<String>;
     fn errors_mut(&mut self) -> &mut Vec<String>;
     fn get_connection_id(&self) -> i32;
@@ -255,7 +259,7 @@ impl<'a> Msg<'a> for Wrapper {
     fn items_mut(&mut self) -> &mut Vec<ArcItem> {
         &mut self.items
     }
-    fn hasErr(&self) -> bool {
+    fn has_error(&self) -> bool {
         self.errors.len() > 0
     }
     fn errors(&self) -> &Vec<String> {
@@ -302,9 +306,6 @@ impl Item for Resource<Post> {
     fn get_watchers_mut(&mut self) -> &mut Vec<i32> {
         &mut self.watchers
     }
-    // fn set_watchers(&mut self, watchers: &Vec<i32>) {
-    //     self.watchers = watchers.clone();
-    // }
     fn get_version(&self) -> u64 {
         self.version
     }
@@ -348,8 +349,19 @@ pub struct Comment {
     pub id: i32,
     pub text: String,
     // timestamp: PgTimestamp,
-    post_id: i32,
-    user_id: i32,
+    pub post_id: i32,
+    pub user_id: i32,
+}
+
+impl Comment {
+    pub fn new() -> Comment {
+        Comment {
+            id: 1,
+            text: String::from(""),
+            post_id: 1,
+            user_id: 1,
+        }
+    }
 }
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -372,6 +384,13 @@ pub struct Post {
     pub practices: Vec<i32>,
 }
 
+#[derive(Debug)]
+enum F<'a> {
+    User(User),
+    Post(&'a mut Post),
+    Comment(Comment),
+}
+
 #[cfg(test)]
 
 mod tests {
@@ -383,6 +402,31 @@ mod tests {
 
     pub fn typeid<T: Any>(_: &T) -> TypeId {
         TypeId::of::<T>()
+    }
+
+    #[test]
+    fn test_enum_model() {
+        let mut p = Post::new();
+        let mut post = F::Post(&mut p);
+        let mut x = vec![];
+        x.push(&mut post);
+        // x.push(&mut F::User(User::new()));
+        // x.push(&mut F::Comment(Comment::new()));
+        println!("X --------------> {:?}", x);
+        for y in x.iter_mut() {
+            println!("Y: {:?}", y);
+            match y {
+                F::Post(ref mut p) => {
+                    println!("This is a post with id: {:?}", p.id);
+                    println!("Post Content: {:?}", p.content);
+                    p.id = 1;
+                    println!("This is a post with id: {:?}", p.id);
+                }
+                F::User(u) => println!("This is a user: {:?}", u),
+                F::Comment(c) => println!("This is a comment: {:?}", c),
+                _ => println!("This is everything else..."),
+            }
+        }
     }
 
     // a few of the tests below are pointless, keep that in mind
