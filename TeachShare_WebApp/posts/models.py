@@ -155,6 +155,7 @@ class Post(models.Model):
         (1, 'Lab'),
         (2, 'Lecture')
     )
+    
 
     practices = ArrayField(
         models.IntegerField(blank=True, 
@@ -192,6 +193,8 @@ class Post(models.Model):
     content_type = models.IntegerField(choices=CONTENT_TYPE,default=0)
 
     standards = models.ManyToManyField(Standard, blank=True)    
+    class Meta:
+        permissions = (('view_post', 'Can View Post'),)
 
 
 class Comment(models.Model):

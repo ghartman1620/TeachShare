@@ -386,15 +386,25 @@ pub struct Post {
 }
 
 #[derive(Debug)]
-enum F {
+struct UserPermission {
+    pub id: i32,
+    pub object_id: Model,
+    pub permission: Permission,
+    pub user: i32,
+}
+
+#[derive(Debug)]
+enum Permission {
+    view_post(bool),
+    
+}
+
+#[derive(Debug)]
+enum Model {
     User(User),
     Post(Post),
     Comment(Comment),
 }
-
-type PostID = i32;
-type CommentID = i32;
-type UserID = i32;
 
 #[derive(Debug, Eq, PartialEq, Hash)]
 enum ID {
