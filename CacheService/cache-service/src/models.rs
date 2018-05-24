@@ -47,23 +47,52 @@ use std::sync::Arc;
 //     }
 // }
 
+#[derive(Debug)]
+pub struct UserPermission {
+    pub id: i32,
+    pub object_id: Model,
+    pub permission: Permission,
+    pub user: i32,
+}
+
+#[derive(Debug)]
+pub enum Permission {
+    view_post(bool),
+    // etc...
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum Model {
+    User(User),
+    Post(Post),
+    Comment(Comment),
+}
+
+#[derive(Debug, Eq, PartialEq, Hash)]
+pub enum ID {
+    Post(i32),
+    User(i32),
+    Comment(i32),
+    Permission(i32),
+}
+
 #[derive(Debug, Clone)]
-pub struct Resource<T> {
+pub struct Resource {
     /// Watchers: These keep track of all the users that are watching this
     /// peice of data.
     ///
     pub watchers: Vec<i32>,
     /// Data: Where the data is actually stored. Generically, of course.
     ///
-    pub data: T,
+    pub data: Model,
 
     /// Version: the id of the most recent update to a post.
     pub version: u64,
 }
 
-impl<'a, T> Resource<T> {
-    pub fn new(inner: T) -> Resource<T> {
-        Resource::<T> {
+impl Resource {
+    pub fn new(inner: Model) -> Resource {
+        Resource {
             data: inner,
             watchers: vec![],
             version: 0,
@@ -87,13 +116,6 @@ impl<'a, T> Resource<T> {
     }
 }
 
-impl PartialEq for Resource<Post> {
-    fn eq(&self, other: &Resource<Post>) -> bool {
-        self.data.id == other.data.id
-    }
-}
-impl Eq for Resource<Post> {}
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct IdAndVersion {
     pub id: i32,
@@ -110,37 +132,20 @@ pub enum MessageType {
 }
 
 #[derive(Debug, Clone)]
-pub enum CommandType {
-    Exit = 0,
-}
-
-#[derive(Debug, Clone)]
 pub enum ModelType {
     Post = 0,
     User,
     Comment,
 }
 
-pub enum Operation {
-    Add = 0,
-}
-
-#[derive(Debug, Clone)]
-pub enum Data {
-    Post,
-    User,
-    Comment,
-}
-
-pub type ArcItem = Arc<Item + Send + Sync>;
-pub type ArcType<T: Item + Send + Sync> = Arc<T>;
+// pub type Arc<Msg> = Arc<Item + Send + Sync>;
+// pub type ArcType<T: Item + Send + Sync> = Arc<T>;
 
 #[derive(Clone)]
-pub struct Wrapper {
-    pub model_type: ModelType,
+pub struct Msg {
     pub msg_type: MessageType,
     pub timestamp: i32,
-    pub items: Vec<ArcItem>,
+    pub items: Vec<Arc<Resource>>,
     pub errors: Vec<String>,
     pub connection_id: i32,
 }
@@ -148,20 +153,15 @@ pub struct Wrapper {
 /// Wrapper implements the Msg trait so it can be used generically. It also uses the
 /// common standard library/crate pattern for building objects calle the 'builder pattern'.
 /// This can be found at: https://abronan.com/rust-trait-objects-box-and-rc/
-impl Wrapper {
-    pub fn new() -> Wrapper {
-        Wrapper {
-            model_type: ModelType::Post,
+impl Msg {
+    pub fn new() -> Msg {
+        Msg {
             msg_type: MessageType::Get,
             timestamp: 0,
             items: vec![],
             errors: vec![],
             connection_id: 0,
         }
-    }
-    pub fn set_model(&mut self, model: ModelType) -> &mut Self {
-        self.model_type = model;
-        self
     }
     pub fn set_msg_type(&mut self, msg_type: MessageType) -> &mut Self {
         self.msg_type = msg_type;
@@ -171,7 +171,7 @@ impl Wrapper {
         self.errors.push(err);
         self
     }
-    pub fn set_items(&mut self, items: &Vec<ArcItem>, watchers: &[Vec<i32>]) -> &mut Self {
+    pub fn set_items(&mut self, items: &Vec<Resource>, watchers: &[Vec<i32>]) -> &mut Self {
         // Generate a temporary value, iterate though it, zipping it together
         // with the watchers, mapping them both to generate a new Resource
         // with the correct watchers. This sort of data-gymnastics was necessary
@@ -180,7 +180,7 @@ impl Wrapper {
             .iter()
             .zip(watchers.iter())
             .map(|(post, watchers)| {
-                let temp = &mut Arc::new(Resource::new(post.get_data_clone()));
+                let temp = &mut Arc::new(post.clone()); // @Clone
                 let resource = Arc::get_mut(temp).expect("Could not borrow mutably.");
 
                 watchers.iter().for_each(|watch| {
@@ -191,7 +191,7 @@ impl Wrapper {
             .collect::<Vec<_>>();
 
         // @TODO: avoid this extra loop if possible.
-        let mut actual: Vec<ArcItem> = vec![];
+        let mut actual: Vec<Arc<Resource>> = vec![];
         for a in temp {
             actual.push(a.clone());
         }
@@ -205,125 +205,125 @@ impl Wrapper {
 
     /// Termination of the builder-pattern to return a fully owned clone of the
     /// built up wrapper.
-    pub fn build(&mut self) -> Wrapper {
+    pub fn build(&mut self) -> Msg {
         self.clone()
     }
 }
 
-pub trait Msg<'a> {
-    fn data_type(&self) -> ModelType;
-    fn msg_type(&self) -> MessageType;
-    fn timestamp(&self) -> i32;
-    fn items(&self) -> &Vec<ArcItem>;
-    fn items_mut(&mut self) -> &mut Vec<ArcItem>;
-    fn has_error(&self) -> bool;
-    fn errors(&self) -> &Vec<String>;
-    fn errors_mut(&mut self) -> &mut Vec<String>;
-    fn get_connection_id(&self) -> i32;
-}
+// pub trait Msg<'a> {
+//     fn data_type(&self) -> ModelType;
+//     fn msg_type(&self) -> MessageType;
+//     fn timestamp(&self) -> i32;
+//     fn items(&self) -> &Vec<Arc<Msg>>;
+//     fn items_mut(&mut self) -> &mut Vec<Arc<Msg>>;
+//     fn has_error(&self) -> bool;
+//     fn errors(&self) -> &Vec<String>;
+//     fn errors_mut(&mut self) -> &mut Vec<String>;
+//     fn get_connection_id(&self) -> i32;
+// }
 
-impl<'a> fmt::Debug for Msg<'a> + Send + Sync {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[{:?}] -> {:?}", self.msg_type(), self.items())
-    }
-}
+// impl<'a> fmt::Debug for Msg<'a> + Send + Sync {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         write!(f, "[{:?}] -> {:?}", self.msg_type(), self.items())
+//     }
+// }
 
-impl fmt::Debug for Item + Send + Sync {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "[Post] -> {:?}, [Watchers] -> {:?}",
-            self.get_data(),
-            self.get_watchers()
-        )
-    }
-}
+// impl fmt::Debug for Item + Send + Sync {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         write!(
+//             f,
+//             "[Post] -> {:?}, [Watchers] -> {:?}",
+//             self.get_data(),
+//             self.get_watchers()
+//         )
+//     }
+// }
 
-impl<'a> Msg<'a> {
-    // what do I do here?
-}
+// impl<'a> Msg<'a> {
+//     // what do I do here?
+// }
 
-impl<'a> Msg<'a> for Wrapper {
-    fn data_type(&self) -> ModelType {
-        self.model_type.clone()
-    }
-    fn msg_type(&self) -> MessageType {
-        self.msg_type.clone()
-    }
-    // fn data(&self) -> Self;
-    fn timestamp(&self) -> i32 {
-        self.timestamp
-    }
-    fn items(&self) -> &Vec<ArcItem> {
-        &self.items
-    }
-    fn items_mut(&mut self) -> &mut Vec<ArcItem> {
-        &mut self.items
-    }
-    fn has_error(&self) -> bool {
-        self.errors.len() > 0
-    }
-    fn errors(&self) -> &Vec<String> {
-        &self.errors
-    }
-    fn errors_mut(&mut self) -> &mut Vec<String> {
-        &mut self.errors
-    }
-    fn get_connection_id(&self) -> i32 {
-        self.connection_id
-    }
-}
+// impl<'a> Msg<'a> for Wrapper {
+//     fn data_type(&self) -> ModelType {
+//         self.model_type.clone()
+//     }
+//     fn msg_type(&self) -> MessageType {
+//         self.msg_type.clone()
+//     }
+//     // fn data(&self) -> Self;
+//     fn timestamp(&self) -> i32 {
+//         self.timestamp
+//     }
+//     fn items(&self) -> &Vec<Arc<Msg>> {
+//         &self.items
+//     }
+//     fn items_mut(&mut self) -> &mut Vec<Arc<Msg>> {
+//         &mut self.items
+//     }
+//     fn has_error(&self) -> bool {
+//         self.errors.len() > 0
+//     }
+//     fn errors(&self) -> &Vec<String> {
+//         &self.errors
+//     }
+//     fn errors_mut(&mut self) -> &mut Vec<String> {
+//         &mut self.errors
+//     }
+//     fn get_connection_id(&self) -> i32 {
+//         self.connection_id
+//     }
+// }
 
-pub trait Item {
-    fn new(&self, post: Post, watchers: Vec<i32>) -> Resource<Post>;
-    fn get_data(&self) -> &Post;
-    fn get_data_mut(&mut self) -> &mut Post;
-    fn get_data_clone(&self) -> Post;
-    fn get_watchers(&self) -> &Vec<i32>;
-    fn get_watchers_mut(&mut self) -> &mut Vec<i32>;
-    fn get_version(&self) -> u64;
-}
+// pub trait Item {
+//     fn new(&self, post: Post, watchers: Vec<i32>) -> Resource<Post>;
+//     fn get_data(&self) -> &Post;
+//     fn get_data_mut(&mut self) -> &mut Post;
+//     fn get_data_clone(&self) -> Post;
+//     fn get_watchers(&self) -> &Vec<i32>;
+//     fn get_watchers_mut(&mut self) -> &mut Vec<i32>;
+//     fn get_version(&self) -> u64;
+// }
 
-pub type PostResource = Resource<Post>;
+// pub type PostResource = Resource<Post>;
 
-impl Item for Resource<Post> {
-    fn new(&self, post: Post, watchers: Vec<i32>) -> Resource<Post> {
-        let mut resource = Resource::new(post);
-        resource.watchers = watchers;
-        resource
-    }
-    fn get_data(&self) -> &Post {
-        &self.data
-    }
-    fn get_data_mut(&mut self) -> &mut Post {
-        &mut self.data
-    }
-    fn get_data_clone(&self) -> Post {
-        self.data.clone()
-    }
-    fn get_watchers(&self) -> &Vec<i32> {
-        &self.watchers
-    }
-    fn get_watchers_mut(&mut self) -> &mut Vec<i32> {
-        &mut self.watchers
-    }
-    fn get_version(&self) -> u64 {
-        self.version
-    }
-}
+// impl Item for Resource<Post> {
+//     fn new(&self, post: Post, watchers: Vec<i32>) -> Resource<Post> {
+//         let mut resource = Resource::new(post);
+//         resource.watchers = watchers;
+//         resource
+//     }
+//     fn get_data(&self) -> &Post {
+//         &self.data
+//     }
+//     fn get_data_mut(&mut self) -> &mut Post {
+//         &mut self.data
+//     }
+//     fn get_data_clone(&self) -> Post {
+//         self.data.clone()
+//     }
+//     fn get_watchers(&self) -> &Vec<i32> {
+//         &self.watchers
+//     }
+//     fn get_watchers_mut(&mut self) -> &mut Vec<i32> {
+//         &mut self.watchers
+//     }
+//     fn get_version(&self) -> u64 {
+//         self.version
+//     }
+// }
 
 #[derive(Queryable, Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct User {
-    id: i32,
+    pub id: i32,
     password: String,
     // last_login: Option<PgTimestamp>,
-    is_superuser: bool,
+    pub is_superuser: bool,
     pub username: String,
-    first_name: String,
-    last_name: String,
-    email: String,
-    is_staff: bool,
-    is_active: bool,
+    pub first_name: String,
+    pub last_name: String,
+    pub email: String,
+    pub is_staff: bool,
+    pub is_active: bool,
     // date_joined: PgTimestamp,
 }
 
@@ -383,35 +383,6 @@ pub struct Post {
     pub crosscutting_concepts: Vec<i32>,
     pub disciplinary_core_ideas: Vec<i32>,
     pub practices: Vec<i32>,
-}
-
-#[derive(Debug)]
-struct UserPermission {
-    pub id: i32,
-    pub object_id: Model,
-    pub permission: Permission,
-    pub user: i32,
-}
-
-#[derive(Debug)]
-enum Permission {
-    view_post(bool),
-    
-}
-
-#[derive(Debug)]
-enum Model {
-    User(User),
-    Post(Post),
-    Comment(Comment),
-}
-
-#[derive(Debug, Eq, PartialEq, Hash)]
-enum ID {
-    Post(i32),
-    User(i32),
-    Comment(i32),
-    Permission(i32),
 }
 
 #[cfg(test)]
