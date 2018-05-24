@@ -7,7 +7,7 @@ import random
 import string
 from uuid import uuid4
 import os
-
+from datetime import timedelta
 #django channels
 #tornado
 #aio http python
@@ -173,17 +173,22 @@ class Post(models.Model):
 
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="posts")
+    original_user = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.CASCADE
+    )
+    color = models.CharField(max_length=7, blank=True, default="#96e6b3")
+    layout = JSONField(default=[{"x":0, "y":0, "w":2, "h":30, "i":"0"}])
     title = models.CharField(max_length=100, default='', blank=True)
-    content = JSONField()
+    content = JSONField(blank=True, default={})
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
     likes = models.IntegerField(default=0)
     draft = models.BooleanField(default=True)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
-    tags = JSONField()
+    tags = JSONField(blank=True, default=[])
     
     grade = models.IntegerField(choices=GRADES, default=0)
     subject = models.IntegerField(choices=SUBJECTS, default=0)
-    length = models.DurationField()
+    length = models.DurationField(blank=True, default=timedelta(0))
     content_type = models.IntegerField(choices=CONTENT_TYPE,default=0)
 
     standards = models.ManyToManyField(Standard, blank=True)    
