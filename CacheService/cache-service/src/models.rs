@@ -3,6 +3,7 @@ use serde_json::Value;
 use std::cmp::{Eq, PartialEq};
 use std::error;
 use std::fmt;
+use std::hash::Hash;
 use std::sync::Arc;
 
 // #[derive(Debug)]
@@ -385,10 +386,22 @@ pub struct Post {
 }
 
 #[derive(Debug)]
-enum F<'a> {
+enum F {
     User(User),
-    Post(&'a mut Post),
+    Post(Post),
     Comment(Comment),
+}
+
+type PostID = i32;
+type CommentID = i32;
+type UserID = i32;
+
+#[derive(Debug, Eq, PartialEq, Hash)]
+enum ID {
+    Post(i32),
+    User(i32),
+    Comment(i32),
+    Permission(i32),
 }
 
 #[cfg(test)]
@@ -399,6 +412,7 @@ mod tests {
     use std;
     use std::any::Any;
     use std::any::TypeId;
+    use std::collections::HashMap;
 
     pub fn typeid<T: Any>(_: &T) -> TypeId {
         TypeId::of::<T>()
@@ -406,14 +420,33 @@ mod tests {
 
     #[test]
     fn test_enum_model() {
-        let mut p = Post::new();
-        let mut post = F::Post(&mut p);
+        let p = Post::new();
+        let post = F::Post(p);
         let mut x = vec![];
-        x.push(&mut post);
-        // x.push(&mut F::User(User::new()));
-        // x.push(&mut F::Comment(Comment::new()));
+        x.push(post);
+        x.push(F::User(User::new()));
+        x.push(F::Comment(Comment::new()));
+
+        let mut hm: HashMap<ID, F> = HashMap::new();
+        hm.insert(ID::Post(1), F::Post(Post::new()));
+        hm.insert(ID::Comment(2), F::Comment(Comment::new()));
+        hm.insert(ID::User(2), F::User(User::new()));
+        hm.insert(ID::Post(2), F::Post(Post::new()));
+
+        println!("HM: {:?}", hm[&ID::Post(1)]);
+
+        println!("Typed HASHMAP: {:?}", hm);
+        for (a, b) in &hm {
+            println!(" Entry ---> {:?}: {:?}", a, b);
+            match a {
+                ID::Post(id) => println!("{:?}", id),
+                ID::Comment(id) => println!("{:?}", id),
+                _ => println!("Other..."),
+            }
+        }
+
         println!("X --------------> {:?}", x);
-        for y in x.iter_mut() {
+        for y in &mut x {
             println!("Y: {:?}", y);
             match y {
                 F::Post(ref mut p) => {

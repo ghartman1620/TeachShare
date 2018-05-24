@@ -208,7 +208,7 @@ pub fn cache_thread(
                             assert_eq!(msg.msg_type(), MessageType::Manifest);
                             {
                                 let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                                let res = handle_manifest(msg, c, &ret_pipe, &conn);
+                                handle_manifest(msg, c, &ret_pipe, &conn);
                             }
                         },
                     };
