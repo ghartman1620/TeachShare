@@ -7,11 +7,11 @@ use models::{Item, MessageType, ModelType, Msg, Post, Resource, Wrapper};
 use std::cell::{BorrowMutError, RefCell};
 use std::collections::HashMap;
 use std::hash::Hash;
-use std::sync::Arc;
+use std::ops::{Index, IndexMut};
 use std::rc::Rc;
+use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use std::ops::{Index, IndexMut};
 
 const MAX_DB_SAVE_TIMEOUT: Duration = Duration::from_millis(200);
 
@@ -25,7 +25,8 @@ pub trait Cache {
 
     fn get(&self, key: Self::Key) -> Result<&Self::Entry, Self::Err>;
     fn get_mut(&mut self, key: Self::Key) -> Result<&mut Self::Entry, Self::Err>;
-    fn put(&mut self, key: Self::Key, value: Self::Entry) -> Result<Option<Self::Entry>, Self::Err>;
+    fn put(&mut self, key: Self::Key, value: Self::Entry)
+        -> Result<Option<Self::Entry>, Self::Err>;
 }
 
 #[derive(Debug)]
@@ -78,9 +79,14 @@ impl Cache for AssociativeVecCache<Resource<Post>> {
         Ok(&mut self._inner[key as usize])
     }
 
-    fn put(&mut self, key: i32, value: Resource<Post>) -> Result<Option<Resource<Post>>, CacheError> {
+    fn put(
+        &mut self,
+        key: i32,
+        value: Resource<Post>,
+    ) -> Result<Option<Resource<Post>>, CacheError> {
         if key as usize > self._inner.len() {
-            self._inner.resize(2 * key as usize, Resource::new(Post::new()));
+            self._inner
+                .resize(2 * key as usize, Resource::new(Post::new()));
         }
         self._inner[key as usize] = value;
         Ok(None)
@@ -89,9 +95,7 @@ impl Cache for AssociativeVecCache<Resource<Post>> {
 
 impl<V> AssociativeVecCache<V> {
     pub fn new() -> AssociativeVecCache<V> {
-        AssociativeVecCache::<V> {
-            _inner: vec![],
-        }
+        AssociativeVecCache::<V> { _inner: vec![] }
     }
 }
 
@@ -132,7 +136,11 @@ impl Cache for HashMapCache<i32, Resource<Post>> {
         }
     }
 
-    fn put(&mut self, key: i32, value: Resource<Post>) -> Result<Option<Resource<Post>>, CacheError> {
+    fn put(
+        &mut self,
+        key: i32,
+        value: Resource<Post>,
+    ) -> Result<Option<Resource<Post>>, CacheError> {
         match self._inner.insert(key, value) {
             Some(val) => Ok(Some(val)),
             None => Err(CacheError::Put(
@@ -142,9 +150,9 @@ impl Cache for HashMapCache<i32, Resource<Post>> {
     }
 }
 
-// pub type Cache = Rc<RefCell<HashMap<i32, Resource<Post>>>>;
+
 #[allow(dead_code)]
-pub type SmartCache = Rc<RefCell<HashMap<i32, Resource<Post>>>>;
+pub type SmartCache = RefCell<HashMap<i32, Resource<Post>>>;
 
 #[allow(dead_code)]
 pub fn cache_thread(
@@ -153,28 +161,11 @@ pub fn cache_thread(
     cancel: Receiver<Cancel>,
     db_send: Sender<Post>,
 ) {
-    let mut h = HashMapCache::new();
-    let res = h.put(1, Resource::new(Post::new()));
-
-    println!("Result of HashMapCache: {:?}", res);
-    match res {
-        Ok(val) => println!("Ok(val) ---> {:?}", val),
-        Err(e) => println!("Err(e) ---> {:?}", e),
-    }
-
-    match h.get(1) {
-        Ok(val) => println!("Ok(val) ---> {:?}", val),
-        Err(e) => println!("Err(e) ---> {:?}", e),
-    }
-
-    println!("Cache NOW: {:?}", h);
-
     thread::spawn(move || {
         let db = DB::new();
 
-        let mut cache = Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new())); // Rc::new(Cache::new());
+        let mut cache = Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new()));
         loop {
-            // println!("Strong count: {}.", Rc::strong_count(&cache));
             let conn = db.get();
             select_loop! {
                 recv(in_pipe, msg) => {
@@ -183,7 +174,6 @@ pub fn cache_thread(
                         MessageType::Get => {
                             println!("[CACHE] RECEIVED => {:?}", msg.msg_type());
                             assert_eq!(msg.msg_type(), MessageType::Get);
-                            // println!("Msg: {:?}", msg.msg_type());
                             let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
                             handle_get(&msg, c, &ret_pipe, &conn);
 
@@ -209,7 +199,7 @@ pub fn cache_thread(
                             assert_eq!(msg.msg_type(), MessageType::Update);
                             {
                                 let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                                handle_update(&msg, c, &ret_pipe);
+                                handle_update(&msg, c, &ret_pipe, &db_send);
                             }
 
                         },
@@ -218,7 +208,7 @@ pub fn cache_thread(
                             assert_eq!(msg.msg_type(), MessageType::Manifest);
                             {
                                 let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                                let res = handle_manifest(msg, c, &ret_pipe, &conn);
+                                handle_manifest(msg, c, &ret_pipe, &conn);
                             }
                         },
                     };
@@ -273,17 +263,24 @@ fn handle_manifest(
 
     let mut db_posts: Vec<i32> = Vec::new();
     println!("[CACHE] Manifest: begin");
-    
+
     for m in msg.items() {
         let mut borrowed_val = cash.borrow();
         match borrowed_val.get(&m.get_data().id) {
             //1. if cache has this post id:
             Some(val) => {
-                println!("[CACHE] Manifest: For key: {:?} ----> {:?}", &m.get_data().id, val);
+                println!(
+                    "[CACHE] Manifest: For key: {:?} ----> {:?}",
+                    &m.get_data().id,
+                    val
+                );
                 //2. If the version provided does not match the version in the cache
                 if val.version != m.get_version() {
                     //3. Add the entire post's content to the return wrapper's items
-                    println!("[CACHE] manifest: adding post {} to return list", val.get_data().id);
+                    println!(
+                        "[CACHE] manifest: adding post {} to return list",
+                        val.get_data().id
+                    );
                     let resource = Arc::new(val.clone());
                     wrap.items_mut().push(resource);
                 }
@@ -304,7 +301,6 @@ fn handle_manifest(
 
     println!("[CACHE] Manifest: got posts from db: {:?}", posts);
 
-    
     let mut mutable_cache = cash.borrow_mut();
     // For each post returned by db
     while !posts.is_empty() {
@@ -317,14 +313,16 @@ fn handle_manifest(
         mutable_cache.insert(resource.get_data().id.clone(), resource.clone());
 
         //8. Add them all to the return list.
-        println!("[CACHE] manifest: adding post {} to return list", resource.get_data().id);
+        println!(
+            "[CACHE] manifest: adding post {} to return list",
+            resource.get_data().id
+        );
         wrap.items_mut().push(Arc::new(resource));
     }
     //9. Send back the return list.
     ret_pipe.send(Arc::new(wrap));
     println!("[CACHE] Manifest: end");
 }
-
 
 #[allow(dead_code)]
 fn handle_get(msg: &SafeArcMsg, cash: RefCache, ret_pipe: &Sender<SafeArcMsg>, db: &PgConnection) {
@@ -542,7 +540,7 @@ fn create_posts(
             })
             .collect();
         println!("RESULT SET: {:?}", rs);
-        let errors_inner: Vec<String> = create_posts_db(rs, db_write, true)
+        let errors_inner: Vec<String> = create_posts_db(rs.as_slice(), db_write, true)
             .into_iter()
             .map(|val| val.unwrap_err())
             .collect();
@@ -555,7 +553,7 @@ fn create_posts(
 
 #[allow(dead_code)]
 fn create_posts_db(
-    posts: Vec<Post>,
+    posts: &[Post],
     db_write: &Sender<Post>,
     async: bool,
 ) -> Vec<Result<(), String>> {
@@ -624,7 +622,12 @@ fn create_post_cache(
 }
 
 #[allow(dead_code)]
-fn handle_update(msg: &SafeArcMsg, cash: RefCache, ret_pipe: &Sender<SafeArcMsg>) {
+fn handle_update(
+    msg: &SafeArcMsg,
+    cash: RefCache,
+    ret_pipe: &Sender<SafeArcMsg>,
+    db_write: &Sender<Post>,
+) {
     let mut cache_mut = cash.borrow_mut();
     let all_watchers = &mut vec![];
     for m in msg.items() {
@@ -643,6 +646,7 @@ fn handle_update(msg: &SafeArcMsg, cash: RefCache, ret_pipe: &Sender<SafeArcMsg>
             *entry = Resource::new(m.get_data().clone());
             entry.watchers.clear();
             entry.watchers.extend(old_watchers);
+            entry.increment();
         }
     }
     // create response with...
@@ -654,9 +658,16 @@ fn handle_update(msg: &SafeArcMsg, cash: RefCache, ret_pipe: &Sender<SafeArcMsg>
         .set_items(msg.items(), all_watchers.as_slice())
         .build();
 
-    // return the watchers ID's
+    // return the watchers ID's, on success writeback to DB..?
     match ret_pipe.send(Arc::new(wrap)) {
-        Ok(val) => println!("[CACHE] Result: {:?}", val),
+        Ok(val) => {
+            println!("[CACHE] Result: {:?}", val);
+            let posts: Vec<Post> = msg.items()
+                .iter()
+                .map(|arcitem| arcitem.get_data_clone())
+                .collect();
+            create_posts_db(posts.as_slice(), db_write, true);
+        }
         Err(e) => println!("[CACHE] Error: {:?}", e),
     };
 }
@@ -840,8 +851,8 @@ mod tests {
         let mut vc = AssociativeVecCache::<Resource<Post>>::new();
         match vc.put(1, Resource::new(Post::new())) {
             Ok(val) => match val {
-                    Some(some) => println!("SOME: {:?}", some),
-                    None => println!("None."),
+                Some(some) => println!("SOME: {:?}", some),
+                None => println!("None."),
             },
             Err(e) => {
                 println!("There was an error: {:?}", e);
@@ -854,8 +865,8 @@ mod tests {
         p.likes = 100;
         match vc.put(1000, Resource::new(p)) {
             Ok(val) => match val {
-                    Some(some) => println!("SOME: {:?}", some),
-                    None => println!("None."),
+                Some(some) => println!("SOME: {:?}", some),
+                None => println!("None."),
             },
             Err(e) => {
                 println!("There was an error: {:?}", e);

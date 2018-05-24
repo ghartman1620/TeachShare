@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'rest_framework_social_oauth2',
     'django_filters',
     'django_elasticsearch_dsl',
+    'guardian',
 
     'accounts',
     'posts',
@@ -125,6 +126,7 @@ AUTHENTICATION_BACKENDS = (
 
     'rest_framework_social_oauth2.backends.DjangoOAuth2',
     'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
 )
 
 SOCIAL_AUTH_PIPELINE = (

@@ -270,44 +270,40 @@ const bodyVisible = {
     opacity: "1"
 };
 
-
 @Component({
     name: "post-create",
     components: { PostElement, FontAwesomeIcon, SideBar, TagSelect }
 })
-export default class PostCreate extends Vue{
-    @State(state => state.create) createState;
+export default class PostCreate extends Vue {
+    @State( (state) => state.create) createState;
     get getLoggedInUser(): User {
         return getLoggedInUser(this.$store);
     }
-    
+
     SAVING = PostStatus.Saving;
     LOADING = PostStatus.Loading;
     SAVED = PostStatus.Saved;
 
-    postStatus: PostStatus = this.LOADING;
+    public postStatus: PostStatus = this.LOADING;
 
-    title: string = ""; //@TODO: make changes to title a store mutation that is saved and can be undone/redone
-    inProgressTag: string = "";
-    tags: string[] = [];
-    //userPosts: any[] = [];
-    
+    public title: string = ""; // @TODO: make changes to title a store mutation that is saved and can be undone/redone
+    public inProgressTag: string = "";
+    public tags: string[] = [];
+    // userPosts: any[] = [];
 
-    currentPage: number = 0;
+    public currentPage: number = 0;
 
-    //these aren't ever saved into InProgressPost, they're here for the purpose
-    //of loading in a post's current info when you load up a post.
-    
-
+    // these aren't ever saved into InProgressPost, they're here for the purpose
+    // of loading in a post's current info when you load up a post.
 
     get userPosts(): Post[] {
-        var store = this.$store;
-        
-        let userPosts = getPosts(this.$store).filter(function(p){
-            //getLoggedInUser(store).pk seems to be a string at runtime. It obviously ought to be a number, but somewhere
-            //it gets assigned to a type-unsafe thing that winds up as a string.
+        const store = this.$store;
+        const userPosts = getPosts(this.$store).filter( (p) => {
+            // getLoggedInUser(store).pk seems to be a string at runtime.
+            // It obviously ought to be a number, but somewhere
+            // it gets assigned to a type-unsafe thing that winds up as a string.
             return p.user.pk === parseInt(getLoggedInUser(store).pk as any);
-        })
+        });
         return userPosts;
     }
     get currentPost(): InProgressPost | undefined {
@@ -316,10 +312,8 @@ export default class PostCreate extends Vue{
 
 
     // getters
-    get inProgressPost(): InProgressPost | undefined{
-
+    get inProgressPost(): InProgressPost | undefined {
         return this.createState.post;
-        
     }
 
     get storeElements() {
@@ -332,9 +326,10 @@ export default class PostCreate extends Vue{
         return getCurrentPost(this.$store)!.title.length > 0;
     }
 
-    saveTagChanges(grade: number, length: number, subject: number, contentType: number, standards: number[],
-            concepts, practices, coreIdeas): void {
-        if(this.inProgressPost !== undefined){
+    public saveTagChanges(grade: number, length: number, subject: number, contentType: number, standards: number[],
+                          concepts, practices, coreIdeas): void {
+
+        if (this.inProgressPost !== undefined) {
             this.inProgressPost!.setStandards(standards);
             this.inProgressPost!.setGrade(grade);
             this.inProgressPost!.setSubject(subject);
@@ -348,62 +343,61 @@ export default class PostCreate extends Vue{
         }
 
     }
-    
-    saveDraft() {
+    public saveDraft() {
         saveDraft(this.$store);
     }
-    changeGrade(grade: number) {
+    public changeGrade(grade: number) {
         setGrade(this.$store, grade);
     }
-    changeSubject(subject: number) {
+    public changeSubject(subject: number) {
         setSubject(this.$store, subject);
     }
-    changeContentType(contentType: number){
+    public changeContentType(contentType: number) {
         setContentType(this.$store, contentType);
     }
-    changeLength(length: string) {
+    public changeLength(length: string) {
         setLength(this.$store, parseInt(length));
     }
-    getEditorStyle() {
+    public getEditorStyle() {
         if (this.$route.name !== "create") {
             return editorVisible;
         } else {
             return editorHidden;
         }
     }
-    getBodyStyle() {
+    public getBodyStyle() {
         if (this.$route.name !== "create") {
             return bodyHidden;
         } else {
             return bodyVisible;
         }
     }
-    nop() {}
-    removeTag(index: number) {
-        //@TODO: make tag changes a store mutation that can be undone/redone
+    public nop() {}
+    public removeTag(index: number) {
+        // @TODO: make tag changes a store mutation that can be undone/redone
         this.tags.splice(index, 1);
         setTags(this.$store, this.tags);
     }
-    createTagEvent(e: any) {
+    public createTagEvent(e: any) {
         if (e.keyCode === 13 && this.inProgressTag !== "") {
             this.createTag();
         }
     }
-    createTagBtn() {
-        if(this.inProgressTag !== ""){
+    public createTagBtn() {
+        if (this.inProgressTag !== "") {
             this.createTag();
         }
     }
-    createTag() {
+    public createTag() {
         this.tags.push(this.inProgressTag);
         this.inProgressTag = "";
         setTags(this.$store, this.tags);
     }
-    submitPost(event: any) {
-        var vm = this;
+    public submitPost(event: any) {
+        const vm = this;
         // dispatch createPost method in the store. This will send a
         // post request to the backend server.
-        createPost(this.$store).then(function(ret: any) {
+        createPost(this.$store).then( (ret: any) => {
             // handle the response from the server
             if (ret === undefined) {
                 vm.$notifyDanger(
@@ -418,8 +412,8 @@ export default class PostCreate extends Vue{
                 });
             } else {
                 let total = "";
-                forEach(ret, function(val, key) {
-                    let currentValue = val.join(" ");
+                forEach(ret, (val, key) => {
+                    const currentValue = val.join(" ");
                     total = `${total} "${key}: ${currentValue}" `;
                 });
                 vm.$notifyDanger(
@@ -428,9 +422,9 @@ export default class PostCreate extends Vue{
             }
         });
     }
-    openEditor(index: number) {
-        var type = getCurrentPost(this.$store)!.elements[index].type;
-        var routeName = "edit-";
+    public openEditor(index: number) {
+        const type = getCurrentPost(this.$store)!.elements[index].type;
+        let routeName = "edit-";
         if (type === "text") {
             routeName += "text";
         } else if (type === "audio") {
@@ -442,133 +436,123 @@ export default class PostCreate extends Vue{
         } else {
             routeName += "file";
         }
-        var query: Dictionary<string> = {"index" : index.toString()};
-        var loc: Location = {name: routeName, query: query};
+        const query: Dictionary<string> = { index : index.toString() };
+        const loc: Location = {name: routeName, query};
         this.$router.push(loc);
     }
-    //right now only loads one page of posts
-    //@TODO: make a distinction between making potential edits to your post and publishing those edits.
-    //as a teacher, I want to be able to draft edits to my lesson plan and see them before I publish those edits, even
-    //if my post is already published.
-    editPost(post): void {
+    // right now only loads one page of posts
+    // @TODO: make a distinction between making potential edits to your post and publishing those edits.
+    // as a teacher, I want to be able to draft edits to my lesson plan and see them before I publish those edits, even
+    // if my post is already published.
+    public editPost(post): void {
 
         window.localStorage.setItem("inProgressPost", post.pk);
-        var user: User = <User>this.getLoggedInUser;
-        this.beginPost(<number>user.pk, <number>post.pk);
+        const user: User = this.getLoggedInUser as  User;
+        this.beginPost(user.pk as number, post.pk as number);
     }
-    beginPost(userid: number, postid: number | undefined): void {
+    public beginPost(userid: number, postid: number | undefined): void {
         let vm: PostCreate = this;
-        if(postid !== undefined){
-            fetchPostSubscribe(this.$store, postid).then(function(p){
-                beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p: p});
+        if (postid !== undefined) {
+            fetchPostSubscribe(this.$store, postid).then((p) => {
+                beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p});
                 vm.postStatus = vm.SAVED;
             });
-        }
-        else{
+        } else {
             beginPost(this.$store, {
-                userid: <number>userid, 
+                userid: userid as number,
             });
         }
     }
 
-    moveElementUp(index: number) {
+    public moveElementUp(index: number) {
         if (index != 0) {
             swapElements(this.$store, [index, index - 1]);
             // dispatch only allows one argument so we'll pass them as an array
         }
     }
-    moveElementDown(index: number) {
+    public moveElementDown(index: number) {
         if (index != this.$store.state.create.post.elements.length - 1) {
             swapElements(this.$store, [index, index + 1]);
             // dispatch only allows one argument so we'll pass them as an array
         }
     }
-    removeElement(index: number) {
+    public removeElement(index: number) {
         removeElement(this.$store, index);
     }
-    maxElementIndex() {
+    public maxElementIndex() {
         return getCurrentPost(this.$store)!.elements!.length;
     }
-    undo() {
+    public undo() {
         undo(this.$store);
     }
-    redo() {
+    public redo() {
         redo(this.$store);
     }
-    async getUserPosts(){
-        var vm: PostCreate = this;
-        //@TODO: use store and Post model for this work
-        //This is also all reloaded every time somebody reloads the page.. which is really quite no good.
-        var nextPage = 1;
-        do{
+    public async getUserPosts() {
+        const vm: PostCreate = this;
+        // @TODO: use store and Post model for this work
+        // This is also all reloaded every time somebody reloads the page.. which is really quite no good.
+        let nextPage = 1;
+        do {
             var response;
 
             response = await asLoggedIn(api.get(`/posts/?user=${this.getLoggedInUser.pk}&page=${nextPage.toString()}`));
-            console.log(response);
-            for(var post of response.data.results){
-                
-                if(post.pk != -1){
+            for (const post of response.data.results) {
+                if (post.pk !== -1){
                     fetchPostSubscribe(this.$store, post.pk);
                 }
-                //this.userPosts.push(post);
+                // this.userPosts.push(post);
             }
             nextPage++;
-        }while(response.data.next !== null);
+        } while (response.data.next !== null);
     }
-    created() {
-        var inProgressPost: string | null = window.localStorage.getItem("inProgressPost");
-        if(inProgressPost === null){
-            
-            this.beginPost( 
-                //???? how on earth is this type string | undefined
-                //It's definitely just a number. Look at user.ts.
-                <number>this.getLoggedInUser.pk,
+    public created() {
+        const inProgressPost: string | null = window.localStorage.getItem("inProgressPost");
+        if (inProgressPost === null) {
+            this.beginPost(
+                // ???? how on earth is this type string | undefined
+                // It's definitely just a number. Look at user.ts.
+                this.getLoggedInUser.pk as number,
                 undefined);
-            
-        }
-        else{
+        } else {
             this.getUserPosts();
             this.beginPost(
-                <number>this.getLoggedInUser.pk, parseInt(<string>inProgressPost));
+                this.getLoggedInUser.pk as number, parseInt(inProgressPost as string));
             let store = this.$store;
             let userpk = this.getLoggedInUser.pk as number;
             let vm: PostCreate = this;
-            WebSocket.getInstance().addMessageListener(function(message){
+            WebSocket.getInstance().addMessageListener((message) => {
                 console.log("Post create pkifying a post");
                 console.log(JSON.parse(message.data)[0]);
                 let post = Post.pkify(JSON.parse(message.data)[0]);
-                
                 let inProgressPost = window.localStorage.getItem("inProgressPost");
-                if(inProgressPost){
-                    if(post.pk === parseInt(inProgressPost as string,10)){
+                if (inProgressPost){
+                    if (post.pk === parseInt(inProgressPost as string, 10)) {
                         beginPost(store,{userid: userpk, p: post});
                         vm.postStatus = PostStatus.Saved;
                     }
-                }
-                else{
+                } else {
                     console.error("no inprogressPost localStorage item exists");
                 }
-               
                 return undefined;
             });
         }
-        
-
-        
     }
 
-    mounted() {
-        var vm: PostCreate = this;
-        this.$on("submitElement", function(element: any, index: number){
+    public mounted() {
 
-            if(index == getCurrentPost(vm.$store)!.elements.length){
+        var vm: PostCreate = this;
+        this.$on("submitElement", (element: any, index: number) => {
+
+            // @changed this equality to an === from == ... so if somethign breaks
+            // that could be why
+            if (index === getCurrentPost(vm.$store)!.elements.length) {
                 addElement(vm.$store, element);
-            }
-            else{
-                editElement(vm.$store, {element: element, index: index});
+            } else {
+                editElement(vm.$store, {element, index});
             }
             vm.$router.push({name: "create"});
-        })
+        });
 
         this.$on("submitTagChanges", this.saveTagChanges)
     }
