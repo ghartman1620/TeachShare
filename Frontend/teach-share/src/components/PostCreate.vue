@@ -467,7 +467,7 @@ export default class PostCreate extends Vue{
         //This is also all reloaded every time somebody reloads the page.. which is really quite no good.
         var nextPage = 1;
         do{
-            var response = await api.get("/posts/?user=" + this.getLoggedInUser.pk + "&page=" + nextPage.toString());
+            var response = await api.get("/posts/?user_edit=" + this.getLoggedInUser.pk + "&page=" + nextPage.toString());
             for(var post of response.data.results){
                 vm.userPosts.push(post);
             }

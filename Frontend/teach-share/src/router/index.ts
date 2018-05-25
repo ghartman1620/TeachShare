@@ -41,6 +41,8 @@ const Register = () =>
 
 const WebSocketComp = () =>
     import ( /* webpackChunkName: "register" */ "../components/WebSocket.vue");
+const MockDiff = () =>
+    import ( /* webpackChunkName: "mock-diff" */ "../components/MockDiff.vue");
 
 
 Vue.use(Router);
@@ -49,8 +51,8 @@ const router = new Router({
     mode: "history",
     routes: [
         {
-            path : "/websocket",
-            component: WebSocketComp
+            path : "/diff",
+            component: MockDiff
         },
         {
             path: "/",
