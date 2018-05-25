@@ -489,7 +489,7 @@ impl Connection {
         };
         let mut post = Post::new();
         post.id = post_id;
-        let mut resource = Resource::new(Model::Post(Post::new()));
+        let mut resource = Resource::new(Model::Post(post));
 
         let token = self.tx.token();
         let conn_id = self.tx.connection_id();

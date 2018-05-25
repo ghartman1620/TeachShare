@@ -5,6 +5,8 @@ use std::error;
 use std::fmt;
 use std::hash::Hash;
 use std::sync::Arc;
+use diesel::Insertable;
+use schema::posts_post;
 
 // #[derive(Debug)]
 // pub struct NoIDProvided {
@@ -365,7 +367,8 @@ impl Comment {
     }
 }
 
-#[derive(Queryable, Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Queryable, Insertable, Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[table_name = "posts_post"]
 pub struct Post {
     pub id: i32,
     pub title: String,
@@ -383,6 +386,10 @@ pub struct Post {
     pub crosscutting_concepts: Vec<i32>,
     pub disciplinary_core_ideas: Vec<i32>,
     pub practices: Vec<i32>,
+
+    pub color: String,
+    pub layout: Value,
+    pub original_user_id: Option<i32>,
 }
 
 #[cfg(test)]

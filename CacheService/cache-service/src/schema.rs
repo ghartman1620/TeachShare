@@ -207,6 +207,11 @@ table! {
         crosscutting_concepts -> Array<Int4>,
         disciplinary_core_ideas -> Array<Int4>,
         practices -> Array<Int4>,
+        
+        // added these ones manually...
+        color -> Varchar,
+        layout -> Jsonb,
+        original_user_id -> Nullable<Int4>,
     }
 }
 

@@ -213,6 +213,14 @@ export class ModelMap<V> implements IterableIterator<V> {
     }
 }
 
+interface ILayout {
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    i: string, // @TODO: Ask jeff if this is really suppose to be a string
+}
+
 
 export class Post extends Model {
     /*
@@ -282,10 +290,26 @@ export class Post extends Model {
     public concepts: number[];
     public coreIdeas: number[];
     public practices: number[];
+
+    public color: string;
+    public layout: ILayout;
+    public original_user: User;
+
     constructor(pk?: number, comments?: Comment[], user?: User) {
         super(typeof pk === "undefined" ? -1 : pk);
         this.comments = typeof comments === "undefined" ? [] : comments;
         this.user = typeof user === "undefined" ? new User() : user;
+
+        // set defaults
+        this.color = "#96e6b3";
+        this.layout = {
+            x: 0, 
+            y: 0, 
+            w: 2, 
+            h: 30, 
+            i: "0", // This is how it was in the Django models as default 
+                    // as wierd as that seems...
+        }
     }
 
     // Creates an object of the form the websocket requires for deserialization:

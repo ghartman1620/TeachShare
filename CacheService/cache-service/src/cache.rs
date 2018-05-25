@@ -392,6 +392,8 @@ fn handle_watch(
         .build();
 
     for m in &msg.items {
+        println!("MSG ---------------> {:?}", m);
+
         let mut exists_cache = Option::default();
         let mut exists = false;
 
@@ -419,13 +421,19 @@ fn handle_watch(
             },
             None => {
                 // no value to watch, grab from DB?
+                
                 match &m.data {
                     Model::Post(post) => {
-                        let posts: Option<Vec<Post>> = match Post::get(post.id, db_read) {
+                        println!("POST ID# ----> {}", post.id);
+                        let post_result = Post::get(post.id, db_read);
+                        println!("RAW RESULT: {:?}", post_result);
+                        let posts: Option<Vec<Post>> = match post_result {
                             Ok(val) => Some(val),
                             Err(e) => None,
                         };
+                        println!("RAW POSTS =====>>>> {:?}", posts);
                         if posts.is_some() {
+                            println!("POSTS =====>>>> {:?}", posts);
                             let cleaned_posts_response: Vec<Resource> = posts
                                 .unwrap()
                                 .into_iter()
@@ -452,7 +460,7 @@ fn handle_watch(
                     match response {
                         Some(val) => {
                             val.add_watch(msg.connection_id);
-                            println!("[CACHE] Current watchers: {:?}", val.watchers);
+                            println!("[CACHE] Current watchers -----------------> {:?}", val.watchers);
                         }
                         None => {
                             println!("ERROR: There was no valid entry for that Post ID.");
@@ -617,13 +625,17 @@ fn handle_update(
         
     }
 
+    println!("ALL WATCHERS ------------------> {:?}", all_watchers);
+
     let mut just_resources: Vec<Resource> = vec![];
     for item in &msg.items {
         match item.data {
             Model::Post(ref post) => {
                 let watchers = item.watchers.clone();
                 let version = item.version;
-                let resource = Resource::new(Model::Post(post.clone()));
+                let mut resource = Resource::new(Model::Post(post.clone()));
+                watchers.iter().for_each(|watch| resource.add_watch(*watch));
+                // resource.add_watch()
                 just_resources.push(resource);
             },
             _ => unimplemented!(),

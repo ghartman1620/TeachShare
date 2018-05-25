@@ -11,6 +11,8 @@ use schema::posts_post::dsl::*;
 use serde_json::value::Value;
 use std::env;
 use std::rc::Rc;
+use diesel::insert_into;
+use diesel::result::Error;
 
 pub fn establish_connection() -> PgConnection {
     dotenv().ok();
@@ -36,6 +38,16 @@ impl DB {
     pub fn get_mut(&mut self) -> Option<&mut PgConnection> {
         Rc::get_mut(&mut self._conn)
     }
+    // pub fn insert_post(&self, post: Post) -> Result<Post, Error> {
+    //     self._conn.transaction(|| {
+    //         insert_into(posts_post).default_values().execute(&*self._conn)?;
+    //         let created_post = insert_into(posts_post).values(&post).get_result(&*self._conn)?; //execute(&*self._conn)?;
+    //         println!("** Total rows affected by insert_into: {:?} **", created_post);
+    //         Ok(created_post)
+    //     })?;
+    //     let created_post = insert_into(posts_post).values(&post).get_result(&*self._conn)?;
+    //     Ok(created_post)
+    // }
 }
 
 impl Post {
@@ -57,6 +69,10 @@ impl Post {
             crosscutting_concepts: vec![],
             disciplinary_core_ideas: vec![],
             practices: vec![],
+
+            color: String::from("#96e6b3"),
+            layout: Value::Array(vec![]),
+            original_user_id: None,
         }
     }
     pub fn get_all(ids: Vec<i32>, conn: &PgConnection) -> Result<Vec<Post>, result::Error> {
@@ -94,34 +110,43 @@ impl Post {
         let updated_row: Result<Post, result::Error> = update(posts_post.filter(id.eq(self.id)))
             //copy trait is not defined for String, because it's immutable. So we must clone our strings.
             .set((title.eq(self.title.clone()),
-                 content.eq(self.content.clone()),
-                //  updated.eq(self.updated),
-                 likes.eq(self.likes),
-                //  timestamp.eq(self.timestamp),
-                 tags.eq(self.tags.clone()),
-                 user_id.eq(self.user_id),
-                 draft.eq(self.draft),
-                 content_type.eq(self.content_type),
-                 grade.eq(self.grade),
-                //  length.eq(self.length),
-                 subject.eq(self.subject),
-                 //Hopefully these vectors aren't very long... 
-                 crosscutting_concepts.eq(self.crosscutting_concepts.clone()),
-                 disciplinary_core_ideas.eq(self.disciplinary_core_ideas.clone()),
-                 practices.eq(self.practices.clone())))
+                content.eq(self.content.clone()),
+            //  updated.eq(self.updated),
+                likes.eq(self.likes),
+            //  timestamp.eq(self.timestamp),
+                tags.eq(self.tags.clone()),
+                user_id.eq(self.user_id),
+                draft.eq(self.draft),
+                content_type.eq(self.content_type),
+                grade.eq(self.grade),
+            //  length.eq(self.length),
+                subject.eq(self.subject),
+                //Hopefully these vectors aren't very long... 
+                crosscutting_concepts.eq(self.crosscutting_concepts.clone()),
+                disciplinary_core_ideas.eq(self.disciplinary_core_ideas.clone()),
+                color.eq(self.color.clone()),
+                layout.eq(self.layout.clone()),
+                original_user_id.eq(self.original_user_id),
+                practices.eq(self.practices.clone())))
             .get_result(conn);
 
         return if updated_row.is_err() {
+            let actual_error = updated_row.unwrap_err();
+            println!("[DB]<ERROR> {:?}", actual_error);
             Err(String::from(
                 "There was an issue with the supplied database connection.",
             ))
         } else {
+            println!("[DB] ** Saved post successfully! **");
             Ok(())
         };
     }
+
+    // pub fn insert_post(&self, conn: &)
 }
 pub fn save_posts(rx: Receiver<Post>) {
-    let connection = establish_connection();
+    let db = DB::new();
+    
     loop {
         use std::time::SystemTime;
         let res = rx.recv();
@@ -130,8 +155,13 @@ pub fn save_posts(rx: Receiver<Post>) {
             break;
         } else {
             let p: Post = res.unwrap();
-            let res = p.save(&connection);
-            res.expect("error saving post");
+            // let res = db.insert_post(p);
+            let res = p.save(&*db.get());
+            // res.expect("error saving post");
+            match res {
+                Ok(_) => println!("Saving post in DB response was successful!"),
+                Err(e) => println!("[DB]<ERROR> Saving post error. '{:?}'", e),
+            }
         }
     }
 }
