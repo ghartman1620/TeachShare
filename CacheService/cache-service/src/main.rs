@@ -138,7 +138,7 @@ impl Handler for Connection {
     }
 
     fn on_message(&mut self, msg: Message) -> ws::Result<()> {
-        let result = match msg {
+        match msg {
             Message::Binary(bin) => {
                 println!("{:?}", bin);
                 panic!("Received binary message");
@@ -165,23 +165,21 @@ impl Handler for Connection {
                 let json: Result<WSMessage, serde_json::Error> = serde_json::from_str(&text);
                 let response: Option<String> = match json {
                     Ok(msg) => {
-                        let msg_result = match msg.message {
+                        match msg.message {
                             MessageType::Get => self.handle_get_msg(msg),
                             MessageType::Create => self.handle_create_msg(msg),
                             MessageType::Watch => self.handle_watch_msg(msg),
                             MessageType::Update => self.handle_update_msg(msg),
                             MessageType::Manifest => self.handle_manifest_msg(msg),
-                        };
-                        msg_result
-                    }
+                        }
+                    },
                     Err(e) => Some(format!(
                         "There is a terrible error parsing {:?}: {:?}",
                         text, e
                     )),
                 };
-                match response {
-                    Some(error_msg) => println!("Final error: {:?}", error_msg),
-                    _ => {}
+                if let Some(error_msg) = response {
+                    println!("Final error: {:?}", error_msg);
                 }
             }
         };
@@ -281,50 +279,49 @@ impl Connection {
         }
     }
     fn handle_create_msg(&self, msg: WSMessage) -> Option<String> {
-        None
-    //     println!("[MAIN] received: {:?}", msg.message);
-    //     assert_eq!(msg.message, MessageType::Create);
-    //     let mut wrap = Msg::new()
-    //         .set_msg_type(MessageType::Create)
-    //         .build();
+        println!("[MAIN] received: {:?}", msg.message);
+        assert_eq!(msg.message, MessageType::Create);
+        let mut wrap = Msg::new()
+            .set_msg_type(MessageType::Create)
+            .build();
 
-    //     let p = match msg.post {
-    //         Some(post) => post,
-    //         None => {
-    //             // fail-fast
-    //             return Some(String::from("No post was provided!"));
-    //         }
-    //     };
+        let p = match msg.post {
+            Some(post) => post,
+            None => {
+                // fail-fast
+                return Some(String::from("No post was provided!"));
+            }
+        };
 
-    //     wrap.items_mut().push(Arc::new(Resource::new(Model::Post(p))));
-    //     match self.to_cache.send(Arc::new(wrap)) {
-    //         Ok(val) => {
-    //             println!("Sucessfully sent and got in return: {:?}", val);
-    //         }
-    //         Err(e) => {
-    //             println!(
-    //                 "There was an error communicating with the cache! Err: {:?}",
-    //                 e
-    //             );
-    //             return Some(String::from(
-    //                 "There was an error communicating with the cache.",
-    //             ));
-    //         }
-    //     };
+        wrap.items.push(Arc::new(Resource::new(Model::Post(p))));
+        match self.to_cache.send(Arc::new(wrap)) {
+            Ok(val) => {
+                println!("Sucessfully sent and got in return: {:?}", val);
+            }
+            Err(e) => {
+                println!(
+                    "There was an error communicating with the cache! Err: {:?}",
+                    e
+                );
+                return Some(String::from(
+                    "There was an error communicating with the cache.",
+                ));
+            }
+        };
 
-    //     let resp = match self.from_cache.recv() {
-    //         Ok(val) => val.items.clone(), // @TODO: figure out how to avoid clone/copy
-    //         Err(e) => {
-    //             return Some(String::from("Error receiving from channel (from cache)."));
-    //         }
-    //     };
-    //     println!("resp: {:?}", resp);
+        let resp = match self.from_cache.recv() {
+            Ok(val) => val.items.clone(), // @TODO: figure out how to avoid clone/copy
+            Err(e) => {
+                return Some(String::from("Error receiving from channel (from cache)."));
+            }
+        };
+        println!("resp: {:?}", resp);
 
-    //     let output: Vec<Post> = resp.iter().map(|x| (*x.data).clone()).collect();
-    //     match self.serialize_and_send_posts(output.as_slice()) {
-    //         Ok(o) => None,
-    //         Err(e) => Some(format!("Err: {:?}", e)),
-    //     }
+        let output: Vec<Model> = resp.iter().map(|x| x.data.clone()).collect();
+        match self.serialize_and_send_posts(output.as_slice()) {
+            Ok(o) => None,
+            Err(e) => Some(format!("Err: {:?}", e)),
+        }
     }
 
     fn handle_manifest_msg(&self, msg: WSMessage) -> Option<String> {
@@ -394,140 +391,146 @@ impl Connection {
     //     }
     }
     fn handle_update_msg(&mut self, msg: WSMessage) -> Option<String> {
+        println!("[MAIN] received: {:?}", msg.message);
+        assert_eq!(msg.message, MessageType::Update);
+        let mut wrap = Msg::new()
+            .set_msg_type(MessageType::Update)
+            .build();
+
+        // does the request have a Post ID?
+        let post = match msg.post {
+            Some(post) => post,
+            None => {
+                // fail-fast
+                return Some(String::from("No post ID was provided!"));
+            }
+        };
+        {
+            wrap.items.push(Arc::new(Resource::new(Model::Post(Post::new()))));
+        }
+        println!("WRAP: {:?}", wrap.items);
+
+        match self.to_cache.send(Arc::new(wrap)) {
+            Ok(val) => {
+                println!("Sucessfully sent and got in return: {:?}", val);
+            }
+            Err(e) => {
+                println!(
+                    "There was an error communicating with the cache! Err: {:?}",
+                    e
+                );
+            }
+        };
+        let changes = match self.from_cache.recv() {
+            Ok(val) => Ok(val),
+            Err(e) => Err(String::from("Error receiving from channel (from cache).")),
+        };
+
+        // @TODO: This is the actual update sending code. Could be optimized greatly.
+        if let Ok(updated_data) = changes {
+            let mut watchers: Vec<Vec<i32>> = vec![];
+            let mut posts: Vec<Post> = vec![];
+
+            for result_set in &updated_data.items {
+                println!("RS: {:?}", result_set);
+                match result_set.data {
+                    Model::Post(ref post) => posts.push(post.clone()),
+                    _ => unimplemented!(),
+                }
+                watchers.push(result_set.watchers.clone());
+            }
+            println!("posts: {:?}, watchers: {:?}", posts, watchers);
+
+            // @TODO: This could be simplified somewhat or abstracted into functions/parts
+            match &mut self.parent {
+                Some(val) => match val.try_borrow_mut() {
+                    Ok(parent) => {
+                        for c in &parent.connections {
+                            println!("Connection --> {:?}", c);
+                            let id = c.tx.connection_id();
+                            if let Some(matched_connection) =
+                                watchers.iter().flat_map(|y| y).find(|x| **x == id as i32)
+                            {
+                                let serialized = serde_json::to_string(&posts)
+                                    .expect("Uh-oh... JSON serialization error!~");
+
+                                println!("Serialized content (Update): {}", serialized);
+                                let send_result = c.tx.send(serialized);
+                                if send_result.is_err() {
+                                    return Some(format!("Error: {:?}", send_result.unwrap_err()));
+                                }
+                                return None;
+                            } else {
+                                println!("There was no matched connection for: {}. It does not need to be updated.", id);
+                            }
+                        }
+                    }
+                    Err(e) => println!("Error: {:?}!", e),
+                },
+                None => println!("None. Did not unwrap."),
+            }
+        }
         None
-    //     println!("[MAIN] received: {:?}", msg.message);
-    //     assert_eq!(msg.message, MessageType::Update);
-    //     let mut wrap = Msg::new()
-    //         .set_msg_type(MessageType::Update)
-    //         .build();
-
-    //     // does the request have a Post ID?
-    //     let post = match msg.post {
-    //         Some(post) => post,
-    //         None => {
-    //             // fail-fast
-    //             return Some(String::from("No post ID was provided!"));
-    //         }
-    //     };
-    //     {
-    //         wrap.items_mut().push(Arc::new(Resource::new(Model::Post(Post::new()))));
-    //     }
-    //     println!("WRAP: {:?}", wrap.items());
-
-    //     match self.to_cache.send(Arc::new(wrap)) {
-    //         Ok(val) => {
-    //             println!("Sucessfully sent and got in return: {:?}", val);
-    //         }
-    //         Err(e) => {
-    //             println!(
-    //                 "There was an error communicating with the cache! Err: {:?}",
-    //                 e
-    //             );
-    //         }
-    //     };
-    //     let changes = match self.from_cache.recv() {
-    //         Ok(val) => Ok(val.items.clone()),
-    //         Err(e) => Err(String::from("Error receiving from channel (from cache).")),
-    //     };
-
-    //     // @TODO: This is the actual update sending code. Could be optimized greatly.
-    //     if let Ok(updated_data) = changes {
-    //         let (watchers, posts): (Vec<Vec<i32>>, Vec<Post>) = updated_data
-    //             .iter()
-    //             .map(|x| (x.watchers.clone(), x.data.clone()))
-    //             .unzip();
-
-    //         // @TODO: This could be simplified somewhat or abstracted into functions/parts
-    //         match &mut self.parent {
-    //             Some(val) => match val.try_borrow_mut() {
-    //                 Ok(parent) => {
-    //                     for c in &parent.connections {
-    //                         println!("Connection --> {:?}", c);
-    //                         let id = c.tx.connection_id();
-    //                         if let Some(matched_connection) =
-    //                             watchers.iter().flat_map(|y| y).find(|x| **x == id as i32)
-    //                         {
-    //                             let serialized = serde_json::to_string(&posts)
-    //                                 .expect("Uh-oh... JSON serialization error!~");
-
-    //                             println!("Serialized content (Update): {}", serialized);
-    //                             let send_result = c.tx.send(serialized);
-    //                             if send_result.is_err() {
-    //                                 return Some(format!("Error: {:?}", send_result.unwrap_err()));
-    //                             }
-    //                             return None;
-    //                         } else {
-    //                             println!("There was no matched connection for: {}. It does not need to be updated.", id);
-    //                         }
-    //                     }
-    //                 }
-    //                 Err(e) => println!("Error: {:?}!", e),
-    //             },
-    //             None => println!("None. Did not unwrap."),
-    //         }
-    //     }
-    //     None
     }
     fn handle_watch_msg(&self, msg: WSMessage) -> Option<String> {
-        None
-    //     println!("[MAIN] received: {:?}", msg.message);
-    //     assert_eq!(msg.message, MessageType::Watch);
-    //     let mut wrap = Msg::new()
-    //         .set_msg_type(MessageType::Watch)
-    //         .build();
+        println!("[MAIN] received: {:?}", msg.message);
+        assert_eq!(msg.message, MessageType::Watch);
+        let mut wrap = Msg::new()
+            .set_msg_type(MessageType::Watch)
+            .build();
 
-    //     // does the request have a Post ID?
-    //     let post_id = match msg.id {
-    //         Some(post_id) => post_id,
-    //         None => {
-    //             // fail-fast
-    //             return Some(String::from("No post ID was provided!"));
-    //         }
-    //     };
-    //     let mut post = Post::new();
-    //     post.id = post_id;
-    //     let mut resource = Resource::new(Model::Post(Post::new()));
+        // does the request have a Post ID?
+        let post_id = match msg.id {
+            Some(post_id) => post_id,
+            None => {
+                // fail-fast
+                return Some(String::from("No post ID was provided!"));
+            }
+        };
+        let mut post = Post::new();
+        post.id = post_id;
+        let mut resource = Resource::new(Model::Post(Post::new()));
 
-    //     let token = self.tx.token();
-    //     let conn_id = self.tx.connection_id();
-    //     println!("TOKEN: {:?}", token.0);
-    //     println!("Connection ID: {:?}", conn_id);
-    //     println!("Post ID: {:?}", post_id);
+        let token = self.tx.token();
+        let conn_id = self.tx.connection_id();
+        println!("TOKEN: {:?}", token.0);
+        println!("Connection ID: {:?}", conn_id);
+        println!("Post ID: {:?}", post_id);
 
-    //     // add watch to resource
-    //     resource.add_watch(conn_id as i32);
-    //     wrap.connection_id = conn_id as i32;
+        // add watch to resource
+        resource.add_watch(conn_id as i32);
+        wrap.connection_id = conn_id as i32;
 
-    //     // wrap it up and send
-    //     wrap.items.push(Arc::new(resource));
-    //     match self.to_cache.send(Arc::new(wrap)) {
-    //         Ok(val) => {
-    //             println!("Sucessfully sent and got in return: {:?}", val);
-    //         }
-    //         Err(e) => {
-    //             println!(
-    //                 "There was an error communicating with the cache! Err: {:?}",
-    //                 e
-    //             );
-    //             return Some(String::from(
-    //                 "There was an error communicating with the cache.",
-    //             ));
-    //         }
-    //     };
+        // wrap it up and send
+        wrap.items.push(Arc::new(resource));
+        match self.to_cache.send(Arc::new(wrap)) {
+            Ok(val) => {
+                println!("Sucessfully sent and got in return: {:?}", val);
+            }
+            Err(e) => {
+                println!(
+                    "There was an error communicating with the cache! Err: {:?}",
+                    e
+                );
+                return Some(String::from(
+                    "There was an error communicating with the cache.",
+                ));
+            }
+        };
 
-    //     let resp = match self.from_cache.recv() {
-    //         Ok(val) => val.items.clone(), // @TODO: figure out how to avoid clone/copy
-    //         Err(e) => {
-    //             return Some(String::from("Error receiving from channel (from cache)."));
-    //         }
-    //     };
-    //     println!("resp: {:?}", resp);
+        let resp = match self.from_cache.recv() {
+            Ok(val) => val.items.clone(), // @TODO: figure out how to avoid clone/copy
+            Err(e) => {
+                return Some(String::from("Error receiving from channel (from cache)."));
+            }
+        };
+        println!("resp: {:?}", resp);
 
-    //     let output = vec![];
-    //     match self.serialize_and_send_posts(output.as_slice()) {
-    //         Ok(o) => None,
-    //         Err(e) => Some(format!("Err: {:?}", e)),
-    //     }
+        let output = vec![];
+        match self.serialize_and_send_posts(output.as_slice()) {
+            Ok(o) => None,
+            Err(e) => Some(format!("Err: {:?}", e)),
+        }
     }
 }
 
