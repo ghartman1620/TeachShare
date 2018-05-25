@@ -1,17 +1,27 @@
 <template>
     <div>
-        <div v-for="element in this.post1" class="post-element-container">
-            <div class="card-column column">
+        <div class=" col-12 container" :key="index" v-for="(element,index) in storeElements">
+            <div class="post-element-container">
+                <div class="card-column column">
+                    <div class="col-12 container">
+                        <div class="post-element card">
+                            <post-element :element="element" :index="index"></post-element>
+                        </div>
+                    </div>
 
-                <div class="col-11 container">
-                    <div class="post-element card">
-                        <post-element :element="element"></post-element>
+                    <div class="justify-content-start">
+                        <div id="mx-auto col-9 arrange-btn-group" class="btn-group-horizontal">
+
+                            <button class="btn btn-dark" id="up-button" style="z-index: 2;" @click="moveElementUp(index)"><img width=20 height=20 src="/static/caret-square-up.png"></button>
+                            <button class="btn btn-dark" id="down-button" style="z-index: 2;" @click="moveElementDown(index)"><img width=20 height=20 src="/static/caret-square-down.png"></button>
+                            <button class="btn btn-danger" id="garbage-button" @click="removeElement(index)"><img height=20 src="/static/trash-icon.png"></button>
+                            <button class="btn btn-primary" id="edit-button" @click="openEditor(index)"><img height=20 src="/static/edit-icon.png"></button>
+
+                        </div>
                     </div>
                 </div>
-
-
             </div>
-
+            <br>
         </div>
     </div>
 </template>
