@@ -144,6 +144,7 @@ impl Handler for Connection {
                 panic!("Received binary message");
             } // ..
             Message::Text(text) => {
+                println!("TEXT: {:?}", text);
                 println!("RC: {:?}", self.parent);
                 match &mut self.parent {
                     Some(val) => {
@@ -325,70 +326,69 @@ impl Connection {
     }
 
     fn handle_manifest_msg(&self, msg: WSMessage) -> Option<String> {
-        None
-    //     println!("[MAIN] received: {:?}", msg.message);
-    //     assert_eq!(msg.message, MessageType::Manifest);
+        println!("[MAIN] received: {:?}", msg.message);
+        assert_eq!(msg.message, MessageType::Manifest);
 
-    //     let post_versions = match msg.manifest {
-    //         Some(post_versions) => post_versions,
-    //         None => return Some(String::from("No manifest was provided")),
-    //     };
-    //     if post_versions.len() == 0 {
-    //         let posts = vec![];
-    //         self.serialize_and_send_posts(posts.as_slice());
-    //         return None;
-    //     } else {
-    //         println!("manifest: {:?}", post_versions);
-    //         let mut wrap = Msg::new()
-    //             .set_msg_type(MessageType::Manifest)
-    //             .build();
-    //         for post_version in post_versions {
-    //             println!(
-    //                 "[MAIN] manifest handler: adding post id {} version {} to cache list",
-    //                 post_version.id, post_version.version
-    //             );
-    //             let mut p = Post::new();
-    //             p.id = post_version.id;
-    //             let mut resource = Resource::new(Model::Post(p));
-    //             resource.version = post_version.version;
-    //             wrap.items.push(Arc::new(resource));
-    //         }
-    //         println!("{:?}", wrap.items());
-    //         match self.to_cache.send(Arc::new(wrap)) {
-    //             Ok(val) => {
-    //                 println!("Sucessfully sent and got in return: {:?}", val);
-    //             }
-    //             Err(e) => {
-    //                 println!(
-    //                     "There was an error communicating with the cache! Err: {:?}",
-    //                     e
-    //                 );
-    //                 return Some(String::from(
-    //                     "There was an error communicating with the cache.",
-    //                 ));
-    //             }
-    //         };
+        let post_versions = match msg.manifest {
+            Some(post_versions) => post_versions,
+            None => return Some(String::from("No manifest was provided")),
+        };
+        if post_versions.len() == 0 {
+            let posts = vec![];
+            self.serialize_and_send_posts(posts.as_slice());
+            return None;
+        } else {
+            println!("manifest: {:?}", post_versions);
+            let mut wrap = Msg::new()
+                .set_msg_type(MessageType::Manifest)
+                .build();
+            for post_version in post_versions {
+                println!(
+                    "[MAIN] manifest handler: adding post id {} version {} to cache list",
+                    post_version.id, post_version.version
+                );
+                let mut p = Post::new();
+                p.id = post_version.id;
+                let mut resource = Resource::new(Model::Post(p));
+                resource.version = post_version.version;
+                wrap.items.push(Arc::new(resource));
+            }
+            println!("{:?}", wrap.items);
+            match self.to_cache.send(Arc::new(wrap)) {
+                Ok(val) => {
+                    println!("Sucessfully sent and got in return: {:?}", val);
+                }
+                Err(e) => {
+                    println!(
+                        "There was an error communicating with the cache! Err: {:?}",
+                        e
+                    );
+                    return Some(String::from(
+                        "There was an error communicating with the cache.",
+                    ));
+                }
+            };
 
-    //         let resp = match self.from_cache.recv() {
-    //             Ok(val) => val.items.clone(),
-    //             Err(e) => {
-    //                 return Some(String::from("Error receiving from channel (from cache)."));
-    //             }
-    //         };
-    //         println!("[MAIN] resp: {:?}", resp);
-    //         let output: Vec<Option<Post>> = resp.iter().map(|post| {
-    //             match post.data {
-    //                 Model::Post(p) => Some(p),
-    //                 _ => None,
-    //             }
-    //         }).filter(|post| post.is_some())
-    //             .map(|post| post.unwrap())
-    //             .collect();
-    //         match self.serialize_and_send_posts(output.as_slice()) {
-    //             Err(e) => Some(format!("Error: {:?}", e)),
-    //             _ => None,
-    //         }
-    //     }
+            let resp = match self.from_cache.recv() {
+                Ok(val) => val.items.clone(),
+                Err(e) => {
+                    return Some(String::from("Error receiving from channel (from cache)."));
+                }
+            };
+            println!("[MAIN] resp: {:?}", resp);
+            let output: Vec<Model> = resp.iter().map(|post| {
+                match &post.data {
+                    Model::Post(p) => Some(p),
+                    _ => None,
+                }
+            }).filter(|post| post.is_some())
+                .map(|post| Model::Post(post.unwrap().clone()))
+                .collect();
+            match self.serialize_and_send_posts(output.as_slice()) {
+                Err(e) => Some(format!("Error: {:?}", e)),
+                _ => None,
+            }
+        }
     }
     fn handle_update_msg(&mut self, msg: WSMessage) -> Option<String> {
         println!("[MAIN] received: {:?}", msg.message);
@@ -448,9 +448,12 @@ impl Connection {
                         for c in &parent.connections {
                             println!("Connection --> {:?}", c);
                             let id = c.tx.connection_id();
+                            let all_watchers = watchers.iter().flat_map(|y| y).find(|x| **x == id as i32);
+                            println!("WATCHES ---> {:?}, LOOKING FOR ----> {:?}, MATCHED_WATCHES ---> {:?}", watchers, id, all_watchers);
                             if let Some(matched_connection) =
                                 watchers.iter().flat_map(|y| y).find(|x| **x == id as i32)
-                            {
+                            { 
+                                println!("******************** SENDING TO: {:?} ***************", matched_connection);
                                 let serialized = serde_json::to_string(&posts)
                                     .expect("Uh-oh... JSON serialization error!~");
 
