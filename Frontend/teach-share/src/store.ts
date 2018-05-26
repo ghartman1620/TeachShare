@@ -78,7 +78,6 @@ function circularRecordChecker(record: any, seen: any[] = []) {
     return false;
 }
 
-console.log(PostCreateService);
 const storeOptions: StoreOptions<IRootState> = {
     strict: false, // process.env.NODE_ENV !== "production",
     modules: {
@@ -106,25 +105,35 @@ WebSocket.getInstance().addMessageListener( (msg) => {
     const val = JSON.parse(msg.data);
     console.log("Value is: ");
     console.log(val);
+    console.log(val.Post);
 
     const db: Database = Database.getInstance();
-    for (const post of val) {
-        console.log("Store listener pkifying a post");
-        console.log(post);
-        const p: Post = Post.pkify(post);
-        // check if the post we got from the WS is saved in the DB.
-        db.getPost(p.pk as number).then((dbCurrentPost) => {
-            // If it is, we should save the post we got - because it's a post we've decided in the past to cache
-            db.putPost(p);
-        }).catch(); // If not, DON'T save it, because we're not saving every single post that arrives.
+    for (const item of val) {
+        console.log("Store listener looking at an item");
+        console.log(item);
+        console.log(item.Post);
+        if(item.Post){
+            let post = item.Post;
+            const p: Post = Post.pkify(post);
+            console.log(p);
+            // check if the post we got from the WS is saved in the DB.
+            db.getPost(p.pk as number).then((dbCurrentPost) => {
+                // If it is, we should save the post we got - because it's a post we've decided in the past to cache
+                db.putPost(p);
+            }).catch(); // If not, DON'T save it, because we're not saving every single post that arrives.
 
-        // for all posts - db saved and otherwise, send it over to the store to get rendered by components.
-        if (typeof p.pk !== "undefined" && getMap(store).has(p.pk!.toString())) {
-            // it already exists in the store
-            mutUpdate(store, p);
+            // for all posts - db saved and otherwise, send it over to the store to get rendered by components.
+            if (typeof p.pk !== "undefined" && getMap(store).has(p.pk!.toString())) {
+                // it already exists in the store
+                console.log("doing mut update with our websocket post");
+                mutUpdate(store, p);
+            } else {
+                console.log("doing mut create with our websocket post " );
+                // it didn't already exist in the store - now it does!
+                mutCreate(store, p);
+            }
         } else {
-            // it didn't already exist in the store - now it does!
-            mutCreate(store, p);
+            console.log("got a non-post item from store listener, doing nothing");
         }
     }
     return undefined;

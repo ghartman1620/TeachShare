@@ -23,9 +23,7 @@ export default class Database {
 
     private dbPromise: Promise<DB>;
     private constructor() {
-        console.log("Constructing idb");
         this.dbPromise = idb.open("teachshare", 1, (upgradeDB) => {
-            console.log("opening complete, creating object store");
             upgradeDB.createObjectStore("posts", {keyPath: "pk"});
         });
     }
@@ -64,20 +62,22 @@ export default class Database {
         indexeddb.
     */
     public getPost(pk: number): Promise<Post>{
+        console.log("sending get request for id " + pk);
         return new Promise((resolve, reject) => {
             this.dbPromise.then((db) => {
                 db.transaction("posts")
                 .objectStore("posts").get(pk)
                 .then((post) => {
+                    
                     if (post === undefined) {
+                        console.log("post " + pk + " not found ind b");
                         reject();
                     } else {
-                        console.log("Database pkifying post: ");
-                        console.log(post);
+                        console.log("post " + pk + " found in db");
                         let p: Post = Post.pkify(post);
                         resolve(p);
                     }
-                }).catch((err) => {console.log(err);});
+                }).catch((err) => {console.error(err);});
             });
         });
     }
@@ -119,3 +119,8 @@ export default class Database {
         });
     }
 }
+Database.getInstance().manifest().then((manifest) => {
+    for (const idAndVersion of manifest) {
+        Database.getInstance().deletePost(idAndVersion!.id);
+    }
+});
