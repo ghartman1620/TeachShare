@@ -251,7 +251,8 @@ class PostPermissionViewSet(views.APIView):
             return Response({'error' : 'required field: \'post\''},status=status.HTTP_400_BAD_REQUEST)
         except Post.DoesNotExist as e:
             return Response({'error' : 'that post does not exist'}, status=status.HTTP_404_NOT_FOUND)
-        
+        except ValueError as e:
+            return Response({'error' : 'invalid type for param post'}, status=status.HTTP_400_BAD_REQUEST)
         if request.user == post.user:
             permission = None
             try:
@@ -272,8 +273,15 @@ class PostPermissionViewSet(views.APIView):
             users = []
             try:
                 for u in request.data['users']:
+                        
                     try:
-                        user = User.objects.get(pk=u)
+                        user = None
+                        if isinstance(u, str):
+                            user = User.objects.get(username=u)
+                        elif isinstance(u, int):
+                            user = User.objects.get(pk=u)
+                        else:
+                            return Response({'error' : 'Users should be a string username or number pk'}, status=status.HTTP_404_BAD_REQUEST)
                     except User.DoesNotExist:
                         return Response({'error' : 'user does not exist: ' + u},status=status.HTTP_400_BAD_REQUEST)
                     

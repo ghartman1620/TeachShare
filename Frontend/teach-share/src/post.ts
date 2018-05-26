@@ -68,6 +68,7 @@ export class InProgressPost{
                 post.grade = response.data.grade;
                 post.subject = response.data.subject;
                 post.standards = response.data.standards;
+                post.userPk = response.data.user;
                 console.log("subject: " + response.data.subject);
                 //response: #days hh:mm:ss
                 console.log(response.data.length);

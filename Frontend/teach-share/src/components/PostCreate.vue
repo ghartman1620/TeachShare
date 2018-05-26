@@ -113,6 +113,9 @@
                                  <div v-if="inProgressPost.original_user" style="text-align: center;">
                                     This post was derived from a post authored by {{inProgressPost.original_user}}
                                 </div>
+                                <router-link :to="{name: 'permission-add'}">
+                                    Share
+                                </router-link>
                             </div>
                         </div>
                         <br>

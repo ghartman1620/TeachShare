@@ -41,8 +41,8 @@ const Register = () =>
 
 const WebSocketComp = () =>
     import ( /* webpackChunkName: "register" */ "../components/WebSocket.vue");
-const MockDiff = () =>
-    import ( /* webpackChunkName: "mock-diff" */ "../components/MockDiff.vue");
+const PermissionAdd = () =>
+    import ( /* webpackChunkName: "permission-add" */ "../components/PermissionAdd.vue");
 
 
 Vue.use(Router);
@@ -50,10 +50,6 @@ Vue.use(Router);
 const router = new Router({
     mode: "history",
     routes: [
-        {
-            path : "/diff",
-            component: MockDiff
-        },
         {
             path: "/",
             component: Base,
@@ -63,7 +59,13 @@ const router = new Router({
                     path: "/create",
                     name: "create",
                     component: PostCreate,
-                    children: [{
+                    children: [
+                        {
+                            name: "permission-add",
+                            path: "share",
+                            component: PermissionAdd
+                        },
+                        {
                             name: "edit-text",
                             path: "text",
                             component: EditText
