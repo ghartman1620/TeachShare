@@ -1,7 +1,7 @@
 import Vue from "vue";
 import api from "./api";
 import Database from "./Database";
-import {Post, User} from "./models";
+import {ILayout, Post, User} from "./models";
 import {asLoggedIn} from "./router/index";
 import store from "./store";
 import WebSocket from "./WebSocket";
@@ -27,6 +27,12 @@ export class InProgressPost {
     public coreIdeas: number[];
     public practices: number[];
     public comments: any[];
+
+    // just added
+    public color: string;
+    public layout: ILayout;
+    public original_user?: User;
+
     /*
      * Creates an InProgressPost to be edited. if the optional post parameter does not exist creates an empty post.
      * Otherwise, loads in data from the Post.
@@ -50,19 +56,33 @@ export class InProgressPost {
             this.coreIdeas = post.coreIdeas ? post.coreIdeas : [];
             this.practices = post.practices ? post.practices : [];
             this.comments = post.comments ? post.comments : [];
+            // set defaults
+            this.color = post.color ? post.color : "#96e6b3";
+            this.layout = post.layout ? post.layout: {
+                x: 0,
+                y: 0,
+                w: 2,
+                h: 30,
+                i: "0", // This is how it was in the Django models as default
+                        // as wierd as that seems...
+            };
+
             if (!post.pk) {
                 console.error("InProgressPost error: constructor called with Post object with pk that does not exist");
             } else {
+                console.log("this.pk = post.pk", this.pk, post.pk);
                 this.pk = post.pk;
             }
             console.log("returning from in progress post ctor: post is");
             console.log(this);
         } else {
+            console.log("ELSE BLOCK IN post.ts");
+
             this.elements = [];
             this.title = "";
             this.tags = [];
             this.userPk = userid;
-            this.draft = false;
+            this.draft = true;
             this.pk = -1;
             this.grade = 0;
             this.subject = 0;
@@ -73,6 +93,18 @@ export class InProgressPost {
             this.coreIdeas = [];
             this.practices = [];
             this.comments = [];
+            // set defaults
+            this.color = "#96e6b3";
+            this.layout = {
+                x: 0,
+                y: 0,
+                w: 2,
+                h: 30,
+                i: "0", // This is how it was in the Django models as default 
+                        // as wierd as that seems...
+            };
+            this.original_user = undefined;
+            console.log(this);
         }
     }
 
@@ -244,6 +276,7 @@ export class InProgressPost {
         return p;
     }
     public saveDraft(): void {
+        console.log("saving post...");
         const post: InProgressPost = this;
         this.status = PostStatus.Saving;
         /*api.put("posts/" + this.pk + "/", this.json()).then(function(response){

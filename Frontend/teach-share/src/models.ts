@@ -213,14 +213,13 @@ export class ModelMap<V> implements IterableIterator<V> {
     }
 }
 
-interface ILayout {
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-    i: string, // @TODO: Ask jeff if this is really suppose to be a string
+export interface ILayout {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    i: string; // @TODO: Ask jeff if this is really suppose to be a string
 }
-
 
 export class Post extends Model {
     /*
@@ -303,13 +302,13 @@ export class Post extends Model {
         // set defaults
         this.color = "#96e6b3";
         this.layout = {
-            x: 0, 
-            y: 0, 
-            w: 2, 
-            h: 30, 
-            i: "0", // This is how it was in the Django models as default 
+            x: 0,
+            y: 0,
+            w: 2,
+            h: 30,
+            i: "0", // This is how it was in the Django models as default
                     // as wierd as that seems...
-        }
+        };
     }
 
     // Creates an object of the form the websocket requires for deserialization:
@@ -319,17 +318,21 @@ export class Post extends Model {
     public toApiObject(): object {
         const obj: any = {
             user_id: this.user.pk,
+            original_user_id: undefined,
             id: this.pk,
             disciplinary_core_ideas: this.coreIdeas,
             crosscutting_concepts: this.concepts,
             likes: 0,
             ...this as object,
         };
+        console.log(obj, this.user.pk);
         delete obj.concepts;
         delete obj.coreIdeas;
         delete obj.pk;
         delete obj.user;
+        delete obj.original_user;
         delete obj.comments;
+        console.log(obj);
         return obj;
     }
 

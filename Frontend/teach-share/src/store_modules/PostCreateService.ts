@@ -149,7 +149,11 @@ export const mutations = {
 
 export const actions = {
     beginPost: (context: PostContext, p: BeginPostArg) => {
+        console.log("Begin Post vuex --> ", p);
+
+        // state mutation?
         context.state.post = undefined;
+
         mutBeginPost(context, p);
         // context.commit("BEGIN_POST", user);
     },

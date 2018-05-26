@@ -15,11 +15,6 @@ use std::time::Duration;
 
 const MAX_DB_SAVE_TIMEOUT: Duration = Duration::from_millis(200);
 
-// pub type SafeArcMsg = Arc<Msg<'static> + Send + Sync>;
-// type PostResource = Resource<Post>;
-
-// type ArcWrapper()
-
 pub trait Cache {
     type Key;
     type Entry;
@@ -260,10 +255,10 @@ fn handle_get(msg: &Arc<Msg>, cash: &mut RefCellCache, ret_pipe: &Sender<Arc<Msg
         .set_msg_type(MessageType::Get)
         .build();
 
-    {
-        let mut cache = cash.borrow_mut();
-        let written = cache.put(ID::Post(1), Resource::new(Model::Post(Post::new())));
-    }
+    // {
+    //     let mut cache = cash.borrow_mut();
+    //     let written = cache.put(ID::Post(1), Resource::new(Model::Post(Post::new())));
+    // }
 
     for m in &msg.items {
         let mut dne_flag = false;
@@ -595,8 +590,11 @@ fn handle_update(
 ) {
     let mut cache_mut = cash.borrow_mut();
     let all_watchers = &mut vec![];
+
+
     for m in &msg.items {
         {
+            println!("M ---------------------> {:?}", *m);
             match &m.data {
                 Model::Post(post) => {
                     let resource = cache_mut.get(ID::Post(post.id));

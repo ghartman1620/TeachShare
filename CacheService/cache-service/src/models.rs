@@ -8,46 +8,6 @@ use std::sync::Arc;
 use diesel::Insertable;
 use schema::posts_post;
 
-// #[derive(Debug)]
-// pub struct NoIDProvided {
-//     details: String,
-// }
-
-// impl NoIDProvided {
-//     pub fn new(msg: &str) -> NoIDProvided {
-//         NoIDProvided {
-//             details: msg.to_string(),
-//         }
-//     }
-// }
-
-// #[derive(Debug)]
-// pub enum CacheError {
-//     NoIDProvided(),
-// }
-
-/// Error Trait definition:
-///
-/// pub trait Error: Debug + Display {
-///     fn description(&self) -> &str;
-///     fn cause(&self) -> Option<&Error> { ... }
-/// }
-// impl error::Error for NoIDProvided {
-//     fn description(&self) -> &str {
-//         println!("No ID (pk) provided for request");
-//         "No ID (pk) provided for request"
-//     }
-//     // fn cause(&self) -> Option<&error::Error> {
-//     //     let res = NoIDProvided::new("No ID (pk) was provided");
-//     //     Some(&res)
-//     // }
-// }
-
-// impl fmt::Display for NoIDProvided {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         write!(f, "No ID provided.")
-//     }
-// }
 
 #[derive(Debug)]
 pub struct UserPermission {
@@ -63,6 +23,14 @@ pub enum Permission {
     // etc...
 }
 
+/// This is the Value field for entries in the cache. They can be
+/// matched by their type, and then return the value as
+/// the parameter. 
+///
+/// Implementation note: This will always be exactly the size of the
+/// largest struct. Luckily most of the large fields are simple
+/// strings/json and are referred to via reference. So their actual
+/// size isn't that bad.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Model {
     User(User),
@@ -70,6 +38,9 @@ pub enum Model {
     Comment(Comment),
 }
 
+
+// This is KEY field for HashMap entries that make it so that we can still refer 
+// to an entry only by their id (pk), and have no collision with different types.
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub enum ID {
     Post(i32),
@@ -140,9 +111,6 @@ pub enum ModelType {
     Comment,
 }
 
-// pub type Arc<Msg> = Arc<Item + Send + Sync>;
-// pub type ArcType<T: Item + Send + Sync> = Arc<T>;
-
 #[derive(Clone)]
 pub struct Msg {
     pub msg_type: MessageType,
@@ -152,9 +120,8 @@ pub struct Msg {
     pub connection_id: i32,
 }
 
-/// Wrapper implements the Msg trait so it can be used generically. It also uses the
-/// common standard library/crate pattern for building objects calle the 'builder pattern'.
-/// This can be found at: https://abronan.com/rust-trait-objects-box-and-rc/
+/// Msg uses the common standard library/crate pattern for building objects called
+///  the 'builder pattern'. This can be found at: https://abronan.com/rust-trait-objects-box-and-rc/
 impl Msg {
     pub fn new() -> Msg {
         Msg {
@@ -167,10 +134,6 @@ impl Msg {
     }
     pub fn set_msg_type(&mut self, msg_type: MessageType) -> &mut Self {
         self.msg_type = msg_type;
-        self
-    }
-    pub fn add_error(&mut self, err: String) -> &mut Self {
-        self.errors.push(err);
         self
     }
     pub fn set_items(&mut self, items: &Vec<Resource>, watchers: &[Vec<i32>]) -> &mut Self {
@@ -197,10 +160,6 @@ impl Msg {
         for a in temp {
             actual.push(a.clone());
         }
-
-        // finally, actually assign the generated vector of Resource<_> to the
-        // self.items of this .. object..? What would you call an instantiation
-        // of a struct in rust..? Not an object, surely...
         self.items = actual;
         self
     }
@@ -211,108 +170,6 @@ impl Msg {
         self.clone()
     }
 }
-
-// pub trait Msg<'a> {
-//     fn data_type(&self) -> ModelType;
-//     fn msg_type(&self) -> MessageType;
-//     fn timestamp(&self) -> i32;
-//     fn items(&self) -> &Vec<Arc<Msg>>;
-//     fn items_mut(&mut self) -> &mut Vec<Arc<Msg>>;
-//     fn has_error(&self) -> bool;
-//     fn errors(&self) -> &Vec<String>;
-//     fn errors_mut(&mut self) -> &mut Vec<String>;
-//     fn get_connection_id(&self) -> i32;
-// }
-
-// impl<'a> fmt::Debug for Msg<'a> + Send + Sync {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         write!(f, "[{:?}] -> {:?}", self.msg_type(), self.items())
-//     }
-// }
-
-// impl fmt::Debug for Item + Send + Sync {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         write!(
-//             f,
-//             "[Post] -> {:?}, [Watchers] -> {:?}",
-//             self.get_data(),
-//             self.get_watchers()
-//         )
-//     }
-// }
-
-// impl<'a> Msg<'a> {
-//     // what do I do here?
-// }
-
-// impl<'a> Msg<'a> for Wrapper {
-//     fn data_type(&self) -> ModelType {
-//         self.model_type.clone()
-//     }
-//     fn msg_type(&self) -> MessageType {
-//         self.msg_type.clone()
-//     }
-//     // fn data(&self) -> Self;
-//     fn timestamp(&self) -> i32 {
-//         self.timestamp
-//     }
-//     fn items(&self) -> &Vec<Arc<Msg>> {
-//         &self.items
-//     }
-//     fn items_mut(&mut self) -> &mut Vec<Arc<Msg>> {
-//         &mut self.items
-//     }
-//     fn has_error(&self) -> bool {
-//         self.errors.len() > 0
-//     }
-//     fn errors(&self) -> &Vec<String> {
-//         &self.errors
-//     }
-//     fn errors_mut(&mut self) -> &mut Vec<String> {
-//         &mut self.errors
-//     }
-//     fn get_connection_id(&self) -> i32 {
-//         self.connection_id
-//     }
-// }
-
-// pub trait Item {
-//     fn new(&self, post: Post, watchers: Vec<i32>) -> Resource<Post>;
-//     fn get_data(&self) -> &Post;
-//     fn get_data_mut(&mut self) -> &mut Post;
-//     fn get_data_clone(&self) -> Post;
-//     fn get_watchers(&self) -> &Vec<i32>;
-//     fn get_watchers_mut(&mut self) -> &mut Vec<i32>;
-//     fn get_version(&self) -> u64;
-// }
-
-// pub type PostResource = Resource<Post>;
-
-// impl Item for Resource<Post> {
-//     fn new(&self, post: Post, watchers: Vec<i32>) -> Resource<Post> {
-//         let mut resource = Resource::new(post);
-//         resource.watchers = watchers;
-//         resource
-//     }
-//     fn get_data(&self) -> &Post {
-//         &self.data
-//     }
-//     fn get_data_mut(&mut self) -> &mut Post {
-//         &mut self.data
-//     }
-//     fn get_data_clone(&self) -> Post {
-//         self.data.clone()
-//     }
-//     fn get_watchers(&self) -> &Vec<i32> {
-//         &self.watchers
-//     }
-//     fn get_watchers_mut(&mut self) -> &mut Vec<i32> {
-//         &mut self.watchers
-//     }
-//     fn get_version(&self) -> u64 {
-//         self.version
-//     }
-// }
 
 #[derive(Queryable, Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct User {

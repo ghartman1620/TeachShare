@@ -91,9 +91,12 @@ export default class WebSocket {
         });
     }
     public sendUpdate(p: Post): MessageStatus {
+        const changed = p.toApiObject();
+        // little hack to fix weird string id situation for user_id.
+        (changed as any).user_id = parseInt((changed as any).user_id, 10);
         return this.send({
             message: MessageType.Update,
-            post: p.toApiObject()
+            post: changed
         });
         // console.error("Update message sent - not yet implemented!");
         // return MessageStatus.ConnectionClosed;

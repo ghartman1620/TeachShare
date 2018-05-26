@@ -241,6 +241,7 @@ import {User, Post} from "../models";
 
 import * as Cookie from "tiny-cookie";
 import WebSocket from "../WebSocket";
+import { debug } from 'util';
 
 
 function isBlank(str) {
@@ -297,8 +298,10 @@ export default class PostCreate extends Vue {
     // of loading in a post's current info when you load up a post.
 
     get userPosts(): Post[] {
+        console.log("userPosts");
         const store = this.$store;
         const userPosts = getPosts(this.$store).filter( (p) => {
+            console.log(p);
             // getLoggedInUser(store).pk seems to be a string at runtime.
             // It obviously ought to be a number, but somewhere
             // it gets assigned to a type-unsafe thing that winds up as a string.
@@ -451,16 +454,21 @@ export default class PostCreate extends Vue {
         this.beginPost(user.pk as number, post.pk as number);
     }
     public beginPost(userid: number, postid: number | undefined): void {
+        console.log("Begin Post.");
         let vm: PostCreate = this;
         if (postid !== undefined) {
+            console.log("fetchPostSubscribe");
             fetchPostSubscribe(this.$store, postid).then((p) => {
+                console.log("P: ", p);
                 beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p});
                 vm.postStatus = vm.SAVED;
             });
         } else {
+            console.log("beginPost else");
             beginPost(this.$store, {
                 userid: userid as number,
             });
+            this.postStatus = vm.SAVED;
         }
     }
 
@@ -489,43 +497,54 @@ export default class PostCreate extends Vue {
         redo(this.$store);
     }
     public async getUserPosts() {
+        console.log("getUserPosts");
         const vm: PostCreate = this;
         // @TODO: use store and Post model for this work
         // This is also all reloaded every time somebody reloads the page.. which is really quite no good.
         let nextPage = 1;
         do {
             var response;
+            console.log("response: ", response);
 
             response = await asLoggedIn(api.get(`/posts/?user=${this.getLoggedInUser.pk}&page=${nextPage.toString()}`));
+
             for (const post of response.data.results) {
                 if (post.pk !== -1){
+                    console.log("POST -----> post");
                     fetchPostSubscribe(this.$store, post.pk);
                 }
                 // this.userPosts.push(post);
             }
             nextPage++;
         } while (response.data.next !== null);
+        console.log("leaving getUserPosts");
     }
-    public created() {
+    created() {
         const inProgressPost: string | null = window.localStorage.getItem("inProgressPost");
+        console.log("IN-PROGRESS-POST -----> ", inProgressPost);
+        console.log("created.");
         if (inProgressPost === null) {
+            console.log("if");
             this.beginPost(
                 // ???? how on earth is this type string | undefined
                 // It's definitely just a number. Look at user.ts.
                 this.getLoggedInUser.pk as number,
                 undefined);
         } else {
+            console.log("else");
             this.getUserPosts();
             this.beginPost(
                 this.getLoggedInUser.pk as number, parseInt(inProgressPost as string));
             let store = this.$store;
             let userpk = this.getLoggedInUser.pk as number;
             let vm: PostCreate = this;
+            console.log("userpk, vm", userpk, vm);
             WebSocket.getInstance().addMessageListener((message) => {
                 console.log("Post create pkifying a post");
                 console.log(JSON.parse(message.data)[0]);
                 let post = Post.pkify(JSON.parse(message.data)[0]);
                 let inProgressPost = window.localStorage.getItem("inProgressPost");
+                
                 if (inProgressPost){
                     if (post.pk === parseInt(inProgressPost as string, 10)) {
                         beginPost(store,{userid: userpk, p: post});
@@ -537,10 +556,11 @@ export default class PostCreate extends Vue {
                 return undefined;
             });
         }
+        console.log("end created");
     }
 
-    public mounted() {
-
+    mounted() {
+        console.log("mounted");
         var vm: PostCreate = this;
         this.$on("submitElement", (element: any, index: number) => {
 
@@ -555,8 +575,10 @@ export default class PostCreate extends Vue {
         });
 
         this.$on("submitTagChanges", this.saveTagChanges)
+        console.log("End mounted");
     }
 };
+//# sourceURL=PostCreate.vue
 </script>
 
 

@@ -1,34 +1,4 @@
-/*
-Message for...
-Watch 
-{
-    "message": "watch"
-    "id" : number
-}
 
-Create
-{
-    "message": "create"
-    "post" : {
-        ...
-    }
-}
-
-Update,
-{
-    "message": "update"
-    "post" : {
-        "id" : number
-        ...
-    }
-}
-
-Get
-{
-    "message": "get"
-    "id" : number
-}
-*/
 /*!
  The websocket cache service is used for realtime communication between connected users.
 */
@@ -68,10 +38,8 @@ use std::thread;
 
 #[derive(Debug, Clone)]
 struct GrandSocketStation {
-    // represents the list of users
+    // represents the list of connections
     connections: Vec<Rc<Connection>>,
-    // represents the resource that are being watched by users
-    // watches: Vec<models::Resource>,
 }
 
 impl GrandSocketStation {
@@ -144,25 +112,6 @@ impl Handler for Connection {
                 panic!("Received binary message");
             } // ..
             Message::Text(text) => {
-                println!("TEXT: {:?}", text);
-                println!("RC: {:?}", self.parent);
-                match &mut self.parent {
-                    Some(val) => {
-                        match val.try_borrow_mut() {
-                            Ok(parent) => {
-                                println!("OK: {:?}", parent);
-                                println!("connections: {:?}", parent.connections);
-                                println!("connection count: {}", parent.connections.len());
-                                for c in &parent.connections {
-                                    println!("Connection --> {:?}", c);
-                                    // println!("Sender: {:?}", c.tx);
-                                }
-                            }
-                            Err(e) => println!("Error: {:?}!", e),
-                        }
-                    }
-                    None => println!("None. Did not unwrap."),
-                }
                 let json: Result<WSMessage, serde_json::Error> = serde_json::from_str(&text);
                 let response: Option<String> = match json {
                     Ok(msg) => {
@@ -184,7 +133,6 @@ impl Handler for Connection {
                 }
             }
         };
-        // self.tx.broadcast(msg)
         Ok(())
     }
 
@@ -333,10 +281,13 @@ impl Connection {
             Some(post_versions) => post_versions,
             None => return Some(String::from("No manifest was provided")),
         };
-        if post_versions.len() == 0 {
+        if post_versions.is_empty() {
             let posts = vec![];
-            self.serialize_and_send_posts(posts.as_slice());
-            return None;
+            match self.serialize_and_send_posts(posts.as_slice()) {
+                Ok(_) => {},
+                Err(e) => println!("Websocket Error: {:?}", e),
+            }
+            None
         } else {
             println!("manifest: {:?}", post_versions);
             let mut wrap = Msg::new()
@@ -406,7 +357,7 @@ impl Connection {
             }
         };
         {
-            wrap.items.push(Arc::new(Resource::new(Model::Post(Post::new()))));
+            wrap.items.push(Arc::new(Resource::new(Model::Post(post))));
         }
         println!("WRAP: {:?}", wrap.items);
 
@@ -426,8 +377,10 @@ impl Connection {
             Err(e) => Err(String::from("Error receiving from channel (from cache).")),
         };
 
+
         // @TODO: This is the actual update sending code. Could be optimized greatly.
         if let Ok(updated_data) = changes {
+            println!("Updated_data ---------------> {:?}", updated_data.items);
             let mut watchers: Vec<Vec<i32>> = vec![];
             let mut posts: Vec<Post> = vec![];
 
@@ -446,6 +399,8 @@ impl Connection {
                 Some(val) => match val.try_borrow_mut() {
                     Ok(parent) => {
                         for c in &parent.connections {
+
+                            // @TODO: Simplify/abstract this section into separate function(s)
                             println!("Connection --> {:?}", c);
                             let id = c.tx.connection_id();
                             let all_watchers = watchers.iter().flat_map(|y| y).find(|x| **x == id as i32);
@@ -496,9 +451,6 @@ impl Connection {
 
         let token = self.tx.token();
         let conn_id = self.tx.connection_id();
-        println!("TOKEN: {:?}", token.0);
-        println!("Connection ID: {:?}", conn_id);
-        println!("Post ID: {:?}", post_id);
 
         // add watch to resource
         resource.add_watch(conn_id as i32);
@@ -577,7 +529,10 @@ fn main() {
     }).unwrap();
 
     // await db thread to end...
-    db_handle.join();
+    match db_handle.join() {
+        Ok(_) => {},
+        Err(e) => println!("Error in db_handle.join() --> {:?}", e),
+    }
 }
 
 #[cfg(test)]
