@@ -68,6 +68,8 @@ export const actions = {
         Object.assign(api.defaults, {headers: {}});
 
         window.localStorage.removeItem("refreshToken");
+
+        window.localStorage.removeItem("inProgressPost");
         window.localStorage.removeItem("username");
     },
     login: (context: UserContext, credentials: LoginCredentials): Promise<any> => {
