@@ -108,23 +108,30 @@ WebSocket.getInstance().addMessageListener( (msg) => {
     console.log(val);
 
     const db: Database = Database.getInstance();
-    for (const post of val) {
-        console.log("Store listener pkifying a post");
-        console.log(post);
-        const p: Post = Post.pkify(post);
-        // check if the post we got from the WS is saved in the DB.
-        db.getPost(p.pk as number).then((dbCurrentPost) => {
-            // If it is, we should save the post we got - because it's a post we've decided in the past to cache
-            db.putPost(p);
-        }).catch(); // If not, DON'T save it, because we're not saving every single post that arrives.
+    if ("payload" in Object.keys(val)) {
+        for (const post of val.payload) {
+            console.log("Store listener pkifying a post");
+            console.log("+++++++++++++++++", post.Post);
+            const pkifiedPost: Post = Post.pkify(post.Post);
+            // check if the post we got from the WS is saved in the DB.
 
-        // for all posts - db saved and otherwise, send it over to the store to get rendered by components.
-        if (typeof p.pk !== "undefined" && getMap(store).has(p.pk!.toString())) {
-            // it already exists in the store
-            mutUpdate(store, p);
-        } else {
-            // it didn't already exist in the store - now it does!
-            mutCreate(store, p);
+            console.log("ATTEMPTING TO GET: ", pkifiedPost.pk as number);
+            db.getPost(pkifiedPost.pk as number).then((dbCurrentPost) => {
+                console.log("GOT INSIDE GETPOST");
+                // If it is, we should save the post we got - because it's a post we've decided in the past to cache
+                db.putPost(pkifiedPost);
+            }).catch((err) => {
+                console.log("There was a tremendous error -->", err);
+            }); // If not, DON'T save it, because we're not saving every single post that arrives.
+
+            // for all posts - db saved and otherwise, send it over to the store to get rendered by components.
+            if (typeof pkifiedPost.pk !== "undefined" && getMap(store).has(pkifiedPost.pk!.toString())) {
+                // it already exists in the store
+                mutUpdate(store, pkifiedPost);
+            } else {
+                // it didn't already exist in the store - now it does!
+                mutCreate(store, pkifiedPost);
+            }
         }
     }
     return undefined;

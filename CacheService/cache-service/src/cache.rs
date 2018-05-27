@@ -613,10 +613,17 @@ fn handle_update(
             Model::Post(post) => {
                 if let Some(entry) = cache_mut.get_mut(ID::Post(post.id)) {
                     let old_watchers = entry.watchers.clone();
+                    let old_version = entry.version;
                     *entry = Resource::new(Model::Post(post.clone()));
                     entry.watchers.clear();
                     entry.watchers.extend(old_watchers);
-                    entry.increment();
+                    
+                    println!("\n************************************************************");
+                    println!("Entry of ID:{}, has a version --> {}", post.id, old_version);
+                    entry.version = old_version + 1;
+                    // entry.increment();
+                    println!("New Version: {}", entry.version);
+                    println!("************************************************************\n");
                 }
             },
             _ => unimplemented!(),
@@ -682,199 +689,199 @@ mod tests {
     extern crate crossbeam_channel;
     use crossbeam_channel::{Receiver, Select, Sender};
 
-    #[test]
-    fn test_selector_extended_get() {
-        // start db (SAVE only) thread
-        let (send_db, recv_db) = crossbeam_channel::unbounded();
-        let db_handle = thread::spawn(move || {
-            save_posts(recv_db);
-        });
+    // #[test]
+    // fn test_selector_extended_get() {
+    //     // start db (SAVE only) thread
+    //     let (send_db, recv_db) = crossbeam_channel::unbounded();
+    //     let db_handle = thread::spawn(move || {
+    //         save_posts(recv_db);
+    //     });
 
-        // start cache + return necessary comm. channels
-        let (a, b, c): (
-            crossbeam_channel::Sender<SafeArcMsg>,
-            crossbeam_channel::Receiver<SafeArcMsg>,
-            crossbeam_channel::Sender<Cancel>,
-        ) = wire_up(send_db);
+    //     // start cache + return necessary comm. channels
+    //     let (a, b, c): (
+    //         crossbeam_channel::Sender<SafeArcMsg>,
+    //         crossbeam_channel::Receiver<SafeArcMsg>,
+    //         crossbeam_channel::Sender<Cancel>,
+    //     ) = wire_up(send_db);
 
-        // get
-        let mut wrap = Wrapper::new()
-            .set_model(ModelType::Post)
-            .set_msg_type(MessageType::Get)
-            .build();
+    //     // get
+    //     let mut wrap = Wrapper::new()
+    //         .set_model(ModelType::Post)
+    //         .set_msg_type(MessageType::Get)
+    //         .build();
 
-        wrap.items_mut().push(Arc::new(Resource::new(Post::new())));
-        let response = a.send(Arc::new(wrap)).unwrap();
-        let resp = b.recv();
-    }
-    #[test]
-    fn test_selector_extended_create() {
-        // start db (SAVE only) thread
-        let (send_db, recv_db) = crossbeam_channel::unbounded();
-        let db_handle = thread::spawn(move || {
-            save_posts(recv_db);
-        });
+    //     wrap.items_mut().push(Arc::new(Resource::new(Post::new())));
+    //     let response = a.send(Arc::new(wrap)).unwrap();
+    //     let resp = b.recv();
+    // }
+    // #[test]
+    // fn test_selector_extended_create() {
+    //     // start db (SAVE only) thread
+    //     let (send_db, recv_db) = crossbeam_channel::unbounded();
+    //     let db_handle = thread::spawn(move || {
+    //         save_posts(recv_db);
+    //     });
 
-        // start cache + return necessary comm. channels
-        let (a, b, c): (
-            crossbeam_channel::Sender<SafeArcMsg>,
-            crossbeam_channel::Receiver<SafeArcMsg>,
-            crossbeam_channel::Sender<Cancel>,
-        ) = wire_up(send_db);
+    //     // start cache + return necessary comm. channels
+    //     let (a, b, c): (
+    //         crossbeam_channel::Sender<SafeArcMsg>,
+    //         crossbeam_channel::Receiver<SafeArcMsg>,
+    //         crossbeam_channel::Sender<Cancel>,
+    //     ) = wire_up(send_db);
 
-        let mut wrap = Wrapper::new()
-            .set_model(ModelType::Post)
-            .set_msg_type(MessageType::Create)
-            .build();
+    //     let mut wrap = Wrapper::new()
+    //         .set_model(ModelType::Post)
+    //         .set_msg_type(MessageType::Create)
+    //         .build();
 
-        wrap.items_mut().push(Arc::new(Resource::new(Post::new())));
-        let response = a.send(Arc::new(wrap)).unwrap();
-        let resp = b.recv();
-    }
-    // create
-    #[test]
-    fn test_selector_extended_watch() {
-        // start db (SAVE only) thread
-        let (send_db, recv_db) = crossbeam_channel::unbounded();
-        let db_handle = thread::spawn(move || {
-            save_posts(recv_db);
-        });
+    //     wrap.items_mut().push(Arc::new(Resource::new(Post::new())));
+    //     let response = a.send(Arc::new(wrap)).unwrap();
+    //     let resp = b.recv();
+    // }
+    // // create
+    // #[test]
+    // fn test_selector_extended_watch() {
+    //     // start db (SAVE only) thread
+    //     let (send_db, recv_db) = crossbeam_channel::unbounded();
+    //     let db_handle = thread::spawn(move || {
+    //         save_posts(recv_db);
+    //     });
 
-        // start cache + return necessary comm. channels
-        let (a, b, c): (
-            crossbeam_channel::Sender<SafeArcMsg>,
-            crossbeam_channel::Receiver<SafeArcMsg>,
-            crossbeam_channel::Sender<Cancel>,
-        ) = wire_up(send_db);
+    //     // start cache + return necessary comm. channels
+    //     let (a, b, c): (
+    //         crossbeam_channel::Sender<SafeArcMsg>,
+    //         crossbeam_channel::Receiver<SafeArcMsg>,
+    //         crossbeam_channel::Sender<Cancel>,
+    //     ) = wire_up(send_db);
 
-        let mut wrap = Wrapper::new()
-            .set_model(ModelType::Post)
-            .set_msg_type(MessageType::Watch)
-            .build();
+    //     let mut wrap = Wrapper::new()
+    //         .set_model(ModelType::Post)
+    //         .set_msg_type(MessageType::Watch)
+    //         .build();
 
-        wrap.items_mut().push(Arc::new(Resource::new(Post::new())));
-        let response = a.send(Arc::new(wrap)).unwrap();
-        let resp = b.recv();
-    }
+    //     wrap.items_mut().push(Arc::new(Resource::new(Post::new())));
+    //     let response = a.send(Arc::new(wrap)).unwrap();
+    //     let resp = b.recv();
+    // }
 
-    #[test]
-    fn test_selector_extended_update() {
-        // start db (SAVE only) thread
-        let (send_db, recv_db) = crossbeam_channel::unbounded();
-        let db_handle = thread::spawn(move || {
-            save_posts(recv_db);
-        });
+    // #[test]
+    // fn test_selector_extended_update() {
+    //     // start db (SAVE only) thread
+    //     let (send_db, recv_db) = crossbeam_channel::unbounded();
+    //     let db_handle = thread::spawn(move || {
+    //         save_posts(recv_db);
+    //     });
 
-        // start cache + return necessary comm. channels
-        let (a, b, c): (
-            crossbeam_channel::Sender<SafeArcMsg>,
-            crossbeam_channel::Receiver<SafeArcMsg>,
-            crossbeam_channel::Sender<Cancel>,
-        ) = wire_up(send_db);
+    //     // start cache + return necessary comm. channels
+    //     let (a, b, c): (
+    //         crossbeam_channel::Sender<SafeArcMsg>,
+    //         crossbeam_channel::Receiver<SafeArcMsg>,
+    //         crossbeam_channel::Sender<Cancel>,
+    //     ) = wire_up(send_db);
 
-        let mut wrap = Wrapper::new()
-            .set_model(ModelType::Post)
-            .set_msg_type(MessageType::Update)
-            .build();
+    //     let mut wrap = Wrapper::new()
+    //         .set_model(ModelType::Post)
+    //         .set_msg_type(MessageType::Update)
+    //         .build();
 
-        wrap.items_mut().push(Arc::new(Resource::new(Post::new())));
-        let response = a.send(Arc::new(wrap)).unwrap();
-        let resp = b.recv();
-    }
+    //     wrap.items_mut().push(Arc::new(Resource::new(Post::new())));
+    //     let response = a.send(Arc::new(wrap)).unwrap();
+    //     let resp = b.recv();
+    // }
 
-    #[test]
-    fn test_selector_extended_cancel() {
-        // start db (SAVE only) thread
-        let (send_db, recv_db) = crossbeam_channel::unbounded();
-        let db_handle = thread::spawn(move || {
-            save_posts(recv_db);
-        });
+    // #[test]
+    // fn test_selector_extended_cancel() {
+    //     // start db (SAVE only) thread
+    //     let (send_db, recv_db) = crossbeam_channel::unbounded();
+    //     let db_handle = thread::spawn(move || {
+    //         save_posts(recv_db);
+    //     });
 
-        // start cache + return necessary comm. channels
-        let (a, b, c): (
-            crossbeam_channel::Sender<SafeArcMsg>,
-            crossbeam_channel::Receiver<SafeArcMsg>,
-            crossbeam_channel::Sender<Cancel>,
-        ) = wire_up(send_db);
-        let cancel = Cancel {
-            msg: String::from("[Cancel reason]"),
-        };
-        let response = c.send(cancel).unwrap();
-        let resp = b.recv();
-    }
+    //     // start cache + return necessary comm. channels
+    //     let (a, b, c): (
+    //         crossbeam_channel::Sender<SafeArcMsg>,
+    //         crossbeam_channel::Receiver<SafeArcMsg>,
+    //         crossbeam_channel::Sender<Cancel>,
+    //     ) = wire_up(send_db);
+    //     let cancel = Cancel {
+    //         msg: String::from("[Cancel reason]"),
+    //     };
+    //     let response = c.send(cancel).unwrap();
+    //     let resp = b.recv();
+    // }
 
-    #[test]
-    fn test_cache_get() {
-        let (send_db, recv_db) = crossbeam_channel::unbounded();
-        let db_handle = thread::spawn(move || {
-            save_posts(recv_db);
-        });
-        let (a, b, c): (
-            crossbeam_channel::Sender<SafeArcMsg>,
-            crossbeam_channel::Receiver<SafeArcMsg>,
-            crossbeam_channel::Sender<Cancel>,
-        ) = wire_up(send_db);
+    // #[test]
+    // fn test_cache_get() {
+    //     let (send_db, recv_db) = crossbeam_channel::unbounded();
+    //     let db_handle = thread::spawn(move || {
+    //         save_posts(recv_db);
+    //     });
+    //     let (a, b, c): (
+    //         crossbeam_channel::Sender<SafeArcMsg>,
+    //         crossbeam_channel::Receiver<SafeArcMsg>,
+    //         crossbeam_channel::Sender<Cancel>,
+    //     ) = wire_up(send_db);
 
-        let mut wrap = Wrapper::new()
-            .set_model(ModelType::Post)
-            .set_msg_type(MessageType::Get)
-            .build();
+    //     let mut wrap = Wrapper::new()
+    //         .set_model(ModelType::Post)
+    //         .set_msg_type(MessageType::Get)
+    //         .build();
 
-        let mut p = Post::new();
-        p.id = 1;
+    //     let mut p = Post::new();
+    //     p.id = 1;
 
-        wrap.items_mut().push(Arc::new(Resource::new(p)));
+    //     wrap.items_mut().push(Arc::new(Resource::new(p)));
 
-        match a.send(Arc::new(wrap)) {
-            Ok(val) => {}
-            Err(e) => {
-                println!("[Error] ---> {:?}", e);
-            }
-        };
+    //     match a.send(Arc::new(wrap)) {
+    //         Ok(val) => {}
+    //         Err(e) => {
+    //             println!("[Error] ---> {:?}", e);
+    //         }
+    //     };
 
-        match b.recv() {
-            Ok(val) => println!("{:?}", val.items()),
-            Err(e) => {
-                println!("[Error] ---> {:?}", e);
-                let ret: String = format!("Error receiving from channel (from cache).");
-            }
-        };
-    }
-    #[test]
-    fn test_vec_cache_get() {
-        let mut vc = AssociativeVecCache::<Resource<Post>>::new();
-        match vc.put(1, Resource::new(Post::new())) {
-            Ok(val) => match val {
-                Some(some) => println!("SOME: {:?}", some),
-                None => println!("None."),
-            },
-            Err(e) => {
-                println!("There was an error: {:?}", e);
-            }
-        }
-        println!("VC: {:?}", vc);
+    //     match b.recv() {
+    //         Ok(val) => println!("{:?}", val.items()),
+    //         Err(e) => {
+    //             println!("[Error] ---> {:?}", e);
+    //             let ret: String = format!("Error receiving from channel (from cache).");
+    //         }
+    //     };
+    // }
+    // #[test]
+    // fn test_vec_cache_get() {
+    //     let mut vc = AssociativeVecCache::<Resource<Post>>::new();
+    //     match vc.put(1, Resource::new(Post::new())) {
+    //         Ok(val) => match val {
+    //             Some(some) => println!("SOME: {:?}", some),
+    //             None => println!("None."),
+    //         },
+    //         Err(e) => {
+    //             println!("There was an error: {:?}", e);
+    //         }
+    //     }
+    //     println!("VC: {:?}", vc);
 
-        let mut p = Post::new();
-        p.id = 1000;
-        p.likes = 100;
-        match vc.put(1000, Resource::new(p)) {
-            Ok(val) => match val {
-                Some(some) => println!("SOME: {:?}", some),
-                None => println!("None."),
-            },
-            Err(e) => {
-                println!("There was an error: {:?}", e);
-            }
-        }
-        // println!("VC: {:?}", vc);
-        println!("***********************************");
-        println!("GET: {:?}", vc.get(1000));
-        println!("GET: {:?}", vc[1000]);
+    //     let mut p = Post::new();
+    //     p.id = 1000;
+    //     p.likes = 100;
+    //     match vc.put(1000, Resource::new(p)) {
+    //         Ok(val) => match val {
+    //             Some(some) => println!("SOME: {:?}", some),
+    //             None => println!("None."),
+    //         },
+    //         Err(e) => {
+    //             println!("There was an error: {:?}", e);
+    //         }
+    //     }
+    //     // println!("VC: {:?}", vc);
+    //     println!("***********************************");
+    //     println!("GET: {:?}", vc.get(1000));
+    //     println!("GET: {:?}", vc[1000]);
 
-        {
-            let mutable_vc_entry = &mut vc[1];
-            mutable_vc_entry.get_data_mut().id = 9999;
-        }
-        println!("Mutable_VC_ENTRY.ID: {:?}", vc[1]);
-    }
+    //     {
+    //         let mutable_vc_entry = &mut vc[1];
+    //         mutable_vc_entry.get_data_mut().id = 9999;
+    //     }
+    //     println!("Mutable_VC_ENTRY.ID: {:?}", vc[1]);
+    // }
 }

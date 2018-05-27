@@ -2,8 +2,8 @@ import {Post} from "./models";
 import idb from "idb";
 import {DB} from "idb/lib/idb.d"
 
-//A singleton Database connection class. 
-//Users should call the static get_instance() function
+// A singleton Database connection class. 
+// Users should call the static get_instance() function
 
 export interface IPostVersion {
     id: number;
@@ -19,7 +19,6 @@ export default class Database {
     }
 
     private static instance: Database;
-    
 
     private dbPromise: Promise<DB>;
     private constructor() {
@@ -30,8 +29,6 @@ export default class Database {
         });
     }
 
-
-
     /*
      * Indicates that in the future the post with the given pk will be saved in the database
      * in websocket message receipt handlers. 
@@ -40,7 +37,7 @@ export default class Database {
         return new Promise((resolve, reject) => {
             this.dbPromise.then((db) => {
                 const tx = db.transaction("posts", "readwrite");
-                let obj = {pk: pk};
+                const obj = {pk};
                 tx.objectStore("posts").put(obj);
                 resolve();
             });
@@ -72,12 +69,10 @@ export default class Database {
                     if (post === undefined) {
                         reject();
                     } else {
-                        console.log("Database pkifying post: ");
-                        console.log(post);
-                        let p: Post = Post.pkify(post);
+                        const p: Post = Post.pkify(post);
                         resolve(p);
                     }
-                }).catch((err) => {console.log(err);});
+                }).catch((err) => console.log(err));
             });
         });
     }

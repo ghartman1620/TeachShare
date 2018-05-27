@@ -4,9 +4,9 @@
         <div class="card-body">
             <audio
                 class="col-12"
-                :src="url()"
+                :src="element.url"
                 :type="element.filetype"
-                :controls="url()">
+                :controls="controls">
             </audio>
             <br><br>
             <h4 class="card-title">{{ element.title }}</h4>
@@ -32,6 +32,12 @@ import {
 
 @Component({
     name: "audio-element",
+    props: {
+        controls: {
+            type: Boolean,
+            default: true,
+        }
+    }
 })
 export default class AudioElement extends Vue{
     @Prop({})

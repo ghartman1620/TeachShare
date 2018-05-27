@@ -183,7 +183,10 @@ impl Handler for Connection {
 }
 
 impl Connection {
-    fn serialize_and_send_posts(&self, data: &[Model]) -> Result<(), ws::Error> {
+    fn serialize_and_send_posts(&self, data: &[Model], versions: &[u64]) -> Result<(), ws::Error> {
+        let output = WSMessageResponse::new(data, versions);
+        println!("Sending: {:?}", output);
+
         let serialized = serde_json::to_string(data).expect("Uh-oh... JSON serialization error!~");
         println!("Serialized content: {}", serialized);
         self.tx.send(serialized)
@@ -222,7 +225,9 @@ impl Connection {
         println!("resp: {:?}", resp);
 
         let resp_data: Vec<Model> = resp.iter().map(|x| x.data.clone()).collect();
-        match self.serialize_and_send_posts(resp_data.as_slice()) {
+        let versions: Vec<u64> = resp.iter().map(|resource| resource.version).collect();
+
+        match self.serialize_and_send_posts(&resp_data, &versions) {
             Ok(o) => None,
             Err(e) => Some(format!("Err: {:?}", e)),
         }
@@ -267,7 +272,9 @@ impl Connection {
         println!("resp: {:?}", resp);
 
         let output: Vec<Model> = resp.iter().map(|x| x.data.clone()).collect();
-        match self.serialize_and_send_posts(output.as_slice()) {
+        let versions: Vec<u64> = resp.iter().map(|resource| resource.version).collect();
+
+        match self.serialize_and_send_posts(&output, &versions) {
             Ok(o) => None,
             Err(e) => Some(format!("Err: {:?}", e)),
         }
@@ -283,7 +290,8 @@ impl Connection {
         };
         if post_versions.is_empty() {
             let posts = vec![];
-            match self.serialize_and_send_posts(posts.as_slice()) {
+            let versions = vec![];
+            match self.serialize_and_send_posts(&posts, &versions) {
                 Ok(_) => {},
                 Err(e) => println!("Websocket Error: {:?}", e),
             }
@@ -335,7 +343,9 @@ impl Connection {
             }).filter(|post| post.is_some())
                 .map(|post| Model::Post(post.unwrap().clone()))
                 .collect();
-            match self.serialize_and_send_posts(output.as_slice()) {
+
+            let versions: Vec<u64> = resp.iter().map(|resource| resource.version).collect();
+            match self.serialize_and_send_posts(&output, &versions) {
                 Err(e) => Some(format!("Error: {:?}", e)),
                 _ => None,
             }
@@ -374,7 +384,7 @@ impl Connection {
         };
         let changes = match self.from_cache.recv() {
             Ok(val) => Ok(val),
-            Err(e) => Err(String::from("Error receiving from channel (from cache).")),
+            Err(_) => Err(String::from("Error receiving from channel (from cache).")),
         };
 
 
@@ -382,34 +392,30 @@ impl Connection {
         if let Ok(updated_data) = changes {
             println!("Updated_data ---------------> {:?}", updated_data.items);
             let mut watchers: Vec<Vec<i32>> = vec![];
-            let mut posts: Vec<Post> = vec![];
-
-            for result_set in &updated_data.items {
-                println!("RS: {:?}", result_set);
-                match result_set.data {
-                    Model::Post(ref post) => posts.push(post.clone()),
-                    _ => unimplemented!(),
-                }
-                watchers.push(result_set.watchers.clone());
-            }
-            println!("posts: {:?}, watchers: {:?}", posts, watchers);
+            let (posts, versions): (Vec<Model>, Vec<u64>) = updated_data.items.iter().map(|resource| {
+                watchers.push(resource.watchers.clone()); // @TODO: figure out a way around this clone
+                (resource.data.clone(), resource.version) // @TODO: figure out a way around this clone
+            }).unzip();
 
             // @TODO: This could be simplified somewhat or abstracted into functions/parts
             match &mut self.parent {
                 Some(val) => match val.try_borrow_mut() {
                     Ok(parent) => {
+                        println!("TOTAL CONNECTIONS: {:?}", &parent.connections);
                         for c in &parent.connections {
 
                             // @TODO: Simplify/abstract this section into separate function(s)
                             println!("Connection --> {:?}", c);
                             let id = c.tx.connection_id();
                             let all_watchers = watchers.iter().flat_map(|y| y).find(|x| **x == id as i32);
+
                             println!("WATCHES ---> {:?}, LOOKING FOR ----> {:?}, MATCHED_WATCHES ---> {:?}", watchers, id, all_watchers);
                             if let Some(matched_connection) =
                                 watchers.iter().flat_map(|y| y).find(|x| **x == id as i32)
                             { 
+                                let ws_response = WSMessageResponse::new(&posts, &versions);
                                 println!("******************** SENDING TO: {:?} ***************", matched_connection);
-                                let serialized = serde_json::to_string(&posts)
+                                let serialized = serde_json::to_string(&ws_response)
                                     .expect("Uh-oh... JSON serialization error!~");
 
                                 println!("Serialized content (Update): {}", serialized);
@@ -417,12 +423,11 @@ impl Connection {
                                 if send_result.is_err() {
                                     return Some(format!("Error: {:?}", send_result.unwrap_err()));
                                 }
-                                return None;
                             } else {
                                 println!("There was no matched connection for: {}. It does not need to be updated.", id);
                             }
                         }
-                    }
+                    },
                     Err(e) => println!("Error: {:?}!", e),
                 },
                 None => println!("None. Did not unwrap."),
@@ -482,7 +487,8 @@ impl Connection {
         println!("resp: {:?}", resp);
 
         let output = vec![];
-        match self.serialize_and_send_posts(output.as_slice()) {
+        let versions = vec![];
+        match self.serialize_and_send_posts(&output, &versions) {
             Ok(o) => None,
             Err(e) => Some(format!("Err: {:?}", e)),
         }
@@ -539,15 +545,15 @@ fn main() {
 mod tests {
     use models::*;
 
-    #[test]
-    fn test_raises_no_id_provided() {
-        fn inner(yes: bool) -> Result<(), NoIDProvided> {
-            if yes {
-                Err(NoIDProvided::new("this is the error msg."))
-            } else {
-                Ok(())
-            }
-        }
-    }
+    // #[test]
+    // fn test_raises_no_id_provided() {
+    //     fn inner(yes: bool) -> Result<(), NoIDProvided> {
+    //         if yes {
+    //             Err(NoIDProvided::new("this is the error msg."))
+    //         } else {
+    //             Ok(())
+    //         }
+    //     }
+    // }
 
 }

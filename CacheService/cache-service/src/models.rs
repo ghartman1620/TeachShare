@@ -17,6 +17,28 @@ pub struct UserPermission {
     pub user: i32,
 }
 
+
+// * option 1
+#[derive(Debug, Serialize)]
+pub struct WSMessageResponse<'a> {
+    versions: &'a [u64],
+    payload: &'a [Model],
+}
+
+impl<'a> WSMessageResponse<'a> {
+    pub fn new(payload: &'a [Model], versions: &'a [u64]) -> WSMessageResponse<'a> {
+        WSMessageResponse {
+            payload,
+            versions,
+        }
+    }
+}
+
+
+// * option 2
+#[derive(Debug, Serialize)]
+pub struct WSMsgResponse<'a>(u64, &'a Model);
+
 #[derive(Debug)]
 pub enum Permission {
     view_post(bool),
@@ -71,9 +93,6 @@ impl Resource {
             version: 0,
         }
     }
-    pub fn increment(&mut self) {
-        self.version = self.version + 1;
-    }
     pub fn add_watch(&mut self, id: i32) {
         self.watchers.push(id)
     }
@@ -83,7 +102,9 @@ impl Resource {
         self.watchers.remove_item(&id).unwrap();
     }
 
-    /// all_watchers: goal is to get a vector of copy'd user's
+    // ? all_watchers: goal is to get a vector of copy'd user's
+    // ! deprecated because no longer a trait object and necessary to expose
+    // ! fields as methods.
     pub fn all_watchers(&self) -> &Vec<i32> {
         &self.watchers
     }
@@ -224,7 +245,7 @@ impl Comment {
     }
 }
 
-#[derive(Queryable, Insertable, Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Queryable, Insertable, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 #[table_name = "posts_post"]
 pub struct Post {
     pub id: i32,
@@ -264,100 +285,116 @@ mod tests {
     }
 
     #[test]
-    fn test_enum_model() {
-        let p = Post::new();
-        let post = F::Post(p);
-        let mut x = vec![];
-        x.push(post);
-        x.push(F::User(User::new()));
-        x.push(F::Comment(Comment::new()));
+    fn test_response_msg() {
+        let p: Post = Default::default();
 
-        let mut hm: HashMap<ID, F> = HashMap::new();
-        hm.insert(ID::Post(1), F::Post(Post::new()));
-        hm.insert(ID::Comment(2), F::Comment(Comment::new()));
-        hm.insert(ID::User(2), F::User(User::new()));
-        hm.insert(ID::Post(2), F::Post(Post::new()));
+        let payload = vec![Model::Post(p)];
+        let versions = vec![1];
+        let a = WSMessageResponse::new(&payload, &versions);
+        println!("WSMessageResponse --> {:?}", a);
 
-        println!("HM: {:?}", hm[&ID::Post(1)]);
+        let new_post: Post = Default::default();
+        let t = &Model::Post(new_post);
+        let b = WSMsgResponse(1, t);
+        println!("WSMsgResponse: {:?}", b);
 
-        println!("Typed HASHMAP: {:?}", hm);
-        for (a, b) in &hm {
-            println!(" Entry ---> {:?}: {:?}", a, b);
-            match a {
-                ID::Post(id) => println!("{:?}", id),
-                ID::Comment(id) => println!("{:?}", id),
-                _ => println!("Other..."),
-            }
-        }
-
-        println!("X --------------> {:?}", x);
-        for y in &mut x {
-            println!("Y: {:?}", y);
-            match y {
-                F::Post(ref mut p) => {
-                    println!("This is a post with id: {:?}", p.id);
-                    println!("Post Content: {:?}", p.content);
-                    p.id = 1;
-                    println!("This is a post with id: {:?}", p.id);
-                }
-                F::User(u) => println!("This is a user: {:?}", u),
-                F::Comment(c) => println!("This is a comment: {:?}", c),
-                _ => println!("This is everything else..."),
-            }
-        }
     }
+
+    // #[test]
+    // fn test_enum_model() {
+    //     let p = Post::new();
+    //     let post = F::Post(p);
+    //     let mut x = vec![];
+    //     x.push(post);
+    //     x.push(F::User(User::new()));
+    //     x.push(F::Comment(Comment::new()));
+
+    //     let mut hm: HashMap<ID, F> = HashMap::new();
+    //     hm.insert(ID::Post(1), F::Post(Post::new()));
+    //     hm.insert(ID::Comment(2), F::Comment(Comment::new()));
+    //     hm.insert(ID::User(2), F::User(User::new()));
+    //     hm.insert(ID::Post(2), F::Post(Post::new()));
+
+    //     println!("HM: {:?}", hm[&ID::Post(1)]);
+
+    //     println!("Typed HASHMAP: {:?}", hm);
+    //     for (a, b) in &hm {
+    //         println!(" Entry ---> {:?}: {:?}", a, b);
+    //         match a {
+    //             ID::Post(id) => println!("{:?}", id),
+    //             ID::Comment(id) => println!("{:?}", id),
+    //             _ => println!("Other..."),
+    //         }
+    //     }
+
+    //     println!("X --------------> {:?}", x);
+    //     for y in &mut x {
+    //         println!("Y: {:?}", y);
+    //         match y {
+    //             F::Post(ref mut p) => {
+    //                 println!("This is a post with id: {:?}", p.id);
+    //                 println!("Post Content: {:?}", p.content);
+    //                 p.id = 1;
+    //                 println!("This is a post with id: {:?}", p.id);
+    //             }
+    //             F::User(u) => println!("This is a user: {:?}", u),
+    //             F::Comment(c) => println!("This is a comment: {:?}", c),
+    //             _ => println!("This is everything else..."),
+    //         }
+    //     }
+    // }
 
     // a few of the tests below are pointless, keep that in mind
-    #[test]
-    fn test_post() {
-        let p = models::Post::new();
-        assert_eq!(models::Post::new(), p)
-    }
+    // #[test]
+    // fn test_post() {
+    //     let p = models::Post::new();
+    //     assert_eq!(models::Post::new(), p)
+    // }
 
-    #[test]
-    fn test_new_model() {
-        let m = models::Resource::new(models::Post::new());
-        let typ = typeid(&m);
-        assert_eq!(
-            std::any::TypeId::of::<models::Resource<models::Post>>(),
-            typ
-        );
-    }
+    // #[test]
+    // fn test_new_model() {
+    //     let m = models::Resource::new(models::Post::new());
+    //     let typ = typeid(&m);
+    //     assert_eq!(
+    //         std::any::TypeId::of::<models::Resource<models::Post>>(),
+    //         typ
+    //     );
+    // }
 
-    #[test]
-    fn test_resource_init() {
-        let p = models::Post::new();
-        let m = &mut models::Resource::<models::Post>::new(p);
-    }
-    #[test]
-    fn test_resource_add_watch() {
-        let p = models::Post::new();
-        let m = &mut models::Resource::<models::Post>::new(p);
+    // #[test]
+    // fn test_resource_init() {
+    //     let p = models::Post::new();
+    //     let m = &mut models::Resource::<models::Post>::new(p);
+    // }
+    // #[test]
+    // fn test_resource_add_watch() {
+    //     let p = models::Post::new();
+    //     let m = &mut models::Resource::<models::Post>::new(p);
 
-        m.add_watch(1);
-        m.add_watch(2);
-        {
-            let all = m.all_watchers();
-            assert_eq!(*all, vec![1, 2]);
-            // let t = m.data;
-        }
-    }
-    #[test]
-    fn test_resource_remove_watch() {
-        let p = models::Post::new();
-        let m = &mut models::Resource::<models::Post>::new(p);
+    //     m.add_watch(1);
+    //     m.add_watch(2);
+    //     {
+    //         let all = m.all_watchers();
+    //         assert_eq!(*all, vec![1, 2]);
+    //         // let t = m.data;
+    //     }
+    // }
+    // #[test]
+    // fn test_resource_remove_watch() {
+    //     let p = models::Post::new();
+    //     let m = &mut models::Resource::<models::Post>::new(p);
 
-        m.add_watch(1);
-        m.add_watch(2);
-        {
-            let all = m.all_watchers();
-            assert_eq!(*all, vec![1, 2]);
-            // let t = m.data;
-        }
-        m.remove_watch(1);
-        assert_eq!(m.watchers, vec![2]);
+    //     m.add_watch(1);
+    //     m.add_watch(2);
+    //     {
+    //         let all = m.all_watchers();
+    //         assert_eq!(*all, vec![1, 2]);
+    //         // let t = m.data;
+    //     }
+    //     m.remove_watch(1);
+    //     assert_eq!(m.watchers, vec![2]);
 
-        m.increment();
-        assert_eq!(m.version, 1);
-    }
+    //     // m.increment();
+    //     // assert_eq!(m.version, 1);
+    // }
 }

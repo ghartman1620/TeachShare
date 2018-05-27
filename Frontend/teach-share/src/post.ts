@@ -30,7 +30,7 @@ export class InProgressPost {
 
     // just added
     public color: string;
-    public layout: ILayout;
+    public layout: ILayout[];
     public original_user?: User;
 
     /*
@@ -58,14 +58,14 @@ export class InProgressPost {
             this.comments = post.comments ? post.comments : [];
             // set defaults
             this.color = post.color ? post.color : "#96e6b3";
-            this.layout = post.layout ? post.layout: {
+            this.layout = post.layout ? post.layout : [{
                 x: 0,
                 y: 0,
                 w: 2,
                 h: 30,
                 i: "0", // This is how it was in the Django models as default
                         // as wierd as that seems...
-            };
+            }];
 
             if (!post.pk) {
                 console.error("InProgressPost error: constructor called with Post object with pk that does not exist");
@@ -95,14 +95,14 @@ export class InProgressPost {
             this.comments = [];
             // set defaults
             this.color = "#96e6b3";
-            this.layout = {
+            this.layout = [{
                 x: 0,
                 y: 0,
                 w: 2,
                 h: 30,
                 i: "0", // This is how it was in the Django models as default 
                         // as wierd as that seems...
-            };
+            }];
             this.original_user = undefined;
             console.log(this);
         }

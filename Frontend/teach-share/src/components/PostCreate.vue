@@ -468,7 +468,7 @@ export default class PostCreate extends Vue {
             beginPost(this.$store, {
                 userid: userid as number,
             });
-            this.postStatus = vm.SAVED;
+            // this.postStatus = vm.SAVED;
         }
     }
 
@@ -523,6 +523,12 @@ export default class PostCreate extends Vue {
         const inProgressPost: string | null = window.localStorage.getItem("inProgressPost");
         console.log("IN-PROGRESS-POST -----> ", inProgressPost);
         console.log("created.");
+
+        // Get previous posts from the users
+        this.getUserPosts();
+
+        // Were we working on something? Begin post with either that post, or
+        // the userid of ourselves to start a completely new one.
         if (inProgressPost === null) {
             console.log("if");
             this.beginPost(
@@ -532,30 +538,30 @@ export default class PostCreate extends Vue {
                 undefined);
         } else {
             console.log("else");
-            this.getUserPosts();
+
             this.beginPost(
                 this.getLoggedInUser.pk as number, parseInt(inProgressPost as string));
-            let store = this.$store;
-            let userpk = this.getLoggedInUser.pk as number;
-            let vm: PostCreate = this;
-            console.log("userpk, vm", userpk, vm);
-            WebSocket.getInstance().addMessageListener((message) => {
-                console.log("Post create pkifying a post");
-                console.log(JSON.parse(message.data)[0]);
-                let post = Post.pkify(JSON.parse(message.data)[0]);
-                let inProgressPost = window.localStorage.getItem("inProgressPost");
-                
-                if (inProgressPost){
-                    if (post.pk === parseInt(inProgressPost as string, 10)) {
-                        beginPost(store,{userid: userpk, p: post});
-                        vm.postStatus = PostStatus.Saved;
-                    }
-                } else {
-                    console.error("no inprogressPost localStorage item exists");
-                }
-                return undefined;
-            });
         }
+        let store = this.$store;
+        let userpk = this.getLoggedInUser.pk as number;
+        let vm: PostCreate = this;
+
+        WebSocket.getInstance().addMessageListener((message) => {
+            console.log("Post create pkifying a post");
+            console.log("**********************", JSON.parse(message.data).payload[0].Post);
+            let post = Post.pkify(JSON.parse(message.data).payload[0].Post);
+            let inProgressPost = window.localStorage.getItem("inProgressPost");
+            
+            if (inProgressPost){
+                if (post.pk === parseInt(inProgressPost as string, 10)) {
+                    beginPost(store,{userid: userpk, p: post});
+                    vm.postStatus = PostStatus.Saved;
+                }
+            } else {
+                console.error("no inprogressPost localStorage item exists");
+            }
+            return undefined;
+        });
         console.log("end created");
     }
 

@@ -230,7 +230,7 @@ mod tests {
         let p = &mut posts[0];
         let s = p.title.clone();
         let _ = tx.send(p.clone());
-        for x in 0..1000 {
+        for x in 0..2 {
             p.title = format!("change{}", x);
             tx.send(p.clone()).expect("Error sending post");
         }

@@ -291,7 +291,7 @@ export class Post extends Model {
     public practices: number[];
 
     public color: string;
-    public layout: ILayout;
+    public layout: ILayout[];
     public original_user: User;
 
     constructor(pk?: number, comments?: Comment[], user?: User) {
@@ -301,14 +301,14 @@ export class Post extends Model {
 
         // set defaults
         this.color = "#96e6b3";
-        this.layout = {
+        this.layout = [{
             x: 0,
             y: 0,
             w: 2,
             h: 30,
             i: "0", // This is how it was in the Django models as default
                     // as wierd as that seems...
-        };
+        }];
     }
 
     // Creates an object of the form the websocket requires for deserialization:

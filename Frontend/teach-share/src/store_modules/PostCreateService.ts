@@ -197,10 +197,9 @@ export const actions = {
         }
     },
     addElement: (context: PostContext, element: any) => {
-        // clear order of actions from ADD_ELEMENT --> CLEAR_REDO --> saveDraft.
-        context.commit("ADD_ELEMENT", element);
-        context.commit("CLEAR_REDO");
-        context.dispatch("saveDraft").then((res) => console.error(res));
+        mutAddElement(context, element);
+        mutClearRedo(context);
+        saveDraft(context).then((res) => console.error(res));
     },
     // Actions are only allowed to have one argument so iAndJ is
     // a list with index 0 as the first index to be swapped
