@@ -27,7 +27,7 @@ import {Component} from "vue-property-decorator"
 })
 export default class SideBar extends Vue {
     sidebarClasses: string[] = ["sidebar"];
-    collapsed: boolean = true;
+    collapsed: boolean = false;
 
 
 

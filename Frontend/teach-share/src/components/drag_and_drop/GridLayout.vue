@@ -1,5 +1,5 @@
 <template>
-    <div ref="item" class="vue-grid-layout" :style="mergedStyle">
+    <div @delete-element="deleteElement" ref="item" class="vue-grid-layout" :style="mergedStyle">
         <slot></slot>
         <!-- <grid-item class="vue-grid-placeholder"
                    v-show="isDragging"
@@ -191,10 +191,13 @@
             }
         },
         methods: {
+            deleteElement (index) {
+                console.log("Deleting element at index ", index);
+            },
             layoutUpdate() {
                 if (this.layout !== undefined) {
                     if (this.layout.length !== this.lastLayoutLength) {
-                        //console.log("### LAYOUT UPDATE!");
+                        // console.log("### LAYOUT UPDATE! New layout: ", this.layout);
                         this.lastLayoutLength = this.layout.length;
                     }
                     compact(this.layout, this.verticalCompact);

@@ -9,7 +9,7 @@
                 <post-element :element="element" :index="index"></post-element>
             </div> -->
 
-            <div class="post-element-container" v-bind:id="'element-'+this.i">
+            <div class="post-element-container" v-bind:id="'element-'+this.i" v-bind:style="{'background-color' : this.color}">
                     <div class="card-column column">
                         <span v-if="draggable" ref="dragHandle" class="vue-draggable-handle">
                             <img class="grab-image" src="/static/grid.png">
@@ -49,7 +49,6 @@
 
 $background-color: #e5ffee;
 $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
-$card-color: #96e6b3;
 
 
     #garbage-button {
@@ -76,6 +75,17 @@ $card-color: #96e6b3;
         opacity: 1;
     }
 
+    // .post-element-container {
+
+    //     padding-top: 10px;
+    //     padding-right: 0px;
+    //     padding-left: 0px;
+    //     padding-bottom: 10px;
+    //     border-radius: 5px;
+    //     box-shadow: $card-shadow;
+    //     image-rendering: pixelated;
+    // }
+
     .post-element-container {
         padding-top: 10px;
         padding-right: 0px;
@@ -83,7 +93,18 @@ $card-color: #96e6b3;
         padding-bottom: 10px;
         border-radius: 5px;
         box-shadow: $card-shadow;
-        background-color: $card-color;
+        image-rendering: pixelated;
+        // margin: auto;
+        // position: absolute;
+        // top: 0;
+        // right: 0;
+        // bottom: 0;
+        // left: 0;
+
+    }
+
+    .post-element {
+        image-rendering: pixelated;
     }
 
     .vue-draggable-handle {
@@ -162,21 +183,33 @@ $card-color: #96e6b3;
         user-select: none;
     }
 </style>
+
 <script>
     import * as $ from 'jquery';
     import TextElement from '../text/TextElement';
-    import {setTopLeft, setTopRight, setTransformRtl, setTransform, createMarkup, getLayoutItem} from './utils.ts';
-    import {getControlPosition, offsetXYFromParentOf, createCoreData} from './draggableUtils';
     import {
-  State,
-  Getter,
-  Action,
-  Mutation,
-  namespace
-} from "vuex-class";
+        setTopLeft, 
+        setTopRight, 
+        setTransformRtl, 
+        setTransform, 
+        createMarkup, 
+        getLayoutItem
+    } from './utils.ts';
+    import {
+        getControlPosition,
+        offsetXYFromParentOf,
+        createCoreData
+    } from './draggableUtils';
+    import {
+        State,
+        Getter,
+        Action,
+        Mutation,
+        namespace
+    } from "vuex-class";
 
     import PostElement from '../PostElement.vue';
-    import {removeElement} from '../../store_modules/PostCreateService.ts';
+    import {getCurrentPost, removeElement, getLayout, setLayout, setColor, getColor} from '../../store_modules/PostCreateService.ts';
     //    var eventBus = require('./eventBus');
     var interact = require("interactjs");
 
@@ -330,6 +363,7 @@ $card-color: #96e6b3;
                 innerY: this.y,
                 innerW: this.w,
                 innerH: this.h
+
             }
         },
         created () {
@@ -398,10 +432,13 @@ $card-color: #96e6b3;
         },
         mounted: function () {
             // logDimensions();
+            // this.styleObject["background-color"] = "#FFFFFF";
+
             this.cols = this.$parent.colNum;
             this.rowHeight = this.$parent.rowHeight;
             this.containerWidth = this.$parent.width !== null ? this.$parent.width : 100;
-            this.margin = this.$parent.margin !== undefined ? this.$parent.margin : [10, 10];
+            // this.margin = this.$parent.margin !== undefined ? this.$parent.margin : [10, 10];
+            this.margin = [1,1];
             this.maxRows = this.$parent.maxRows;
             if (this.isDraggable === null) {
                 this.draggable = this.$parent.isDraggable;
@@ -514,6 +551,15 @@ $card-color: #96e6b3;
             }
         },
         computed: {
+            color() {
+                if (getColor(this.$store) === undefined) {
+                    console.log("getColor undefined!!!!");
+                    return "#96e6b3";
+                }
+                console.log("getting color from store, " + this.$store.state.create.post.color);
+                this.colorChanged = true;
+                return this.$store.state.create.post.color;
+            },
             renderRtl() {
                 return (this.$parent.isMirrored) ? !this.rtl : this.rtl;
             },
@@ -526,24 +572,58 @@ $card-color: #96e6b3;
             }
         },
         methods: {
+            openEditor(index) {
+                var type = getCurrentPost(this.$store).elements[index].type;
+                var routeName = "edit-";
+                if (type === "text") {
+                    routeName += "text";
+                } else if (type === "audio") {
+                    routeName += "audio";
+                } else if (type === "video_file" || type === "video_link") {
+                    routeName += "video";
+                } else if (type === "image_file") {
+                    routeName += "image";
+                } else {
+                    routeName += "file";
+                }
+                var query = {"index" : index.toString()};
+                var loc = {name: routeName, query: query};
+                this.$router.push(loc);
+            },
+
             logDimensions: function(){
                 console.log("Element, Index in GridItem.vue: ", this.element, this.index);
                 console.log("x,y,w,h:  ", this.x, this.y, this.w, this.h);
                 console.log("actual x, y, w, h:  ", this.innerX, this.innerY, this.innerW, this.innerH);
             },
             emitDimensions: function(){
-                        var cardHeight = document.getElementById('element-'+this.i).offsetHeight;
-                        // console.log("Post element height: ", cardHeight)
-                        this.elementDimensions["index"] = this.i;
-                        this.elementDimensions["height"] = cardHeight;
-                        this.dimensionsEmitted = true;
-                        this.$emit('update-height', this.elementDimensions);
-                    
+                var cardHeight = document.getElementById('element-'+this.i).offsetHeight;
+                // console.log("Post element height: ", cardHeight)
+                this.elementDimensions["index"] = this.i;
+                this.elementDimensions["height"] = cardHeight;
+                this.dimensionsEmitted = true;
+                this.$emit('update-layout', this.elementDimensions, false);
             },
             removeElement: function (index) {
+                var layout = getLayout(this.$store);
+                console.log("Remove index ", index);
+                console.log("Layout in store: ", layout);
                 removeElement(this.$store, index);
+                layout.splice(index,1);
+                if (layout !== undefined && layout.length > 1) {
+                    for (var i = 0; i < layout.length; i++) {
+                        if (layout[i]["y"] > this.y) { 
+                            layout[i]["y"] = layout[i]["y"] - this.h; 
+                        }
+                        if (layout[i]["i"] > this.i) {
+                            let newIndex = parseInt(layout[i]["i"]) - 1;
+                            layout[i]["i"] = newIndex.toString();
+                        }
+                    }
+                    console.log("New layout from item removal: ", layout);
+                    setLayout(this.$store, layout);
+                }
             },
-
             createStyle: function () {
                 if (this.x + this.w > this.cols) {
                     this.innerX = 0;
@@ -553,7 +633,6 @@ $card-color: #96e6b3;
                   this.innerW = this.w;
                 }
                 var pos = this.calcPosition(this.innerX, this.innerY, this.innerW, this.innerH);
-
 
                 if (this.isDragging) {
                     pos.top = this.dragging.top;
@@ -657,12 +736,12 @@ $card-color: #96e6b3;
                 this.lastH = y;
 
                 if (this.innerW !== pos.w || this.innerH !== pos.h) {
-                    this.$emit("resize", this.i, pos.h, pos.w, newSize.height, newSize.width);
+                    // this.$emit("resize", this.i, pos.h, pos.w, newSize.height, newSize.width);
                 }
                 if (event.type === "resizeend" && (this.previousW !== this.innerW || this.previousH !== this.innerH)) {
-                    this.$emit("resized", this.i, pos.h, pos.w, newSize.height, newSize.width);
+                    // this.$emit("resized", this.i, pos.h, pos.w, newSize.height, newSize.width);
                 }
-                this.eventBus.$emit("resizeEvent", event.type, this.i, this.innerX, this.innerY, pos.h, pos.w);
+                // this.eventBus.$emit("resizeEvent", event.type, this.i, this.innerX, this.innerY, pos.h, pos.w);
             },
             handleDrag(event) {
                 if (this.isResizing) return;
@@ -735,12 +814,12 @@ $card-color: #96e6b3;
                 this.lastY = y;
 
                 if (this.innerX !== pos.x || this.innerY !== pos.y) {
-                    this.$emit("move", this.i, pos.x, pos.y);
+                    // this.$emit("move", this.i, pos.x, pos.y);
                     // console.log("move", this.i, pos.x, pos.y);
 
                 }
                 if (event.type === "dragend" && (this.previousX !== this.innerX || this.previousY !== this.innerY)) {
-                    this.$emit("moved", this.i, pos.x, pos.y);
+                    // this.$emit("moved", this.i, pos.x, pos.y);
                     // console.log("moved", this.i, pos.x, pos.y);
 
                 }

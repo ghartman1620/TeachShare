@@ -186,8 +186,6 @@ class Post(models.Model):
     )
 
 
-    color = models.CharField(max_length=7, blank=True, default="#96e6b3")
-    layout = JSONField(default=[{"x":0, "y":0, "w":2, "h":30, "i":"0"}])
     title = models.CharField(max_length=100, default='', blank=True)
     content = JSONField()
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
@@ -195,7 +193,8 @@ class Post(models.Model):
     draft = models.BooleanField(default=True)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
     tags = JSONField(blank=True, default=[])
-    
+    color = models.CharField(max_length=7, blank=True, default="#96e6b3")
+    layout = JSONField(default=[{"x":0, "y":0, "w":2, "h":30, "i":"0"}])
     grade = models.IntegerField(choices=GRADES, default=0)
     subject = models.IntegerField(choices=SUBJECTS, default=0)
     length = models.DurationField(blank=True, default=timedelta(0))
