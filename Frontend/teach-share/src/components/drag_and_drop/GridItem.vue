@@ -94,6 +94,12 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
         border-radius: 5px;
         box-shadow: $card-shadow;
         image-rendering: pixelated;
+        // margin: auto;
+        // position: absolute;
+        // top: 0;
+        // right: 0;
+        // bottom: 0;
+        // left: 0;
 
     }
 
@@ -181,18 +187,29 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
 <script>
     import * as $ from 'jquery';
     import TextElement from '../text/TextElement';
-    import {setTopLeft, setTopRight, setTransformRtl, setTransform, createMarkup, getLayoutItem} from './utils.ts';
-    import {getControlPosition, offsetXYFromParentOf, createCoreData} from './draggableUtils';
     import {
-  State,
-  Getter,
-  Action,
-  Mutation,
-  namespace
-} from "vuex-class";
+        setTopLeft, 
+        setTopRight, 
+        setTransformRtl, 
+        setTransform, 
+        createMarkup, 
+        getLayoutItem
+    } from './utils.ts';
+    import {
+        getControlPosition,
+        offsetXYFromParentOf,
+        createCoreData
+    } from './draggableUtils';
+    import {
+        State,
+        Getter,
+        Action,
+        Mutation,
+        namespace
+    } from "vuex-class";
 
     import PostElement from '../PostElement.vue';
-    import {removeElement, setColor, getColor} from '../../store_modules/PostCreateService.ts';
+    import {getCurrentPost, removeElement, getLayout, setLayout, setColor, getColor} from '../../store_modules/PostCreateService.ts';
     //    var eventBus = require('./eventBus');
     var interact = require("interactjs");
 
@@ -416,10 +433,12 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
         mounted: function () {
             // logDimensions();
             // this.styleObject["background-color"] = "#FFFFFF";
+
             this.cols = this.$parent.colNum;
             this.rowHeight = this.$parent.rowHeight;
             this.containerWidth = this.$parent.width !== null ? this.$parent.width : 100;
-            this.margin = this.$parent.margin !== undefined ? this.$parent.margin : [10, 10];
+            // this.margin = this.$parent.margin !== undefined ? this.$parent.margin : [10, 10];
+            this.margin = [1,1];
             this.maxRows = this.$parent.maxRows;
             if (this.isDraggable === null) {
                 this.draggable = this.$parent.isDraggable;
@@ -553,23 +572,52 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
             }
         },
         methods: {
+            openEditor(index) {
+                var type = getCurrentPost(this.$store).elements[index].type;
+                var routeName = "edit-";
+                if (type === "text") {
+                    routeName += "text";
+                } else if (type === "audio") {
+                    routeName += "audio";
+                } else if (type === "video_file" || type === "video_link") {
+                    routeName += "video";
+                } else if (type === "image_file") {
+                    routeName += "image";
+                } else {
+                    routeName += "file";
+                }
+                var query = {"index" : index.toString()};
+                var loc = {name: routeName, query: query};
+                this.$router.push(loc);
+            },
+
             logDimensions: function(){
                 console.log("Element, Index in GridItem.vue: ", this.element, this.index);
                 console.log("x,y,w,h:  ", this.x, this.y, this.w, this.h);
                 console.log("actual x, y, w, h:  ", this.innerX, this.innerY, this.innerW, this.innerH);
             },
             emitDimensions: function(){
-                        var cardHeight = document.getElementById('element-'+this.i).offsetHeight;
-                        // console.log("Post element height: ", cardHeight)
-                        this.elementDimensions["index"] = this.i;
-                        this.elementDimensions["height"] = cardHeight;
-                        this.dimensionsEmitted = true;
-                        this.$emit('update-height', this.elementDimensions);
+                var cardHeight = document.getElementById('element-'+this.i).offsetHeight;
+                // console.log("Post element height: ", cardHeight)
+                this.elementDimensions["index"] = this.i;
+                this.elementDimensions["height"] = cardHeight;
+                this.dimensionsEmitted = true;
+                this.$emit('update-layout', this.elementDimensions, false);
             },
             removeElement: function (index) {
+                var layout = getLayout(this.$store);
+                console.log("Remove index ", index);
+                console.log("Layout in store: ", layout);
                 removeElement(this.$store, index);
+                layout.splice(index,1);
+                if (layout !== undefined && layout.length > 1) {
+                    for (var i = 0; i < layout.length; i++) {
+                        if (layout[i]["y"] > this.y) { layout[i]["y"] = layout[i]["y"] - this.h; }
+                    }
+                    console.log("New layout from item removal: ", layout);
+                    setLayout(this.$store, layout);
+                }
             },
-
             createStyle: function () {
                 if (this.x + this.w > this.cols) {
                     this.innerX = 0;
@@ -579,7 +627,6 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
                   this.innerW = this.w;
                 }
                 var pos = this.calcPosition(this.innerX, this.innerY, this.innerW, this.innerH);
-
 
                 if (this.isDragging) {
                     pos.top = this.dragging.top;
@@ -683,12 +730,12 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
                 this.lastH = y;
 
                 if (this.innerW !== pos.w || this.innerH !== pos.h) {
-                    this.$emit("resize", this.i, pos.h, pos.w, newSize.height, newSize.width);
+                    // this.$emit("resize", this.i, pos.h, pos.w, newSize.height, newSize.width);
                 }
                 if (event.type === "resizeend" && (this.previousW !== this.innerW || this.previousH !== this.innerH)) {
-                    this.$emit("resized", this.i, pos.h, pos.w, newSize.height, newSize.width);
+                    // this.$emit("resized", this.i, pos.h, pos.w, newSize.height, newSize.width);
                 }
-                this.eventBus.$emit("resizeEvent", event.type, this.i, this.innerX, this.innerY, pos.h, pos.w);
+                // this.eventBus.$emit("resizeEvent", event.type, this.i, this.innerX, this.innerY, pos.h, pos.w);
             },
             handleDrag(event) {
                 if (this.isResizing) return;
@@ -761,12 +808,12 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
                 this.lastY = y;
 
                 if (this.innerX !== pos.x || this.innerY !== pos.y) {
-                    this.$emit("move", this.i, pos.x, pos.y);
+                    // this.$emit("move", this.i, pos.x, pos.y);
                     // console.log("move", this.i, pos.x, pos.y);
 
                 }
                 if (event.type === "dragend" && (this.previousX !== this.innerX || this.previousY !== this.innerY)) {
-                    this.$emit("moved", this.i, pos.x, pos.y);
+                    // this.$emit("moved", this.i, pos.x, pos.y);
                     // console.log("moved", this.i, pos.x, pos.y);
 
                 }

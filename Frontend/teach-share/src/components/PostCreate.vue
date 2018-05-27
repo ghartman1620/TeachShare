@@ -427,25 +427,8 @@ export default class PostCreate extends Vue{
             }
         });
     }
-    openEditor(index: number) {
-        var type = getCurrentPost(this.$store)!.elements[index].type;
-        var routeName = "edit-";
-        if (type === "text") {
-            routeName += "text";
-        } else if (type === "audio") {
-            routeName += "audio";
-        } else if (type === "video_file" || type === "video_link") {
-            routeName += "video";
-        } else if (type === "image_file") {
-            routeName += "image";
-        } else {
-            routeName += "file";
-        }
-        var query: Dictionary<string> = {"index" : index.toString()};
-        var loc: Location = {name: routeName, query: query};
-        this.$router.push(loc);
-    }
-    //right now only loads one page of posts
+
+//right now only loads one page of posts
     //@TODO: make a distinction between making potential edits to your post and publishing those edits.
     //as a teacher, I want to be able to draft edits to my lesson plan and see them before I publish those edits, even
     //if my post is already published.

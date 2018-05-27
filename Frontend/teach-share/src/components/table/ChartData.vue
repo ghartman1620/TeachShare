@@ -16,7 +16,7 @@
                     <PieChart userLabel=userLabel v-bind:userData=userData></PieChart>
                 </div>
             </div> -->
-            <b-table striped hover :items="this.displayData"> </b-table>
+            <b-table striped hover :fields="displayData" :items="this.displayData"> </b-table>
             <b-tabs>
                 <b-tab v-if="this.graphOptions.bar === true" title="Bar Graph" @click="setActiveTab('bar')" active>
                     <br>
@@ -92,7 +92,7 @@
             PieChart,
             BootstrapVue
         },
-        mounted () {
+        created () {
             this.processData();
         }
     });
