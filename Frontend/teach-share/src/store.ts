@@ -78,7 +78,6 @@ function circularRecordChecker(record: any, seen: any[] = []) {
     return false;
 }
 
-console.log(PostCreateService);
 const storeOptions: StoreOptions<IRootState> = {
     strict: false, // process.env.NODE_ENV !== "production",
     modules: {
@@ -106,6 +105,7 @@ WebSocket.getInstance().addMessageListener( (msg) => {
     const val = JSON.parse(msg.data);
     console.log("Value is: ");
     console.log(val);
+    console.log(val.Post);
 
     const db: Database = Database.getInstance();
     if ("payload" in Object.keys(val)) {

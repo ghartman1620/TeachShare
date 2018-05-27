@@ -41,10 +41,8 @@ class MockWebSocket {
     }
     public addEventListener(type: string, listener: (e) => undefined) {
         if (type === "open") {
-            console.log("adding open listener to mock socket");
             this.openListeners.push(listener);
         } else if (type === "message") {
-            console.log("adding message listener to mock socket");
             this.receiveListeners.push(listener);
         } else {
             console.error("only message and open are valid listeners for MockWebSocket");
@@ -102,7 +100,6 @@ export default class WebSocket {
         // return MessageStatus.ConnectionClosed;
     }
     public sendWatch(id: number): MessageStatus {
-        console.log("WEBSOCKET: sending watch for post " + id);
         return this.send({
             message: MessageType.Watch,
             id
@@ -111,6 +108,7 @@ export default class WebSocket {
 
     }
     public sendGet(id: number): MessageStatus {
+        console.log("sending get for id " + id);
         return this.send({
             message: MessageType.Get,
             id,
@@ -118,8 +116,6 @@ export default class WebSocket {
     }
     public async sendManifest() {
         Database.getInstance().manifest().then((manifest) => {
-            console.log("manifest: " );
-            console.log(manifest);
             this.send({
                 message: MessageType.Manifest,
                 manifest,
@@ -144,9 +140,7 @@ export default class WebSocket {
         this.rws.addEventListener("message", fn);
     }
     private send(val): MessageStatus {
-        console.log(val.manifest);
         const msg = JSON.stringify(val);
-        console.log("sending... " + msg);
         if (this.rws.readyState ===  ReadyState.Connecting) {
             this.addOpenListener((event) => {
                 this.rws.send(msg);

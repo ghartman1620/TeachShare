@@ -298,7 +298,6 @@ export default class PostCreate extends Vue {
     // of loading in a post's current info when you load up a post.
 
     get userPosts(): Post[] {
-        console.log("userPosts");
         const store = this.$store;
         const userPosts = getPosts(this.$store).filter( (p) => {
             console.log(p);
@@ -454,17 +453,13 @@ export default class PostCreate extends Vue {
         this.beginPost(user.pk as number, post.pk as number);
     }
     public beginPost(userid: number, postid: number | undefined): void {
-        console.log("Begin Post.");
         let vm: PostCreate = this;
         if (postid !== undefined) {
-            console.log("fetchPostSubscribe");
             fetchPostSubscribe(this.$store, postid).then((p) => {
-                console.log("P: ", p);
                 beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p});
                 vm.postStatus = vm.SAVED;
             });
         } else {
-            console.log("beginPost else");
             beginPost(this.$store, {
                 userid: userid as number,
             });
@@ -497,27 +492,23 @@ export default class PostCreate extends Vue {
         redo(this.$store);
     }
     public async getUserPosts() {
-        console.log("getUserPosts");
         const vm: PostCreate = this;
         // @TODO: use store and Post model for this work
         // This is also all reloaded every time somebody reloads the page.. which is really quite no good.
         let nextPage = 1;
         do {
             var response;
-            console.log("response: ", response);
 
             response = await asLoggedIn(api.get(`/posts/?user=${this.getLoggedInUser.pk}&page=${nextPage.toString()}`));
 
             for (const post of response.data.results) {
                 if (post.pk !== -1){
-                    console.log("POST -----> post");
                     fetchPostSubscribe(this.$store, post.pk);
                 }
                 // this.userPosts.push(post);
             }
             nextPage++;
         } while (response.data.next !== null);
-        console.log("leaving getUserPosts");
     }
     created() {
         const inProgressPost: string | null = window.localStorage.getItem("inProgressPost");
@@ -530,7 +521,6 @@ export default class PostCreate extends Vue {
         // Were we working on something? Begin post with either that post, or
         // the userid of ourselves to start a completely new one.
         if (inProgressPost === null) {
-            console.log("if");
             this.beginPost(
                 // ???? how on earth is this type string | undefined
                 // It's definitely just a number. Look at user.ts.
@@ -566,7 +556,6 @@ export default class PostCreate extends Vue {
     }
 
     mounted() {
-        console.log("mounted");
         var vm: PostCreate = this;
         this.$on("submitElement", (element: any, index: number) => {
 
@@ -581,7 +570,6 @@ export default class PostCreate extends Vue {
         });
 
         this.$on("submitTagChanges", this.saveTagChanges)
-        console.log("End mounted");
     }
 };
 //# sourceURL=PostCreate.vue
