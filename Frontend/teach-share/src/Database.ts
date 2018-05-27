@@ -9,6 +9,13 @@ export interface IPostVersion {
     id: number;
     version: number;
 }
+
+export interface IVersionedPost {
+    pk: number;
+    version: number;
+    post: Post;
+}
+
 export default class Database {
     // Is this thread safe? no lmao
     public static getInstance(): Database {
@@ -45,11 +52,12 @@ export default class Database {
     /*
         Returns a promise resolved when the given post p is saved to indexeddb.
     */
-    public putPost(p: Post): Promise<void>{
+    public putPost(p: Post, v: number): Promise<void>{
         return new Promise((resolve, reject) => {
             this.dbPromise.then((db) => {
                 const tx = db.transaction("posts", "readwrite");
-                tx.objectStore("posts").put(p);
+                const obj: IVersionedPost = {pk: p.pk, version: v, post: p};
+                tx.objectStore("posts").put(obj);
                 resolve();
             });
         });

@@ -284,7 +284,7 @@ export class InProgressPost {
             console.log(response);
             post.status = PostStatus.Saved;
         })*/
-        Database.getInstance().putPost(this.toPost());
+        Database.getInstance().putPost(this.toPost(), 1); // @TODO: is this right?
         WebSocket.getInstance().sendUpdate(this.toPost());
         // in the future - potentially some kind of ack message sent back to indicate to user post was saved?
         this.status = PostStatus.Saved;

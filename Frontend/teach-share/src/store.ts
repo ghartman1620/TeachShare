@@ -108,10 +108,15 @@ WebSocket.getInstance().addMessageListener( (msg) => {
     console.log(val.payload);
 
     const db: Database = Database.getInstance();
-    if ("payload" in Object.keys(val)) {
-        for (const post of val.payload) {
+    const keys = Object.keys(val);
+    if ("payload" in keys && "version" in keys) {
+        for (let i = 0; i < val.payload.length; i++) {
+            const post = val.payload[i].Post;
+            const version = val.versions[i];
             console.log("Store listener pkifying a post");
+
             console.log("+++++++++++++++++", post.Post);
+            console.log("VERSION: ", version);
             const pkifiedPost: Post = Post.pkify(post.Post);
             // check if the post we got from the WS is saved in the DB.
 
@@ -119,7 +124,7 @@ WebSocket.getInstance().addMessageListener( (msg) => {
             db.getPost(pkifiedPost.pk as number).then((dbCurrentPost) => {
                 console.log("GOT INSIDE GETPOST");
                 // If it is, we should save the post we got - because it's a post we've decided in the past to cache
-                db.putPost(pkifiedPost);
+                db.putPost(pkifiedPost, version);
             }).catch((err) => {
                 console.log("There was a tremendous error -->", err);
             }); // If not, DON'T save it, because we're not saving every single post that arrives.

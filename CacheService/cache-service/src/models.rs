@@ -6,17 +6,8 @@ use std::fmt;
 use std::hash::Hash;
 use std::sync::Arc;
 use diesel::Insertable;
-use schema::posts_post;
-
-
-#[derive(Debug)]
-pub struct UserPermission {
-    pub id: i32,
-    pub object_id: Model,
-    pub permission: Permission,
-    pub user: i32,
-}
-
+use schema::{posts_post, oauth2_provider_accesstoken};
+use diesel::data_types::PgTimestamp;
 
 // * option 1
 #[derive(Debug, Serialize)]
@@ -39,12 +30,6 @@ impl<'a> WSMessageResponse<'a> {
 #[derive(Debug, Serialize)]
 pub struct WSMsgResponse<'a>(u64, &'a Model);
 
-#[derive(Debug)]
-pub enum Permission {
-    view_post(bool),
-    // etc...
-}
-
 /// This is the Value field for entries in the cache. They can be
 /// matched by their type, and then return the value as
 /// the parameter. 
@@ -57,7 +42,7 @@ pub enum Permission {
 pub enum Model {
     User(User),
     Post(Post),
-    Comment(Comment),
+    Comment(Comment), 
 }
 
 
@@ -68,7 +53,46 @@ pub enum ID {
     Post(i32),
     User(i32),
     Comment(i32),
-    Permission(i32),
+}
+
+#[derive(Debug, Clone)]
+pub struct UserPermission {
+    pub permission: Permission,
+    pub user: User,
+}
+
+#[derive(Debug, Clone)]
+pub enum Permission {
+    view_post(bool),
+    // etc...
+}
+
+
+// user access tokens cache:
+// need: user_id, token, expires?
+#[derive(Queryable, Insertable, Debug, Clone, PartialEq)]
+#[table_name = "oauth2_provider_accesstoken"]
+pub struct Oauth2ProviderAccesstoken {
+    pub id: i64,
+    pub token: String,
+    pub expires: PgTimestamp,
+    pub scope: String,
+    pub application_id: Option<i64>,
+    pub user_id: Option<i32>,
+    pub created: PgTimestamp,
+    pub updated: PgTimestamp,
+}
+
+// Keep track of user auth table -> oauth2_provider_accesstoken
+// map token --> user
+// keep flat map/list of users w/ certain access inside resource
+impl UserPermission {
+    pub fn new() -> UserPermission {
+        UserPermission {
+            permission: Permission::view_post(true),
+            user: User::new(),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -83,6 +107,8 @@ pub struct Resource {
 
     /// Version: the id of the most recent update to a post.
     pub version: u64,
+
+    pub permission: UserPermission,
 }
 
 impl Resource {
@@ -91,6 +117,7 @@ impl Resource {
             data: inner,
             watchers: vec![],
             version: 0,
+            permission: UserPermission::new(),
         }
     }
     pub fn add_watch(&mut self, id: i32) {

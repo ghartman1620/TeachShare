@@ -336,7 +336,7 @@ fn handle_create(
         .set_msg_type(MessageType::Create)
         .build();
 
-    for m in &msg.items {
+    for m in &msg.items { 
         match m.data {
             Model::Post(ref post) => {
                 let (resource, need_db) = create_post_cache(&post, &cash);

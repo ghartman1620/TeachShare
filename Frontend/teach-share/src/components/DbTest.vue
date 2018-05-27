@@ -59,7 +59,7 @@ export default class DbTest extends Vue{
             "type" : "text",
             "content" : "<b>I have content</b>"
         }];
-        this.d.putPost(p)
+        this.d.putPost(p, 1);
     }
     getPost() {
         var vm: DbTest = this;

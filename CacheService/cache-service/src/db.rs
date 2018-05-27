@@ -54,7 +54,7 @@ impl Post {
     pub fn new() -> Post {
         Post {
             id: 0,
-            title: String::from(""),
+            title: String::from(""), 
             content: Value::Null,
             // updated: PgTimestamp(0),
             likes: 0,

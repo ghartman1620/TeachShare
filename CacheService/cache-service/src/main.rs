@@ -40,6 +40,7 @@ use std::thread;
 struct GrandSocketStation {
     // represents the list of connections
     connections: Vec<Rc<Connection>>,
+
 }
 
 impl GrandSocketStation {
@@ -63,6 +64,7 @@ impl std::cmp::PartialEq for Connection {
 #[derive(Clone)]
 struct Connection {
     parent: Option<Rc<RefCell<GrandSocketStation>>>,
+    user: Option<User>,
     id: i32,
     tx: Sender,
     to_cache: crossbeam_channel::Sender<Arc<Msg>>,
@@ -417,7 +419,7 @@ impl Connection {
 
                                 println!("Serialized content (Update): {}", serialized);
                                 let send_result = c.tx.send(serialized);
-                                if send_result.is_err() {
+                                if send_result.is_err() { 
                                     return Some(format!("Error: {:?}", send_result.unwrap_err()));
                                 }
                             } else {
@@ -516,6 +518,7 @@ fn main() {
             value = Some(Connection {
                 id: *i,
                 tx: out.clone(),
+                user: None,
                 parent: Some(hub.clone()),
                 to_cache: a.clone(),
                 from_cache: b.clone(),
