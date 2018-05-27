@@ -42,6 +42,12 @@ export const mutations = {
     SET_TAGS: (state: PostState, tags: string[]) => {
         state.post!.setTags(tags);
     },
+    SET_LAYOUT: (state: PostState, layout: Object[]) => {
+        state.post!.setLayout(layout);
+    },
+    SET_COLOR: (state: PostState, color: string) => {
+        state.post!.setColor(color);
+    },
     SET_TITLE: (state: PostState, newTitle: string) => {
         state.post!.setTitle(newTitle);
     },
@@ -148,7 +154,6 @@ export const mutations = {
         state.post!.setLength(length);
     },
 
-
 };
 
 export const actions = {
@@ -160,6 +165,12 @@ export const actions = {
     setTags: (context: PostContext, tags: string[]) => {
         mutSetTags(context, tags);
         // context.commit("SET_TAGS", tags);
+    },
+    setLayout: (context: PostContext, layout: Object[]) => {
+        mutSetLayout(context, layout);
+    },
+    setColor: (context: PostContext, color: string) => {
+        mutSetColor(context, color);
     },
     setTitle: (context: PostContext, title: string) => {
         mutSetTitle(context, title);
@@ -316,6 +327,18 @@ export const getters = {
         }
         return undefined;
     },
+    getLayout: (state: PostState) => {
+        if (typeof state.post !== "undefined") {
+            return state.post!.layout;
+        }
+        return undefined;
+    },
+    getColor: (state: PostState) => {
+        if (typeof state.post !== "undefined") {
+            return state.post!.color;
+        }
+        return undefined;
+    },
     getTitle: (state: PostState) => {
         if (typeof state.post !== "undefined") {
             return state.post!.title;
@@ -341,6 +364,7 @@ export const getters = {
         }
     },
 };
+
 const PostCreateService = {
     namespaced: true,
     strict: process.env.NODE_ENV !== "production",
@@ -366,6 +390,8 @@ const { commit, read, dispatch } = getStoreAccessors<PostState, IRootState>(
 export const addElement = dispatch(PostCreateService.actions.addElement);
 export const beginPost = dispatch(PostCreateService.actions.beginPost);
 export const setTags = dispatch(PostCreateService.actions.setTags);
+export const setLayout = dispatch(PostCreateService.actions.setLayout);
+export const setColor = dispatch(PostCreateService.actions.setColor);
 export const setTitle = dispatch(PostCreateService.actions.setTitle);
 export const undo = dispatch(PostCreateService.actions.undo);
 export const redo = dispatch(PostCreateService.actions.redo);
@@ -390,6 +416,8 @@ export const createPost = dispatch(PostCreateService.actions.createPost);
  * Getter Handlers
  */
 export const getTags = read(PostCreateService.getters.getTags);
+export const getLayout = read(PostCreateService.getters.getLayout);
+export const getColor = read(PostCreateService.getters.getColor);
 export const getTitle = read(PostCreateService.getters.getTitle);
 export const getContent = read(PostCreateService.getters.getContent);
 export const getCurrentPost = read(PostCreateService.getters.getCurrentPost);
@@ -414,6 +442,8 @@ export const mutRemoveElement = commit(
 );
 export const mutSaveDraft = commit(PostCreateService.mutations.SAVE_DRAFT);
 export const mutSetTags = commit(PostCreateService.mutations.SET_TAGS);
+export const mutSetLayout = commit(PostCreateService.mutations.SET_LAYOUT);
+export const mutSetColor = commit(PostCreateService.mutations.SET_COLOR);
 export const mutSetTitle = commit(PostCreateService.mutations.SET_TITLE);
 export const mutSwapElements = commit(
     PostCreateService.mutations.SWAP_ELEMENTS

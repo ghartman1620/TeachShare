@@ -2,15 +2,15 @@
             <table class="table table-bordered table-hover table-condensed table-striped vue-table">
                 <thead>
                     <tr>
-                        <th v-for="column in displayCols" :key="column">
+                        <th v-for="(column, index) in displayCols" :key="index">
                             <!--:class="getClasses(column)"-->
                             {{ column.title }}
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="entry in values" :key="entry">
-                        <td v-for="column in displayColsVisible" :key="column"
+                    <tr v-for="(entry, index) in values" :key="index">
+                        <td v-for="(column, index2) in displayColsVisible" :key="index2"
                             v-show="column.visible" :class="column.cellstyle">
                             <span v-if="column.renderfunction!==false" v-html="column.renderfunction( column.name, entry )"></span>
                             <span v-else-if="!column.editable"> {{ entry[column.name] }} </span>

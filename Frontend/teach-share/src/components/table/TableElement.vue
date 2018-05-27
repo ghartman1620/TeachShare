@@ -12,7 +12,9 @@ Vue.use(BootstrapVue);
 
 export default Vue.component("table-element", {
     data () {
-        values: []
+        return {
+            values: []
+        }
     },
     props: {
         element: {

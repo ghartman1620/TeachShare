@@ -14,6 +14,9 @@ from django.conf import settings
 from django.utils.timezone import now as timezone_now
 from django.db import IntegrityError
 from rest_framework import status
+from django.http import Http404
+from rest_framework.exceptions import ParseError
+from posts.models import Post
 
 #import pdb; pdb.set_trace()
 
@@ -35,6 +38,7 @@ from rest_framework.permissions import IsAuthenticated
 from oauth2_provider.views.mixins import OAuthLibMixin
 from oauth2_provider.oauth2_backends import OAuthLibCore
 from oauth2_provider.settings import oauth2_settings
+from guardian.shortcuts import get_users_with_perms
 
 import json
 
@@ -107,7 +111,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('user',)
-
+    
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -119,6 +123,24 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('username', 'email')
+    def get_queryset(self):
+        post_pk = self.request.query_params.get('post', None)
+        if post_pk != None:
+            try:
+                post = Post.objects.get(pk=post_pk)
+            except Post.DoesNotExist:
+                raise Http404('the post you specified in post query param does not exist')
+            except ValueError:
+                raise ParseError('invalid type for param post')
+            user_perms = get_users_with_perms(post, attach_perms=True, with_superusers=False)
+            self.queryset = User.objects.none()
+            for u,p in user_perms.items():
+                if('change_post' in p):
+                    self.queryset = self.queryset | User.objects.filter(pk=u.pk)
+            
+            
+        return self.queryset
+
     def create(self, request, format=None):
         print(request._data['username'])
         print(format)

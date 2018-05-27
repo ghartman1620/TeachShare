@@ -115,6 +115,7 @@ export const mutations = {
             if (!ctx.posts.has(data.pk)) {
                 // @TODO: check if this actually works with vue reactivity.
                 // posts.set(String(data.pk), data);
+                console.log(data);
                 Vue.set(ctx.posts.data, Number(data.pk), data);
             }
         }

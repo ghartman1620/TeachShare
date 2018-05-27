@@ -55,9 +55,6 @@ class PostDocument(DocType):
     id = fields.IntegerField()
 
     standards = fields.TextField()
-
-
-
     grade = fields.IntegerField()
     content_type = fields.IntegerField()
     subject = fields.IntegerField()

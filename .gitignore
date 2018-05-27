@@ -11,5 +11,9 @@ media/
 Rust_ws/target
 TeachShare_WebApp/cache/diesel_demo/target
 static/
+<<<<<<< HEAD
 TeachShare_WebApp/cache/websockets/target
 CacheService/cache-service/target
+=======
+CacheService/cache-service/target
+>>>>>>> collab

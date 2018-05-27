@@ -28,17 +28,17 @@ services:
     depends_on:
       - db
       - search
-#  celery:
-#    build: ./TeachShare_WebApp/.
-#    command: bash -c "cd TeachShare_WebApp && celery -A TeachShare_WebApp worke#r-l info -B"
-#    volumes:
-#      - .:/code
-#    networks:
-#      - teachnet
-#    volumes:
-#      - .:/code
-#    depends_on:
-#      - web
+  # celery:
+  #   build: ./TeachShare_WebApp/.
+  #   command: bash -c "cd TeachShare_WebApp && celery -A TeachShare_WebApp worker -l info -B"
+  #   volumes:
+  #     - .:/code
+  #   networks:
+  #     - teachnet
+  #   volumes:
+  #     - .:/code
+  #   depends_on:
+  #     - web
   # vue:
   #   build: Frontend/.
   #   networks:

@@ -16,6 +16,11 @@
                         </span>
                     </h4>
                     <hr>
+                    <div v-if="post.original_post" style="text-align: center;">
+                        This post was derived from a <router-link :to="{name: 'detail', params: {post_id: post.original_post}}">post</router-link>
+                             authored by {{getOriginalUser().username}}
+                    </div>
+                    <hr>
                     <div>
                         <div :key="element.pk" v-for="element in post.content">
                             <post-element :element="element"  :index="index"/>
@@ -146,6 +151,9 @@ export default class PostComp extends Vue {
         }
         return postTitle;
     }
+    getOriginalUser(){
+        return getUserByID(this.$store)(this.post.original_user);
+    }
 
     getComments() {
         var vm = this;
@@ -222,9 +230,13 @@ export default class PostComp extends Vue {
         }
     }
 
-    @Watch("$route")
-    onRouteChange(to: any, from: any) {
-        this.createPostTitle();
+    created() {
+        // this.$store.dispatch("fetchUser", this.post.user);
+        if(this.post.original_user){
+            console.log("hi");
+            console.log(this.post.original_user);
+            fetchUser(this.$store, this.post.original_user);
+        }
     }
 
 };

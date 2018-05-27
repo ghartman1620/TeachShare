@@ -11,6 +11,8 @@ export class InProgressPost {
     elements: any[];
     title: string;
     tags: string[];
+    layout: Object[];
+    color: string;
     userPk: number;
     status: PostStatus;
     draft: boolean;
@@ -25,11 +27,13 @@ export class InProgressPost {
     concepts: number[];
     coreIdeas: number[];
     practices: number[];
+    original_user: number | undefined;
+    original_post: number | undefined;
     /*
     */ 
    
     //@TODO: instead of dealing with window localstorage here this should accept
-    //a post model as a parameter. Then window local storage should be delt with in PostCreate.
+    //a post model as a parameter. Then window local storage should be dealt with in PostCreate.
     //This is currently bad design - what if some module that doens't care about the state of local storage 
     //(for example, when we go to allow users to integrate elements of another user's post into their own)
     //wants to use InProgressPost?
@@ -45,6 +49,8 @@ export class InProgressPost {
             this.elements = [];
             this.title = "";
             this.tags = [];
+            this.layout = [];
+            this.color = "#96e6b3";
             this.userPk = userid;
             var post: InProgressPost = this;
             this.status = PostStatus.Loading;
@@ -57,6 +63,9 @@ export class InProgressPost {
             this.concepts = [];
             this.coreIdeas = [];
             this.practices = [];
+            this.original_user = undefined;
+
+            this.original_post = undefined;
             post.pk = postid;
             asLoggedIn(api.get("/posts/"+ postid)).then(function(response){
                 console.log(response);
@@ -64,10 +73,13 @@ export class InProgressPost {
                 post.title = response.data.title;
                 post.draft = response.data.draft;
                 post.tags = response.data.tags;
+                post.layout = response.data.layout;
+                post.color = response.data.color ? response.data.color : "#96e6b3"; 
                 post.status = PostStatus.Saved;
                 post.grade = response.data.grade;
                 post.subject = response.data.subject;
                 post.standards = response.data.standards;
+                post.userPk = response.data.user;
                 console.log("subject: " + response.data.subject);
                 //response: #days hh:mm:ss
                 console.log(response.data.length);
@@ -80,6 +92,10 @@ export class InProgressPost {
                 post.coreIdeas = response.data.coreIdeas;
                 post.concepts = response.data.concepts;
                 post.practices = response.data.practices;
+                post.original_user = response.data.original_user;
+                post.original_post = response.data.original_post;
+                  
+                post.layout = response.data.layout;
             })
             console.log("returning from post constructor");
         }
@@ -88,6 +104,7 @@ export class InProgressPost {
             this.elements = [];
             this.title = "";
             this.tags = [];
+            this.color = "#96e6b3";
             this.userPk = userid;
             this.status = PostStatus.Saving;
             this.draft = true;
@@ -99,14 +116,28 @@ export class InProgressPost {
             this.concepts = [];
             this.practices = [];
             this.coreIdeas = [];
+            this.original_user = undefined;
+            this.original_post = undefined;
+            
+            this.layout = [];
             this.createNewDraft();
         }
     }
     setTags(tags: string[]): void {
         this.tags = tags;
+        this.saveDraft();
+    }
+    setLayout(layout: Object[]): void {
+        this.layout = layout;
+        this.saveDraft();
+    }
+    setColor(color: string): void {
+        this.color = color;
+        this.saveDraft();
     }
     setTitle(title: string): void {
         this.title = title;
+        this.saveDraft();
     }
     setGrade(grade: number): void {
         this.grade = grade;
@@ -132,7 +163,6 @@ export class InProgressPost {
     setConcepts(concepts: number[]): void {
         this.concepts = concepts;
     }
-
     addElement(element: any): void{
         this.elements.push(element);
     }
@@ -158,7 +188,6 @@ export class InProgressPost {
         console.log(print);
     }
     createNewDraft(){
-        
         var post: InProgressPost = this;
         var obj = this.json();
         console.log("CREATING DRAFT");
@@ -179,6 +208,8 @@ export class InProgressPost {
             likes: 0,
             comments: [],
             tags: this.tags,
+            layout: this.layout,
+            color: this.color,
             content_type: this.contentType,
             grade: this.grade,
             length: `00:${this.length}:00`,
@@ -188,6 +219,7 @@ export class InProgressPost {
             crosscutting_concepts: this.concepts,
             disciplinary_core_ideas: this.coreIdeas,
             practices: this.practices,
+            original_post: this.original_post,
         }
     }
     

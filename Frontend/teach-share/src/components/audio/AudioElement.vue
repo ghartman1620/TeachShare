@@ -1,12 +1,12 @@
 <template>
 <div>
-    <div style="width: 100%; padding: 10px;">
+    <div style="width: 100%;">
         <div class="card-body">
             <audio
                 class="col-12"
-                :src="url()"
-                :type="element.filetype"
-                :controls="url()">
+                v-bind:src="url()"
+                v-bind:type="element.filetype"
+                v-bind:controls="url()">
             </audio>
             <br><br>
             <h4 class="card-title">{{ element.title }}</h4>
@@ -43,6 +43,7 @@ export default class AudioElement extends Vue{
     mounted() {
         console.log(this.element);
         console.log(this.url());
+
     }
 
 };

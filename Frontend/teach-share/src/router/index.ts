@@ -2,7 +2,6 @@ import Base from "@/components/Base.vue";
 import * as Cookie from "tiny-cookie";
 import Vue from "vue";
 import Router from "vue-router";
-
 import api from "../api";
 import store from "../store";
 import {logout} from "../store_modules/UserService";
@@ -48,6 +47,8 @@ const WebSocketComp = () =>
     import ( /* webpackChunkName: "register" */ "../components/WebSocket.vue");
 const DbTest = () =>
     import ( /* webpackChunkName: "db-test" */ "../components/DbTest.vue");
+const PermissionAdd = () =>
+    import ( /* webpackChunkName: "permission-add" */ "../components/PermissionAdd.vue");
 
 
 Vue.use(Router);
@@ -55,10 +56,6 @@ Vue.use(Router);
 const router = new Router({
     mode: "history",
     routes: [
-        {
-            path : "/websocket",
-            component: WebSocketComp
-        },
         {
             path: "/",
             component: Base,
@@ -68,7 +65,13 @@ const router = new Router({
                     path: "/create",
                     name: "create",
                     component: PostCreate,
-                    children: [{
+                    children: [
+                        {
+                            name: "permission-add",
+                            path: "share",
+                            component: PermissionAdd
+                        },
+                        {
                             name: "edit-text",
                             path: "text",
                             component: EditText
@@ -168,6 +171,7 @@ export function asLoggedIn(promise: AxiosPromise<any>): Promise<any> {
 }
 
 function verifyAndRefreshLogin(): Promise<any> {
+    console.log("I'm verifying and refreshing login!");
     if (store.getters.isLoggedIn){
         console.log("is logged in with store");
         return new Promise((resolve) => {resolve(true);});
@@ -188,6 +192,7 @@ function verifyAndRefreshLogin(): Promise<any> {
             };
             console.log(body);
             const head = { headers: { "content-type": "application/json" } };
+            console.log("ASSIGNING API DEFAULTS TO EMPTY");
             Object.assign(api.defaults, {});
             api.post("get_token/", body, head).then((response: any) => {
                 console.log(response);
@@ -216,7 +221,7 @@ function verifyAndRefreshLogin(): Promise<any> {
     }
 }
 
-const loginProtectedRoutes = ["create"];
+const loginProtectedRoutes = ["create", "posts"];
 const loggedOutRoutes = ["login", "register"];
 router.beforeEach((to, from, next) => {
     console.log(window.localStorage.getItem("refreshToken"));
