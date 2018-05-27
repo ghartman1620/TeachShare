@@ -181,6 +181,11 @@ class Post(models.Model):
     original_user = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.CASCADE
     )
+    original_post = models.ForeignKey(
+        'self', null=True, blank=True, on_delete=models.CASCADE
+    )
+
+
     color = models.CharField(max_length=7, blank=True, default="#96e6b3")
     layout = JSONField(default=[{"x":0, "y":0, "w":2, "h":30, "i":"0"}])
     title = models.CharField(max_length=100, default='', blank=True)

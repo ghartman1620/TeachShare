@@ -356,9 +356,9 @@ class PostViewSet(viewsets.ModelViewSet):
     
     def get_object(self):
         post = super(PostViewSet, self).get_object()
-        if not self.request.user.has_perm('view_post', post):
-            print('Auth failed! returning 401')
-            raise PermissionDenied('You are not allowed to view that post.')
+        #if not self.request.user.has_perm('view_post', post):
+        #    print('Auth failed! returning 401')
+        #    raise PermissionDenied('You are not allowed to view that post.')
             #return Response({'error': 'You are not allowed to view that post.'}, status=status.HTTP_401_UNAUTHORIZED)
 
         return post

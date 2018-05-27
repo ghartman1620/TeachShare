@@ -62,4 +62,4 @@ class PostSerializer(serializers.ModelSerializer):
                   'tags', 'draft', 'length', 'content_type', 
                   'standards', 'subject', 'grade', 'practices',
                   'crosscutting_concepts', 'disciplinary_core_ideas',
-                  'original_user')
+                  'original_user', 'original_post')

@@ -24,6 +24,7 @@ export class InProgressPost{
     coreIdeas: number[];
     practices: number[];
     original_user: number | undefined;
+    original_post: number | undefined;
     /*
     */ 
    
@@ -57,6 +58,8 @@ export class InProgressPost{
             this.coreIdeas = [];
             this.practices = [];
             this.original_user = undefined;
+
+            this.original_post = undefined;
             post.pk = postid;
             api.get("/posts/"+ postid).then(function(response){
                 console.log(response);
@@ -82,6 +85,8 @@ export class InProgressPost{
                 post.concepts = response.data.concepts;
                 post.practices = response.data.practices;
                 post.original_user = response.data.original_user;
+                post.original_post = response.data.original_post;
+                  
             })
             console.log("returning from post constructor");
         }
@@ -102,6 +107,8 @@ export class InProgressPost{
             this.practices = [];
             this.coreIdeas = [];
             this.original_user = undefined;
+            this.original_post = undefined;
+            
             this.createNewDraft();
         }
     }
@@ -191,6 +198,7 @@ export class InProgressPost{
             crosscutting_concepts: this.concepts,
             disciplinary_core_ideas: this.coreIdeas,
             practices: this.practices,
+            original_post: this.original_post,
         }
     }
     
