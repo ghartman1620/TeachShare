@@ -208,27 +208,26 @@ impl Connection {
         return_message.items.push(Arc::new(Resource::new(Model::Post(p))));
 
         match self.to_cache.send(Arc::new(return_message)) {
-            Ok(val) => {}
+            Ok(_) => {}
             Err(e) => {
                 println!("[Error] ---> {:?}", e);
             }
         };
 
         let resp = match self.from_cache.recv() {
-            Ok(val) => val.items.clone(), // @TODO: figure out how to avoid clone/copy
+            Ok(val) => val,
             Err(e) => {
                 println!("[Error] ---> {:?}", e);
                 let ret: String = format!("Error receiving from channel (from cache).");
                 return Some(ret);
             }
         };
-        println!("resp: {:?}", resp);
-
-        let resp_data: Vec<Model> = resp.iter().map(|x| x.data.clone()).collect();
-        let versions: Vec<u64> = resp.iter().map(|resource| resource.version).collect();
+        
+        let resp_data: Vec<Model> = resp.items.iter().map(|x| x.data.clone()).collect();
+        let versions: Vec<u64> = resp.items.iter().map(|resource| resource.version).collect();
 
         match self.serialize_and_send_posts(&resp_data, &versions) {
-            Ok(o) => None,
+            Ok(_) => None,
             Err(e) => Some(format!("Err: {:?}", e)),
         }
     }
@@ -264,18 +263,17 @@ impl Connection {
         };
 
         let resp = match self.from_cache.recv() {
-            Ok(val) => val.items.clone(), // @TODO: figure out how to avoid clone/copy
-            Err(e) => {
+            Ok(val) => val,
+            Err(_) => {
                 return Some(String::from("Error receiving from channel (from cache)."));
             }
         };
-        println!("resp: {:?}", resp);
 
-        let output: Vec<Model> = resp.iter().map(|x| x.data.clone()).collect();
-        let versions: Vec<u64> = resp.iter().map(|resource| resource.version).collect();
+        let output: Vec<Model> = resp.items.iter().map(|x| x.data.clone()).collect();
+        let versions: Vec<u64> = resp.items.iter().map(|resource| resource.version).collect();
 
         match self.serialize_and_send_posts(&output, &versions) {
-            Ok(o) => None,
+            Ok(_) => None,
             Err(e) => Some(format!("Err: {:?}", e)),
         }
     }
@@ -329,13 +327,12 @@ impl Connection {
             };
 
             let resp = match self.from_cache.recv() {
-                Ok(val) => val.items.clone(),
-                Err(e) => {
+                Ok(val) => val,
+                Err(_) => {
                     return Some(String::from("Error receiving from channel (from cache)."));
                 }
             };
-            println!("[MAIN] resp: {:?}", resp);
-            let output: Vec<Model> = resp.iter().map(|post| {
+            let output: Vec<Model> = resp.items.iter().map(|post| {
                 match &post.data {
                     Model::Post(p) => Some(p),
                     _ => None,
@@ -344,7 +341,7 @@ impl Connection {
                 .map(|post| Model::Post(post.unwrap().clone()))
                 .collect();
 
-            let versions: Vec<u64> = resp.iter().map(|resource| resource.version).collect();
+            let versions: Vec<u64> = resp.items.iter().map(|resource| resource.version).collect();
             match self.serialize_and_send_posts(&output, &versions) {
                 Err(e) => Some(format!("Error: {:?}", e)),
                 _ => None,
@@ -479,12 +476,11 @@ impl Connection {
         };
 
         let resp = match self.from_cache.recv() {
-            Ok(val) => val.items.clone(), // @TODO: figure out how to avoid clone/copy
-            Err(e) => {
+            Ok(val) => val,
+            Err(_) => {
                 return Some(String::from("Error receiving from channel (from cache)."));
             }
         };
-        println!("resp: {:?}", resp);
 
         let output = vec![];
         let versions = vec![];

@@ -107,7 +107,7 @@ pub fn cache_thread(
                             assert_eq!(msg.msg_type, MessageType::Create);
                             {
                                 let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
-                                handle_create(msg, c, &ret_pipe, &db_send);
+                                handle_create(&msg, c, &ret_pipe, &db_send);
                             }
                         },                        
                         MessageType::Watch => {
@@ -255,11 +255,6 @@ fn handle_get(msg: &Arc<Msg>, cash: &mut RefCellCache, ret_pipe: &Sender<Arc<Msg
         .set_msg_type(MessageType::Get)
         .build();
 
-    // {
-    //     let mut cache = cash.borrow_mut();
-    //     let written = cache.put(ID::Post(1), Resource::new(Model::Post(Post::new())));
-    // }
-
     for m in &msg.items {
         let mut dne_flag = false;
         let mut db_posts: Vec<Post> = vec![];
@@ -317,7 +312,6 @@ fn handle_get(msg: &Arc<Msg>, cash: &mut RefCellCache, ret_pipe: &Sender<Arc<Msg
                     }
                     None => {
                         println!("[CACHE] Key did not currently exist.");
-
                     }
                 }
                 wrap.items.push(Arc::new(resource_new));
@@ -333,7 +327,7 @@ fn handle_get(msg: &Arc<Msg>, cash: &mut RefCellCache, ret_pipe: &Sender<Arc<Msg
 
 #[allow(dead_code)]
 fn handle_create(
-    msg: Arc<Msg>,
+    msg: &Arc<Msg>,
     cash: &mut RefCellCache,
     ret_pipe: &Sender<Arc<Msg>>,
     db: &Sender<Post>,
