@@ -538,17 +538,25 @@ export default class PostCreate extends Vue {
 
         WebSocket.getInstance().addMessageListener((message) => {
             console.log("Post create pkifying a post");
-            console.log("**********************", JSON.parse(message.data).payload[0].Post);
-            let post = Post.pkify(JSON.parse(message.data).payload[0].Post);
-            let inProgressPost = window.localStorage.getItem("inProgressPost");
             
-            if (inProgressPost){
-                if (post.pk === parseInt(inProgressPost as string, 10)) {
-                    beginPost(store,{userid: userpk, p: post});
-                    vm.postStatus = PostStatus.Saved;
+            
+            const val = JSON.parse(message.data);
+            console.log("RAW DATA: ");
+            console.log(val);
+            if (val.payload && val.payload.length > 0) {
+                console.log("WHY!?");
+                console.log("**********************", val.payload[0].Post);
+                let post = Post.pkify(val.payload[0].Post);
+                let inProgressPost = window.localStorage.getItem("inProgressPost");
+                
+                if (inProgressPost){
+                    if (post.pk === parseInt(inProgressPost as string, 10)) {
+                        beginPost(store,{userid: userpk, p: post});
+                        vm.postStatus = PostStatus.Saved;
+                    }
+                } else {
+                    console.error("no inprogressPost localStorage item exists");
                 }
-            } else {
-                console.error("no inprogressPost localStorage item exists");
             }
             return undefined;
         });

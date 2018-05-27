@@ -187,7 +187,7 @@ impl Connection {
         let output = WSMessageResponse::new(data, versions);
         println!("Sending: {:?}", output);
 
-        let serialized = serde_json::to_string(data).expect("Uh-oh... JSON serialization error!~");
+        let serialized = serde_json::to_string(&output).expect("Uh-oh... JSON serialization error!~");
         println!("Serialized content: {}", serialized);
         self.tx.send(serialized)
     }

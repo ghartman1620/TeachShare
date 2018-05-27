@@ -105,7 +105,7 @@ WebSocket.getInstance().addMessageListener( (msg) => {
     const val = JSON.parse(msg.data);
     console.log("Value is: ");
     console.log(val);
-    console.log(val.Post);
+    console.log(val.payload);
 
     const db: Database = Database.getInstance();
     if ("payload" in Object.keys(val)) {
