@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     'rest_framework_social_oauth2',
     'django_filters',
     'django_elasticsearch_dsl',
-    # 'django_elasticsearch_dsl',
     'guardian',
 
     'accounts',

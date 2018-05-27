@@ -60,11 +60,8 @@ export default class PostDetail extends Vue {
         var vm = this;
         // createUpdateComment(this.$store, )
         getByPost(this.$store, Number(this.$route.params.post_id)).then(function(res) {
-            console.log(res);
             let comments = getCommentsForPost(vm.$store)(Number(vm.$route.params.post_id));
-            console.log(comments);
             for (let c of comments) {
-                console.log(c);
                 let alreadyFetchedUsers = vm.userModule.otherUsers as User[]
                 if (typeof c !== 'undefined' && typeof c.user !== 'undefined') {
                     if (typeof alreadyFetchedUsers.find( (val) => (val as User).pk as number === (c as Comment).user as number) === 'undefined') {

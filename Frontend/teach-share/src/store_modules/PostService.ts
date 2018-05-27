@@ -4,6 +4,7 @@ import { ActionContext } from "vuex";
 import { getStoreAccessors } from "vuex-typescript";
 import api from "../api";
 import { IRootState, ModelMap, Post } from "../models";
+import WebSocket from "../WebSocket";
 
 export interface IPostState {
     posts: ModelMap<Post>;
@@ -18,7 +19,6 @@ const state = {
 
 export const actions = {
     postSearch: async (ctx: PostContext, query) => {
-        console.log("in postSearch");
         let querystring = "";
         let firstProperty = true;
         Object.keys(query).forEach((key, index) => {
@@ -29,7 +29,6 @@ export const actions = {
                 querystring += "&" + key + "=" + query[key];
             }
         });
-        console.log(querystring);
         try {
             const resp: AxiosResponse<Post[]> = await api.get("search/" + querystring);
             mutLoadAll(ctx, resp.data as Post[]);
@@ -59,12 +58,25 @@ export const actions = {
     fetchPost: async (ctx: PostContext, postID: string|number) => {
         try {
 
-            if(typeof postID === "string"){
-                postID = parseInt(postID);
+            if (typeof postID === "string") {
+                postID = parseInt(postID, 10);
             }
-            console.log("awaiting Post.get with postid with type " + (typeof postID))
-            var p: Post = await Post.get(postID as number);
-            //const resp: AxiosResponse<Post> = await api.get(`posts/${postID}/`);
+            const p: Post = await Post.get(postID as number);
+            // const resp: AxiosResponse<Post> = await api.get(`posts/${postID}/`);
+            mutCreate(ctx, p);
+            return p;
+        } catch (err) {
+            return err;
+        }
+    },
+    fetchPostSubscribe: async (ctx: PostContext, postID: string|number) => {
+        try {
+            console.log("fetch post subscribing to post" + postID);
+            if (typeof postID === "string") {
+                postID = parseInt(postID, 10);
+            }
+            const p: Post = await Post.get(postID as number, true);
+            // const resp: AxiosResponse<Post> = await api.get(`posts/${postID}/`);
             mutCreate(ctx, p);
             return p;
         } catch (err) {
@@ -83,7 +95,6 @@ export const actions = {
     updateExistingPost: async (ctx: PostContext, postObj: Post) => {
         try {
             const resp: AxiosResponse<Post> = await api.put(`posts/${postObj.pk}/`, postObj);
-            console.log(resp);
             return resp.data;
         } catch (err) {
             if (err.response) {
@@ -110,13 +121,18 @@ export const mutations = {
         }
     },
     CREATE: (ctx, data: Post) => {
+        console.log("doing mut create")
+        
         const posts = ctx.posts as ModelMap<Post>;
+        console.log("before: posts.get(Number(data.pk)) = " + posts.get(Number(data.pk)));
+        console.log(data);
         if (typeof data.pk !== "undefined") {
             if (!ctx.posts.has(data.pk)) {
                 // @TODO: check if this actually works with vue reactivity.
                 // posts.set(String(data.pk), data);
-                console.log(data);
                 Vue.set(ctx.posts.data, Number(data.pk), data);
+                console.log("after: posts.get(Number(data.pk)) = " + posts.get(Number(data.pk)));
+        
             }
         }
     },
@@ -125,6 +141,8 @@ export const mutations = {
         if (typeof data.pk !== "undefined") {
             posts.set(String(data.pk), data);
             // Vue.set(ctx.posts!.data, Number(data.pk), data);
+        } else {
+            console.error("PostService error: UPDATE called on post without pk");
         }
     },
     DELETE: (ctx: IPostState, data: number | string ) => {
@@ -137,6 +155,7 @@ export const mutations = {
 };
 
 export const getters = {
+    map: (ctx) => ctx.posts,
     allByPk: (ctx: IPostState) => ctx.posts.data,
     all: (ctx: IPostState): Post[] => ctx.posts.list(),
     getPostById: (ctx: IPostState, getters: any) => (id: string|number): Post => {
@@ -167,11 +186,14 @@ export const fetchAllPosts = dispatch(PostService.actions.fetchAllPosts);
 export const fetchPost = dispatch(PostService.actions.fetchPost);
 export const postSearch = dispatch(PostService.actions.postSearch);
 
+export const fetchPostSubscribe = dispatch(PostService.actions.fetchPostSubscribe);
+
 /**
  * Getters Handlers
  */
 export const getPosts = read(PostService.getters.all);
 export const getPostById = read(PostService.getters.getPostById);
+export const getMap = read(PostService.getters.map);
 
 /**
  * Mutations Handlers

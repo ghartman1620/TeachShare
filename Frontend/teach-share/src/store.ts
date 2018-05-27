@@ -1,28 +1,53 @@
 import { AxiosResponse } from "axios";
 import Vue from "vue";
 import Vuex, { ActionContext, ActionTree, StoreOptions } from "vuex";
-import { getStoreAccessors, ActionHandlerNoPayload } from "vuex-typescript";
+import { ActionHandlerNoPayload, getStoreAccessors } from "vuex-typescript";
 
 import api from "../src/api";
-import { IRootState, Post, User, Comment } from "./models";
+import Database from "./Database";
+import { Comment, ContentType, IRootState, Post, User } from "./models";
 import CommentService from "./store_modules/CommentService";
 import FileService from "./store_modules/FileService";
 import NotificationService from "./store_modules/NotificationService";
 import PostCreateService from "./store_modules/PostCreateService";
+import PostService from "./store_modules/PostService";
 import UserService from "./store_modules/UserService";
 import YouTubeService from "./store_modules/YouTubeService";
-import PostService from "./store_modules/PostService";
 import { WatchStore } from "./WatchStore";
-import Database from "./Database";
+
+import WebSocket from "./WebSocket";
 
 Vue.use(Vuex);
 
 const state = {};
 
-var storeSocket = new WebSocket("ws://127.0.0.1:3012/");
+// var storeSocket = new WebSocket("ws://127.0.0.1:3012/");
 
+const storeSocket: WebSocket = WebSocket.getInstance();
 
+const p = new Post(1, [], new User(1));
+p.attachments = [];
+p.concepts = [];
+// return MessageStatus.ConnectionClosed;
+p.comments = [new Comment(1, 1, 1, "")];
+p.content = [];
+p.content_type = ContentType.Game;
+p.coreIdeas = [];
+p.draft = false;
+p.grade = 1;
+p.likes = 0;
+p.practices = [];
+p.standards = [];
+p.subject = 0;
+p.tags = [];
+p.title = "This is a post title";
+// p.updated = new Date();
 
+// storeSocket.sendCreate(p);
+storeSocket.sendGet(2);
+storeSocket.sendWatch(1);
+// storeSocket.sendWatch(2);
+storeSocket.sendUpdate(p);
 
 function circularRecordChecker(record: any, seen: any[] = []) {
 
@@ -38,65 +63,22 @@ function circularRecordChecker(record: any, seen: any[] = []) {
     if (typeof record === "object") {
         for (const k of Object.keys(record)) {
             if (typeof k !== "undefined") {
-                let result = circularRecordChecker(record[k], seen);
+                const result = circularRecordChecker(record[k], seen);
                 if (result) { return true; }
             }
         }
     } else if (record instanceof Array) {
         for (const v of record) {
             if (typeof v !== "undefined") {
-                let result = circularRecordChecker(v, seen);
+                const result = circularRecordChecker(v, seen);
                 if (result) { return true; }
             }
         }
     }
     return false;
 }
-enum WSStatus {
-    CONNECTING=0,
-    OPEN,
-    CLOSING,
-    CLOSED
 
-}
-
-storeSocket.addEventListener("open", function(ev) {
-    console.log(ev);
-});
-
-storeSocket.onopen = (val) => {
-    
-    console.log("[WS] Websocket successfully opened!");
-    let testUser = new User(1);
-    let testPost = new Post(10)
-    let testComment = new Comment(10, testPost, testUser, "some comment text");
-    let comments = new Array<Comment>();
-    comments.push(testComment);WebSocket
-    testPost.comments = comments;
-    testPost.user = testUser;
-    console.log("[WS] Websocket sending: ", testPost);
-    const isCircular = circularRecordChecker(testPost);
-    console.log(isCircular);
-    if (!isCircular) {
-        storeSocket.send(JSON.stringify(testPost)); // JSON.stringify(testPost)
-    }
-    else {
-        // map all the internal structures to maps of pk's
-        testPost.comments = comments.map((val, ind, arr) => { 
-            if (typeof val.pk !== "undefined") {
-                return Number(val.pk); 
-            }
-            return 0;
-        });
-        storeSocket.send(JSON.stringify(testPost));
-    }
-};
-
-storeSocket.onmessage = (val) => {
-    console.log("[WS] Websocket recieved message: ", JSON.parse(val.data));
-};
-
-const store: StoreOptions<IRootState> = {
+const storeOptions: StoreOptions<IRootState> = {
     strict: false, // process.env.NODE_ENV !== "production",
     modules: {
         fs: FileService,
@@ -107,7 +89,56 @@ const store: StoreOptions<IRootState> = {
         comment: CommentService,
         user: UserService
     },
-    plugins: [WatchStore]
+    // plugins: [WatchStore]
 };
 
-export default new Vuex.Store<IRootState>(store);
+const store = new Vuex.Store<IRootState>(storeOptions);
+
+import {getMap, mutCreate, mutUpdate} from "./store_modules/PostService";
+/*
+ * After we've declared all of our store modules we can now add a message listener to the websocket.
+ * Can't do it in websocket because this function depends on our store modules, and if websocket itself had
+ * a store dependency we'd have a circular dependency and would cause all sorts of errors.
+*/
+WebSocket.getInstance().addMessageListener( (msg) => {
+    console.log("Got a message!: " + msg.data.toString());
+    const val = JSON.parse(msg.data);
+    console.log("Value is: ");
+    console.log(val);
+    console.log(val.payload);
+
+    const db: Database = Database.getInstance();
+    const keys = Object.keys(val);
+    if ("payload" in keys && "version" in keys) {
+        for (let i = 0; i < val.payload.length; i++) {
+            const post = val.payload[i].Post;
+            const version = val.versions[i];
+            console.log("Store listener pkifying a post");
+
+            console.log("+++++++++++++++++", post.Post);
+            console.log("VERSION: ", version);
+            const pkifiedPost: Post = Post.pkify(post.Post);
+            // check if the post we got from the WS is saved in the DB.
+
+            console.log("ATTEMPTING TO GET: ", pkifiedPost.pk as number);
+            db.getPost(pkifiedPost.pk as number).then((dbCurrentPost) => {
+                console.log("GOT INSIDE GETPOST");
+                // If it is, we should save the post we got - because it's a post we've decided in the past to cache
+                db.putPost(pkifiedPost, version);
+            }).catch((err) => {
+                console.log("There was a tremendous error -->", err);
+            }); // If not, DON'T save it, because we're not saving every single post that arrives.
+
+            // for all posts - db saved and otherwise, send it over to the store to get rendered by components.
+            if (typeof pkifiedPost.pk !== "undefined" && getMap(store).has(pkifiedPost.pk!.toString())) {
+                // it already exists in the store
+                mutUpdate(store, pkifiedPost);
+            } else {
+                // it didn't already exist in the store - now it does!
+                mutCreate(store, pkifiedPost);
+            }
+        }
+    }
+    return undefined;
+});
+export default store;

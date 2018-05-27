@@ -1,21 +1,230 @@
-// use diesel::pg::data_types::{PgTimestamp, PgInterval};
-// use serde_json::value::Value;
-
+use serde_json::from_str;
+use serde_json::Value;
 use std::cmp::{Eq, PartialEq};
-use std::collections;
-use std::collections::HashMap;
-use std::cell::RefCell;
-use std::rc::Rc;
+use std::error;
+use std::fmt;
+use std::hash::Hash;
+use std::sync::Arc;
+use diesel::Insertable;
+use schema::{posts_post, oauth2_provider_accesstoken};
+use diesel::data_types::PgTimestamp;
 
-/**
- *  This
- */
-#[derive(Clone, Debug)]
+// * option 1
+#[derive(Debug, Serialize)]
+pub struct WSMessageResponse<'a> {
+    versions: &'a [u64],
+    payload: &'a [Model],
+}
+
+impl<'a> WSMessageResponse<'a> {
+    pub fn new(payload: &'a [Model], versions: &'a [u64]) -> WSMessageResponse<'a> {
+        WSMessageResponse {
+            payload,
+            versions,
+        }
+    }
+}
+
+
+// * option 2
+#[derive(Debug, Serialize)]
+pub struct WSMsgResponse<'a>(u64, &'a Model);
+
+/// This is the Value field for entries in the cache. They can be
+/// matched by their type, and then return the value as
+/// the parameter. 
+///
+/// Implementation note: This will always be exactly the size of the
+/// largest struct. Luckily most of the large fields are simple
+/// strings/json and are referred to via reference. So their actual
+/// size isn't that bad.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum Model {
+    User(User),
+    Post(Post),
+    Comment(Comment), 
+}
+
+
+// This is KEY field for HashMap entries that make it so that we can still refer 
+// to an entry only by their id (pk), and have no collision with different types.
+#[derive(Debug, Eq, PartialEq, Hash)]
+pub enum ID {
+    Post(i32),
+    User(i32),
+    Comment(i32),
+}
+
+#[derive(Debug, Clone)]
+pub struct UserPermission {
+    pub permission: Permission,
+    pub user: User,
+}
+
+#[derive(Debug, Clone)]
+pub enum Permission {
+    view_post(bool),
+    // etc...
+}
+
+
+// user access tokens cache:
+// need: user_id, token, expires?
+#[derive(Queryable, Insertable, Debug, Clone, PartialEq)]
+#[table_name = "oauth2_provider_accesstoken"]
+pub struct Oauth2ProviderAccesstoken {
+    pub id: i64,
+    pub token: String,
+    pub expires: PgTimestamp,
+    pub scope: String,
+    pub application_id: Option<i64>,
+    pub user_id: Option<i32>,
+    pub created: PgTimestamp,
+    pub updated: PgTimestamp,
+}
+
+// Keep track of user auth table -> oauth2_provider_accesstoken
+// map token --> user
+// keep flat map/list of users w/ certain access inside resource
+impl UserPermission {
+    pub fn new() -> UserPermission {
+        UserPermission {
+            permission: Permission::view_post(true),
+            user: User::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Resource {
+    /// Watchers: These keep track of all the users that are watching this
+    /// peice of data.
+    ///
+    pub watchers: Vec<i32>,
+    /// Data: Where the data is actually stored. Generically, of course.
+    ///
+    pub data: Model,
+
+    /// Version: the id of the most recent update to a post.
+    pub version: u64,
+
+    pub permission: UserPermission,
+}
+
+impl Resource {
+    pub fn new(inner: Model) -> Resource {
+        Resource {
+            data: inner,
+            watchers: vec![],
+            version: 0,
+            permission: UserPermission::new(),
+        }
+    }
+    pub fn add_watch(&mut self, id: i32) {
+        self.watchers.push(id)
+    }
+
+    /// remove_watch: remove's a watch from the watchers map
+    pub fn remove_watch(&mut self, id: i32) {
+        self.watchers.remove_item(&id).unwrap();
+    }
+
+    // ? all_watchers: goal is to get a vector of copy'd user's
+    // ! deprecated because no longer a trait object and necessary to expose
+    // ! fields as methods.
+    pub fn all_watchers(&self) -> &Vec<i32> {
+        &self.watchers
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct IdAndVersion {
+    pub id: i32,
+    pub version: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Eq, PartialEq, Deserialize)]
+pub enum MessageType {
+    Watch,
+    Manifest,
+    Create,
+    Update,
+    Get,
+}
+
+#[derive(Debug, Clone)]
+pub enum ModelType {
+    Post = 0,
+    User,
+    Comment,
+}
+
+#[derive(Clone)]
+pub struct Msg {
+    pub msg_type: MessageType,
+    pub timestamp: i32,
+    pub items: Vec<Arc<Resource>>,
+    pub errors: Vec<String>,
+    pub connection_id: i32,
+}
+
+/// Msg uses the common standard library/crate pattern for building objects called
+///  the 'builder pattern'. This can be found at: https://abronan.com/rust-trait-objects-box-and-rc/
+impl Msg {
+    pub fn new() -> Msg {
+        Msg {
+            msg_type: MessageType::Get,
+            timestamp: 0,
+            items: vec![],
+            errors: vec![],
+            connection_id: 0,
+        }
+    }
+    pub fn set_msg_type(&mut self, msg_type: MessageType) -> &mut Self {
+        self.msg_type = msg_type;
+        self
+    }
+    pub fn set_items(&mut self, items: &Vec<Resource>, watchers: &[Vec<i32>]) -> &mut Self {
+        // Generate a temporary value, iterate though it, zipping it together
+        // with the watchers, mapping them both to generate a new Resource
+        // with the correct watchers. This sort of data-gymnastics was necessary
+        // to be able to set the items of a wrapper, including watchers in one go.
+        let temp = items
+            .iter()
+            .zip(watchers.iter())
+            .map(|(post, watchers)| {
+                let temp = &mut Arc::new(post.clone()); // @Clone
+                let resource = Arc::get_mut(temp).expect("Could not borrow mutably.");
+
+                watchers.iter().for_each(|watch| {
+                    resource.add_watch(watch.clone());
+                });
+                Arc::new(resource.clone())
+            })
+            .collect::<Vec<_>>();
+
+        // @TODO: avoid this extra loop if possible.
+        let mut actual: Vec<Arc<Resource>> = vec![];
+        for a in temp {
+            actual.push(a.clone());
+        }
+        self.items = actual;
+        self
+    }
+
+    /// Termination of the builder-pattern to return a fully owned clone of the
+    /// built up wrapper.
+    pub fn build(&mut self) -> Msg {
+        self.clone()
+    }
+}
+
+#[derive(Queryable, Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct User {
     pub id: i32,
     password: String,
     // last_login: Option<PgTimestamp>,
-    is_superuser: bool,
+    pub is_superuser: bool,
     pub username: String,
     pub first_name: String,
     pub last_name: String,
@@ -24,13 +233,6 @@ pub struct User {
     pub is_active: bool,
     // date_joined: PgTimestamp,
 }
-
-impl PartialEq for User {
-    fn eq(&self, other: &User) -> bool {
-        self.id == other.id
-    }
-}
-impl Eq for User {}
 
 impl User {
     pub fn new() -> User {
@@ -50,250 +252,36 @@ impl User {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct Resource<T> {
-    /// Watchers: These keep track of all the users that are watching this
-    /// peice of data.
-    ///
-    pub watchers: HashMap<i32, User>,
-
-    /// Data: Where the data is actually stored. Generically, of course.
-    ///
-    pub data: T,
-
-    /// Version is something along the lines of [browser, cache, db]
-    /// to keep track of which version this current data is.
-    /// Although it could be done using a single integer, having actual
-    /// 'mutators' identified allows for a finer grained decision making
-    /// process when it comes to WHICH value to keep/save as most 'current'.
-    ///
-    /// ```
-    /// version = [1, 0, 0];
-    /// ```
-    ///
-    version: [u32; 3],
+#[derive(Queryable, Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct Comment {
+    pub id: i32,
+    pub text: String,
+    // timestamp: PgTimestamp,
+    pub post_id: i32,
+    pub user_id: i32,
 }
 
-impl<'a, T> Resource<T> {
-    pub fn new(inner: T) -> Resource<T> {
-        Resource::<T> {
-            data: inner,
-            watchers: HashMap::new(),
-            version: [0, 0, 0],
-        }
-    }
-    pub fn increment(&mut self) {
-        self.version[1] = self.version[1] + 1;
-    }
-    pub fn add_watch(&mut self, user: User) -> Option<User> {
-        self.watchers.insert(user.id, user)
-    }
-
-    /// remove_watch: remove's a watch from the watchers map
-    pub fn remove_watch(&mut self, user_id: i32) -> Option<User> {
-        self.watchers.remove(&user_id)
-    }
-
-    /// all_watchers: goal is to get a vector of copy'd user's
-    pub fn all_watchers(&mut self) -> Vec<User> {
-        let out: &mut Vec<User> = &mut vec![];
-        let temp = self.watchers.clone();
-        for (_, user) in temp.iter() {
-            out.push(user.clone());
-        }
-        return out.clone();
-    }
-
-    /// watchers_to_iter: gives an iterator from the watchers list
-    pub fn watchers_to_iter(&self) -> collections::hash_map::Iter<i32, User> {
-        self.watchers.iter()
-    }
-}
-
-impl PartialEq for Resource<Post> {
-    fn eq(&self, other: &Resource<Post>) -> bool {
-        self.data.id == other.data.id
-    }
-}
-impl Eq for Resource<Post> {}
-
-#[derive(Debug, Clone)]
-pub enum MessageType {
-    Watch = 0,
-    Create,
-    Update,
-    Get,
-}
-
-#[derive(Debug, Clone)]
-pub enum CommandType {
-    Exit = 0,
-}
-
-#[derive(Debug, Clone)]
-pub enum ModelType {
-    Post = 0,
-    User,
-    Comment,
-}
-
-pub enum Operation {
-    Add = 0,
-}
-
-#[derive(Debug, Clone)]
-pub enum Data {
-    Post,
-    User,
-    Comment,
-}
-
-type RcItem = Rc<Item>;
-pub struct Wrapper {
-    pub model_type: ModelType,
-    pub msg_type: MessageType,
-    pub timestamp: i32,
-    pub items: Vec<RcItem>, 
-}
-
-pub trait Msg<'a> {
-    fn data_type(&self) -> ModelType;
-    fn msg_type(&self) -> MessageType;
-    // fn data(&self) -> Self;
-    fn timestamp(&self) -> i32;
-    fn items(&self) -> &Vec<RcItem>;
-}
-
-impl<'a> Msg<'a> {
-    // what do I do here?
-}
-
-impl<'a> Msg<'a> for Wrapper {
-    fn data_type(&self) -> ModelType {
-        return self.model_type.clone();
-    }
-    fn msg_type(&self) -> MessageType {
-        return self.msg_type.clone();
-    }
-    // fn data(&self) -> Self;
-    fn timestamp(&self) -> i32 {
-        return self.timestamp;
-    }
-    fn items(&self) -> &Vec<RcItem> {
-        return &self.items;
-    }
-}
-
-pub trait Item {
-    fn get_data(&self) -> &Post;
-    fn get_data_mut(&mut self) -> &mut Post;
-    fn get_watchers(&self) -> &HashMap<i32, User>;
-    fn get_watchers_mut(&mut self) -> &mut HashMap<i32, User>;
-    fn get_version(&self) -> [u32; 3];
-}
-
-type PostResource = Resource<Post>;
-
-impl Item for PostResource {
-    fn get_data(&self) -> &Post {
-        return &self.data;
-    }
-    fn get_data_mut(&mut self) -> &mut Post {
-        return &mut self.data;
-    }
-    fn get_watchers(&self) -> &HashMap<i32, User> {
-        return &self.watchers;
-    }
-    fn get_watchers_mut(&mut self) -> &mut HashMap<i32, User> {
-        return &mut self.watchers;
-    }
-    fn get_version(&self) -> [u32; 3] {
-        return self.version;
-    }
-    
-}
-
-/// Message<T> is a wrapper for defining messages for communication
-/// with this very service.
-#[derive(Debug, Clone)]
-pub struct Message<T>
-where
-    T: Model + Clone,
-{
-    pub data: T,
-    pub msg_type: MessageType,
-    // pub operation: Operation,
-    pub timestamp: i32,
-    pub version: [i32; 3],
-}
-
-
-impl<T> Message<T> where 
-    T: Model + Clone,
-{
-    pub fn new() -> Message<T> {
-        Message {
-            data: T::new(),
-            // data_type: ModelType::Post,
-            msg_type: MessageType::Get,
-            timestamp: 0,
-            version: [0,0,0],
+impl Comment {
+    pub fn new() -> Comment {
+        Comment {
+            id: 1,
+            text: String::from(""),
+            post_id: 1,
+            user_id: 1,
         }
     }
 }
 
-#[derive(Debug)]
-pub struct Command<T> {
-    pub cmd_type: CommandType,
-    pub value: T,
-}
-
-type ModelTable<T> = RefCell<HashMap<i32, Resource<T>>>;
-
-#[derive(Debug, Clone)]
-pub struct Cache<T> {
-    // using classical generics and predefined models
-    pub _data: ModelTable<T>,
-}
-
-impl<'a, T> Cache<T> 
-where
-    T: Model,
-{
-    pub fn new() -> Cache<T> {
-        Cache {
-            _data: RefCell::from(HashMap::new()),
-        }
-    }
-    pub fn get(self, key: i32) /*-> Option<&'a Resource<T>>*/ {
-        let temp = self._data;
-        let selfy = temp.borrow();
-        let result = selfy.get(&key).unwrap();
-        // println!("{:?}", result.id());
-    }
-    pub fn set(&mut self, key: i32, new_post: T) -> Option<Resource<T>> {
-        let model = Resource::new(new_post);
-        let mut selfy = self._data.borrow_mut();
-        let res = selfy.insert(key, model);
-        res
-    }
-    pub fn update(&'static mut self, key: i32, new_post: T) -> bool {
-        let mut temp = self._data.borrow_mut(); 
-        let prev = temp.get_mut(&key).unwrap();
-        *prev = Resource::new(new_post);
-        true
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)] // , PartialEq, Eq
+#[derive(Queryable, Insertable, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+#[table_name = "posts_post"]
 pub struct Post {
     pub id: i32,
     pub title: String,
-    // pub content: Value,
+    pub content: Value,
     // pub updated: PgTimestamp,
     pub likes: i32,
     // pub timestamp: PgTimestamp,
-    // pub tags: Value,
+    pub tags: Value,
     pub user_id: i32,
     pub draft: bool,
     pub content_type: i32,
@@ -303,66 +291,10 @@ pub struct Post {
     pub crosscutting_concepts: Vec<i32>,
     pub disciplinary_core_ideas: Vec<i32>,
     pub practices: Vec<i32>,
-}
 
-impl Post {
-    pub fn new() -> Post {
-        Post {
-            id: 0,
-            title: String::from(""),
-            // content: Value::Null,
-            // updated: PgTimestamp(0),
-            likes: 0,
-            // timestamp: PgTimestamp(0),
-            // tags: Value::Array(vec!()),
-            user_id: 0,
-            draft: false,
-            content_type: 0,
-            grade: 0,
-            // length: PgInterval::new(0, 0, 0),
-            subject: 0,
-            crosscutting_concepts: vec![],
-            disciplinary_core_ideas: vec![],
-            practices: vec![],
-        }
-    }
-}
-
-pub trait Model {
-    type model;
-    fn id(&self) -> i32;
-    fn new() -> Self;
-    fn data(self) -> Self where 
-        Self: Sized,
-    {
-        return self;
-    }
-    fn inner(self) -> Self where 
-        Self: Sized,
-    {
-        return self;
-    }
-}
-
-impl Model for Post {
-    type model = Post;
-    fn id(&self) -> i32 {
-        self.id
-    }
-    fn new() -> Post {
-        Post::new()
-    }
-    fn inner(self) -> Self where 
-        Self: Sized,
-    {
-        return self;
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
-pub struct Comment {
-    pub id: i32,
-    pub text: String,
+    pub color: String,
+    pub layout: Value,
+    pub original_user_id: Option<i32>,
 }
 
 #[cfg(test)]
@@ -373,54 +305,123 @@ mod tests {
     use std;
     use std::any::Any;
     use std::any::TypeId;
+    use std::collections::HashMap;
 
     pub fn typeid<T: Any>(_: &T) -> TypeId {
         TypeId::of::<T>()
     }
-    // just 'test' tests..
-    #[test]
-    fn test_post() {
-        let p = models::Post::new();
-        assert_eq!(models::Post::new(), p)
-    }
 
     #[test]
-    fn test_new_model() {
-        let m = models::Resource::new(models::Post::new());
-        let typ = typeid(&m);
-        println!("{:?}", typ);
-        assert_eq!(
-            std::any::TypeId::of::<models::Resource<models::Post>>(),
-            typ
-        );
+    fn test_response_msg() {
+        let p: Post = Default::default();
+
+        let payload = vec![Model::Post(p)];
+        let versions = vec![1];
+        let a = WSMessageResponse::new(&payload, &versions);
+        println!("WSMessageResponse --> {:?}", a);
+
+        let new_post: Post = Default::default();
+        let t = &Model::Post(new_post);
+        let b = WSMsgResponse(1, t);
+        println!("WSMsgResponse: {:?}", b);
+
     }
 
-    #[test]
-    fn test_model_post() {
-        let p = models::Post::new();
-        // p.data();
-    }
+    // #[test]
+    // fn test_enum_model() {
+    //     let p = Post::new();
+    //     let post = F::Post(p);
+    //     let mut x = vec![];
+    //     x.push(post);
+    //     x.push(F::User(User::new()));
+    //     x.push(F::Comment(Comment::new()));
 
-    #[test]
-    fn test_msg_struct() {
-        let mut msg = Wrapper {
-            model_type: ModelType::Post,
-            msg_type: MessageType::Get,
-            timestamp: 0,
-            items: vec!(),
-        };
-        let resource = Rc::new(PostResource{
-            data: Post::new(),
-            watchers: HashMap::new(),
-            version: [0, 0, 0],
-        });
-        
-        let r = resource.clone();
-        msg.items.push(resource);
-        msg.items.push(r);
-        for a in &msg.items {
-            println!("{:?}", a.get_data());
-        }
-        // println!("{:?}", msg.items);
-    }
+    //     let mut hm: HashMap<ID, F> = HashMap::new();
+    //     hm.insert(ID::Post(1), F::Post(Post::new()));
+    //     hm.insert(ID::Comment(2), F::Comment(Comment::new()));
+    //     hm.insert(ID::User(2), F::User(User::new()));
+    //     hm.insert(ID::Post(2), F::Post(Post::new()));
+
+    //     println!("HM: {:?}", hm[&ID::Post(1)]);
+
+    //     println!("Typed HASHMAP: {:?}", hm);
+    //     for (a, b) in &hm {
+    //         println!(" Entry ---> {:?}: {:?}", a, b);
+    //         match a {
+    //             ID::Post(id) => println!("{:?}", id),
+    //             ID::Comment(id) => println!("{:?}", id),
+    //             _ => println!("Other..."),
+    //         }
+    //     }
+
+    //     println!("X --------------> {:?}", x);
+    //     for y in &mut x {
+    //         println!("Y: {:?}", y);
+    //         match y {
+    //             F::Post(ref mut p) => {
+    //                 println!("This is a post with id: {:?}", p.id);
+    //                 println!("Post Content: {:?}", p.content);
+    //                 p.id = 1;
+    //                 println!("This is a post with id: {:?}", p.id);
+    //             }
+    //             F::User(u) => println!("This is a user: {:?}", u),
+    //             F::Comment(c) => println!("This is a comment: {:?}", c),
+    //             _ => println!("This is everything else..."),
+    //         }
+    //     }
+    // }
+
+    // a few of the tests below are pointless, keep that in mind
+    // #[test]
+    // fn test_post() {
+    //     let p = models::Post::new();
+    //     assert_eq!(models::Post::new(), p)
+    // }
+
+    // #[test]
+    // fn test_new_model() {
+    //     let m = models::Resource::new(models::Post::new());
+    //     let typ = typeid(&m);
+    //     assert_eq!(
+    //         std::any::TypeId::of::<models::Resource<models::Post>>(),
+    //         typ
+    //     );
+    // }
+
+    // #[test]
+    // fn test_resource_init() {
+    //     let p = models::Post::new();
+    //     let m = &mut models::Resource::<models::Post>::new(p);
+    // }
+    // #[test]
+    // fn test_resource_add_watch() {
+    //     let p = models::Post::new();
+    //     let m = &mut models::Resource::<models::Post>::new(p);
+
+    //     m.add_watch(1);
+    //     m.add_watch(2);
+    //     {
+    //         let all = m.all_watchers();
+    //         assert_eq!(*all, vec![1, 2]);
+    //         // let t = m.data;
+    //     }
+    // }
+    // #[test]
+    // fn test_resource_remove_watch() {
+    //     let p = models::Post::new();
+    //     let m = &mut models::Resource::<models::Post>::new(p);
+
+    //     m.add_watch(1);
+    //     m.add_watch(2);
+    //     {
+    //         let all = m.all_watchers();
+    //         assert_eq!(*all, vec![1, 2]);
+    //         // let t = m.data;
+    //     }
+    //     m.remove_watch(1);
+    //     assert_eq!(m.watchers, vec![2]);
+
+    //     // m.increment();
+    //     // assert_eq!(m.version, 1);
+    // }
 }

@@ -80,11 +80,9 @@ export const actions = {
             password: credentials.password,
             grant_type: "password"
         };
-        console.log(body);
         const head = { headers: { "content-type": "application/json" } };
         return new Promise( (resolve, reject) => {
             api.post("get_token/", body, head).then( (response: any) => {
-                console.log(response);
                 const user: User = new User(response.data.user.username,
                         response.data.user.pk,
                         response.data.user.email,
@@ -108,16 +106,12 @@ const mutations = {
         state.user = user;
     },
     ADD_USER: (state, user: User) => {
-        console.log("ADDUSER: ", user);
         let index = state.otherUsers.findIndex((val) => val.pk === user.pk);
-        console.log(index);
         if (index !== -1) {
             state.otherUsers.splice(index, user);
-            console.log(state.otherUsers);
             return;
         }
         state.otherUsers.push(user);
-        console.log(state.otherUsers);
     },
     CLEAR_USER: (state) => {
         state.user = undefined;
@@ -129,11 +123,9 @@ export const getters = {
         return state.otherUsers.find((val, ind, obj) => val.pk === id);
     },
     getLoggedInUser(state: UserState): User{
-        console.log("in  getLoggedInUser");
         return state.user!;
     },
     isLoggedIn (state: UserState) {
-        console.log("in isLoggedIn getter");
         return state.user !== undefined;
     },
     allUsers: (state) => state.otherUsers,

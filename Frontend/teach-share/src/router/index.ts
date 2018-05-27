@@ -163,9 +163,15 @@ export function asLoggedIn(promise: AxiosPromise<any>): Promise<any> {
         promise
         .then((response) => {resolve(response); })
         .catch((err) => {
-            logout(store);
-            router.push({name: "login"});
-            reject();
+            if(err.response.status === 401){
+                logout(store);
+                router.push({name: "login"});
+                reject(err);
+            }
+            else{
+                console.error(err);
+                reject(err);
+            }
         });
     });
 }
@@ -173,31 +179,25 @@ export function asLoggedIn(promise: AxiosPromise<any>): Promise<any> {
 function verifyAndRefreshLogin(): Promise<any> {
     console.log("I'm verifying and refreshing login!");
     if (store.getters.isLoggedIn){
-        console.log("is logged in with store");
         return new Promise((resolve) => {resolve(true);});
     } else if (Cookie.get("token") != null){
-        console.log("is logged in with token");
         const u: User = new User();
         setUser(store, u);
         // store.dispatch("setUser", u);
         return new Promise((resolve) => {resolve(true); });
     } else if (window.localStorage.getItem("refreshToken") !== null){
-        console.log("logging back in...");
-        console.log(window.localStorage.getItem("username"));
+
         return new Promise((resolve, reject) => {
             const body = {
                 grant_type: "refresh_token",
                 refresh_token: window.localStorage.getItem("refreshToken"),
                 username: window.localStorage.getItem("username")
             };
-            console.log(body);
             const head = { headers: { "content-type": "application/json" } };
             console.log("ASSIGNING API DEFAULTS TO EMPTY");
             Object.assign(api.defaults, {});
             api.post("get_token/", body, head).then((response: any) => {
-                console.log(response);
-                console.log(response.data.user);
-                console.log(response.data.user.username);
+
                 const user: User = new User(response.data.user.username,
                     response.data.user.pk,
                     response.data.user.email,
@@ -216,7 +216,6 @@ function verifyAndRefreshLogin(): Promise<any> {
             });
         });
     } else{
-        console.log("foobar");
         return new Promise((resolve) => {resolve(false); });
     }
 }
@@ -224,9 +223,7 @@ function verifyAndRefreshLogin(): Promise<any> {
 const loginProtectedRoutes = ["create", "posts"];
 const loggedOutRoutes = ["login", "register"];
 router.beforeEach((to, from, next) => {
-    console.log(window.localStorage.getItem("refreshToken"));
     if (loggedOutRoutes.some(val => val === to.name)) {
-        console.log("I'm trying to get to a logged out page.");
         verifyAndRefreshLogin().then((loggedIn) => {
             if (loggedIn) {
                 next({ name: "dashboard" });
@@ -236,7 +233,6 @@ router.beforeEach((to, from, next) => {
         });
     } else if (loginProtectedRoutes.some((val) => val === to.name)) {
         verifyAndRefreshLogin().then((loggedIn) => {
-            console.log(loggedIn);
             if (loggedIn) {
                 next();
             } else {

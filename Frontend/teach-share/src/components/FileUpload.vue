@@ -149,8 +149,7 @@ export default class FileUpload extends Vue {
         return getFile(this.$store)(id);
     }
     save(formData) {
-        console.log(this);
-        uploadFiles(this.$store, formData).then(resp => console.log("upload response: ", resp));
+        uploadFiles(this.$store, formData);
     }
 
     resetState() {
@@ -169,14 +168,12 @@ export default class FileUpload extends Vue {
     }
     removeItem(file) {
         var vm = this;
-        console.log("get_file: ", this.getFile(file.pk));
         removeFile(this.$store, file).then(function() {
             vm.$parent.$emit("RemoveItem", file);
         });
     }
 
     mounted() {
-        console.log(this);
         changeLimit(this.$store, this.fileLimit);
         this.resetState();
     }

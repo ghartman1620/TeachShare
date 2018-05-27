@@ -4,9 +4,9 @@
         <div class="card-body">
             <audio
                 class="col-12"
-                v-bind:src="url()"
-                v-bind:type="element.filetype"
-                v-bind:controls="url()">
+                :src="element.url"
+                :type="element.filetype"
+                :controls="controls">
             </audio>
             <br><br>
             <h4 class="card-title">{{ element.title }}</h4>
@@ -32,6 +32,12 @@ import {
 
 @Component({
     name: "audio-element",
+    props: {
+        controls: {
+            type: Boolean,
+            default: true,
+        }
+    }
 })
 export default class AudioElement extends Vue{
     @Prop({})
@@ -39,11 +45,6 @@ export default class AudioElement extends Vue{
 
     url(): string {
         return `http://localhost:8000${this.element.url}`;
-    }
-    mounted() {
-        console.log(this.element);
-        console.log(this.url());
-
     }
 
 };

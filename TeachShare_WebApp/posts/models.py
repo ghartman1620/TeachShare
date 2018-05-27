@@ -8,7 +8,6 @@ import string
 from uuid import uuid4
 import os
 from datetime import timedelta
-
 #django channels
 #tornado
 #aio http python
@@ -187,7 +186,7 @@ class Post(models.Model):
 
 
     title = models.CharField(max_length=100, default='', blank=True)
-    content = JSONField()
+    content = JSONField(blank=True, default={})
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
     likes = models.IntegerField(default=0)
     draft = models.BooleanField(default=True)
@@ -201,6 +200,8 @@ class Post(models.Model):
     content_type = models.IntegerField(choices=CONTENT_TYPE,default=0)
 
     standards = models.ManyToManyField(Standard, blank=True)    
+    class Meta:
+        permissions = (('view_post', 'Can View Post'),)
 
 
 class Comment(models.Model):

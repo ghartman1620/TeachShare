@@ -71,12 +71,12 @@ services:
       - esdata2:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
-#  redis:
-#    image: "redis:alpine"
-#    ports:
-#      - 6379:6379
-#    networks:
-#      - teachnet
+  redis:
+    image: "redis:alpine"
+    ports:
+      - 6379:6379
+    networks:
+      - teachnet
 volumes:
   esdata2:
     driver: local

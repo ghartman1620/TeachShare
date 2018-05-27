@@ -264,7 +264,7 @@ export default class PostFeed extends Vue {
 
     beforeMount(){
 
-        this.reloadPosts();
+        //this.reloadPosts();
 
         var t = this;
         window.addEventListener(

@@ -80,9 +80,7 @@
                         this.displayLabels.push(this.userData[i][rowLabel]);
                         delete this.userData[i][rowLabel];
                     }
-                    console.log("Display labels:  ", this.displayLabels);
                 }
-                console.log("User data array to be sent to graphs", this.userData);
 
             }
         },

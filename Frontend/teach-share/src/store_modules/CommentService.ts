@@ -11,11 +11,9 @@ export interface CommentState {
 }
 
 type CommentContext = ActionContext<CommentState, IRootState>;
-
-const state = {
-    comments: new ModelMap<Comment>()
-};
-
+var state: CommentState = {
+    comments: new ModelMap<Comment>(),
+}
 export const actions = {
     /**
      * FetchAllComments will fetch comments.

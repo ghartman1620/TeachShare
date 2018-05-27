@@ -1,131 +1,146 @@
 extern crate crossbeam_channel;
-use crossbeam_channel::{Receiver, Select, Sender, TryRecvError, TrySendError};
+use crossbeam_channel::{Receiver, Sender};
+use db::*;
+use diesel::pg::PgConnection;
+use diesel::result;
 use models::*;
-use pool;
-use std::fmt::Debug;
-use std::ops::Fn;
-use std::thread;
-use std::rc::Rc;
-use std::thread::JoinHandle;
+use std::cell::{BorrowMutError, RefCell};
 use std::collections::HashMap;
-use std::cell::RefCell;
+use std::hash::Hash;
+use std::ops::{Index, IndexMut};
+use std::rc::Rc;
+use std::sync::Arc;
+use std::thread;
 use std::time::Duration;
 
-pub type SendMsg<T> = Sender<Message<T>>;
-pub type RecvMsg<T> = Receiver<Message<T>>;
+const MAX_DB_SAVE_TIMEOUT: Duration = Duration::from_millis(200);
 
-/// `ChanTuple<T>` is a type alias for `(SendMsg<T>, RecvMsg<T>)`, the tuple
-/// where `SendMsg<T>` is `Sender<Message<T>>` and RecvMsg is `Reciever<Message<T>>`.
-pub type ChanTuple<T> = (SendMsg<T>, RecvMsg<T>);
+pub trait Cache {
+    type Key;
+    type Entry;
+    type Err;
 
-pub fn selector<T, U, V, F>(
-    in_pipe: Receiver<Message<Post>>,
-    ret_pipe: Sender<Resource<Post>>,
-    cancel: Receiver<V>,
-    closure: F,
-) where 
-    T: Debug + Send + 'static,
-    U: Debug + Send + 'static,
-    V: Debug + Send + 'static,  
-    F: Fn(T, RcCellHash<U>) -> Resource<U> + 'static, //This is crucial need to be able to go from Message<T> -> Message<U>
+    fn get(&self, key: Self::Key) -> Option<&Self::Entry>;
+    fn get_mut(&mut self, key: Self::Key) -> Option<&mut Self::Entry>;
+    fn put(&mut self, key: Self::Key, value: Self::Entry) -> Option<Self::Entry>;
+}
+
+
+/// Unused (substantially) currently but may soon
+#[derive(Debug)]
+pub enum CacheError {
+    Get(&'static str),
+    GetMut(&'static str),
+    Put(&'static str),
+}
+
+#[derive(Debug)]
+pub struct HashMapCache<K: Eq + Hash, V> {
+    _inner: HashMap<K, V>,
+}
+
+impl<K, V> HashMapCache<K, V>
+where
+    K: Eq + Hash,
 {
-    thread::spawn(move || {    
-        let mut cache = Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new()));  // Rc::new(Cache::new());
+    pub fn new() -> HashMapCache<K, V> {
+        HashMapCache {
+            _inner: HashMap::new(),
+        }
+    }
+}
+
+impl Cache for HashMapCache<ID, Resource> {
+    type Key = ID;
+    type Entry = Resource;
+
+    /// Currently unused.
+    type Err = CacheError;
+
+    /// Thin wrapper around a simple get immutable borrow from the
+    /// underlying hashmap
+    fn get(&self, key: ID) -> Option<&Resource> {
+        self._inner.get(&key)
+    }
+
+    /// Thin wrapper to get a mutable reference to the item stored in the
+    /// cache.
+    fn get_mut(&mut self, key: ID) -> Option<&mut Resource> {
+        self._inner.get_mut(&key)
+    }
+
+    /// Very thin wrapper around insert in a hashmap
+    fn put(&mut self, key: ID, value: Resource) -> Option<Resource> {
+        self._inner.insert(key, value)
+    }
+}
+
+type RefCellCache = RefCell<HashMapCache<ID, Resource>>;
+
+#[allow(dead_code)]
+pub fn cache_thread(
+    in_pipe: Receiver<Arc<Msg>>,
+    ret_pipe: Sender<Arc<Msg>>,
+    cancel: Receiver<Cancel>,
+    db_send: Sender<Post>,
+) {
+    thread::spawn(move || {
+        let db = DB::new();
+
+        let mut cache = Rc::new(RefCell::new(HashMapCache::new()));   //Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new()));
         loop {
-            // println!("Strong count: {}.", Rc::strong_count(&cache));
+            let conn = db.get();
             select_loop! {
                 recv(in_pipe, msg) => {
-                    let response = match msg.msg_type {
+                    let m = msg.clone();
+                    match msg.msg_type {
                         MessageType::Get => {
-                            println!("Msg: {:?}", msg.msg_type);
+                            println!("[CACHE] RECEIVED => {:?}", msg.msg_type);
+                            assert_eq!(msg.msg_type, MessageType::Get);
                             {
-                                let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                                let borrowed_val = c.borrow_mut();
-                                let res = borrowed_val.get(&msg.data.id());
-                                if res.is_some() {
-                                    let val = res.unwrap();
-                                    println!("For key: {:?} ----> {:?}", msg.data.id(), val);
-                                    let ret_result = ret_pipe.send(val.clone());
-
-                                } else {
-                                    println!("Key ({:?}) did not exist.", msg.data.id());
-                                    let ret_result = ret_pipe.send(Resource::new(msg.data));
-                                }
+                                let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
+                                handle_get(&msg, c, &ret_pipe, &conn);
                             }
-                            // let ret_result = ret_pipe.send(val.clone());
-                        },
+                        },                        
                         MessageType::Create => {
-                            println!("Msg: {:?}", msg.msg_type);
-                            // let c_create = Rc::make_mut(&mut c);
-                            // let inner = msg.data;
+                            println!("[CACHE] RECEIVED => {:?}", msg.msg_type);
+                            assert_eq!(msg.msg_type, MessageType::Create);
                             {
-                                let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                                let mut borrowed_val = c.borrow_mut();
-                                let res = borrowed_val.insert(msg.data.id(), Resource::new(msg.data.clone()));
-                                if res.is_some() {
-                                    let val = res.unwrap();
-                                    println!("For key: {:?} ----> {:?}", msg.data.id(), val);
-                                    let ret_result = ret_pipe.send(val.clone());
-                                    
-                                } else {
-                                    println!("Key ({:?}) did not exist.", msg.data.id());
-                                    let ret_result = ret_pipe.send(Resource::new(msg.data));
-                                    
-                                }
+                                let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
+                                handle_create(&msg, c, &ret_pipe, &db_send);
                             }
-                            println!("Value: {:?}", cache);
-                            // cache.insert(inner.id(), Resource::new(inner));
-                            // let mutable_cache = &mut cache.clone();
-                            // handle_create(inner, );
-                        },
+                        },                        
                         MessageType::Watch => {
-                            println!("Msg: {:?}", msg.msg_type);
+                            println!("[CACHE] RECEIVED => {:?}", msg.msg_type);
+                            assert_eq!(msg.msg_type, MessageType::Watch);
                             {
-                                let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                                let mut borrowed_val = c.borrow_mut();
-                                let res = borrowed_val.get_mut(&msg.data.id());
-                                if res.is_some() {
-                                    let val: &mut Resource<Post> = res.unwrap();
-                                    println!("For key: {:?} ----> {:?}", msg.data.id(), val);
-                                    val.add_watch(User::new());
-                                    let watchers = &mut val.all_watchers();
-                                    println!("Watchers: {:?}", watchers);
-                                    // let watch_iter = watchers.into_iter();
-                                    let by_ids: Vec<i32> = watchers.iter_mut().map(|x| x.id).collect();
-                                    println!("Watcher id's ==> {:?}", by_ids);
-                                    let ret_result = ret_pipe.send(val.clone());
-                                } else {
-                                    println!("Key ({:?}) did not exist.", msg.data.id());
-                                    let ret_result = ret_pipe.send(Resource::new(msg.data));
-                                }
+                                let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
+                                handle_watch(&msg, c, &ret_pipe, &conn, &db_send);
                             }
-                            println!("Value: {:?}", cache);
-                            // handle_watch(msg.data, Rc::try_unwrap(cache).unwrap());
-                        },
+                        },                        
                         MessageType::Update => {
-                            println!("Msg: {:?}", msg.msg_type);
+                            println!("[CACHE] RECEIVED => {:?}", msg.msg_type);
+                            assert_eq!(msg.msg_type, MessageType::Update);
                             {
-                                let c: &mut RefCell<HashMap<i32, Resource<Post>>> = Rc::get_mut(&mut cache).unwrap();
-                                let mut borrowed_val = c.borrow_mut();
-                                let res = borrowed_val.insert(msg.data.id(), Resource::new(msg.data.clone()));
-                                if res.is_some() {
-                                    let val = res.unwrap();
-                                    println!("For key: {:?} ----> {:?}", msg.data.id(), val);
-                                    let ret_result = ret_pipe.send(val.clone());
-                                } else {
-                                    println!("Key ({:?}) did not exist.", msg.data.id());
-                                    let ret_result = ret_pipe.send(Resource::new(msg.data));
-                                }
+                                let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
+                                handle_update(&msg, c, &ret_pipe, &db_send);
                             }
-                            println!("Value: {:?}", cache);
-                            // handle_update(msg, Rc::try_unwrap(cache).unwrap());
-                        }
+                        },
+                        //  _ => println!("CATCH ALL"),
+                        MessageType::Manifest => {
+                            println!("[CACHE] RECEIVED => {:?}", msg.msg_type);
+                            assert_eq!(msg.msg_type, MessageType::Manifest);
+                            {
+                                let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
+                                handle_manifest(msg, c, &ret_pipe, &conn);
+                            }
+                        },
                     };
 
-                    // let ret_resp = ret_pipe.send(response).unwrap();
+                println!("[CACHE] (current) -> {:?}", cache);
                 },
                 recv(cancel, s) => {
-                    println!("Cancel Message: {:?}", s);
+                    println!("[CACHE] Exiting.... Cancel Message: {:?}", s);
                     return;
                 }
             }
@@ -133,134 +148,22 @@ pub fn selector<T, U, V, F>(
     });
 }
 
-type RcCellHash<T> = Rc<RefCell<HashMap<i32, Resource<T>>>>;
+// #[allow(dead_code)]
+// type RcCellHash<T> = Rc<RefCell<HashMap<i32, Resource>>>;
 
 #[allow(dead_code)]
-/// wire_up<T, U, V> uses the types to setup crossbeam channels and returns the relevant information
-fn wire_up<'a, T, U, V, F>(closure: F) -> (Sender<Message<Post>>, Receiver<Resource<Post>>, Sender<V>)
-where
-    T: Debug + Sized + Send + 'static,
-    U: Debug + Sized + Send + 'static,
-    V: Debug + Sized + Send + 'static,
-    F: Fn(T, RcCellHash<U>) -> Resource<U> + Send + 'static,
-{
-    let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<Message<Post>>();
-    let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<Resource<Post>>();
-    let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<V>();
-    let _sel = selector(recv_pipe, send_ret_pipe, recv_cancel, closure);
-    println!("Selector closure finished...");
+/// wire_up uses the types to setup crossbeam channels and returns the relevant information
+pub fn wire_up(
+    db_send: Sender<Post>,
+) -> (Sender<Arc<Msg>>, Receiver<Arc<Msg>>, Sender<Cancel>) {
+    let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<Arc<Msg>>();
+    let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<Arc<Msg>>();
+    let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<Cancel>();
+
+    cache_thread(recv_pipe, send_ret_pipe, recv_cancel, db_send);
+
+    println!("Server started..");
     (send_pipe, recv_ret_pipe, send_cancel)
-}
-
-fn test_selector_extended<'a>() {
-    let (a, b, c): (
-        crossbeam_channel::Sender<Message<Post>>,
-        crossbeam_channel::Receiver<Resource<Post>>,
-        crossbeam_channel::Sender<Cancel>,
-    ) = wire_up(|msg: Message<Post>, cache: RcCellHash<Post>| {
-        println!("MESSAGE: {:?}", msg);
-        // let m = msg.clone();
-        // let temp = &mut cache.clone();
-        // let temp2 = cache.clone();
-        // let c_create = Rc::make_mut(temp);  
-        // let c_get = temp2;
-                                
-        match msg.msg_type {
-            MessageType::Get => {
-                println!("Msg: {:?}", msg.msg_type);
-                // #![feature(ptr_internals)]
-                println!("Number of strong references: {}", Rc::strong_count(&cache));
-                // let c = &mut Rc::get_mut(&cache);
-                // let val = cache.get(&msg.data.id());
-                // if val.is_some() {
-                //     println!("It exists!");
-                //     let result = val.unwrap();
-                // } else {
-                //     println!("It doesn't exist");
-                // }
-                
-            },
-            MessageType::Create => {
-                println!("Msg: {:?}", msg.msg_type);
-                // let c_create = Rc::make_mut(&mut c);
-                let inner = msg.data;
-                // cache.insert(inner.id(), Resource::new(inner));
-                // let mutable_cache = &mut cache.clone();
-                // handle_create(inner, );
-            },
-            MessageType::Watch => {
-                println!("Msg: {:?}", msg.msg_type);
-                // handle_watch(msg.data, Rc::try_unwrap(cache).unwrap());
-            },
-            MessageType::Update => {
-                println!("Msg: {:?}", msg.msg_type);
-                // handle_update(msg, Rc::try_unwrap(cache).unwrap());
-            }
-        }
-        Resource::new(Post::new())
-    });
-    println!("A: {}", a.len());
-    println!("B: {}", b.len());
-    println!("C: {}", c.len());
-
-    // get
-    let response = a.send(Message::<Post>::new()).expect("There was a terrible error sending it!");
-    println!("response: {:?}", response);
-    let resp = b.recv();
-    println!("resp: {:?}", resp);
-
-    // create
-    let mut create = Message::<Post>::new();
-    create.msg_type = MessageType::Create;
-    let response = a.send(create).expect("There was a terrible error sending it!");
-    
-    println!("response: {:?}", response);
-    let resp = b.recv();
-    println!("resp: {:?}", resp);
-
-    // watch
-    let mut create = Message::<Post>::new();
-    create.msg_type = MessageType::Watch;
-    let response = a.send(create).expect("There was a terrible error sending it!");
-    
-    println!("response: {:?}", response);
-    let resp = b.recv();
-    println!("resp: {:?}", resp);
-
-    // thread::sleep(Duration::from_secs(2));
-
-    // update
-    let mut create = Message::<Post>::new();
-    create.msg_type = MessageType::Update;
-    let response = a.send(create).expect("There was a terrible error sending it!");
-    
-    println!("response: {:?}", response);
-    let resp = b.recv();
-    println!("resp: {:?}", resp);
-
-
-    // cancel
-    let cancel = Cancel{msg: String::from("CANCEL MEOOOW.")};
-    create.msg_type = MessageType::Watch;
-    let response = c.send(cancel).expect("There was a terrible error sending it!");
-    
-    println!("response: {:?}", response);
-    let resp = b.recv();
-    println!("resp: {:?}", resp);
-}
-
-// get, update, subscribe
-
-pub trait MessageSender<T> {
-    fn send(&self, msg: T) -> Result<(), TrySendError<T>>;
-}
-
-pub trait MessageReciever<V> {
-    fn recv(&self, sender: Receiver<V>, block: bool) -> Result<V, &'static str>;
-}
-
-pub trait Cancellable<V> {
-    fn cancel(&self, msg: String) -> Result<(), crossbeam_channel::SendError<V>>;
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -268,72 +171,507 @@ pub struct Cancel {
     msg: String,
 }
 
+fn handle_manifest(
+    msg: Arc<Msg>,
+    cash: &mut RefCellCache,
+    ret_pipe: &Sender<Arc<Msg>>,
+    db: &PgConnection,
+) {
+    //to be sent back -> will contain post content on any post whose version is out of date
+    let mut wrap = Msg::new()
+        .set_msg_type(MessageType::Manifest)
+        .build();
 
+    let mut db_posts: Vec<i32> = Vec::new();
+    println!("[CACHE] Manifest: begin");
 
-#[allow(dead_code)]
-fn handle_get<T, U>(msg: T, cash: HashMap<i32, Resource<U>>) -> Result<T, &'static str> where
-    T: Debug + Model,
-    U: 'static,
-{
-    println!("{:?}", msg);
-    println!("[GET] ------------------------------------------------->");
-    // let cash = &cash;
-    // cash.get(msg.id());
-    Ok(msg)
+    
+    for m in &msg.items {
+        let id = match &m.data {
+            Model::Post(post) => post.id,
+            _ => unimplemented!(),
+        };
+
+        let mut borrowed_val = cash.borrow();
+
+        match borrowed_val.get(ID::Post(id)) {
+            //1. if cache has this post id:
+            Some(val) => {
+                println!(
+                    "[CACHE] Manifest: For key: {:?} ----> {:?}", id, val);
+                //2. If the version provided does not match the version in the cache
+                if val.version != m.version {
+                    //3. Add the entire post's content to the return wrapper's items
+                    // println!(
+                    //     "[CACHE] manifest: adding post {} to return list",
+                    //     val.get_data().id
+                    // );
+                    let resource = Arc::new(val.clone());
+                    wrap.items.push(resource);
+                }
+                //otherwise, the sender has the correct post and doesn't need it updated
+            }
+            //4. If cache does not have this post id:
+            None => {
+                println!("[CACHE] Manifest Key ({:?}) did not exist.", id);
+                //5. Add it to the list of the db post gets we'll need to make
+                db_posts.push(id);
+            }
+        }
+    }
+    println!("[CACHE] Manifest: making db hits for posts {:?}", db_posts);
+    //6. Get all the posts in the manifest list that weren't in the cache
+
+    let mut posts: Vec<Post> = Post::get_all(db_posts, db).expect("Getting from database failed");
+
+    println!("[CACHE] Manifest: got posts from db: {:?}", posts);
+
+    let mut mutable_cache = cash.borrow_mut();
+    // For each post returned by db
+    while !posts.is_empty() {
+        //pop() is only none when posts is empty; never because of loop condition
+        let post: Post = posts.pop().unwrap();
+        let id = post.id;
+        //7. add those posts to the cache with version 0
+        let mut resource = Resource::new(Model::Post(post));
+        resource.version = 0;
+        mutable_cache.put(ID::Post(id), resource.clone());
+
+        //8. Add them all to the return list.
+        println!(
+            "[CACHE] manifest: adding post {} to return list",
+            id
+        );
+        wrap.items.push(Arc::new(resource));
+    }
+    //9. Send back the return list.
+    ret_pipe.send(Arc::new(wrap));
+    println!("[CACHE] Manifest: end");
 }
 
 #[allow(dead_code)]
-fn handle_create<T, U>(msg: T, cash: HashMap<i32, Resource<U>>) -> Result<T, &'static str> where
-    T: Debug + Model + Clone,
-{
-    println!("{:?}", msg);
-    println!("[CREATE] ------------------------------------------------->"); 
-    // let mut mutable_cache = Rc::make_mut(&mut cash);
-    // cash.set(msg.id(), T::new());
-    Ok(msg)
-    // println!("************** ==>> {:?}", msg.data());
-    // let inner =  msg.data();
-    // let c = Rc::get_mut(cash).unwrap(); // TODO: handle errors better...
-    
-    // let result = c.set(inner.id(), inner);
-    // print!("\n\n");
-    // for (i, c) in &c._data {
-    //     println!("{}.) {:?}", i, c);
-    // }
-    // // return result;
+fn handle_get(msg: &Arc<Msg>, cash: &mut RefCellCache, ret_pipe: &Sender<Arc<Msg>>, db: &PgConnection) -> Result<Resource, CacheError> {
+    let mut wrap = Msg::new()
+        .set_msg_type(MessageType::Get)
+        .build();
 
-    // println!("Error!! ****************")
-    
-    // Option::from(Resource::<Post>::new(Post::new()))
-} 
+    for m in &msg.items {
+        let mut dne_flag = false;
+        let mut db_posts: Vec<Post> = vec![];
+        {
+            // immutably borrow cache
+            let mut cache = cash.borrow();
+            
+            // Get the inner cache data, if exists
+            let result_data: Option<&Resource> = match &m.data {
+                Model::Post(p) => cache.get(ID::Post(p.id)),
+                Model::User(u) => cache.get(ID::User(u.id)),
+                Model::Comment(c) => cache.get(ID::Comment(c.id)),
+            };
 
-#[allow(dead_code)]
-fn handle_watch<T, U>(msg: T, cash: HashMap<i32, Resource<U>>) -> Result<T, &'static str> where
-    T: Model + Debug,
-{
-    println!("{:?}", msg);
-    
-    println!("[WATCH] ------------------------------------------------->");
-    // Option::from(msg)
-    Ok(msg)
+            if result_data.is_none() {
+                // get it from the db... 
+
+                // grab the id from the message
+                let id = match &m.data {
+                    Model::Post(p) => p.id,
+                    _ => unimplemented!(),
+                };
+
+                // get post from the database
+                let post_result = Post::get(id, db);
+                match post_result {
+                    Ok(posts) => {
+                        dne_flag = true;
+                        db_posts.extend(posts);
+                        println!("POSTS: {:?}", db_posts);
+                    },
+                    Err(err) => {
+                        println!("[DB]<ERROR> {:?}", err);
+                    },
+                }
+
+            } else {
+                // model_data is the data from the cache
+                let model_data = result_data.unwrap();
+                wrap.items.push(Arc::new(model_data.clone()));
+            }
+        }
+        if dne_flag {
+            let mut cache = cash.borrow_mut();
+            if db_posts.len() == 1 {
+                let first = &db_posts[0];
+                let resource_new = Resource::new(Model::Post(first.clone()));
+                let inserted = cache.put(ID::Post(first.id), resource_new.clone());
+                match inserted {
+                    Some(val) => {
+                        println!(
+                            "[CACHE] ******* Key already existed. Previous --> {:?}",
+                            val
+                        );
+                    }
+                    None => {
+                        println!("[CACHE] Key did not currently exist.");
+                    }
+                }
+                wrap.items.push(Arc::new(resource_new));
+            }
+        }
+    }
+    match ret_pipe.send(Arc::new(wrap)) {
+        Ok(val) => println!("[CACHE] Successfully sent return value: {:?}", val),
+        Err(e) => println!("[CACHE] Error: {:?}", e),
+    };
+    Err(CacheError::Get("meh, something went wrong."))
 }
 
 #[allow(dead_code)]
-fn handle_update<T, U>(msg: T, cash: HashMap<i32, Resource<U>>) -> Result<T, &'static str> where
-    T: Debug,
-{
-    println!("{:?}", msg);
-    
-    println!("[UPDATE] ------------------------------------------------->");
-    Ok(msg)
+fn handle_create(
+    msg: &Arc<Msg>,
+    cash: &mut RefCellCache,
+    ret_pipe: &Sender<Arc<Msg>>,
+    db: &Sender<Post>,
+) {
+    let wrap = Msg::new()
+        .set_msg_type(MessageType::Create)
+        .build();
+
+    for m in &msg.items { 
+        match m.data {
+            Model::Post(ref post) => {
+                let (resource, need_db) = create_post_cache(&post, &cash);
+                println!("[CREATE] Resource: {:?}", resource);
+                match resource {
+                    Ok(val) => match val {
+                        Some(old) => println!("Replaced value {:?}", old),
+                        None => println!("Did not previously exist."),
+                    },
+                    // This would be a huge problem, and a systemic failure
+                    Err(e) => println!("There was an error borrowing the cache. {:?}", e),
+                }
+                if need_db {
+                    let errors = create_post_db(&post, db, true);
+                    println!("[CREATE] <Errors> --> {:?}", errors);
+                }
+            },
+            _ => unimplemented!(),
+        }
+    }
+    send_back(ret_pipe, wrap);
 }
 
+#[allow(dead_code)]
+fn send_back(return_pipe: &Sender<Arc<Msg>>, msg: Msg) {
+    match return_pipe.send(Arc::new(msg)) {
+        Ok(val) => println!("[CACHE] Successfully sent return value: {:?}", val),
+        Err(e) => println!("[CACHE] Error sending on return pipe: {:?}", e),
+    };
+}
 
+#[allow(dead_code)]
+fn handle_watch(
+    msg: &Arc<Msg>,
+    cash: &mut RefCellCache,
+    ret_pipe: &Sender<Arc<Msg>>,
+    db_read: &PgConnection,
+    db_write: &Sender<Post>,
+) {
+    // create a wrapper for the response
+    let wrap = Msg::new()
+        .set_msg_type(MessageType::Create)
+        .build();
+
+    for m in &msg.items {
+        println!("MSG ---------------> {:?}", m);
+
+        let mut exists_cache = Option::default();
+        let mut exists = false;
+
+        // Check cache if it already exists
+        {
+            let c = cash.borrow();
+            match &m.data {
+                Model::Post(post) => {
+                    if let Some(val) = c.get(ID::Post(post.id)) {
+                        exists_cache = Some(val.clone());
+                    };
+                },
+                Model::User(user) => unimplemented!(),
+                Model::Comment(comment) => unimplemented!(),
+            }
+        }
+
+        // This next section does a few things:
+        // @TODO: This can all be simplified. Do so if it comes about at a convenient time.
+        match exists_cache {
+            Some(val) => {
+                exists = val.all_watchers()
+                    .iter()
+                    .any(|&x| x == msg.connection_id);
+            },
+            None => {
+                // no value to watch, grab from DB?
+                
+                match &m.data {
+                    Model::Post(post) => {
+                        println!("POST ID# ----> {}", post.id);
+                        let post_result = Post::get(post.id, db_read);
+                        println!("RAW RESULT: {:?}", post_result);
+                        let posts: Option<Vec<Post>> = match post_result {
+                            Ok(val) => Some(val),
+                            Err(e) => None,
+                        };
+                        println!("RAW POSTS =====>>>> {:?}", posts);
+                        if posts.is_some() {
+                            println!("POSTS =====>>>> {:?}", posts);
+                            let cleaned_posts_response: Vec<Resource> = posts
+                                .unwrap()
+                                .into_iter()
+                                .map(|post| create_post_cache(&post, &cash))
+                                .filter(|(resource, need_db)| *need_db && resource.is_ok())
+                                .map(|(resource, _)| resource.unwrap())
+                                .filter(|resource| resource.is_some())
+                                .map(|resource| resource.unwrap())
+                                .collect();
+                            println!("cleaned_posts_response: {:?}", cleaned_posts_response);
+                        }
+                    },
+                    Model::User(user) => unimplemented!(),
+                    Model::Comment(comment) => unimplemented!(),
+                }
+            }
+        }
+
+        if !exists {
+            match &m.data {
+                Model::Post(post) => {
+                    let mut cache = cash.borrow_mut();
+                    let response = cache.get_mut(ID::Post(post.id));
+                    match response {
+                        Some(val) => {
+                            val.add_watch(msg.connection_id);
+                            println!("[CACHE] Current watchers -----------------> {:?}", val.watchers);
+                        }
+                        None => {
+                            println!("ERROR: There was no valid entry for that Post ID.");
+                        }
+                    }
+                },
+                Model::User(user) => unimplemented!(),
+                Model::Comment(comment) => unimplemented!(),
+            }
+        }
+    }
+    send_back(ret_pipe, wrap);
+}
+
+#[allow(dead_code)]
+fn create_posts(
+    output: &mut Vec<Post>,
+    cache: RefCellCache,
+    db_read: &PgConnection,
+    db_write: &Sender<Post>,
+) -> Vec<String> {
+    let need_db = create_posts_cache(output, cache);
+    let mut errors = vec![];
+    if need_db.is_some() {
+        // actually create them
+        let ids = need_db.unwrap();
+        let rs: Vec<Post> = ids.into_iter()
+            .flat_map(|x| {
+                let ret = Post::get(x, db_read);
+
+                // @FIX: This throws away legitimate errors potentially
+                // also will treat duplicate PK values as legitimate by
+                // flattening the results. This could cause undefined behavior.
+                if ret.is_ok() {
+                    ret.unwrap()
+                } else {
+                    errors.push(ret.map_err(|e| format!("{:?}", e)).unwrap_err());
+                    return vec![]; // empty
+                }
+                // ret
+            })
+            .collect();
+        println!("RESULT SET: {:?}", rs);
+        let errors_inner: Vec<String> = create_posts_db(rs.as_slice(), db_write, true)
+            .into_iter()
+            .map(|val| val.unwrap_err())
+            .collect();
+        println!("ERRORS_INNER: {:?}", errors_inner);
+        errors.extend(errors_inner);
+    }
+    println!("ALL_ERRORS: {:?}", errors);
+    errors
+}
+
+#[allow(dead_code)]
+fn create_posts_db(
+    posts: &[Post],
+    db_write: &Sender<Post>,
+    async: bool,
+) -> Vec<Result<(), String>> {
+    // @TODO: Consider fire+forget on saves for performance. This is a good way
+    // during development, though.
+    posts
+        .into_iter()
+        .map(|post| create_post_db(&post, db_write, async))
+        .collect()
+}
+
+#[allow(dead_code)]
+fn create_post_db(post: &Post, db_write: &Sender<Post>, async: bool) -> Result<(), String> {
+    println!("[CACHE] Sending Post ID# {} to be written to DB.", post.id);
+
+    if !async {
+        db_write
+            .send_timeout(post.clone(), MAX_DB_SAVE_TIMEOUT)
+            .map_err(|err| format!("[CACHE] Save to DB took too long!! Error: {:?}", err))
+    } else {
+        db_write
+            .try_send(post.clone())
+            .map_err(|err| format!("[CACHE] Async save to DB failed!! Error: {:?}", err))
+    }
+}
+
+#[allow(dead_code)]
+fn create_posts_cache(output: &mut Vec<Post>, cache: RefCellCache) -> Option<Vec<i32>> {
+    // let need_fetch = &mut vec![];
+    let mapped: Vec<i32> = output
+        .into_iter()
+        .map(|x| {
+            let (last, get) = create_post_cache(&x, &cache);
+            last.expect("There was an error Borrowing the cache!");
+            (x.id, get)
+        })
+        .filter(|(_, fetch)| *fetch)
+        .map(|(a, _)| a)
+        .collect();
+
+    println!("{:?}", mapped);
+    Some(mapped)
+}
+
+fn create_post_cache(
+    post: &Post,
+    cache: &RefCellCache,
+) -> (Result<Option<Resource>, BorrowMutError>, bool) {
+    let mut mut_cache = cache.try_borrow_mut();
+    match mut_cache {
+        Ok(ref mut val) => {
+            match val.put(ID::Post(post.id), Resource::new(Model::Post(post.clone()))) {
+                Some(result) => {
+                    (Ok(Some(result)), false) // key existed
+                }
+                None => {
+                    (Ok(None), true) // key did not exist
+                }
+            }
+        }
+        Err(e) => {
+            println!("There was an error borrowing the cache.");
+            (Err(e), true) // @TODO: pull from db just in case?
+        }
+    }
+}
+
+#[allow(dead_code)]
+fn handle_update(
+    msg: &Arc<Msg>,
+    cash: &mut RefCellCache,
+    ret_pipe: &Sender<Arc<Msg>>,
+    db_write: &Sender<Post>,
+) {
+    let mut cache_mut = cash.borrow_mut();
+    let all_watchers = &mut vec![];
+
+
+    for m in &msg.items {
+        {
+            println!("M ---------------------> {:?}", *m);
+            match &m.data {
+                Model::Post(post) => {
+                    let resource = cache_mut.get(ID::Post(post.id));
+                    if resource.is_some() {
+                        // current watchers from Cache
+                        let w = resource.unwrap().watchers.to_vec();
+                        println!("Watchers --> {:?}", w);
+                        all_watchers.push(w);
+                    }
+                },
+                _ => unimplemented!(),
+            }
+        }
+        // insert updates
+        match &m.data {
+            Model::Post(post) => {
+                if let Some(entry) = cache_mut.get_mut(ID::Post(post.id)) {
+                    let old_watchers = entry.watchers.clone();
+                    let old_version = entry.version;
+                    *entry = Resource::new(Model::Post(post.clone()));
+                    entry.watchers.clear();
+                    entry.watchers.extend(old_watchers);
+                    
+                    println!("\n************************************************************");
+                    println!("Entry of ID:{}, has a version --> {}", post.id, old_version);
+                    entry.version = old_version + 1;
+                    // entry.increment();
+                    println!("New Version: {}", entry.version);
+                    println!("************************************************************\n");
+                }
+            },
+            _ => unimplemented!(),
+        }
+        
+    }
+
+    println!("ALL WATCHERS ------------------> {:?}", all_watchers);
+
+    let mut just_resources: Vec<Resource> = vec![];
+    for item in &msg.items {
+        match item.data {
+            Model::Post(ref post) => {
+                let watchers = item.watchers.clone();
+                let version = item.version;
+                let mut resource = Resource::new(Model::Post(post.clone()));
+                watchers.iter().for_each(|watch| resource.add_watch(*watch));
+                // resource.add_watch()
+                just_resources.push(resource);
+            },
+            _ => unimplemented!(),
+        }
+    }
+
+    // create response with...
+    //    -  [1] updated data
+    //    -  [2] watchers list to send updates to
+    let wrap = Msg::new()
+        .set_msg_type(MessageType::Create)
+        .set_items(&just_resources, all_watchers.as_slice())
+        .build();
+
+    // return the watchers ID's, on success writeback to DB..?
+    match ret_pipe.send(Arc::new(wrap)) {
+        Ok(val) => {
+            println!("[CACHE] Result: {:?}", val);
+            let posts: Vec<Post> = msg.items
+                .iter()
+                .map(|item| match item.data {
+                    Model::Post(ref post) => post.clone(),
+                    _ => unimplemented!(),
+                })
+                .collect();
+            create_posts_db(posts.as_slice(), db_write, true);
+        }
+        Err(e) => println!("[CACHE] Error: {:?}", e),
+    };
+}
 
 #[cfg(test)]
 mod tests {
     use cache;
     use cache::*;
+    use db::*;
     use models;
     use models::*;
     use pool;
@@ -345,336 +683,199 @@ mod tests {
     extern crate crossbeam_channel;
     use crossbeam_channel::{Receiver, Select, Sender};
 
-    
-
     // #[test]
-    // fn test_selector() {
+    // fn test_selector_extended_get() {
+    //     // start db (SAVE only) thread
+    //     let (send_db, recv_db) = crossbeam_channel::unbounded();
+    //     let db_handle = thread::spawn(move || {
+    //         save_posts(recv_db);
+    //     });
+
+    //     // start cache + return necessary comm. channels
     //     let (a, b, c): (
-    //         crossbeam_channel::Sender<Message<Post>>,
-    //         crossbeam_channel::Receiver<Resource<Post>>,
+    //         crossbeam_channel::Sender<SafeArcMsg>,
+    //         crossbeam_channel::Receiver<SafeArcMsg>,
     //         crossbeam_channel::Sender<Cancel>,
-    //     ) = wire_up(|msg: Message<Post>, cache: &Rc<Cache<Resource<Post>>>| {
-    //         println!("MESSAGE: {:?}", msg);
-    //         Resource::new(Post::new())
-    //     });
-    //     println!("A: {}", a.len());
-    //     println!("B: {}", b.len());
-    //     println!("C: {}", c.len());
-    //     let response = c.send(Cancel {
-    //         msg: String::from("Cancelled it!"),
-    //     }).expect("There was a terrible error cancelling it!");
-    //     println!("response: {:?}", response);
+    //     ) = wire_up(send_db);
+
+    //     // get
+    //     let mut wrap = Wrapper::new()
+    //         .set_model(ModelType::Post)
+    //         .set_msg_type(MessageType::Get)
+    //         .build();
+
+    //     wrap.items_mut().push(Arc::new(Resource::new(Post::new())));
+    //     let response = a.send(Arc::new(wrap)).unwrap();
+    //     let resp = b.recv();
     // }
-
-    #[test]
-    fn test_selector_extended() {
-        cache::test_selector_extended();
-    }
-}
-
-
-// handle_get is used to do an actual CREATE of a Post Resource in the Cache.
-// fn handle_get(msg: &Message<Post>, cash: &mut Cache) -> Option<Resource<Post>> {
-//     println!("[GET] ------------------------------------------------->");
-//     Option::from(Resource::new(Post::new()))
-// }
-
-// handle_delete is used to do an actual CREATE of a Post Resource in the Cache.
-// fn handle_delete(msg: &Message<Post>, cash: &mut Cache) -> Option<Resource<Post>> {
-//     println!("[DELETE] ------------------------------------------------->");
-//     Option::from(Resource::new(Post::new()))
-// }
-
-// handle_update is used to do an actual CREATE of a Post Resource in the Cache.
-// fn handle_update(msg: &Message<Post>, cash: &mut Cache) -> Option<Resource<Post>> {
-//     println!("[UPDATE] ------------------------------------------------->");
-//     let result = cash.update_post(msg.data.id, Resource::new(msg.data.clone()));
-//     Option::from(Resource::new(Post::new()))
-// }
-
-// handle_watch is used to do an actual CREATE of a Post Resource in the Cache.
-// fn handle_watch(msg: &Message<Post>, cash: &mut Cache) -> Option<Resource<Post>> {
-//     println!("[WATCH] ------------------------------------------------->");
-//     Option::from(Resource::new(Post::new()))
-// }
-
-// /// handle_create is used to do an actual CREATE of a Post Resource in the Cache.
-// fn handle_create<T>(msg: T, cash: &mut Cache<T>) -> Option<Resource<T>> {
-//     println!("[CREATE] ------------------------------------------------->");
-//     let result = cash.set(msg.data.id, msg.data.clone());
-//     print!("\n\n");
-//     for (i, c) in &cash._data {
-//         println!("{}.) {:?}", i, c);
-//     }
-//     return result;
-// }
-
-// #[test]
-    // /// Tests whether or not the cach_handler works as expected in that it sends a certain
-    // /// number of messages and gets back a certain number of messages on a select-loop.
-    // fn test_cash_handler() {
-    //     let (cancel_send, cancel_recv) = crossbeam_channel::unbounded::<Cancel>();
-
-    //     let mut list: Vec<ChannelCycle<Post, Resource<Post>, Cancel>> = vec![];
-    //     let count = Arc::new(RwLock::new(0));
-
-    //     let (ret, x) = crossbeam_channel::unbounded::<Resource<Post>>();
-    //     let c2 = count.clone();
-    //     let last = count.clone();
-    //     let cancel2 = cancel_recv.clone();
-    //     let p = pool::ThreadPool::new(4).unwrap();
-    //     let receiver = p.execute(move || {
-    //         let c3 = &mut c2.clone();
-    //         loop {
-    //             select_loop! {
-    //                 recv(cancel2, result) => {
-    //                     println!("Recieved [cancel]: {:?}", result);
-    //                     return;
-    //                 },
-    //                 recv(x, result) => {
-    //                     println!("Recieved: {:?}", result);
-    //                     {
-    //                         let mut n = c3.write().unwrap();
-    //                         *n = *n + 1;
-    //                         println!("{}", n);
-    //                     }
-    //                     println!("X: {:?} --> count = {}.", result, c3.read().unwrap());
-    //                 }
-    //             }
-    //         }
-    //     });
-    //     let (send, recv) = crossbeam_channel::unbounded::<Message<Post>>();
-    //     // let (cancel_send, cancel_recv) = crossbeam_channel::unbounded::<Cancel>();
-    //     for a in 0..5 {
-    //         let (s, r) = crossbeam_channel::unbounded::<Message<Post>>();
-    //         let val = ChannelCycle {
-    //             io: (s, r),
-    //             ret: ret.clone(),
-    //             cancel: cancel_recv.clone(),
-    //         };
-    //         list.push(val);
-    //     }
-
-    //     let l2 = list.clone();
-    //     let res = cache::cash_looper(list);
-
-    //     let second = p.execute(move || {
-    //         let mut i = 0;
-    //         for val in &l2 {
-    //             let &(ref s, ref r) = &val.io;
-    //             // let v = &val.ret;
-    //             let mut p = Post::new();
-    //             p.id = i;
-    //             let m = Message::<Post> {
-    //                 data: p,
-    //                 data_type: ModelType::Post,
-    //                 msg_type: MessageType::Watch,
-    //                 timestamp: 0,
-    //                 version: [0, 0, 0],
-    //             };
-    //             let o = s.send(m).unwrap();
-    //             i = i + 1;
-    //             println!("Result: {:?} => {}", o, i);
-    //         }
-    //         println!("EXITING SECOND THREAD");
-    //     });
-    //     thread::sleep(Duration::from_secs(1));
-    //     let x = Arc::strong_count(&last);
-    //     println!("Strong references: {}", x);
-
-    //     cancel_send.send(Cancel {
-    //         msg: String::from("Need to close for the test."),
-    //     });
-    //     cancel_send.send(Cancel {
-    //         msg: String::from("Need to close for the test."),
-    //     });
-    //     res.join();
-    //     let x = Arc::strong_count(&count);
-    //     println!("Strong references: {}", x);
-    //     drop(last);
-    //     let x = Arc::strong_count(&count);
-    //     println!("Strong references: {}", x);
-    //     let v = Arc::try_unwrap(count);
-    //     let y = v.unwrap();
-    //     println!("Total count: {:?}", *y.read().unwrap());
-    //     assert_eq!(*y.read().unwrap(), 5);
-    // }
-
-    // Tests whether or not the cach_handler works as expected in that it sends a certain
-    // number of messages and gets back a certain number of messages on a select-loop.
     // #[test]
-    // fn test_cash_handler_create() {
-    //     let c_loop/*: Nexus<Message<Post>, Message<Post>, Cancel>*/ =
-    //         Nexus::<Message<Post>, Message<Post>, Cancel>::new();
+    // fn test_selector_extended_create() {
+    //     // start db (SAVE only) thread
+    //     let (send_db, recv_db) = crossbeam_channel::unbounded();
+    //     let db_handle = thread::spawn(move || {
+    //         save_posts(recv_db);
+    //     });
+
+    //     // start cache + return necessary comm. channels
+    //     let (a, b, c): (
+    //         crossbeam_channel::Sender<SafeArcMsg>,
+    //         crossbeam_channel::Receiver<SafeArcMsg>,
+    //         crossbeam_channel::Sender<Cancel>,
+    //     ) = wire_up(send_db);
+
+    //     let mut wrap = Wrapper::new()
+    //         .set_model(ModelType::Post)
+    //         .set_msg_type(MessageType::Create)
+    //         .build();
+
+    //     wrap.items_mut().push(Arc::new(Resource::new(Post::new())));
+    //     let response = a.send(Arc::new(wrap)).unwrap();
+    //     let resp = b.recv();
+    // }
+    // // create
+    // #[test]
+    // fn test_selector_extended_watch() {
+    //     // start db (SAVE only) thread
+    //     let (send_db, recv_db) = crossbeam_channel::unbounded();
+    //     let db_handle = thread::spawn(move || {
+    //         save_posts(recv_db);
+    //     });
+
+    //     // start cache + return necessary comm. channels
+    //     let (a, b, c): (
+    //         crossbeam_channel::Sender<SafeArcMsg>,
+    //         crossbeam_channel::Receiver<SafeArcMsg>,
+    //         crossbeam_channel::Sender<Cancel>,
+    //     ) = wire_up(send_db);
+
+    //     let mut wrap = Wrapper::new()
+    //         .set_model(ModelType::Post)
+    //         .set_msg_type(MessageType::Watch)
+    //         .build();
+
+    //     wrap.items_mut().push(Arc::new(Resource::new(Post::new())));
+    //     let response = a.send(Arc::new(wrap)).unwrap();
+    //     let resp = b.recv();
     // }
 
+    // #[test]
+    // fn test_selector_extended_update() {
+    //     // start db (SAVE only) thread
+    //     let (send_db, recv_db) = crossbeam_channel::unbounded();
+    //     let db_handle = thread::spawn(move || {
+    //         save_posts(recv_db);
+    //     });
 
-// impl MessageSender<Message<Post>> for Nexus<Message<Post>, Message<Post>, Cancel> {
-//     fn send(&self, msg: Message<Post>) -> Result<(), TrySendError<Message<Post>>> {
-//         let (sender, _) = crossbeam_channel::unbounded::<Message<Post>>();
-//         sender.try_send(msg)
-//     }
-// }
+    //     // start cache + return necessary comm. channels
+    //     let (a, b, c): (
+    //         crossbeam_channel::Sender<SafeArcMsg>,
+    //         crossbeam_channel::Receiver<SafeArcMsg>,
+    //         crossbeam_channel::Sender<Cancel>,
+    //     ) = wire_up(send_db);
 
-// impl MessageReciever<Message<Post>> for Nexus<Message<Post>, Receiver<Message<Post>>, Cancel> {
-//     fn recv(
-//         &self,
-//         reciever: Receiver<Message<Post>>,
-//         block: bool,
-//     ) -> Result<Message<Post>, &'static str> {
-//         if !reciever.is_disconnected() && !block {
-//             let res = reciever.try_recv();
-//             match res {
-//                 Ok(val) => Ok(val),
-//                 Err(_) => Err("Could not receive"),
-//             }
-//         } else {
-//             let res = reciever.recv();
-//             match res {
-//                 Ok(val) => Ok(val),
-//                 Err(_) => Err("Could not receive"),
-//             }
-//         }
-//     }
-// }
+    //     let mut wrap = Wrapper::new()
+    //         .set_model(ModelType::Post)
+    //         .set_msg_type(MessageType::Update)
+    //         .build();
 
-// impl Cancellable<Cancel> for Nexus<Message<Post>, Message<Post>, Cancel> {
-//     fn cancel(&self, msg: String) -> Result<(), crossbeam_channel::SendError<Cancel>> {
-//         return self.cancel_recv.send(Cancel { msg: msg });
-//     }
-// }
+    //     wrap.items_mut().push(Arc::new(Resource::new(Post::new())));
+    //     let response = a.send(Arc::new(wrap)).unwrap();
+    //     let resp = b.recv();
+    // }
 
-// fn handle_post_msg<T>(msg: T, cash: &mut Cache<T>) -> Option<Resource<T>> {
-//     match msg.msg_type {
-//         MessageType::Create => handle_create(&msg, cash),
-//         MessageType::Watch => handle_watch(&msg, cash),
-//         MessageType::Update => handle_update(&msg, cash),
-//         MessageType::Delete => handle_delete(&msg, cash),
-//         MessageType::Get => handle_get(&msg, cash),
-//     }
-// }
+    // #[test]
+    // fn test_selector_extended_cancel() {
+    //     // start db (SAVE only) thread
+    //     let (send_db, recv_db) = crossbeam_channel::unbounded();
+    //     let db_handle = thread::spawn(move || {
+    //         save_posts(recv_db);
+    //     });
 
-// Select-loop for cache
-//
-// # Examples
-//
-// ```rust
-// use models::*;
-//
-// let mut list: Vec<ChanTuple<Post>> = vec![];
-//
-// let (send, recv) = crossbeam_channel::unbounded::<Message<Post>>();
-// for a in 0..5 {
-//     let (s, r) = crossbeam_channel::unbounded::<Message<Post>>();
-//     list.push((s, r));
-// }
-//
-// let res = cache::cash_looper(list);
-//
-// ```
-// #[allow(unused)]
-// pub fn cash_looper(chans: Vec<ChannelCycle<Post, Resource<Post>, Cancel>>) -> JoinHandle<()> {
-//     let mut sel = Select::new();
-//     let mut cache = build_cache();
+    //     // start cache + return necessary comm. channels
+    //     let (a, b, c): (
+    //         crossbeam_channel::Sender<SafeArcMsg>,
+    //         crossbeam_channel::Receiver<SafeArcMsg>,
+    //         crossbeam_channel::Sender<Cancel>,
+    //     ) = wire_up(send_db);
+    //     let cancel = Cancel {
+    //         msg: String::from("[Cancel reason]"),
+    //     };
+    //     let response = c.send(cancel).unwrap();
+    //     let resp = b.recv();
+    // }
 
-//     thread::spawn(move || {
-//         let mut close = false;
+    // #[test]
+    // fn test_cache_get() {
+    //     let (send_db, recv_db) = crossbeam_channel::unbounded();
+    //     let db_handle = thread::spawn(move || {
+    //         save_posts(recv_db);
+    //     });
+    //     let (a, b, c): (
+    //         crossbeam_channel::Sender<SafeArcMsg>,
+    //         crossbeam_channel::Receiver<SafeArcMsg>,
+    //         crossbeam_channel::Sender<Cancel>,
+    //     ) = wire_up(send_db);
 
-//         'outer: while !close {
-//             let msg = 'select: loop {
-//                 // In each iteration of the selection loop we probe cases in the same order.
-//                 for vals in &chans {
-//                     let &(_, ref rx) = &vals.io;
-//                     if let Ok(msg) = sel.recv(rx) {
-//                         println!("recieved message: {:?}", msg);
+    //     let mut wrap = Wrapper::new()
+    //         .set_model(ModelType::Post)
+    //         .set_msg_type(MessageType::Get)
+    //         .build();
 
-//                         // explicit scope so that it can re-mutably borrow on next iteration.
-//                         {
-//                             let result = handle_post_msg(&msg, &mut cache);
-//                             // handle the result, send responses...
-//                             // if (...) { vals.ret.send(... Respose...); }
-//                             // println!("RESULT {:?}", result.unwrap());
-//                             let send_ret = vals.ret.send(result.unwrap());
-//                             println!("SEND_RESULT: {:?}", send_ret);
-//                         }
+    //     let mut p = Post::new();
+    //     p.id = 1;
 
-//                         // Break the outer loop with the received message as the result.
-//                         break 'select msg;
-//                     }
+    //     wrap.items_mut().push(Arc::new(Resource::new(p)));
 
-//                     if let Ok(cancel) = sel.recv(&vals.cancel) {
-//                         println!("recieved CANCEL: {:?}", cancel);
-//                         // panic!("CLOSE");
-//                         // return Message<Post>(Post::new());
-//                         close = true;
-//                         break 'outer;
-//                         // break 'getout;
-//                     }
-//                 }
-//             };
-//             // println!("Recieved post message: {:?}", msg);
-//         }
-//         println!("Thread is closing!!!!");
-//     })
-// }
+    //     match a.send(Arc::new(wrap)) {
+    //         Ok(val) => {}
+    //         Err(e) => {
+    //             println!("[Error] ---> {:?}", e);
+    //         }
+    //     };
 
-// named affectionately after something from starcraft, the video game.
-// #[derive(Debug)]
-// pub struct Nexus<T, U, V> {
-//     pool: pool::ThreadPool,
-//     cache: &Cache,
-//     send: Sender<T>,
-//     recv: Receiver<U>,
-//     cancel_send: Receiver<V>,
-//     cancel_recv: Sender<V>,
-// }
+    //     match b.recv() {
+    //         Ok(val) => println!("{:?}", val.items()),
+    //         Err(e) => {
+    //             println!("[Error] ---> {:?}", e);
+    //             let ret: String = format!("Error receiving from channel (from cache).");
+    //         }
+    //     };
+    // }
+    // #[test]
+    // fn test_vec_cache_get() {
+    //     let mut vc = AssociativeVecCache::<Resource<Post>>::new();
+    //     match vc.put(1, Resource::new(Post::new())) {
+    //         Ok(val) => match val {
+    //             Some(some) => println!("SOME: {:?}", some),
+    //             None => println!("None."),
+    //         },
+    //         Err(e) => {
+    //             println!("There was an error: {:?}", e);
+    //         }
+    //     }
+    //     println!("VC: {:?}", vc);
 
-// impl<T, U, V, a> Nexus<T, U, V>
-// where
-//     T: Debug + Send + MessageSender + 'static,
-//     U: Debug + Send + Sync + 'static,
-//     V: Debug + Send + Sync + Cancellable + 'static,
-// {
-//     pub fn new() -> &Nexus<T, U, V> {
-//         let p: pool::ThreadPool = pool::ThreadPool::new(1).unwrap();
-//         let (snd, _) = crossbeam_channel::unbounded::<T>();
-//         let (_, rec) = crossbeam_channel::unbounded::<U>();
-//         let rec2 = rec.clone();
-//         let (cancel_send, cancel_recv) = crossbeam_channel::unbounded::<V>();
-//         let cancel_closure = cancel_recv.clone();
-//         let mut c = &mut Cache::new();
-//         p.execute(move || {
-//             loop {
-//                 select_loop! {
-//                     recv(rec, r) => {
-//                         println!("Recieved: {:?}", r);
-//                         handle_post_msg(&r, c);
-//                     },
-//                     recv(cancel_closure, s) => {
-//                         println!("Send: {:?}", s);
-//                     }
-//                 }
-//             }
-//         });
-//         &Nexus {
-//             pool: pool::ThreadPool::new(1).unwrap(),
-//             send: snd,
-//             recv: rec2,
-//             cache: &c,
-//             cancel_send: cancel_recv,
-//             cancel_recv: cancel_send
-//         }
-//     }
-// }
+    //     let mut p = Post::new();
+    //     p.id = 1000;
+    //     p.likes = 100;
+    //     match vc.put(1000, Resource::new(p)) {
+    //         Ok(val) => match val {
+    //             Some(some) => println!("SOME: {:?}", some),
+    //             None => println!("None."),
+    //         },
+    //         Err(e) => {
+    //             println!("There was an error: {:?}", e);
+    //         }
+    //     }
+    //     // println!("VC: {:?}", vc);
+    //     println!("***********************************");
+    //     println!("GET: {:?}", vc.get(1000));
+    //     println!("GET: {:?}", vc[1000]);
 
-// #[derive(Clone, Debug)]
-// pub struct ChannelCycle<T, V, U>
-// where
-//     T: Model,
-// {
-//     io: ChanTuple<T>,
-
-//     // this is the return channel for operations that require a response.
-//     ret: Sender<V>,
-//     cancel: Receiver<U>,
-// }
+    //     {
+    //         let mutable_vc_entry = &mut vc[1];
+    //         mutable_vc_entry.get_data_mut().id = 9999;
+    //     }
+    //     println!("Mutable_VC_ENTRY.ID: {:?}", vc[1]);
+    // }
+}
