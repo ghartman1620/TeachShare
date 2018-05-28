@@ -7,7 +7,7 @@ from django.contrib.auth.views import password_reset, password_reset_done, passw
 from rest_framework import routers
 from accounts.views import UserProfileViewSet, UserViewSet, GroupViewSet, TokenView, TokenVerification
 
-from posts.views import PostViewSet, CommentViewSet, AttachmentViewSet, SearchPostsView, StandardViewSet
+from posts.views import PostViewSet, CommentViewSet, AttachmentViewSet, SearchPostsView, StandardViewSet, PostPermissionViewSet
 from posts.views import *
 from posts.views import FileUploadView
 
@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^api/verify_token', TokenVerification.as_view()),
     url(r'^api/upload/(?P<filename>[^/]+)$', FileUploadView.as_view()),
     url(r'^api/search/', SearchPostsView.as_view()),
+    url(r'^api/perm/', PostPermissionViewSet.as_view()),
     url(r'^admin/', admin.site.urls),
     # this and urls down are concerned with reseting pssword
     # url(r'^reset-password/$', password_reset, name="reset_password"),

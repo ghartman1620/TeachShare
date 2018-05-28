@@ -56,3 +56,4 @@ def create_random_string(length=30):
 
 
 post_save.connect(create_profile, sender=User)
+

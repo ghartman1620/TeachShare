@@ -60,9 +60,8 @@
 
 <script>
 
-var handleRow = function (event, entry) {
-    console.log("CLICK ROW: " + JSON.stringify(entry));
-};
+    var handleRow = function (event, entry) {
+    };
     import Vue from "vue";
     import BootstrapVue from "bootstrap-vue";
     import VueBootstrapTable from "./Table";
@@ -100,8 +99,7 @@ var handleRow = function (event, entry) {
                         this.dataLabelsIncluded = false;
                     }
                 }
-                console.log("Data label boolean now: ", this.dataLabelsIncluded);
-                console.log("Value array:  ", this.values);
+
             },
             filterNumericValues: function () { //makes sure the values are just numeric values and labels are properly recognized
                 this.firstColumnLabels();
@@ -121,9 +119,7 @@ var handleRow = function (event, entry) {
                         }
                         if (isNumericArray === false) break;
                     }
-                    console.log("Is column at index ", x," an object with numeric values?", isNumericArray);
                 }
-                console.log("Done filtering.")
             },
             submit: function(event) {
                 this.filterNumericValues();

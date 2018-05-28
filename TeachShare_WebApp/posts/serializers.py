@@ -61,4 +61,5 @@ class PostSerializer(serializers.ModelSerializer):
                   'likes', 'timestamp', 'user', 'comments',
                   'tags', 'draft', 'length', 'content_type', 
                   'standards', 'subject', 'grade', 'practices',
-                  'crosscutting_concepts', 'disciplinary_core_ideas')
+                  'original_user', 'original_post',
+                  'crosscutting_concepts', 'disciplinary_core_ideas', 'color', 'layout')

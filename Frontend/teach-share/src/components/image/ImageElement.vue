@@ -11,7 +11,7 @@
                     <b-carousel-slide 
                         :caption="i.title" 
                         :text="i.description"
-                        :img-src="URL(i.url)"
+                        :img-src="i.url"
                         style="height: 480px; width: auto;"
                     />
                 </div>
@@ -45,7 +45,9 @@ export default class ImageElement extends Vue{
     audio: any = null;
     editing: boolean = false;
     sizeStyle: any = { width: "100%", height: "600px", padding: "20px" }; 
-
+    created(){
+        console.log("im in image element")
+    }
     getSizeStyle() {
 
         return {
@@ -84,7 +86,6 @@ export default class ImageElement extends Vue{
     }
     mounted() {
         window.setTimeout(this.changeSizeStyle, 500);
-        console.log("in mounted function");
     }
 };
 

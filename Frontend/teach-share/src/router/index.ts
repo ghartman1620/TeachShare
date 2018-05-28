@@ -1,11 +1,14 @@
 import Base from "@/components/Base.vue";
+import * as Cookie from "tiny-cookie";
 import Vue from "vue";
 import Router from "vue-router";
-
 import api from "../api";
 import store from "../store";
+import {logout} from "../store_modules/UserService";
+import {AxiosPromise} from "axios";
 import { setUser } from "../store_modules/UserService";
 import User from "../user";
+
 
 // typescript 'require' workaround hack
 declare function require(name: string): any;
@@ -42,6 +45,10 @@ const Register = () =>
 
 const WebSocketComp = () =>
     import ( /* webpackChunkName: "register" */ "../components/WebSocket.vue");
+const DbTest = () =>
+    import ( /* webpackChunkName: "db-test" */ "../components/DbTest.vue");
+const PermissionAdd = () =>
+    import ( /* webpackChunkName: "permission-add" */ "../components/PermissionAdd.vue");
 
 
 Vue.use(Router);
@@ -49,10 +56,6 @@ Vue.use(Router);
 const router = new Router({
     mode: "history",
     routes: [
-        {
-            path : "/websocket",
-            component: WebSocketComp
-        },
         {
             path: "/",
             component: Base,
@@ -62,7 +65,13 @@ const router = new Router({
                     path: "/create",
                     name: "create",
                     component: PostCreate,
-                    children: [{
+                    children: [
+                        {
+                            name: "permission-add",
+                            path: "share",
+                            component: PermissionAdd
+                        },
+                        {
                             name: "edit-text",
                             path: "text",
                             component: EditText
@@ -140,39 +149,55 @@ const router = new Router({
             path: "/register",
             name: "register",
             component: Register
+        },
+        {
+            path: "/indexeddb",
+            name: "db-test",
+            component: DbTest
         }
     ]
 });
 
-var Cookie = require("tiny-cookie");
+export function asLoggedIn(promise: AxiosPromise<any>): Promise<any> {
+    return new Promise((resolve, reject) => {
+        promise
+        .then((response) => {resolve(response); })
+        .catch((err) => {
+            if(err.response.status === 401){
+                logout(store);
+                router.push({name: "login"});
+                reject(err);
+            }
+            else{
+                console.error(err);
+                reject(err);
+            }
+        });
+    });
+}
+
 function verifyAndRefreshLogin(): Promise<any> {
+    console.log("I'm verifying and refreshing login!");
     if (store.getters.isLoggedIn){
-        console.log("is logged in with store");
         return new Promise((resolve) => {resolve(true);});
     } else if (Cookie.get("token") != null){
-        console.log("is logged in with token");
         const u: User = new User();
         setUser(store, u);
         // store.dispatch("setUser", u);
         return new Promise((resolve) => {resolve(true); });
     } else if (window.localStorage.getItem("refreshToken") !== null){
-        console.log("logging back in...");
-        console.log(window.localStorage.getItem("refreshToken"));
 
-        console.log(window.localStorage.getItem("username"));
         return new Promise((resolve, reject) => {
             const body = {
                 grant_type: "refresh_token",
                 refresh_token: window.localStorage.getItem("refreshToken"),
                 username: window.localStorage.getItem("username")
             };
-            console.log(body);
             const head = { headers: { "content-type": "application/json" } };
+            console.log("ASSIGNING API DEFAULTS TO EMPTY");
             Object.assign(api.defaults, {});
             api.post("get_token/", body, head).then((response: any) => {
-                console.log(response);
-                console.log(response.data.user);
-                console.log(response.data.user.username);
+
                 const user: User = new User(response.data.user.username,
                     response.data.user.pk,
                     response.data.user.email,
@@ -191,15 +216,13 @@ function verifyAndRefreshLogin(): Promise<any> {
             });
         });
     } else{
-        console.log("foobar");
         return new Promise((resolve) => {resolve(false); });
     }
 }
 
-const loginProtectedRoutes = ["create"];
+const loginProtectedRoutes = ["create", "posts"];
 const loggedOutRoutes = ["login", "register"];
 router.beforeEach((to, from, next) => {
-    console.log(window.localStorage.getItem("refreshToken"));
     if (loggedOutRoutes.some(val => val === to.name)) {
         verifyAndRefreshLogin().then((loggedIn) => {
             if (loggedIn) {
@@ -208,9 +231,7 @@ router.beforeEach((to, from, next) => {
                 next();
             }
         });
-    }
-    // @TODO: make sure this works!!!
-    if (loginProtectedRoutes.some((val) => val === to.name)) {
+    } else if (loginProtectedRoutes.some((val) => val === to.name)) {
         verifyAndRefreshLogin().then((loggedIn) => {
             if (loggedIn) {
                 next();
@@ -218,8 +239,9 @@ router.beforeEach((to, from, next) => {
                 next({ name: "login" });
             }
         });
+    } else {
+        next();
     }
-    next();
 });
 
 export default router;

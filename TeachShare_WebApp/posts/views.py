@@ -5,6 +5,7 @@ import django_filters
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
+from django.core.exceptions import PermissionDenied
 from .models import Post, Comment, Attachment, Standard
 from .serializers import PostSerializer, AttachmentSerializer, CommentSerializer, StandardSerializer
 from .documents import PostDocument
@@ -12,6 +13,7 @@ from .documents import PostDocument
 # test
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.contrib.auth.models import Permission
 from django.db.models import Q
 from urllib.parse import unquote
 from enum import Enum
@@ -25,18 +27,20 @@ from rest_framework.pagination import PageNumberPagination
 
 from .documents import PostDocument
 from .models import Attachment, Comment, Post
+from django.contrib.auth.models import User
 from .serializers import (AttachmentSerializer, CommentSerializer,
                           PostSerializer)
 from .tasks import add
 import os
 import google.cloud.storage
 from django.conf import settings
+from guardian.shortcuts import assign_perm, remove_perm, get_objects_for_user
 
 
 #Post search parameters
 #?term=string - searching for this string
-#?in=string - a list containing some of "title" "filenames" "content" "tags"
-#?sort=string - one of "date" "score" 
+#?in=string - a list containing some of 'title' 'filenames' 'content' 'tags'
+#?sort=string - one of 'date' 'score' 
 #?exclude=string - some keywords to discard some search results
 #?termtype=string - either 'and' or 'or' - says whether multiple words a query
     #should try to match every one of the words or any of the words
@@ -95,7 +99,7 @@ class SearchPostsView(views.APIView):
     # optionParams will be dealt with first. They affect filtering.
 
     def setSearchIn(self, value, queryset):
-        self.searchIn = value.split(" ")
+        self.searchIn = value.split(' ')
         return queryset
 
     def setTermType(self, value, queryset):
@@ -147,7 +151,7 @@ class SearchPostsView(views.APIView):
         return queryset.exclude(myQuery)
 
     def queryByStandards(self, value, queryset):
-        print("filtering by standards")
+        print('filtering by standards')
         terms = value.split(' ')
         myQuery = Match(standards=terms[0])
         for term in terms[1:]:
@@ -216,7 +220,7 @@ class SearchPostsView(views.APIView):
         try:
             queryset = self.get_queryset()
         except ValueError:
-            return Response({"error": "bad query parameter type"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'bad query parameter type'}, status=status.HTTP_400_BAD_REQUEST)
         for hit in queryset.scan():
             try:
                 response.append(Post.objects.get(id=hit._d_['id']))
@@ -225,10 +229,92 @@ class SearchPostsView(views.APIView):
 
         return Response(PostSerializer(response, many=True).data)
 
+from enum import Enum
+class PostPermission(Enum):
+    VIEW = 'view'
+    CHANGE = 'change'
+    def permission(self):
+        return Permission.objects.get(codename=self.value + '_post')
+
+
+
+
+
+class PostPermissionViewSet(views.APIView):
+    permission_classes=(IsAuthenticated,)
+
+    def post(self, request):
+        post = None
+        try:
+            post = Post.objects.get(pk=request.data['post'])
+        except KeyError as e:
+            return Response({'error' : 'required field: \'post\''},status=status.HTTP_400_BAD_REQUEST)
+        except Post.DoesNotExist as e:
+            return Response({'error' : 'that post does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        except ValueError as e:
+            return Response({'error' : 'invalid type for param post'}, status=status.HTTP_400_BAD_REQUEST)
+        if request.user == post.user:
+            permission = None
+            try:
+                permission = PostPermission(request.data['permission'])
+            except KeyError as e:
+                return Response({'error' : 'required field: \'permission\''},status=status.HTTP_400_BAD_REQUEST)
+            except ValueError as e:
+                return Response({'error' : 'invalid permission: \'' + str(request.data['permission']) + '\''},status=status.HTTP_400_BAD_REQUEST)
+            grant = False
+            try:
+                if request.data['action'] == 'grant':
+                    grant = True
+                elif request.data['action'] != 'revoke':
+                    return Response({'error' : 'invalid action - only \'grant\' or \'revoke\' a permission'}, status=status.HTTP_400_BAD_REQUEST)
+
+            except KeyError:
+                return Response({'error' : 'required field: \'permission\''},status=status.HTTP_400_BAD_REQUEST)
+            users = []
+            try:
+                for u in request.data['users']:
+                        
+                    try:
+                        user = None
+                        if isinstance(u, str):
+                            user = User.objects.get(username=u)
+                        elif isinstance(u, int):
+                            user = User.objects.get(pk=u)
+                        else:
+                            return Response({'error' : 'Users should be a string username or number pk'}, status=status.HTTP_404_BAD_REQUEST)
+                    except User.DoesNotExist:
+                        return Response({'error' : 'user does not exist: ' + u},status=status.HTTP_400_BAD_REQUEST)
+                    
+                    if grant:
+                        #also allow users who can change posts to view posts
+                        if(permission == PostPermission.CHANGE):
+                            assign_perm(PostPermission.VIEW.permission(), user, post)
+                        assign_perm(permission.permission(), user, post)
+                        
+                        users.append(u)
+                    else: #revoke
+                        if user == post.user:
+                            return Response({'error' : 'You attempted to revoke permissions from the owner of this post (the user sending this request)'}, status=status.HTTP_400_BAD_REQUEST)
+                        if remove_perm(permission.permission(), user, post)[0] == 1:
+                            users.append(u)
+                        
+            except KeyError:
+                return Response({'error' : 'required field: \'users\''},status=status.HTTP_400_BAD_REQUEST)
+            if(len(users)):
+                return Response({'message' : 'action successful for some users', 'users' : users})
+            else:
+                return Response({'message' : 'action successful for some users' if len(users) else 'no permissions granted or revoked ' + \
+                    '(the users you listed might not have had permissions you tried to revoke, or you might\'ve listed no users'})
+        else:
+            return Response({'error' : 'you are not the owner of this post'}, status=status.HTTP_403_FORBIDDEN)
+        
+        
+
 
 class PostFilter(filters.FilterSet):
     beginIndex = django_filters.NumberFilter(
-        name='beginIndex', label="beginIndex", method='filterNumberPosts')
+        name='beginIndex', label='beginIndex', method='filterNumberPosts')
+
 
     class Meta:
         model = Post
@@ -237,6 +323,7 @@ class PostFilter(filters.FilterSet):
 
     def filterNumberPosts(self, queryset, name, value):
         return queryset[value:value+10]
+    
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -246,18 +333,35 @@ class StandardResultsSetPagination(PageNumberPagination):
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    """
+    '''
     API endpoint for Post model
-    """
-    permission_classes = (AllowAny,)
+    '''
+    permission_classes = (IsAuthenticated,)
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     filter_class = PostFilter
     pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
-        return self.queryset
+        user_editing = self.request.query_params.get('user_edit', None)
+        if(user_editing != None):
+            view_set = get_objects_for_user(self.request.user, 'view_post', Post)
 
+            edit_set = get_objects_for_user(User.objects.get(pk=user_editing), 'change_post', Post)
+
+            self.queryset = view_set & edit_set
+        else:
+            self.queryset = get_objects_for_user(self.request.user, 'view_post', Post)
+        return self.queryset
+    
+    def get_object(self):
+        post = super(PostViewSet, self).get_object()
+        #if not self.request.user.has_perm('view_post', post):
+        #    print('Auth failed! returning 401')
+        #    raise PermissionDenied('You are not allowed to view that post.')
+            #return Response({'error': 'You are not allowed to view that post.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        return post
 
 class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
@@ -271,9 +375,9 @@ class StandardViewSet(viewsets.ModelViewSet):
     filter_fields= ('grade', 'name', 'subject') 
 
 class AttachmentViewSet(viewsets.ModelViewSet):
-    """
+    '''
     API endpoint for Attachment model
-    """
+    '''
     permission_classes = (AllowAny,)
     parser_classes = (JSONParser, )
     queryset = Attachment.objects.all()
@@ -318,7 +422,7 @@ def isBinary(f):
 
 
 def fileExt(filename):
-    ext = ""
+    ext = ''
     for i in reversed(range(0, len(filename))):
         if filename[i] == '.':
             break
@@ -369,7 +473,7 @@ class FileUploadView(views.APIView):
                 raise err
             print(blob.public_url)
 
-        print("file upload")
+        print('file upload')
         from pprint import pprint
         print(request.data)
         print(request.query_params['post'])

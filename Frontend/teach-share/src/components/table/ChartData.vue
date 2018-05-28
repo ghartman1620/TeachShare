@@ -16,7 +16,7 @@
                     <PieChart userLabel=userLabel v-bind:userData=userData></PieChart>
                 </div>
             </div> -->
-            <b-table striped hover :items="this.displayData"> </b-table>
+            <b-table striped hover :fields="displayData" :items="this.displayData"> </b-table>
             <b-tabs>
                 <b-tab v-if="this.graphOptions.bar === true" title="Bar Graph" @click="setActiveTab('bar')" active>
                     <br>
@@ -80,9 +80,7 @@
                         this.displayLabels.push(this.userData[i][rowLabel]);
                         delete this.userData[i][rowLabel];
                     }
-                    console.log("Display labels:  ", this.displayLabels);
                 }
-                console.log("User data array to be sent to graphs", this.userData);
 
             }
         },
@@ -92,7 +90,7 @@
             PieChart,
             BootstrapVue
         },
-        mounted () {
+        created () {
             this.processData();
         }
     });

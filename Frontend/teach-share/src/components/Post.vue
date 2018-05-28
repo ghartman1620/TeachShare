@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-12">
                     <br>
-                    <h2 class="text-center"><strong>{{post.title}}</strong></h2>
+                    <h2 class="text-center"><strong v-html="postTitle"></strong></h2>
                     <h5 class="text-center">posted: {{ post.updated | moment("from") }}</h5>
                     <h6 class="text-center">by <b-badge variant="dark">{{fullUsername}}</b-badge></h6>
                     <h4 class="text-right">
@@ -16,9 +16,14 @@
                         </span>
                     </h4>
                     <hr>
+                    <div v-if="post.original_post" style="text-align: center;">
+                        This post was derived from a <router-link :to="{name: 'detail', params: {post_id: post.original_post}}">post</router-link>
+                             authored by {{getOriginalUser().username}}
+                    </div>
+                    <hr>
                     <div>
                         <div :key="element.pk" v-for="element in post.content">
-                            <post-element :element="element" :index="index"/>
+                            <post-element :element="element"  :index="index"/>
                         </div>
                     </div>
                 </div> <!-- div class="col-12" -->
@@ -63,7 +68,7 @@
 
 <script lang="ts">
 
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import SeeMore from "./SeeMore.vue";
 import PostElement from "./PostElement.vue";
 import Comments from "./comments/Comments.vue";
@@ -103,6 +108,9 @@ export default class PostComp extends Vue {
     @Prop() index: number;
     @Prop() maxHeight: number;
 
+    highlightedWords: String[] = [];
+    postTitle: String = this.createPostTitle();
+
     newCommentText: string = "";
 
     get actualMaxHeight() {
@@ -125,14 +133,33 @@ export default class PostComp extends Vue {
         super();
     }
 
+
+    createPostTitle(): String {
+        var postTitle = "";
+        if(!this.$route.query.term){
+            return this.post.title;
+        }
+        this.highlightedWords = this.$route.query.term.split(" ");
+        for( var word of this.post.title.split(" ")){
+            if(this.highlightedWords.includes(word as String)){
+                postTitle = postTitle.concat(`<span class=\"highlight\">${word} </span>`);
+            }
+            else{
+                postTitle = postTitle.concat(word + " ");
+            }
+        }
+        return postTitle;
+    }
+    getOriginalUser(){
+        return getUserByID(this.$store)(this.post.original_user);
+    }
+
     getComments() {
         var vm = this;
         getByPost(this.$store, Number(this.post.pk)).then(function(res) {
             for (let c of getCommentsForPost(vm.$store)(vm.post.pk as number)) {
-                console.log(c);
                 let hasUser = vm.$store.state.user.otherUsers.find(
                     (val: User) => {
-                        console.log(val, c, typeof c);
                         if (val.pk === ((c as Comment).user as number)) {
                             return true;
                         }
@@ -150,7 +177,6 @@ export default class PostComp extends Vue {
         var vm = this;
         let currentUser = this.$store.getters.getLoggedInUser;
         if (currentUser === undefined) {
-            // this.$log("cookie: ", this.$cookie.get("userId"));
 
             // @TODO: fix this
             // this.$store.fetchCurrentUser();
@@ -165,7 +191,6 @@ export default class PostComp extends Vue {
     }
     actualSubmit() {
         var vm = this;
-        this.$logDanger(this.$store.state.user.profile);
         if (typeof getLoggedInUser(this.$store) !== "undefined") {
             let comment = new Comment(
                 undefined,
@@ -175,7 +200,6 @@ export default class PostComp extends Vue {
             );
             createUpdateComment(this.$store, comment).then(function(ret: any): any {
                     if (ret.status < 300) {
-                        console.log(ret);
                         vm.$notifySuccess(
                             "Your comment was successfully posted!"
                         );
@@ -192,7 +216,6 @@ export default class PostComp extends Vue {
                     }
                 })
                 .catch(function(ret) {
-                    console.log(ret);
                     vm.$notifyDanger(
                         `There was a problem submitting your comment.`
                     );
@@ -202,14 +225,22 @@ export default class PostComp extends Vue {
 
     created() {
         // this.$store.dispatch("fetchUser", this.post.user);
-        this.$log(this.post);
+        if(this.post.original_user){
+            console.log("hi");
+            console.log(this.post.original_user);
+            fetchUser(this.$store, this.post.original_user);
+        }
     }
+
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .tag-entry {
     padding: 6px;
     margin: 4px;
+}
+.highlight {
+    background-color: yellow;
 }
 </style>

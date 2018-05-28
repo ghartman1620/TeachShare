@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'django_filters',
-    # 'django_elasticsearch_dsl',
+    'django_elasticsearch_dsl',
+    'guardian',
 
     'accounts',
     'posts',
@@ -66,7 +67,7 @@ INSTALLED_APPS = [
 ElasticSearch-DSL Django settings
     - Signal Processor is temporary, will likely increase server load
 """
-ELASTICSEARCH_DSL = {1
+ELASTICSEARCH_DSL = {
     'default': {
         'hosts': 'search:9200'
     },
@@ -125,6 +126,7 @@ AUTHENTICATION_BACKENDS = (
 
     'rest_framework_social_oauth2.backends.DjangoOAuth2',
     'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
 )
 
 SOCIAL_AUTH_PIPELINE = (
