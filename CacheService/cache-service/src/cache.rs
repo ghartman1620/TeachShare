@@ -5,13 +5,14 @@ use diesel::pg::PgConnection;
 use diesel::result;
 use models::*;
 use std::cell::{BorrowMutError, RefCell};
-use std::collections::HashMap;
+use std::collections::{HashMap, BTreeMap};
 use std::hash::Hash;
 use std::ops::{Index, IndexMut};
 use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
+use users::Oauth2ProviderAccesstoken;
 
 const MAX_DB_SAVE_TIMEOUT: Duration = Duration::from_millis(200);
 
@@ -25,7 +26,6 @@ pub trait Cache {
     fn put(&mut self, key: Self::Key, value: Self::Entry) -> Option<Self::Entry>;
 }
 
-
 /// Unused (substantially) currently but may soon
 #[derive(Debug)]
 pub enum CacheError {
@@ -37,15 +37,24 @@ pub enum CacheError {
 #[derive(Debug)]
 pub struct HashMapCache<K: Eq + Hash, V> {
     _inner: HashMap<K, V>,
+    _auth: BTreeMap<i32, Oauth2ProviderAccesstoken>,
 }
 
 impl<K, V> HashMapCache<K, V>
 where
     K: Eq + Hash,
 {
-    pub fn new() -> HashMapCache<K, V> {
+    pub fn new(conn: &PgConnection) -> HashMapCache<K, V> {
+        let auth = match Oauth2ProviderAccesstoken::build_user_table_cached(conn) {
+            Some(val) => val,
+            None => BTreeMap::new(),
+        };
+        println!("\n*********************************************");
+        println!("User Table: {:?}", auth);
+        println!("*********************************************");
         HashMapCache {
             _inner: HashMap::new(),
+            _auth: auth,
         }
     }
 }
@@ -86,8 +95,8 @@ pub fn cache_thread(
 ) {
     thread::spawn(move || {
         let db = DB::new();
-
-        let mut cache = Rc::new(RefCell::new(HashMapCache::new()));   //Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new()));
+        let session = db.get();
+        let mut cache = Rc::new(RefCell::new(HashMapCache::new(&session))); //Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new()));
         loop {
             let conn = db.get();
             select_loop! {
@@ -101,7 +110,7 @@ pub fn cache_thread(
                                 let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
                                 handle_get(&msg, c, &ret_pipe, &conn);
                             }
-                        },                        
+                        },
                         MessageType::Create => {
                             println!("[CACHE] RECEIVED => {:?}", msg.msg_type);
                             assert_eq!(msg.msg_type, MessageType::Create);
@@ -109,7 +118,7 @@ pub fn cache_thread(
                                 let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
                                 handle_create(&msg, c, &ret_pipe, &db_send);
                             }
-                        },                        
+                        },
                         MessageType::Watch => {
                             println!("[CACHE] RECEIVED => {:?}", msg.msg_type);
                             assert_eq!(msg.msg_type, MessageType::Watch);
@@ -117,7 +126,7 @@ pub fn cache_thread(
                                 let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
                                 handle_watch(&msg, c, &ret_pipe, &conn, &db_send);
                             }
-                        },                        
+                        },
                         MessageType::Update => {
                             println!("[CACHE] RECEIVED => {:?}", msg.msg_type);
                             assert_eq!(msg.msg_type, MessageType::Update);
@@ -153,9 +162,7 @@ pub fn cache_thread(
 
 #[allow(dead_code)]
 /// wire_up uses the types to setup crossbeam channels and returns the relevant information
-pub fn wire_up(
-    db_send: Sender<Post>,
-) -> (Sender<Arc<Msg>>, Receiver<Arc<Msg>>, Sender<Cancel>) {
+pub fn wire_up(db_send: Sender<Post>) -> (Sender<Arc<Msg>>, Receiver<Arc<Msg>>, Sender<Cancel>) {
     let (send_pipe, recv_pipe) = crossbeam_channel::unbounded::<Arc<Msg>>();
     let (send_ret_pipe, recv_ret_pipe) = crossbeam_channel::unbounded::<Arc<Msg>>();
     let (send_cancel, recv_cancel) = crossbeam_channel::unbounded::<Cancel>();
@@ -178,14 +185,11 @@ fn handle_manifest(
     db: &PgConnection,
 ) {
     //to be sent back -> will contain post content on any post whose version is out of date
-    let mut wrap = Msg::new()
-        .set_msg_type(MessageType::Manifest)
-        .build();
+    let mut wrap = Msg::new().set_msg_type(MessageType::Manifest).build();
 
     let mut db_posts: Vec<i32> = Vec::new();
     println!("[CACHE] Manifest: begin");
 
-    
     for m in &msg.items {
         let id = match &m.data {
             Model::Post(post) => post.id,
@@ -197,8 +201,7 @@ fn handle_manifest(
         match borrowed_val.get(ID::Post(id)) {
             //1. if cache has this post id:
             Some(val) => {
-                println!(
-                    "[CACHE] Manifest: For key: {:?} ----> {:?}", id, val);
+                println!("[CACHE] Manifest: For key: {:?} ----> {:?}", id, val);
                 //2. If the version provided does not match the version in the cache
                 if val.version != m.version {
                     //3. Add the entire post's content to the return wrapper's items
@@ -238,10 +241,7 @@ fn handle_manifest(
         mutable_cache.put(ID::Post(id), resource.clone());
 
         //8. Add them all to the return list.
-        println!(
-            "[CACHE] manifest: adding post {} to return list",
-            id
-        );
+        println!("[CACHE] manifest: adding post {} to return list", id);
         wrap.items.push(Arc::new(resource));
     }
     //9. Send back the return list.
@@ -250,10 +250,13 @@ fn handle_manifest(
 }
 
 #[allow(dead_code)]
-fn handle_get(msg: &Arc<Msg>, cash: &mut RefCellCache, ret_pipe: &Sender<Arc<Msg>>, db: &PgConnection) -> Result<Resource, CacheError> {
-    let mut wrap = Msg::new()
-        .set_msg_type(MessageType::Get)
-        .build();
+fn handle_get(
+    msg: &Arc<Msg>,
+    cash: &mut RefCellCache,
+    ret_pipe: &Sender<Arc<Msg>>,
+    db: &PgConnection,
+) -> Result<Resource, CacheError> {
+    let mut wrap = Msg::new().set_msg_type(MessageType::Get).build();
 
     for m in &msg.items {
         let mut dne_flag = false;
@@ -261,7 +264,7 @@ fn handle_get(msg: &Arc<Msg>, cash: &mut RefCellCache, ret_pipe: &Sender<Arc<Msg
         {
             // immutably borrow cache
             let mut cache = cash.borrow();
-            
+
             // Get the inner cache data, if exists
             let result_data: Option<&Resource> = match &m.data {
                 Model::Post(p) => cache.get(ID::Post(p.id)),
@@ -270,7 +273,7 @@ fn handle_get(msg: &Arc<Msg>, cash: &mut RefCellCache, ret_pipe: &Sender<Arc<Msg
             };
 
             if result_data.is_none() {
-                // get it from the db... 
+                // get it from the db...
 
                 // grab the id from the message
                 let id = match &m.data {
@@ -285,12 +288,11 @@ fn handle_get(msg: &Arc<Msg>, cash: &mut RefCellCache, ret_pipe: &Sender<Arc<Msg
                         dne_flag = true;
                         db_posts.extend(posts);
                         println!("POSTS: {:?}", db_posts);
-                    },
+                    }
                     Err(err) => {
                         println!("[DB]<ERROR> {:?}", err);
-                    },
+                    }
                 }
-
             } else {
                 // model_data is the data from the cache
                 let model_data = result_data.unwrap();
@@ -332,11 +334,9 @@ fn handle_create(
     ret_pipe: &Sender<Arc<Msg>>,
     db: &Sender<Post>,
 ) {
-    let wrap = Msg::new()
-        .set_msg_type(MessageType::Create)
-        .build();
+    let wrap = Msg::new().set_msg_type(MessageType::Create).build();
 
-    for m in &msg.items { 
+    for m in &msg.items {
         match m.data {
             Model::Post(ref post) => {
                 let (resource, need_db) = create_post_cache(&post, &cash);
@@ -353,7 +353,7 @@ fn handle_create(
                     let errors = create_post_db(&post, db, true);
                     println!("[CREATE] <Errors> --> {:?}", errors);
                 }
-            },
+            }
             _ => unimplemented!(),
         }
     }
@@ -377,9 +377,7 @@ fn handle_watch(
     db_write: &Sender<Post>,
 ) {
     // create a wrapper for the response
-    let wrap = Msg::new()
-        .set_msg_type(MessageType::Create)
-        .build();
+    let wrap = Msg::new().set_msg_type(MessageType::Create).build();
 
     for m in &msg.items {
         println!("MSG ---------------> {:?}", m);
@@ -395,7 +393,7 @@ fn handle_watch(
                     if let Some(val) = c.get(ID::Post(post.id)) {
                         exists_cache = Some(val.clone());
                     };
-                },
+                }
                 Model::User(user) => unimplemented!(),
                 Model::Comment(comment) => unimplemented!(),
             }
@@ -405,13 +403,11 @@ fn handle_watch(
         // @TODO: This can all be simplified. Do so if it comes about at a convenient time.
         match exists_cache {
             Some(val) => {
-                exists = val.all_watchers()
-                    .iter()
-                    .any(|&x| x == msg.connection_id);
-            },
+                exists = val.all_watchers().iter().any(|&x| x == msg.connection_id);
+            }
             None => {
                 // no value to watch, grab from DB?
-                
+
                 match &m.data {
                     Model::Post(post) => {
                         println!("POST ID# ----> {}", post.id);
@@ -435,7 +431,7 @@ fn handle_watch(
                                 .collect();
                             println!("cleaned_posts_response: {:?}", cleaned_posts_response);
                         }
-                    },
+                    }
                     Model::User(user) => unimplemented!(),
                     Model::Comment(comment) => unimplemented!(),
                 }
@@ -450,13 +446,16 @@ fn handle_watch(
                     match response {
                         Some(val) => {
                             val.add_watch(msg.connection_id);
-                            println!("[CACHE] Current watchers -----------------> {:?}", val.watchers);
+                            println!(
+                                "[CACHE] Current watchers -----------------> {:?}",
+                                val.watchers
+                            );
                         }
                         None => {
                             println!("ERROR: There was no valid entry for that Post ID.");
                         }
                     }
-                },
+                }
                 Model::User(user) => unimplemented!(),
                 Model::Comment(comment) => unimplemented!(),
             }
@@ -585,7 +584,6 @@ fn handle_update(
     let mut cache_mut = cash.borrow_mut();
     let all_watchers = &mut vec![];
 
-
     for m in &msg.items {
         {
             println!("M ---------------------> {:?}", *m);
@@ -598,7 +596,7 @@ fn handle_update(
                         println!("Watchers --> {:?}", w);
                         all_watchers.push(w);
                     }
-                },
+                }
                 _ => unimplemented!(),
             }
         }
@@ -611,7 +609,7 @@ fn handle_update(
                     *entry = Resource::new(Model::Post(post.clone()));
                     entry.watchers.clear();
                     entry.watchers.extend(old_watchers);
-                    
+
                     println!("\n************************************************************");
                     println!("Entry of ID:{}, has a version --> {}", post.id, old_version);
                     entry.version = old_version + 1;
@@ -619,10 +617,9 @@ fn handle_update(
                     println!("New Version: {}", entry.version);
                     println!("************************************************************\n");
                 }
-            },
+            }
             _ => unimplemented!(),
         }
-        
     }
 
     println!("ALL WATCHERS ------------------> {:?}", all_watchers);
@@ -637,7 +634,7 @@ fn handle_update(
                 watchers.iter().for_each(|watch| resource.add_watch(*watch));
                 // resource.add_watch()
                 just_resources.push(resource);
-            },
+            }
             _ => unimplemented!(),
         }
     }

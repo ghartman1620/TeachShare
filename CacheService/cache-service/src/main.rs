@@ -1,9 +1,13 @@
-
 /*!
  The websocket cache service is used for realtime communication between connected users.
 */
 #![feature(vec_remove_item)]
 #![warn(clippy)]
+#![feature(extern_prelude)]
+
+extern crate chrono;
+
+extern crate time;
 
 extern crate ws;
 #[macro_use]
@@ -25,6 +29,7 @@ mod db;
 mod models;
 mod pool;
 mod schema;
+mod users;
 
 use cache::*;
 use db::save_posts;
@@ -40,7 +45,6 @@ use std::thread;
 struct GrandSocketStation {
     // represents the list of connections
     connections: Vec<Rc<Connection>>,
-
 }
 
 impl GrandSocketStation {
@@ -116,14 +120,12 @@ impl Handler for Connection {
             Message::Text(text) => {
                 let json: Result<WSMessage, serde_json::Error> = serde_json::from_str(&text);
                 let response: Option<String> = match json {
-                    Ok(msg) => {
-                        match msg.message {
-                            MessageType::Get => self.handle_get_msg(msg),
-                            MessageType::Create => self.handle_create_msg(msg),
-                            MessageType::Watch => self.handle_watch_msg(msg),
-                            MessageType::Update => self.handle_update_msg(msg),
-                            MessageType::Manifest => self.handle_manifest_msg(msg),
-                        }
+                    Ok(msg) => match msg.message {
+                        MessageType::Get => self.handle_get_msg(msg),
+                        MessageType::Create => self.handle_create_msg(msg),
+                        MessageType::Watch => self.handle_watch_msg(msg),
+                        MessageType::Update => self.handle_update_msg(msg),
+                        MessageType::Manifest => self.handle_manifest_msg(msg),
                     },
                     Err(e) => Some(format!(
                         "There is a terrible error parsing {:?}: {:?}",
@@ -189,7 +191,8 @@ impl Connection {
         let output = WSMessageResponse::new(data, versions);
         println!("Sending: {:?}", output);
 
-        let serialized = serde_json::to_string(&output).expect("Uh-oh... JSON serialization error!~");
+        let serialized =
+            serde_json::to_string(&output).expect("Uh-oh... JSON serialization error!~");
         println!("Serialized content: {}", serialized);
         self.tx.send(serialized)
     }
@@ -197,9 +200,7 @@ impl Connection {
     fn handle_get_msg(&self, msg: WSMessage) -> Option<String> {
         println!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Get);
-        let mut return_message = Msg::new()
-            .set_msg_type(MessageType::Get)
-            .build();
+        let mut return_message = Msg::new().set_msg_type(MessageType::Get).build();
 
         let mut p = Post::new();
         p.id = match msg.id {
@@ -207,7 +208,9 @@ impl Connection {
             None => return Some(String::from("No Post ID provided.")),
         };
 
-        return_message.items.push(Arc::new(Resource::new(Model::Post(p))));
+        return_message
+            .items
+            .push(Arc::new(Resource::new(Model::Post(p))));
 
         match self.to_cache.send(Arc::new(return_message)) {
             Ok(_) => {}
@@ -224,7 +227,7 @@ impl Connection {
                 return Some(ret);
             }
         };
-        
+
         let resp_data: Vec<Model> = resp.items.iter().map(|x| x.data.clone()).collect();
         let versions: Vec<u64> = resp.items.iter().map(|resource| resource.version).collect();
 
@@ -236,9 +239,7 @@ impl Connection {
     fn handle_create_msg(&self, msg: WSMessage) -> Option<String> {
         println!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Create);
-        let mut wrap = Msg::new()
-            .set_msg_type(MessageType::Create)
-            .build();
+        let mut wrap = Msg::new().set_msg_type(MessageType::Create).build();
 
         let p = match msg.post {
             Some(post) => post,
@@ -292,15 +293,13 @@ impl Connection {
             let posts = vec![];
             let versions = vec![];
             match self.serialize_and_send_posts(&posts, &versions) {
-                Ok(_) => {},
+                Ok(_) => {}
                 Err(e) => println!("Websocket Error: {:?}", e),
             }
             None
         } else {
             println!("manifest: {:?}", post_versions);
-            let mut wrap = Msg::new()
-                .set_msg_type(MessageType::Manifest)
-                .build();
+            let mut wrap = Msg::new().set_msg_type(MessageType::Manifest).build();
             for post_version in post_versions {
                 println!(
                     "[MAIN] manifest handler: adding post id {} version {} to cache list",
@@ -334,12 +333,13 @@ impl Connection {
                     return Some(String::from("Error receiving from channel (from cache)."));
                 }
             };
-            let output: Vec<Model> = resp.items.iter().map(|post| {
-                match &post.data {
+            let output: Vec<Model> = resp.items
+                .iter()
+                .map(|post| match &post.data {
                     Model::Post(p) => Some(p),
                     _ => None,
-                }
-            }).filter(|post| post.is_some())
+                })
+                .filter(|post| post.is_some())
                 .map(|post| Model::Post(post.unwrap().clone()))
                 .collect();
 
@@ -353,9 +353,7 @@ impl Connection {
     fn handle_update_msg(&mut self, msg: WSMessage) -> Option<String> {
         println!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Update);
-        let mut wrap = Msg::new()
-            .set_msg_type(MessageType::Update)
-            .build();
+        let mut wrap = Msg::new().set_msg_type(MessageType::Update).build();
 
         // does the request have a Post ID?
         let post = match msg.post {
@@ -386,15 +384,18 @@ impl Connection {
             Err(_) => Err(String::from("Error receiving from channel (from cache).")),
         };
 
-
         // @TODO: This is the actual update sending code. Could be optimized greatly.
         if let Ok(updated_data) = changes {
             println!("Updated_data ---------------> {:?}", updated_data.items);
             let mut watchers: Vec<Vec<i32>> = vec![];
-            let (posts, versions): (Vec<Model>, Vec<u64>) = updated_data.items.iter().map(|resource| {
-                watchers.push(resource.watchers.clone()); // @TODO: figure out a way around this clone
-                (resource.data.clone(), resource.version) // @TODO: figure out a way around this clone
-            }).unzip();
+            let (posts, versions): (Vec<Model>, Vec<u64>) = updated_data
+                .items
+                .iter()
+                .map(|resource| {
+                    watchers.push(resource.watchers.clone()); // @TODO: figure out a way around this clone
+                    (resource.data.clone(), resource.version) // @TODO: figure out a way around this clone
+                })
+                .unzip();
 
             // @TODO: This could be simplified somewhat or abstracted into functions/parts
             match &mut self.parent {
@@ -402,31 +403,34 @@ impl Connection {
                     Ok(parent) => {
                         println!("TOTAL CONNECTIONS: {:?}", &parent.connections);
                         for c in &parent.connections {
-
                             // @TODO: Simplify/abstract this section into separate function(s)
                             println!("Connection --> {:?}", c);
                             let id = c.tx.connection_id();
-                            let all_watchers = watchers.iter().flat_map(|y| y).find(|x| **x == id as i32);
+                            let all_watchers =
+                                watchers.iter().flat_map(|y| y).find(|x| **x == id as i32);
 
                             println!("WATCHES ---> {:?}, LOOKING FOR ----> {:?}, MATCHED_WATCHES ---> {:?}", watchers, id, all_watchers);
                             if let Some(matched_connection) =
                                 watchers.iter().flat_map(|y| y).find(|x| **x == id as i32)
-                            { 
+                            {
                                 let ws_response = WSMessageResponse::new(&posts, &versions);
-                                println!("******************** SENDING TO: {:?} ***************", matched_connection);
+                                println!(
+                                    "******************** SENDING TO: {:?} ***************",
+                                    matched_connection
+                                );
                                 let serialized = serde_json::to_string(&ws_response)
                                     .expect("Uh-oh... JSON serialization error!~");
 
                                 println!("Serialized content (Update): {}", serialized);
                                 let send_result = c.tx.send(serialized);
-                                if send_result.is_err() { 
+                                if send_result.is_err() {
                                     return Some(format!("Error: {:?}", send_result.unwrap_err()));
                                 }
                             } else {
                                 println!("There was no matched connection for: {}. It does not need to be updated.", id);
                             }
                         }
-                    },
+                    }
                     Err(e) => println!("Error: {:?}!", e),
                 },
                 None => println!("None. Did not unwrap."),
@@ -437,9 +441,7 @@ impl Connection {
     fn handle_watch_msg(&self, msg: WSMessage) -> Option<String> {
         println!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Watch);
-        let mut wrap = Msg::new()
-            .set_msg_type(MessageType::Watch)
-            .build();
+        let mut wrap = Msg::new().set_msg_type(MessageType::Watch).build();
 
         // does the request have a Post ID?
         let post_id = match msg.id {
@@ -535,7 +537,7 @@ fn main() {
 
     // await db thread to end...
     match db_handle.join() {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(e) => println!("Error in db_handle.join() --> {:?}", e),
     }
 }

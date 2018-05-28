@@ -218,7 +218,7 @@ export interface ILayout {
     y: number;
     w: number;
     h: number;
-    i: string; // @TODO: Ask jeff if this is really suppose to be a string
+    i: string;
 }
 
 export class Post extends Model {

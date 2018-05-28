@@ -1,3 +1,7 @@
+
+use diesel::data_types::PgTimestamp;
+use diesel::Insertable;
+use schema::{oauth2_provider_accesstoken, posts_post};
 use serde_json::from_str;
 use serde_json::Value;
 use std::cmp::{Eq, PartialEq};
@@ -5,9 +9,7 @@ use std::error;
 use std::fmt;
 use std::hash::Hash;
 use std::sync::Arc;
-use diesel::Insertable;
-use schema::{posts_post, oauth2_provider_accesstoken};
-use diesel::data_types::PgTimestamp;
+use users::*;
 
 // * option 1
 #[derive(Debug, Serialize)]
@@ -18,13 +20,9 @@ pub struct WSMessageResponse<'a> {
 
 impl<'a> WSMessageResponse<'a> {
     pub fn new(payload: &'a [Model], versions: &'a [u64]) -> WSMessageResponse<'a> {
-        WSMessageResponse {
-            payload,
-            versions,
-        }
+        WSMessageResponse { payload, versions }
     }
 }
-
 
 // * option 2
 #[derive(Debug, Serialize)]
@@ -32,7 +30,7 @@ pub struct WSMsgResponse<'a>(u64, &'a Model);
 
 /// This is the Value field for entries in the cache. They can be
 /// matched by their type, and then return the value as
-/// the parameter. 
+/// the parameter.
 ///
 /// Implementation note: This will always be exactly the size of the
 /// largest struct. Luckily most of the large fields are simple
@@ -42,11 +40,10 @@ pub struct WSMsgResponse<'a>(u64, &'a Model);
 pub enum Model {
     User(User),
     Post(Post),
-    Comment(Comment), 
+    Comment(Comment),
 }
 
-
-// This is KEY field for HashMap entries that make it so that we can still refer 
+// This is KEY field for HashMap entries that make it so that we can still refer
 // to an entry only by their id (pk), and have no collision with different types.
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub enum ID {
@@ -65,22 +62,6 @@ pub struct UserPermission {
 pub enum Permission {
     view_post(bool),
     // etc...
-}
-
-
-// user access tokens cache:
-// need: user_id, token, expires?
-#[derive(Queryable, Insertable, Debug, Clone, PartialEq)]
-#[table_name = "oauth2_provider_accesstoken"]
-pub struct Oauth2ProviderAccesstoken {
-    pub id: i64,
-    pub token: String,
-    pub expires: PgTimestamp,
-    pub scope: String,
-    pub application_id: Option<i64>,
-    pub user_id: Option<i32>,
-    pub created: PgTimestamp,
-    pub updated: PgTimestamp,
 }
 
 // Keep track of user auth table -> oauth2_provider_accesstoken
@@ -126,7 +107,17 @@ impl Resource {
 
     /// remove_watch: remove's a watch from the watchers map
     pub fn remove_watch(&mut self, id: i32) {
-        self.watchers.remove_item(&id).unwrap();
+        // self.watchers.remove_item(&id).unwrap();
+        let mut index = -1;
+        {
+            let temp = self.watchers.iter().find(|x| **x == id);
+            if temp.is_some() {
+                index = *temp.unwrap();
+            } else {
+                return;
+            }
+        }
+        self.watchers.remove(index as usize); 
     }
 
     // ? all_watchers: goal is to get a vector of copy'd user's
@@ -324,7 +315,6 @@ mod tests {
         let t = &Model::Post(new_post);
         let b = WSMsgResponse(1, t);
         println!("WSMsgResponse: {:?}", b);
-
     }
 
     // #[test]

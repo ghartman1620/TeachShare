@@ -1,18 +1,19 @@
 use crossbeam_channel::Receiver;
+use diesel::insert_into;
 use diesel::pg::data_types::PgInterval;
 use diesel::pg::data_types::PgTimestamp;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::result;
+use diesel::result::Error;
 use diesel::update;
 use dotenv::dotenv;
+
 use models::Post;
 use schema::posts_post::dsl::*;
 use serde_json::value::Value;
 use std::env;
 use std::rc::Rc;
-use diesel::insert_into;
-use diesel::result::Error;
 
 pub fn establish_connection() -> PgConnection {
     dotenv().ok();
@@ -38,23 +39,13 @@ impl DB {
     pub fn get_mut(&mut self) -> Option<&mut PgConnection> {
         Rc::get_mut(&mut self._conn)
     }
-    // pub fn insert_post(&self, post: Post) -> Result<Post, Error> {
-    //     self._conn.transaction(|| {
-    //         insert_into(posts_post).default_values().execute(&*self._conn)?;
-    //         let created_post = insert_into(posts_post).values(&post).get_result(&*self._conn)?; //execute(&*self._conn)?;
-    //         println!("** Total rows affected by insert_into: {:?} **", created_post);
-    //         Ok(created_post)
-    //     })?;
-    //     let created_post = insert_into(posts_post).values(&post).get_result(&*self._conn)?;
-    //     Ok(created_post)
-    // }
 }
 
 impl Post {
     pub fn new() -> Post {
         Post {
             id: 0,
-            title: String::from(""), 
+            title: String::from(""),
             content: Value::Null,
             // updated: PgTimestamp(0),
             likes: 0,
@@ -79,49 +70,21 @@ impl Post {
         return posts_post.filter(id.eq_any(ids)).load::<Post>(conn);
     }
 
-    //where should connection live? maybe in a singleton class in models?
     pub fn get(pk_id: i32, conn: &PgConnection) -> Result<Vec<Post>, result::Error> {
-        // I'm not sure about this plan to just return the first thing in the vec given by expect.
-        // Does diesel have some way to expecft a single post from a filter?
-
-        //res is a Result<Vec<Post>, diesel::result::Error>
-
         return posts_post.filter(id.eq(pk_id)).load::<Post>(conn);
-        // if res.is_ok() {
-        //     let mut results: Vec<Post> = res.unwrap();
-
-        //     if results.len() == 0 {
-        //         return Err(format!("Post {} not found", pk_id));
-        //     }
-        //     if results.len() > 1 {
-        //         return Err(format!(
-        //             "More than one post returned for {}.
-        //            This is very unexpected and indicates an error in your database
-        //            that you have more than one post with a particular primary key.",
-        //             pk_id
-        //         ));
-        //     }
-        //     return Ok(results.pop().unwrap());
-        // } else {
-        //     return Err(res.unwrap_err());
-        // }
     }
+
     pub fn save(&self, conn: &PgConnection) -> Result<(), String> {
         let updated_row: Result<Post, result::Error> = update(posts_post.filter(id.eq(self.id)))
-            //copy trait is not defined for String, because it's immutable. So we must clone our strings.
             .set((title.eq(self.title.clone()),
                 content.eq(self.content.clone()),
-            //  updated.eq(self.updated),
                 likes.eq(self.likes),
-            //  timestamp.eq(self.timestamp),
                 tags.eq(self.tags.clone()),
                 user_id.eq(self.user_id),
                 draft.eq(self.draft),
                 content_type.eq(self.content_type),
                 grade.eq(self.grade),
-            //  length.eq(self.length),
-                subject.eq(self.subject),
-                //Hopefully these vectors aren't very long... 
+                subject.eq(self.subject), 
                 crosscutting_concepts.eq(self.crosscutting_concepts.clone()),
                 disciplinary_core_ideas.eq(self.disciplinary_core_ideas.clone()),
                 color.eq(self.color.clone()),
@@ -142,11 +105,10 @@ impl Post {
         };
     }
 
-    // pub fn insert_post(&self, conn: &)
 }
 pub fn save_posts(rx: Receiver<Post>) {
     let db = DB::new();
-    
+
     loop {
         use std::time::SystemTime;
         let res = rx.recv();
