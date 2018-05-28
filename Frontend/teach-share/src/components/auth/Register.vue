@@ -88,7 +88,6 @@ export default class Register extends Vue{
         //TODO: do more meaningful email
         //check than something@something.something
         var regex = /\S+@\S+\.\S+/
-        console.log(regex.test(this.email));
         return regex.test(this.email);
     }
     get emailFeedback() {
@@ -107,23 +106,19 @@ export default class Register extends Vue{
     }
 
     register() {
-        console.log("in register");
 
         if(this.emailValid && this.usernameValid && this.passwordValid){
             var vm = this;
-            console.log("creating user...");
             this.createUser("createUser", {
                 username: this.username,
                 password: this.pw1,
                 email: this.email,
                 
             }).then(function(ret) {
-                console.log("RETURNED: ", ret);
                 
                 vm.$router.push({name: "login"});
             })
             .catch(function(err) {
-                console.log("caught error!");
                 Object.keys(err).forEach(function(key){
                     console.log(key);
                     console.log(err[key]);
@@ -139,7 +134,6 @@ export default class Register extends Vue{
                         (this.passwordValid ? "" : (this.passwordFeedback + "<br>")) + 
                         (this.usernameValid ? "" : (this.usernameFeedback + "<br>")) + 
                         "Please fix them and try again."
-            console.log(str);
 
             this.$notifyDanger(str );
 

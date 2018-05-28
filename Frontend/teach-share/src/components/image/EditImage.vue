@@ -76,8 +76,6 @@ var _ = require("lodash");
 export default class EditImage extends Vue{
     @State("create") postState;
     @State("fs") fileState;
-    @Action("addElement") addElement;
-    @Action("editElement") editElement;
     @Getter("fs/allFilesUploadComplete") allFilesUploadComplete;
     @Getter("fs/files") files;
 

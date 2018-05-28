@@ -1,9 +1,8 @@
 <template>
 <div>
-    <!-- @TODO (although this is more a sidebar thign i put it here for visibility) 
-    fix an issue where the scroll bar doesn't show if the bottom of the sidebar is underneath the bottom
-    of the navbar on the bottom of post create -->
+    
     <side-bar collapsedString="Your posts">
+
         <div v-for="post in userPosts">
             <a href="#" v-on:click.stop="editPost(post)">
                 {{post.title}}
@@ -11,7 +10,9 @@
         </div>
     </side-bar>
     <div v-if="currentPage===1">
-        <div v-if="inProgressPost !== undefined && inProgressPost.status !== LOADING" :style="getBodyStyle()">
+       
+
+        <div v-if="this.createState.post !== undefined && this.postStatus !== this.LOADING" :style="getBodyStyle()">
             <div class="col-sm-12 col-lg-10 col-md-12 card card-outline-danger container icon-card-container">
                 <div class="col-8 mx-auto card-deck" id="button-bar">
 
@@ -162,10 +163,11 @@
 
         </tag-select>
     </div>
+    
 
     <br><br><br> <!-- this is so problems don't occur with bottom of page button presses -->
     <nav class="navbar fixed-bottom navbar-light navbar-left bottom-navbar bg-light">
-        <div id="bottomNavTitle" class="title" v-if="inProgressPost.title != ''">{{inProgressPost.title}}</div>
+        <div id="bottomNavTitle" class="title" v-if="postStatus !== LOADING && inProgressPost.title != ''">{{inProgressPost.title}}</div>
         <div class="title title-placeholder" v-else></div>
     </nav>
 
@@ -240,15 +242,23 @@ import { addElement,
     setSubject, 
     setContentType, 
     setLength,
-    saveDraft 
+    saveDraft, 
 } from "../store_modules/PostCreateService";
+import {fetchPostSubscribe, getPosts} from "../store_modules/PostService";
 import {
-    getLoggedInUser
+    getLoggedInUser,
+    logout
 } from "../store_modules/UserService";
 import SideBar from "./SideBar.vue";
+import {asLoggedIn} from "../router/index";
 import TagSelect from "./TagSelect.vue";
 import DragAndDrop from "./DragAndDrop.vue";
-import {User} from "../models";
+import {User, Post, ILayout} from "../models";
+import * as Cookie from "tiny-cookie";
+import WebSocket from "../WebSocket";
+import { debug } from 'util';
+
+
 
 function isBlank(str) {
     return !str || /^\s*$/.test(str);
@@ -277,43 +287,52 @@ const bodyVisible = {
     opacity: "1"
 };
 
-
-
 @Component({
     name: "post-create",
     components: { PostElement, FontAwesomeIcon, SideBar, TagSelect, DragAndDrop }
 })
-
-export default class PostCreate extends Vue{
-
+export default class PostCreate extends Vue {
+    @State( (state) => state.create) createState;
     get getLoggedInUser(): User {
         return getLoggedInUser(this.$store);
     }
-    
+
     SAVING = PostStatus.Saving;
     LOADING = PostStatus.Loading;
     SAVED = PostStatus.Saved;
-    title: string = ""; //@TODO: make changes to title a store mutation that is saved and can be undone/redone
-    inProgressTag: string = "";
-    tags: string[] = [];
-    userPosts: any[] = [];
-    layout: Object[] = [];
 
-    currentPage: number = 0;
+    public postStatus: PostStatus = this.LOADING;
 
-    //these aren't ever saved into InProgressPost, they're here for the purpose
-    //of loading in a post's current info when you load up a post.
-    
+    public title: string = ""; // @TODO: make changes to title a store mutation that is saved and can be undone/redone
+    public inProgressTag: string = "";
+    public tags: string[] = [];
+    public layout: ILayout[] = [];
+    // userPosts: any[] = [];
+
+    public currentPage: number = 0;
+
+    // these aren't ever saved into InProgressPost, they're here for the purpose
+    // of loading in a post's current info when you load up a post.
+
+    get userPosts(): Post[] {
+        const store = this.$store;
+        const userPosts = getPosts(this.$store).filter( (p) => {
+            console.log(p);
+            // getLoggedInUser(store).pk seems to be a string at runtime.
+            // It obviously ought to be a number, but somewhere
+            // it gets assigned to a type-unsafe thing that winds up as a string.
+            return p.user.pk === parseInt(getLoggedInUser(store).pk as any);
+        });
+        return userPosts;
+    }
     get currentPost(): InProgressPost | undefined {
         return getCurrentPost(this.$store);
     }
 
-    get postStatus(): PostStatus {
-        return getCurrentPost(this.$store)!.status;
-    }
+
     // getters
-    get inProgressPost(): InProgressPost {
-        return getCurrentPost(this.$store)!;
+    get inProgressPost(): InProgressPost | undefined {
+        return this.createState.post;
     }
 
     get storeElements() {
@@ -334,82 +353,82 @@ export default class PostCreate extends Vue{
         return getColor(this.$store);
     }
 
-    changeColor(color: string){
+    public changeColor(color: string){
         setColor(this.$store, color);
     }
 
-    saveTagChanges(grade: number, length: number, subject: number, contentType: number, standards: number[],
+    public saveTagChanges(grade: number, length: number, subject: number, contentType: number, standards: number[],
             concepts, practices, coreIdeas, layout): void {
         console.log(standards);
-        this.inProgressPost.setStandards(standards);
-        this.inProgressPost.setGrade(grade);
-        this.inProgressPost.setSubject(subject);
-        this.inProgressPost.setContentType(contentType);
-        this.inProgressPost.setLength(length);
-        this.inProgressPost.setConcepts(concepts);
-        this.inProgressPost.setPractices(practices);
-        this.inProgressPost.setLayout(layout);
-        this.saveDraft();
+        if (this.inProgressPost !== undefined) {
+            this.inProgressPost.setStandards(standards);
+            this.inProgressPost.setGrade(grade);
+            this.inProgressPost.setSubject(subject);
+            this.inProgressPost.setContentType(contentType);
+            this.inProgressPost.setLength(length);
+            this.inProgressPost.setConcepts(concepts);
+            this.inProgressPost.setPractices(practices);
+            this.inProgressPost.setLayout(layout);
+            this.saveDraft();
+        } else {
+            console.error("Error: saveTagChanges() called when inprogresspost does not exist");
+        }
     }
-    
-    saveDraft() {
+    public saveDraft() {
         saveDraft(this.$store);
     }
-    changeGrade(grade: number) {
-        console.log(grade);
+    public changeGrade(grade: number) {
         setGrade(this.$store, grade);
     }
-    changeSubject(subject: number) {
-        console.log(subject);
+    public changeSubject(subject: number) {
         setSubject(this.$store, subject);
     }
-    changeContentType(contentType: number){
+    public changeContentType(contentType: number) {
         setContentType(this.$store, contentType);
     }
-    changeLength(length: string) {
+    public changeLength(length: string) {
         setLength(this.$store, parseInt(length));
     }
-    getEditorStyle() {
-        this.$log(this.$route.name !== "create");
+    public getEditorStyle() {
         if (this.$route.name !== "create") {
             return editorVisible;
         } else {
             return editorHidden;
         }
     }
-    getBodyStyle() {
+    public getBodyStyle() {
         if (this.$route.name !== "create") {
             return bodyHidden;
         } else {
             return bodyVisible;
         }
     }
-    nop() {}
-    removeTag(index: number) {
-        //@TODO: make tag changes a store mutation that can be undone/redone
+    public nop() {}
+    public removeTag(index: number) {
+        // @TODO: make tag changes a store mutation that can be undone/redone
         this.tags.splice(index, 1);
         setTags(this.$store, this.tags);
     }
-    createTagEvent(e: any) {
+    public createTagEvent(e: any) {
         if (e.keyCode === 13 && this.inProgressTag !== "") {
             this.createTag();
         }
     }
-    createTagBtn() {
-        if(this.inProgressTag !== ""){
+    public createTagBtn() {
+        if (this.inProgressTag !== "") {
             this.createTag();
         }
     }
-    createTag() {
+    public createTag() {
         this.tags.push(this.inProgressTag);
         this.inProgressTag = "";
         setTags(this.$store, this.tags);
     }
-    submitPost(event: any) {
-        var vm = this;
+    public submitPost(event: any) {
+        const vm = this;
         // dispatch createPost method in the store. This will send a
         // post request to the backend server.
-        createPost(this.$store).then(function(ret: any) {
+        createPost(this.$store).then( (ret: any) => {
             // handle the response from the server
             if (ret === undefined) {
                 vm.$notifyDanger(
@@ -424,8 +443,8 @@ export default class PostCreate extends Vue{
                 });
             } else {
                 let total = "";
-                forEach(ret, function(val, key) {
-                    let currentValue = val.join(" ");
+                forEach(ret, (val, key) => {
+                    const currentValue = val.join(" ");
                     total = `${total} "${key}: ${currentValue}" `;
                 });
                 vm.$notifyDanger(
@@ -434,106 +453,154 @@ export default class PostCreate extends Vue{
             }
         });
     }
-
-//right now only loads one page of posts
-    //@TODO: make a distinction between making potential edits to your post and publishing those edits.
-    //as a teacher, I want to be able to draft edits to my lesson plan and see them before I publish those edits, even
-    //if my post is already published.
-    editPost(post): void {
-        console.log("EDITING POST...");
-        console.log(post);
-        window.localStorage.setItem("inProgressPost", post.pk);
-        var user: User = <User>this.getLoggedInUser;
-        this.beginPost(<number>user.pk, <number>post.pk);
+    public openEditor(index: number) {
+        const type = getCurrentPost(this.$store)!.elements[index].type;
+        let routeName = "edit-";
+        if (type === "text") {
+            routeName += "text";
+        } else if (type === "audio") {
+            routeName += "audio";
+        } else if (type === "video_file" || type === "video_link") {
+            routeName += "video";
+        } else if (type === "image_file") {
+            routeName += "image";
+        } else {
+            routeName += "file";
+        }
+        const query: Dictionary<string> = { index : index.toString() };
+        const loc: Location = {name: routeName, query};
+        this.$router.push(loc);
     }
-    beginPost(userid: number, postid: number | undefined): void {
-        beginPost(this.$store, {
-            userid: <number>userid, 
-            id: postid,
-        });
+    // right now only loads one page of posts
+    // @TODO: make a distinction between making potential edits to your post and publishing those edits.
+    // as a teacher, I want to be able to draft edits to my lesson plan and see them before I publish those edits, even
+    // if my post is already published.
+    public editPost(post): void {
+
+        window.localStorage.setItem("inProgressPost", post.pk);
+        const user: User = this.getLoggedInUser as  User;
+        this.beginPost(user.pk as number, post.pk as number);
+    }
+    public beginPost(userid: number, postid: number | undefined): void {
+        let vm: PostCreate = this;
+        if (postid !== undefined) {
+            fetchPostSubscribe(this.$store, postid).then((p) => {
+                beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p});
+                vm.postStatus = vm.SAVED;
+            });
+        } else {
+            beginPost(this.$store, {
+                userid: userid as number,
+            });
+            // this.postStatus = vm.SAVED;
+        }
     }
     saveLayout() {
         setLayout(this.$store, this.layout);
     }
-    moveElementUp(index: number) {
-        console.log("move element up" + index);
-        if (index != 0) {
-            swapElements(this.$store, [index, index - 1]);
-            // dispatch only allows one argument so we'll pass them as an array
-        }
-    }
-    moveElementDown(index: number) {
-        if (index != this.$store.state.create.post.elements.length - 1) {
-            swapElements(this.$store, [index, index + 1]);
-            // dispatch only allows one argument so we'll pass them as an array
-        }
-    }
-    removeElement(index: number) {
+    public removeElement(index: number) {
         removeElement(this.$store, index);
     }
-    maxElementIndex() {
+    public maxElementIndex() {
         return getCurrentPost(this.$store)!.elements!.length;
     }
-    undo() {
+    public undo() {
         undo(this.$store);
     }
-    redo() {
+    public redo() {
         redo(this.$store);
     }
-    async getUserPosts(){
-        var vm: PostCreate = this;
-        //@TODO: use store and Post model for this work
-        //This is also all reloaded every time somebody reloads the page.. which is really quite no good.
-        var nextPage = 1;
-        do{
-            var response = await api.get("/posts/?user_edit=" + this.getLoggedInUser.pk + "&page=" + nextPage.toString());
-            for(var post of response.data.results){
-                vm.userPosts.push(post);
+    public async getUserPosts() {
+        const vm: PostCreate = this;
+        // @TODO: use store and Post model for this work
+        // This is also all reloaded every time somebody reloads the page.. which is really quite no good.
+        let nextPage = 1;
+        do {
+            var response;
+
+            response = await asLoggedIn(api.get(`/posts/?user_edit=${this.getLoggedInUser.pk}&page=${nextPage.toString()}`));
+
+            for (const post of response.data.results) {
+                if (post.pk !== -1){
+                    fetchPostSubscribe(this.$store, post.pk);
+                }
+                // this.userPosts.push(post);
             }
             nextPage++;
-        }while(response.data.next !== null);
+        } while (response.data.next !== null);
     }
     created() {
+        const inProgressPost: string | null = window.localStorage.getItem("inProgressPost");
+        console.log("IN-PROGRESS-POST -----> ", inProgressPost);
+        console.log("created.");
 
-        console.log(this.getLoggedInUser);
-        var inProgressPost = window.localStorage.getItem("inProgressPost");
-        console.log(inProgressPost);
-        if(inProgressPost == undefined){
-            this.beginPost( 
-                //???? how on earth is this type string | undefined
-                //It's definitely just a number. Look at user.ts.
-                <number>this.getLoggedInUser.pk,
-                undefined);
-        }
-        else{
-            this.beginPost(
-                <number>this.getLoggedInUser.pk, parseInt(<string>inProgressPost));
-        }
+        // Get previous posts from the users
         this.getUserPosts();
+
+        // Were we working on something? Begin post with either that post, or
+        // the userid of ourselves to start a completely new one.
+        if (inProgressPost === null) {
+            this.beginPost(
+                // ???? how on earth is this type string | undefined
+                // It's definitely just a number. Look at user.ts.
+                this.getLoggedInUser.pk as number,
+                undefined);
+        } else {
+            console.log("else");
+
+            this.beginPost(
+                this.getLoggedInUser.pk as number, parseInt(inProgressPost as string));
+        }
+        let store = this.$store;
+        let userpk = this.getLoggedInUser.pk as number;
+        let vm: PostCreate = this;
+
+        WebSocket.getInstance().addMessageListener((message) => {
+            console.log("Post create pkifying a post");
+            
+            
+            const val = JSON.parse(message.data);
+            console.log("RAW DATA: ");
+            console.log(val);
+            if (val.payload && val.payload.length > 0) {
+                console.log("WHY!?");
+                console.log("**********************", val.payload[0].Post);
+                let post = Post.pkify(val.payload[0].Post);
+                let inProgressPost = window.localStorage.getItem("inProgressPost");
+                
+                if (inProgressPost){
+                    if (post.pk === parseInt(inProgressPost as string, 10)) {
+                        beginPost(store,{userid: userpk, p: post});
+                        vm.postStatus = PostStatus.Saved;
+                    }
+                } else {
+                    console.error("no inprogressPost localStorage item exists");
+                }
+            }
+            return undefined;
+        });
+        console.log("end created");
     }
 
     mounted() {
-        console.log("New layout: ", this.layout);
-        console.log("mounted post create");
         var vm: PostCreate = this;
-        console.log("Post color: ", this.color);
-        this.$on("submitElement", function(element: any, index: number){
-            console.log("submitting element");
-            console.log(element);
-            console.log(index);
-            if(index == getCurrentPost(vm.$store)!.elements.length){
+        this.$on("submitElement", (element: any, index: number) => {
+
+            // @changed this equality to an === from == ... so if somethign breaks
+            // that could be why
+            if (index === getCurrentPost(vm.$store)!.elements.length) {
                 addElement(vm.$store, element);
-            }
-            else{
-                editElement(vm.$store, {element: element, index: index});
+            } else {
+                editElement(vm.$store, {element, index});
             }
             vm.$router.push({name: "create"});
-        })
+        });
 
         this.$on("submitTagChanges", this.saveTagChanges)
     }
 
 };
+//# sourceURL=PostCreate.vue
 </script>
 
 

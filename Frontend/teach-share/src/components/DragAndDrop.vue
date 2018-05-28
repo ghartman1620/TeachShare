@@ -37,6 +37,7 @@ import { Component, Prop, Watch } from "vue-property-decorator";
 import GridItem from "./drag_and_drop/GridItem.vue";
 import GridLayout from "./drag_and_drop/GridLayout.vue";
 import PostElement from "./PostElement.vue";
+import {ILayout} from "../models";
 
 import {
   State,
@@ -81,7 +82,7 @@ export default class DragAndDrop extends Vue {
     defaultHeight : number = 30;
     newHeight : number = 0;
     storeElements: Object[] = getCurrentPost(this.$store)!.elements;
-    layout : Object[] = [{"x":0, "y":0, "w":2, "h":this.defaultHeight, "i":"0"}];
+    layout : ILayout[] = [{"x":0, "y":0, "w":2, "h":this.defaultHeight, "i":"0"}];
 
     removeElement(index: number, element: Object) {
         console.log("Element to be removed: ", element);

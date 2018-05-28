@@ -93,7 +93,6 @@ export const getters = {
         return "";
     },
     videoDescription: (ctx: IYTState, gets: IRootState): string  => {
-        console.log("[YT]", state.videoDetails);
         if (state.videoDetails.length > 0 && state.videoDetails[0] && state.videoDetails[0].items.length > 0) {
             return state.videoDetails[0].items[0].snippet.description;
         }

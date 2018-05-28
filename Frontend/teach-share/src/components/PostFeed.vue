@@ -56,7 +56,7 @@
         </b-form-group>
 
         <b-form-group
-            label="Standards you're looking for"
+            label="Standards you're looking for (select grade & subject)"
             description="use Ctrl+Click to select multiple">
             <b-form-select multiple v-model="standards" :select-size="15" :options="standardOptions" class="mb-3">
             </b-form-select>
@@ -182,27 +182,17 @@ export default class PostFeed extends Vue {
         if(this.subject != null && this.grade !== null){
             this.standardOptions = [];   
             var vm: PostFeed = this;
-            console.log("in loadstandards" + this.grade);
-            console.log(this.standardOptions);
             api.get(`/standards/?grade=${this.grade}&subject=${this.subject}`).then(function(response: any) {
-                console.log(response.data);
-                console.log(vm.standardOptions);
                 for(var std of <any[]>response.data){
                     vm.standardOptions.push({
                         value: std.pk,
                         text: std.name + " (" + std.code +")",
                     })
                 }
-                console.log(vm.standardOptions);
-                console.log(vm.grade);
+
             })
-            console.log(this.grade);
         }
-        const p = fetchAllPosts(this.$store);
-        p.then((res) => { 
-            console.log("blah...");
-            console.log("***********", res);
-        });
+
     }
     scroll() {
         var offset =
@@ -214,19 +204,16 @@ export default class PostFeed extends Vue {
         }
     }
     reloadPosts(){
-        if(this.$route.query != {}){
-            console.log("here");
-            
+        if(this.$route.query != {}){            
             postSearch(this.$store,this.$route.query);
         }
         else{
-            console.log("fetching all posts");
             this.$store.dispatch("fetchAllPosts");
         }
     }
 
     advancedSearch() {
-        var query: any = {}
+        var query: any = {};
         query.sort = this.sortBy;
 
         if (this.keywords !== ""){
@@ -271,12 +258,13 @@ export default class PostFeed extends Vue {
         }
         
         this.$router.push({name: "dashboard", query: query});
+        //this.$router.go(0);
+        this.reloadPosts();
     }
 
     beforeMount(){
-        console.log("in beforemount");
-        console.log(this.$route.query);
-        this.reloadPosts();
+
+        //this.reloadPosts();
 
         var t = this;
         window.addEventListener(
@@ -296,10 +284,7 @@ export default class PostFeed extends Vue {
         // this doesn't work: because t is not defined.
         // window.removeEventListener("scroll", function() {t.scroll()}, false);
     }
-    @Watch("$route")
-    onRouteChange(to: any, from: any) {
-        this.reloadPosts();
-    }
+    
 }
 </script>
 
