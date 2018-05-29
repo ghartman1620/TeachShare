@@ -44,10 +44,10 @@ p.title = "This is a post title";
 // p.updated = new Date();
 
 // storeSocket.sendCreate(p);
-storeSocket.sendGet(2);
-storeSocket.sendWatch(1);
+// storeSocket.sendGet(2);
+// storeSocket.sendWatch(1);
 // storeSocket.sendWatch(2);
-storeSocket.sendUpdate(p);
+// storeSocket.sendUpdate(p);
 
 function circularRecordChecker(record: any, seen: any[] = []) {
 

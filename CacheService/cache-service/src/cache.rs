@@ -84,6 +84,40 @@ impl Cache for HashMapCache<ID, Resource> {
     }
 }
 
+// not really recommended..
+impl Index<ID> for HashMapCache<ID, Resource> {
+    type Output = Resource;
+
+    fn index(&self, index: ID) -> &Resource {
+        self._inner.index(&index)
+    }   
+}
+
+// not really commended either..
+impl IndexMut<ID> for HashMapCache<ID, Resource> {
+    fn index_mut(&mut self, index: ID) -> &mut Resource {
+        if !self._inner.contains_key(&index) {
+            // @TODO: spruce this up so that it covers all corner cases..
+            
+            match index {
+                ID::Post(id) => {
+                    self._inner.insert(index.clone(), Resource::new(Model::Post(Post::new())));
+                },
+                ID::User(id) => {
+                    self._inner.insert(index.clone(), Resource::new(Model::User(User::new())));
+                },
+                ID::Comment(id) => {
+                    self._inner.insert(index.clone(), Resource::new(Model::Comment(Comment::new())));
+                },
+            }
+        }
+        match self._inner.get_mut(&index) {
+            Some(val) => val,
+            None => panic!("Index did not exist!!"),
+        } 
+    }
+}
+
 type RefCellCache = RefCell<HashMapCache<ID, Resource>>;
 
 #[allow(dead_code)]
@@ -679,6 +713,44 @@ mod tests {
 
     extern crate crossbeam_channel;
     use crossbeam_channel::{Receiver, Select, Sender};
+
+    #[test]
+    fn test_hashmap_cache_index() {
+        let db = DB::new();
+        let conn = db.get();
+        let mut hmc = HashMapCache::new(&conn);
+        
+        let mut p = Post::new();
+        p.id = 1;
+        hmc.put(ID::Post(1), Resource::new(Model::Post(p)));
+
+        // check it!
+        {
+            let result = &hmc[ID::Post(1)];
+            println!("HMC [Post(1)] -> {:?}", result);
+        }
+        {
+            let id = 2;
+            let mut p = Post::new();
+            p.id = id;
+            hmc[ID::Post(2)] = Resource::new(Model::Post(p));
+        }
+        {
+            let id = 3;
+            let mut u = User::new();
+            u.id = id;
+            hmc[ID::User(3)] = Resource::new(Model::User(u));
+        }
+        {
+            let id = 4;
+            let mut c = Comment::new();
+            c.id = id;
+            hmc[ID::Comment(4)] = Resource::new(Model::Comment(c));
+        }
+        println!("Post(2): {:?}", hmc[ID::Post(2)]);
+        println!("User(3): {:?}", hmc[ID::User(3)]);
+        println!("Comment(4): {:?}", hmc[ID::Comment(4)]);
+    }
 
     // #[test]
     // fn test_selector_extended_get() {

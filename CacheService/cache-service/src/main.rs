@@ -108,6 +108,11 @@ struct WSMessage {
 impl Handler for Connection {
     fn on_open(&mut self, hs: Handshake) -> ws::Result<()> {
         println!("client connected");
+        println!("HANDSHAKE: {:?}", hs);
+        println!("HEADERS: {:?}", hs.request.headers());
+        for (key, value) in hs.request.headers() {
+            println!("{:?}: {:?}", key, String::from_utf8(value.clone()) );
+        }
         Ok(())
     }
 
@@ -142,40 +147,17 @@ impl Handler for Connection {
 
     fn on_close(&mut self, code: CloseCode, reason: &str) {
         match code {
-            CloseCode::Normal => println!("The client is done with the connection."),
+            CloseCode::Normal => {
+                println!("The client is done with the connection.");
+                self.remove_client();
+            },
             CloseCode::Away => {
                 println!("The client is leaving the site.");
-                match &mut self.parent {
-                    Some(val) => {
-                        println!("Some: {:?}", val);
-                        match val.try_borrow_mut() {
-                            Ok(ref mut parent) => {
-                                println!("OK: {:?}", parent);
-                                println!("connections: {:?}", parent.connections);
-                                let mut exiting_connection_id = 0;
-                                let old_connection_id = self.tx.connection_id();
-                                println!("connection count: {}", parent.connections.len());
-                                {
-                                    exiting_connection_id = parent
-                                        .connections
-                                        .clone()
-                                        .into_iter()
-                                        .position(|x| x.tx.connection_id() == old_connection_id)
-                                        .unwrap();
-                                }
-                                parent.connections.remove(exiting_connection_id);
-                                for c in &parent.connections {
-                                    println!("Connection --> {:?}", c);
-                                }
-                            }
-                            Err(e) => println!("Error: {:?}!", e),
-                        }
-                    }
-                    None => println!("None. Did not unwrap."),
-                }
+                self.remove_client();
             }
             CloseCode::Abnormal => {
-                println!("Closing handshake failed! Unable to obtain closing status from client.")
+                println!("Closing handshake failed! Unable to obtain closing status from client.");
+                self.remove_client();
             }
             _ => println!("The client encountered an error: {}", reason),
         }
@@ -187,6 +169,41 @@ impl Handler for Connection {
 }
 
 impl Connection {
+    fn remove_client(&mut self) {
+        println!("[GrandSocketStation] Removing 'self' from GrandSocketStation: {:?}", self.id);
+        match &mut self.parent {
+            Some(val) => {
+                match val.try_borrow_mut() {
+                    Ok(ref mut parent) => {
+                        println!("[GrandSocketStation] [{:?}] Current Connections: {:?}", 
+                            parent.connections.len(),
+                            parent.connections,
+                        );
+                        let mut exiting_connection_id = 0;
+                        let old_connection_id = self.tx.connection_id();
+                        {
+                            exiting_connection_id = parent
+                                .connections
+                                .clone()
+                                .into_iter()
+                                .position(|x| x.tx.connection_id() == old_connection_id)
+                                .unwrap();
+                        }
+                        parent.connections.remove(exiting_connection_id);
+                        println!("[GrandSocketStation] [{:?}] Current Remaining Connections: {:?}", 
+                            parent.connections.len(), 
+                            parent.connections
+                        );
+                    }
+                    Err(e) => println!("[GrandSocketStation] Error: {:?}!", e),
+                }
+                
+            }
+            None => println!("[GrandSocketStation] None. Could not unwrap when attempting to access parent."),
+        }
+        
+    }
+
     fn serialize_and_send_posts(&self, data: &[Model], versions: &[u64]) -> Result<(), ws::Error> {
         let output = WSMessageResponse::new(data, versions);
         println!("Sending: {:?}", output);

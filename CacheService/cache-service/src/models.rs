@@ -43,9 +43,10 @@ pub enum Model {
     Comment(Comment),
 }
 
+
 // This is KEY field for HashMap entries that make it so that we can still refer
 // to an entry only by their id (pk), and have no collision with different types.
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum ID {
     Post(i32),
     User(i32),
@@ -60,7 +61,8 @@ pub struct UserPermission {
 
 #[derive(Debug, Clone)]
 pub enum Permission {
-    view_post(bool),
+    ViewPost(bool), // "view_post" currently --> #70,
+    ChangePost(bool), // "change_post" currently --> #68,
     // etc...
 }
 
@@ -70,7 +72,7 @@ pub enum Permission {
 impl UserPermission {
     pub fn new() -> UserPermission {
         UserPermission {
-            permission: Permission::view_post(true),
+            permission: Permission::ViewPost(true),
             user: User::new(),
         }
     }
