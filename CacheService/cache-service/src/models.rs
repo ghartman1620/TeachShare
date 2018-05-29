@@ -298,10 +298,28 @@ mod tests {
     use std;
     use std::any::Any;
     use std::any::TypeId;
-    use std::collections::HashMap;
+    use std::collections::{HashMap, HashSet};
+    use std::collections::hash_map::{DefaultHasher, RandomState};
+    use std::hash::{BuildHasher, Hasher};
 
     pub fn typeid<T: Any>(_: &T) -> TypeId {
         TypeId::of::<T>()
+    }
+
+    pub struct TestHasher {}
+
+    pub struct TestHash {}
+
+    impl Hasher for TestHash {
+        fn finish(&self) -> u64 {0}
+        fn write(&mut self, input: &[u8]) {}
+    }
+
+    impl BuildHasher for TestHasher {
+        type Hasher = TestHash;
+        fn build_hasher(&self) -> <Self as std::hash::BuildHasher>::Hasher {
+            TestHash{}
+        }
     }
 
     #[test]
@@ -317,6 +335,15 @@ mod tests {
         let t = &Model::Post(new_post);
         let b = WSMsgResponse(1, t);
         println!("WSMsgResponse: {:?}", b);
+    }
+
+    #[test]
+    fn test_hashset_stuff() {
+        let d = DefaultHasher::new();
+        let r = RandomState::new();
+        let hasher = TestHasher{}.build_hasher();
+
+        HashSet::with_hasher(hasher);
     }
 
     // #[test]
