@@ -162,7 +162,7 @@ mod tests {
         let res1: Result<Vec<Post>, result::Error> = Post::get(-1, &conn);
         assert!(res1.is_ok());
         let mut posts: Vec<Post> = res1.unwrap();
-        let mut p = &mut posts[0];
+        let p = &mut posts[0];
         println!("{}", p.title);
         assert_eq!(p.title, String::from("changed"));
         p.title = s.clone();

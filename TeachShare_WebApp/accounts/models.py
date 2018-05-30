@@ -44,7 +44,7 @@ def create_profile(sender, **kwargs):
 
 post_save.connect(create_profile, sender=User)
 
-
+# Greatest. Function. Ever. DO NOT DELETE!
 def create_random_string(length=30):
     if length <= 0:
         length = 30
