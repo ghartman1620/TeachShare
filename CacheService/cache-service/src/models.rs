@@ -7,10 +7,11 @@ use serde_json::Value;
 use std::cmp::{Eq, PartialEq};
 use std::error;
 use std::fmt;
-use std::hash::Hash;
 use std::sync::Arc;
 use users::*;
 use std::collections::{HashSet, HashMap};
+use std::hash::{Hasher, Hash};
+use std::ops::{Add, AddAssign};
 
 // * option 1
 #[derive(Debug, Serialize)]
@@ -99,7 +100,47 @@ impl PartialEq for UserPermission {
 }
 impl Eq for UserPermission {}
 
-#[derive(Debug, Clone, Hash, Eq, PartialEq)]
+impl Add for UserPermission {
+    type Output = UserPermission;
+
+    fn add(self, other: UserPermission) -> UserPermission {
+        match self {
+            UserPermission::ChangePost(inner_lhs) => match other {
+                UserPermission::ChangePost(inner_rhs) => {
+                    let union: HashSet<_> = inner_lhs.union(&inner_rhs).cloned().collect();
+                    if inner_lhs == inner_rhs {
+                        // return the RHS which is considered the 'newer' version of the same
+                        // value/key.
+                        return UserPermission::ChangePost(inner_rhs);
+                    }
+                    UserPermission::ChangePost(union)
+                },
+                _ => panic!("Cannot add different variants of UserPermission!!"),
+            },
+            UserPermission::ViewPost(inner_lhs) => match other {
+                UserPermission::ViewPost(inner_rhs) => {
+                    let union: HashSet<_> = inner_lhs.union(&inner_rhs).cloned().collect();
+                    if inner_lhs == inner_rhs {
+                        // return the RHS which is considered the 'newer' version of the same
+                        // value/key.
+                        return UserPermission::ViewPost(inner_rhs);
+                    }
+                    UserPermission::ViewPost(union)
+                },
+                _ => panic!("Cannot add different variants of UserPermission!!"),
+            }
+        }
+    }
+}
+
+impl AddAssign for UserPermission {
+    fn add_assign(&mut self, other: UserPermission) {
+        *self = self.clone() + other;
+    }
+}
+
+
+#[derive(Debug, Clone)]
 pub struct UserID {
     id: i32,
     token: String,
@@ -120,8 +161,22 @@ impl UserID {
     }
 }
 
+impl Hash for UserID {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+
+/// equality based solely on the primary key (id).
+impl PartialEq for UserID {
+    fn eq(&self, other: &UserID) -> bool {
+        self.id == other.id
+    }
+}
+impl Eq for UserID {}
+
 impl UserPermission {
-    pub fn add(&mut self, u: UserID) -> bool {
+    pub fn insert(&mut self, u: UserID) -> bool {
         println!("Inserting User: {:?}", u);
         match self {
             UserPermission::ViewPost(view_post) => {
@@ -172,7 +227,8 @@ pub struct Resource {
     /// Version: the id of the most recent update to a post.
     pub version: u64,
 
-    /// ## Permission: the permission information for this resource. 
+    /// ## Permission: 
+    ///  the permission information for this resource. 
     ///  Can be though of as a Set of Set's (cause it is) in that
     ///  the outer set contains an inner set that is an individual
     ///  permission type (with all the users that have that permission)
@@ -182,7 +238,8 @@ pub struct Resource {
     /// 
     ///  ### Example: 
     ///     let resource = Resource::new();
-    ///     resource.permissions.insert(Permission::ViewPost(true), UserPermission::ViewPost())
+    ///     resource.permissions.insert(Permission::ViewPost(true), 
+    ///                                 UserPermission::ViewPost());
     /// 
     pub permissions: Vec<UserPermission>,
 }
@@ -198,10 +255,10 @@ impl Resource {
     }
 
     /// add_permission: really just merges the permissions object passed in, into the actual values
-    pub fn add_permission(&mut self, permission: UserPermission) -> Option<Vec<bool>> {
+    pub fn add_permission(&mut self, permission: UserPermission) /* -> Option<Vec<bool>> */ {
         
         println!("\n******************************************\n");
-        println!("USER_PERMISSION: {:?}", permission);
+        println!("[PERM] Permissions before: {:?}", self.permissions);
 
         // This is a little confusing, because I have to clone a value due to
         //   - Lifetime
@@ -212,47 +269,27 @@ impl Resource {
         let temp = self.permissions.clone();
         let existing_value = temp.iter().find(|user_permission| **user_permission == permission);
         
-        let insertions: Option<Vec<bool>> = match existing_value {
+        match existing_value {
             None => {
+                println!("[PERM] pushing permission: {:?}.", permission);
                 self.permissions.push(permission); 
-                println!("Post-Push permissions: {:?}", self.permissions);
-                None
             },
             Some(_) => {
                 for perm in &mut self.permissions {
-                    let new_users: HashSet<_> = permission.get_users();
-                    println!("Pre-Union: {:?}", perm);
-                    match perm {
-                        UserPermission::ChangePost(val) => { 
-                            let union: HashSet<_> = val.union(&new_users).cloned().collect();
-                            for a in union.iter().enumerate() {
-                                println!("union[{}]: {:?}", a.0, a.1);
-                            }
-                            // println!("Previous: {:?}", perm);
-                            *perm = UserPermission::ChangePost(union);
-                            println!("Post-Union: {:?}", perm.clone());
-                        },
-                        UserPermission::ViewPost(val) => {
-                            let union: HashSet<_> = val.union(&new_users).cloned().collect();
-                            for a in union.iter().enumerate() {
-                                println!("union[{}]: {:?}", a.0, a.1);
-                            }
-                            *perm = UserPermission::ViewPost(union);
-                            println!("Post-Union: {:?}", perm.clone());
-                        }
+                    let perm_clone = permission.clone();
+                    if *perm == perm_clone {
+                        println!("[PERM] Matched {:?}=={:?}", perm, perm_clone);
+                        let added = perm.clone() + perm_clone;
+                        *perm = added;
                     }
                 }
-                None                
             }
-        };
-        println!("existing value --> {:?}", existing_value);
-        for perm in &self.permissions {
-            println!("permission: {:?}", perm);
         }
-        println!("INSERTIONS: {:?}", insertions);
+        for perm in &self.permissions {
+            println!("[PERM]<DEBUG> perm in &self.permissions --> {:?}", perm);
+        }
+        println!("[PERM] Permissions after: {:?}", self.permissions);
         println!("\n******************************************\n");
-
-        None
     }
 
     pub fn add_watch(&mut self, id: i32) {
@@ -500,18 +537,35 @@ mod tests {
         let mut resource = Resource::new(Model::Post(Post::new()));
         let user = UserID::new();
         let mut perm = UserPermission::ViewPost(HashSet::new());
-        perm.add(user);
-        resource.add_permission(perm);
+        perm.insert(user);
+        resource.add_permission(perm.clone());
 
         let user2 = UserID::create(1, String::from("aisdmoaismdasdf"));
         let mut perm2 = UserPermission::ViewPost(HashSet::new());
-        perm2.add(user2);
-        resource.add_permission(perm2);
+        perm2.insert(user2);
+        resource.add_permission(perm2.clone());
 
         let user3 = UserID::create(3, String::from("mkmdsopaifdj9834kdf"));
         let mut perm3 = UserPermission::ChangePost(HashSet::new());
-        perm3.add(user3);
-        resource.add_permission(perm3);
+        perm3.insert(user3);
+        resource.add_permission(perm3.clone());
+
+        let user4 = UserID::create(3, String::from("changedtokeninoneword"));
+        let mut perm4 = UserPermission::ChangePost(HashSet::new());
+        perm4.insert(user4);
+        resource.add_permission(perm4.clone());
+
+        let mut perm_add = perm.clone() + perm2.clone();
+        println!("** perm add --> perm [{:?}] + perm2 [{:?}] = {:?}", perm, perm2, perm_add);
+
+        let user5 = UserID::create(10, "aso7asdjd56fifk30dfikasdf8^&)hsd".to_owned());
+        let mut perm5 = UserPermission::ViewPost(HashSet::new());
+        perm5.insert(user5);
+
+        perm_add += perm5.clone();
+        println!("** perm add2 (+=) --> perm_add [{:?}] += perm5 [{:?}]", perm_add, perm5);
+
+
 
         // let test = UserSetEntry(1, Some(hs));
 

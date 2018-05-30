@@ -40,14 +40,33 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
+use std::collections::BTreeMap;
+use diesel::pg::PgConnection;
+use users::Oauth2ProviderAccesstoken;
+use db::DB;
+
 
 #[derive(Debug, Clone)]
 struct GrandSocketStation {
     // represents the list of connections
     connections: Vec<Rc<Connection>>,
+    auth_table: BTreeMap<i32, Oauth2ProviderAccesstoken>,
 }
 
 impl GrandSocketStation {
+    pub fn new(conn: &PgConnection) -> GrandSocketStation {
+        let auth = match Oauth2ProviderAccesstoken::build_user_table_cached(conn) {
+            Some(val) => val,
+            None => BTreeMap::new(),
+        };
+        println!("\n*********************************************");
+        println!("User Table: {:?}", auth);
+        println!("*********************************************");
+        GrandSocketStation {
+            connections: vec![],
+            auth_table: BTreeMap::new(),
+        }
+    }
     pub fn get_connections(&self) -> &Vec<Rc<Connection>> {
         &self.connections
     }
@@ -513,9 +532,10 @@ impl Connection {
 }
 
 fn main() {
-    let hub = Rc::new(RefCell::new(GrandSocketStation {
-        connections: vec![],
-    }));
+    let db = DB::new();
+    let session = db.get();
+
+    let hub = Rc::new(RefCell::new(GrandSocketStation::new(&session)));
     let i = &mut 0;
 
     // start db (SAVE only) thread

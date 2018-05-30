@@ -37,24 +37,15 @@ pub enum CacheError {
 #[derive(Debug)]
 pub struct HashMapCache<K: Eq + Hash, V> {
     _inner: HashMap<K, V>,
-    _auth: BTreeMap<i32, Oauth2ProviderAccesstoken>,
 }
 
 impl<K, V> HashMapCache<K, V>
 where
     K: Eq + Hash,
 {
-    pub fn new(conn: &PgConnection) -> HashMapCache<K, V> {
-        let auth = match Oauth2ProviderAccesstoken::build_user_table_cached(conn) {
-            Some(val) => val,
-            None => BTreeMap::new(),
-        };
-        println!("\n*********************************************");
-        println!("User Table: {:?}", auth);
-        println!("*********************************************");
+    pub fn new() -> HashMapCache<K, V> {
         HashMapCache {
             _inner: HashMap::new(),
-            _auth: auth,
         }
     }
 }
@@ -129,8 +120,8 @@ pub fn cache_thread(
 ) {
     thread::spawn(move || {
         let db = DB::new();
-        let session = db.get();
-        let mut cache = Rc::new(RefCell::new(HashMapCache::new(&session))); //Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new()));
+        
+        let mut cache = Rc::new(RefCell::new(HashMapCache::new())); //Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new()));
         loop {
             let conn = db.get();
             select_loop! {
@@ -718,7 +709,7 @@ mod tests {
     fn test_hashmap_cache_index() {
         let db = DB::new();
         let conn = db.get();
-        let mut hmc = HashMapCache::new(&conn);
+        let mut hmc = HashMapCache::new();
         
         let mut p = Post::new();
         p.id = 1;
