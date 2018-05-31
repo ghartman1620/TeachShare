@@ -43,7 +43,7 @@ export default class PostDetail extends Vue {
     forkpost(){
         var obj :any= {
             ...this.postLocal,
-            original_user: this.postLocal.user,
+            original_user: this.postLocal.user.pk,
             original_post: this.postLocal.pk,
         }
         obj.user = getLoggedInUser(this.$store).pk;

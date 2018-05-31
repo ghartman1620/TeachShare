@@ -153,7 +153,7 @@
                         <br>
                         <br>
                         <br>
-                        <drag-and-drop v-if="currentPost.elements.length > 0" :key="[nextStateId, currentPost.layout]">
+                        <drag-and-drop v-if="currentPost.elements.length > 0" :key="changeDragAndDrop">
                         </drag-and-drop>
                         <br>
                         <br>
@@ -319,6 +319,9 @@ export default class PostCreate extends Vue {
     public inProgressTag: string = "";
     public tags: string[] = [];
     public layout: ILayout[] = [];
+    // this is a key for the drag and dropped, for the purpose of re-mounting the drag and drop component
+    // if layout is changed by the websocket 
+    public changeDragAndDrop: number = 0;
     // userPosts: any[] = [];
 
     public currentPage: number = 0;
@@ -534,6 +537,7 @@ export default class PostCreate extends Vue {
                 comments: [],
 
             }).then((response) => {
+                this.thisUserPosts.push(response.data.pk);
                 window.localStorage.setItem("inProgressPost", response.data.pk.toString());
                 // We're not even going to bother dealing with the response from fetch post.
                 // It will always be undefined because this will never be a cache hit - it can't possibly be,
@@ -603,17 +607,35 @@ export default class PostCreate extends Vue {
         let vm: PostCreate = this;
 
         WebSocket.getInstance().addMessageListener((message) => {
-            
+            //debugger;
             const val = JSON.parse(message.data);
             let iPP = window.localStorage.getItem("inProgressPost");
-            console.log("Got a message! it looks like this");
-            console.log(val);
+            //console.log("Got a message! it looks like this");
+            //console.log(val);
             let inProgressPk: number = -1;
             if (iPP) inProgressPk = parseInt(iPP as string);
             if (val.payload && val.payload.length > 0 && inProgressPk != -1) {
                 for(let p of val.payload){
                     let post = Post.pkify(p.Post);
                     if (post.pk === inProgressPk) {
+                        //console.log("considering whether or not to remount drag and drop");
+                        //console.log(this.inProgressPost === undefined);
+                        if(this.inProgressPost !== undefined){
+                            //console.log(post.layout !== this.inProgressPost!.layout);
+                        }
+                        else{
+                            //console.log("in progress post is undefined");
+                        }
+                        if(this.inProgressPost === undefined || post.layout !== this.inProgressPost!.layout){
+                            this.changeDragAndDrop++;
+                            //console.log("Changing drag and drop!");
+                        }
+                        else{
+                            //console.log("not changing drag and drop");
+                        }
+                            
+                    
+                        
                         beginPost(store,{userid: userpk, p: post});
                         vm.postStatus = PostStatus.Saved;
                     }
@@ -628,7 +650,7 @@ export default class PostCreate extends Vue {
     mounted() {
         var vm: PostCreate = this;
         this.$on("submitElement", (element: any, index: number) => {
-
+            this.changeDragAndDrop++;
             // @changed this equality to an === from == ... so if somethign breaks
             // that could be why
             if (index === getCurrentPost(vm.$store)!.elements.length) {

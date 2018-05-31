@@ -195,6 +195,8 @@ export class InProgressPost {
     }
     setLayout(layout: ILayout[]): void {
         this.layout = layout;
+        console.log("setting layotu!");
+        console.trace();
         this.saveDraft();
     }
     setColor(color: string): void {
@@ -298,8 +300,6 @@ export class InProgressPost {
         /*api.put("posts/" + this.pk + "/", this.json()).then(function(response){
             post.status = PostStatus.Saved;
         })*/
-        console.log("saving draft!");
-        console.log(this);
         Database.getInstance().putPost(this.toPost(), 1); // @TODO: is this right?
         WebSocket.getInstance().sendUpdate(this.toPost());
         // in the future - potentially some kind of ack message sent back to indicate to user post was saved?
