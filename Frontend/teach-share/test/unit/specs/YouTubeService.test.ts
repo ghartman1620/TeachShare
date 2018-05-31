@@ -27,7 +27,6 @@ const vueInstance = new Vue({
     template: "<div/>"
 });
 
-// console.log("MUTATIONS: ", Object.keys(mutations));
 const { SET, CLEAR } = mutations;
 
 function setup_state(): IYTState {
@@ -118,7 +117,6 @@ id=MczSxA0RrVU&key=AIzaSyAOHmdMqDLrCvAxnbkdTabddnKRZkpqPJY&\
 part=snippet,statistics`;
 
         const value = videoDetail(store);
-        console.log("videoDETAIL: ", value);
 
     });
 });

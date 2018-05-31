@@ -54,34 +54,26 @@ class IDBStore {
     }
 
     private errorHandler = (event: Event) => {
-        console.log("ERROR: ", event);
     }
 
     private successHandler = (event: Event) => {
         return new Promise((resolve, reject) => {
-            console.log("[SUCCESS HANDLER]");
             this.db = ((event.target as EventTarget) as any).result;
             const objStore = this.db.transaction("a", "readwrite").objectStore("a");
             let req = objStore.add({pk: 2, date: Date.now()});
             req.onsuccess = (evt) => {
-                console.log("[SUCCESS]: ", evt);
                 resolve(evt);
             };
             req.onerror = (evt) => {
-                console.log("[ERROR]: ", evt);
                 reject(evt);
             };
-            console.log("OBJSTORE: ", objStore);
         });
     }
 
     private upgradeHandler = (event: Event) => {
-        console.log("[UPGRADE HANDLER]");
         this.db = ((event.target as EventTarget) as any).result;
         const objStore = this.db.createObjectStore("a",  { keyPath: "pk" });
-        console.log("[UPGRADE]", objStore);
         objStore.transaction.oncomplete = (evt) => {
-            console.log(evt);
             let testStore = this.db.transaction("a", "readwrite").objectStore("a");
             testStore.add({pk: 1, date: Date.now()});
         };

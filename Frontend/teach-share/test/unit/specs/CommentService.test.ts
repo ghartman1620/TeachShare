@@ -8,7 +8,6 @@ import {
     mutations
 } from "../../../src/store_modules/CommentService";
 
-console.log("MUTATIONS: ", Object.keys(mutations));
 const { CREATE, UPDATE, DELETE, CLEAR } = mutations;
 
 function setup_state(): CommentState {

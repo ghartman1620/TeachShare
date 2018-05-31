@@ -120,8 +120,7 @@
                         erd.listenTo(self.$refs.item, function(element) {
                             self.onWindowResize();
                             /*var width = element.offsetWidth;
-                             var height = element.offsetHeight;
-                             console.log("Size: " + width + "x" + height);*/
+                             var height = element.offsetHeight;*/
                         });
                     });
                 }
@@ -178,7 +177,6 @@
             },
             dragEvent: function(eventName, id, x, y) {
                 var self = this;
-//                console.log(eventName + " id=" + id + ", x=" + x + ", y=" + y);
                 var l = getLayoutItem(this.layout, id);
                 // Move the element to the dragged location.
                 this.layout = moveElement(this.layout, l, x, y, true);
@@ -196,7 +194,6 @@
                 /*if (eventName === "drag" && h < -40 && w < -40) {
                  return;
                  }*/
-//                console.log(eventName + " id=" + id);
                 // Move the element to the dragged location.
                 compact(this.layout, this.verticalCompact);
                 //this.$broadcast("compact", this.layout);

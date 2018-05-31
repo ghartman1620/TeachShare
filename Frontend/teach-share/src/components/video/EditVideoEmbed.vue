@@ -152,14 +152,12 @@ export default class EditVideoEmbed extends Vue {
     }
     async submit() {
         // debugger;
-        console.log("POST CREATE: ", this.$store.state.create);
         if (
             this.$route.query.index ==
             this.$store.state.create.post.elements.length
         ) {
             try {
                 const resp = await addElement(this.$store, this.generateEmbedJSON());
-                console.log(resp);
                 // this.$notifySuccess(resp);
             } catch (err) {
                 this.$notifyDanger(err);
@@ -177,7 +175,6 @@ export default class EditVideoEmbed extends Vue {
             let resp = await getVideoInfo(this.$store, input);
             return resp;
         } catch (err) {
-            console.log(err);
             return err;
         }
     }

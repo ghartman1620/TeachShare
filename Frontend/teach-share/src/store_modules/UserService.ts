@@ -65,7 +65,6 @@ export const actions = {
         Cookie.remove("loggedIn");
         Cookie.remove("userId");
         Cookie.remove("username");
-        console.log("ASSIGNING API DEFAULT HEADERS TO EMPTY");
         Object.assign(api.defaults, {headers: {}});
 
         window.localStorage.removeItem("refreshToken");
@@ -92,11 +91,12 @@ export const actions = {
                         new Date(Date.now() + response.data.body.expiresIn * 1000),
                         credentials.persist ? response.data.body.refresh_token : undefined);
                 context.commit("SET_USER", user);
+                Object.assign(api.defaults, {headers: {Authorization: "Bearer " + response.data.body.access_token}});
                 resolve();
 
             }).catch( (error) => {
                 reject(error);
-            })
+            });
         });
     }
 };

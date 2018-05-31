@@ -1,7 +1,6 @@
 import { expect } from "chai";
 import { mutations } from "../../../src/store";
 
-console.log("MUTATIONS: ", Object.keys(mutations));
 const { LOAD_ALL_POSTS, LOAD_POST } = mutations;
 
 describe("[STORE] mutations", () => {

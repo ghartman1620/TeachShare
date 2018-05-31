@@ -225,8 +225,6 @@ export default class PostComp extends Vue {
     created() {
         // this.$store.dispatch("fetchUser", this.post.user);
         if(this.post.original_user){
-            console.log("hi");
-            console.log(this.post.original_user);
             fetchUser(this.$store, this.post.original_user);
         }
     }

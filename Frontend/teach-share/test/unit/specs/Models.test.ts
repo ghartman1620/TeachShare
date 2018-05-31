@@ -42,7 +42,6 @@ describe("[MODELMAP<V>] ModelMap class should work", () => {
         let files = new ModelMap<GenericFile>();
         let a = new GenericFile("key", 10, undefined, undefined);
         files.set(a.pk, a);
-        console.log("*******", files.list());
         expect(files.get(a.pk)).to.eql(a);
     });
 });

@@ -62,7 +62,7 @@ export default class Login extends Vue {
             vm.$router.push({name: "create"});
         })
         .catch((err) => {
-            console.log(err);
+            console.error(err);
             vm.$notifyDanger("You could not login<br>" + err.response.data.error_description);
         }); 
     }

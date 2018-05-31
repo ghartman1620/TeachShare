@@ -155,6 +155,7 @@ pub fn save_posts(rx: Receiver<Post>) {
             break;
         } else {
             let p: Post = res.unwrap();
+            
             // let res = db.insert_post(p);
             let res = p.save(&*db.get());
             // res.expect("error saving post");

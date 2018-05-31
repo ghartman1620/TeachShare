@@ -45,9 +45,6 @@ export default class ImageElement extends Vue{
     audio: any = null;
     editing: boolean = false;
     sizeStyle: any = { width: "100%", height: "600px", padding: "20px" }; 
-    created(){
-        console.log("im in image element")
-    }
     getSizeStyle() {
 
         return {

@@ -43,7 +43,7 @@ export const upload_file = async (ctx, files: File[]) => {
         // @TODO: get type safe definition for this.
         postid = getCurrentPostId(ctx);
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return err;
     }
 
@@ -64,7 +64,6 @@ export const upload_file = async (ctx, files: File[]) => {
             !fileAlreadyUploaded &&
             i + ctx.state.files.length < ctx.state.limit
         ) {
-            console.log(ctx.state.files);
             let id = v4();
             let cancelToken = axios.CancelToken;
             let cancel = cancelToken.source();
@@ -101,14 +100,13 @@ export const upload_file = async (ctx, files: File[]) => {
                     response.data.url
                 );
                 // update the current uploaded file object
-                console.log(fileResponse);
                 mutUpdate(ctx, fileResponse);
             } catch (error) {
                 /**
                  * Uh-oh! there was an error in the axios request, while
                  * attempting to upload the file.
                  */
-                console.log(error);
+                console.error(error);
                 if (axios.isCancel(error)) {
                     sendNotification(ctx, {
                         type: NotifyType.warning,
@@ -192,7 +190,6 @@ export const mutations = {
      * @param  {GenericFile} data
      */
     CREATE: (ctx, data: GenericFile) => {
-        console.log(ctx, typeof ctx);
         if (typeof data.pk !== "undefined") {
             if (!ctx.files.data.hasOwnProperty(data.pk)) {
                 Vue.set(ctx.files.data, data.pk, data);

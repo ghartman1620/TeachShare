@@ -142,7 +142,6 @@ export const getters = {
     loadedComments: (state): Comment[] => {
         let comments: Comment[] = [];
         for (let c of state.comments) {
-            console.log(c);
             comments.push(c);
         }
         return comments;

@@ -94,7 +94,6 @@ Vue.use(Badge);
 
 Vue.use(Notifications);
 Vue.use(UserInstanceProperties);
-Vue.prototype.$foobar = function() { console.log("blah");};
 Vue.use(Logger, true);
 
 Validator.extend("YoutubeEmbedURL", {

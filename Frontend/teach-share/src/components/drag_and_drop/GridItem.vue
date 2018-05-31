@@ -553,10 +553,8 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
         computed: {
             color() {
                 if (getColor(this.$store) === undefined) {
-                    console.log("getColor undefined!!!!");
                     return "#96e6b3";
                 }
-                console.log("getting color from store, " + this.$store.state.create.post.color);
                 this.colorChanged = true;
                 return this.$store.state.create.post.color;
             },
@@ -591,14 +589,8 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
                 this.$router.push(loc);
             },
 
-            logDimensions: function(){
-                console.log("Element, Index in GridItem.vue: ", this.element, this.index);
-                console.log("x,y,w,h:  ", this.x, this.y, this.w, this.h);
-                console.log("actual x, y, w, h:  ", this.innerX, this.innerY, this.innerW, this.innerH);
-            },
             emitDimensions: function(){
                 var cardHeight = document.getElementById('element-'+this.i).offsetHeight;
-                // console.log("Post element height: ", cardHeight)
                 this.elementDimensions["index"] = this.i;
                 this.elementDimensions["height"] = cardHeight;
                 this.dimensionsEmitted = true;
@@ -606,8 +598,6 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
             },
             removeElement: function (index) {
                 var layout = getLayout(this.$store);
-                console.log("Remove index ", index);
-                console.log("Layout in store: ", layout);
                 removeElement(this.$store, index);
                 layout.splice(index,1);
                 if (layout !== undefined && layout.length > 1) {
@@ -620,7 +610,6 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
                             layout[i]["i"] = newIndex.toString();
                         }
                     }
-                    console.log("New layout from item removal: ", layout);
                     setLayout(this.$store, layout);
                 }
             },
@@ -687,7 +676,6 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
                         this.isResizing = true;
                         break;
                     case "resizemove":
-//                        console.log("### resize => " + event.type + ", lastW=" + this.lastW + ", lastH=" + this.lastH);
                         const coreEvent = createCoreData(this.lastW, this.lastH, x, y);
                         if (this.renderRtl) {
                             newSize.width = this.resizing.width - coreEvent.deltaX;
@@ -696,15 +684,12 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
                         }
                         newSize.height = this.resizing.height + coreEvent.deltaY;
 
-                        ///console.log("### resize => " + event.type + ", deltaX=" + coreEvent.deltaX + ", deltaY=" + coreEvent.deltaY);
                         this.resizing = newSize;
                         break;
                     case "resizeend":
-                        //console.log("### resize end => x=" +this.innerX + " y=" + this.innerY + " w=" + this.innerW + " h=" + this.innerH);
                         var pos = this.calcPosition(this.innerX, this.innerY, this.innerW, this.innerH);
                         newSize.width = pos.width;
                         newSize.height = pos.height;
-//                        console.log("### resize end => " + JSON.stringify(newSize));
                         this.resizing = null;
                         this.isResizing = false;
                         break;
@@ -781,8 +766,6 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
                             newPosition.left = clientRect.left - parentRect.left;
                         }
                         newPosition.top = clientRect.top - parentRect.top;
-                        // console.log("### drag end => " + JSON.stringify(newPosition));
-                        // console.log("### DROP: " + JSON.stringify(newPosition));
                         this.dragging = null;
                         this.isDragging = false;
                         shouldUpdate = true;
@@ -796,9 +779,6 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
                             newPosition.left = this.dragging.left + coreEvent.deltaX;
                         }
                         newPosition.top = this.dragging.top + coreEvent.deltaY;
-                        // console.log("### drag => " + event.type + ", x=" + x + ", y=" + y);
-                        // console.log("### drag => " + event.type + ", deltaX=" + coreEvent.deltaX + ", deltaY=" + coreEvent.deltaY);
-                        // console.log("### drag end => " + JSON.stringify(newPosition));
                         this.dragging = newPosition;
                         break;
                 }
@@ -815,16 +795,13 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
 
                 if (this.innerX !== pos.x || this.innerY !== pos.y) {
                     // this.$emit("move", this.i, pos.x, pos.y);
-                    // console.log("move", this.i, pos.x, pos.y);
 
                 }
                 if (event.type === "dragend" && (this.previousX !== this.innerX || this.previousY !== this.innerY)) {
                     // this.$emit("moved", this.i, pos.x, pos.y);
-                    // console.log("moved", this.i, pos.x, pos.y);
 
                 }
                 this.eventBus.$emit("dragEvent", event.type, this.i, pos.x, pos.y, this.innerH, this.innerW);
-                // console.log("dragEvent", event.type, this.i, pos.x, pos.y, this.innerH, this.innerW);
 
             },
             calcPosition: function (x, y, w, h) {
@@ -884,7 +861,6 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
             // Helper for generating column width
             calcColWidth() {
                 var colWidth = (this.containerWidth - (this.margin[0] * (this.cols + 1))) / this.cols;
-               // console.log("### COLS=" + this.cols + " COL WIDTH=" + colWidth + " MARGIN " + this.margin[0]);
                 return colWidth;
             },
 

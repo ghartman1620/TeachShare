@@ -26,20 +26,6 @@ export default class DbTest extends Vue{
     d: Database = Database.getInstance();
     num: number = -1;
     mounted() {
-        // const dbPromise: Promise<DB> = idb.open("teachshare-demo", 1, upgradeDB => {
-        //     upgradeDB.createObjectStore("posts", {keyPath: "id"});
-        // })
-        // dbPromise.then(db => {
-        //     const tx = db.transaction("posts", "readwrite");
-        //     tx.objectStore("posts").put({
-        //         id: 123456,
-        //         content: {type: "text", "content": "<b> i have content</b>"}
-        //     });
-        //     db.transaction("posts")
-        //         .objectStore("posts").get(123456)
-        //         .then(function(p) { console.log(p);});
-        
-        // }).then(p => console.log(p));
         
 
 
@@ -65,11 +51,10 @@ export default class DbTest extends Vue{
         var vm: DbTest = this;
         this.d.getPost(this.num).then(function(p){
             vm.posts.push(p);
-        }).catch(err => console.log("no post"));
+        }).catch(err => console.error("no post"));
     }
     deletePost() {
         this.d.deletePost(this.num).then(function(p){
-            console.log("Deleted post");
         })
     }
 };

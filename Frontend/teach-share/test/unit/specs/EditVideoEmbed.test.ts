@@ -27,8 +27,6 @@ import { CONSTRUCT } from "../utils";
 //     });
 
 //     it("should make youtube request", () => {
-//         console.log(vm);
-//         console.log(vm.$el);
 //         const input = "https://www.youtube.com/watch?v=KMX1mFEmM3E"
 
 //         vm.getYoutubeData(input).then((resp) => {

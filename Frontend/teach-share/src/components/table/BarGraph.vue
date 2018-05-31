@@ -74,8 +74,6 @@
             }
 
             this.renderChart(datacollection, this.options);
-            // console.log("bar graph labels: ", Object.keys(this.userData));
-            // console.log("bar graph data: ", Object.values(this.userData));
 
 
         }

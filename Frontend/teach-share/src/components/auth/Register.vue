@@ -119,12 +119,7 @@ export default class Register extends Vue{
                 vm.$router.push({name: "login"});
             })
             .catch(function(err) {
-                Object.keys(err).forEach(function(key){
-                    console.log(key);
-                    console.log(err[key]);
-                })
-                console.log(err);
-                console.log(err.response.data);
+                console.error(err);
                 vm.$notifyDanger("There was a problem creating your account!<br>" + err.response.data.error);
             });
 

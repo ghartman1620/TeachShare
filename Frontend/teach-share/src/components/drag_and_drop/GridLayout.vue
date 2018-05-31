@@ -192,12 +192,10 @@
         },
         methods: {
             deleteElement (index) {
-                console.log("Deleting element at index ", index);
             },
             layoutUpdate() {
                 if (this.layout !== undefined) {
                     if (this.layout.length !== this.lastLayoutLength) {
-                        // console.log("### LAYOUT UPDATE! New layout: ", this.layout);
                         this.lastLayoutLength = this.layout.length;
                     }
                     compact(this.layout, this.verticalCompact);
@@ -236,7 +234,6 @@
                         this.isDragging = false;
                     });
                 }
-                //console.log(eventName + " id=" + id + ", x=" + x + ", y=" + y);
                 var l = getLayoutItem(this.layout, id);
                 //GetLayoutItem sometimes returns null object
                 if (l === undefined || l === null){

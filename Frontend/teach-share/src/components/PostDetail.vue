@@ -48,11 +48,9 @@ export default class PostDetail extends Vue {
         }
         obj.user = getLoggedInUser(this.$store).pk;
         obj.comments = [];
-        console.log(obj);
         api.post("/posts/", obj).then(Response=>{
             window.localStorage.setItem("inProgressPost", Response.data.pk);
             this.$router.push({name: "create"});
-            console.log(Response);
         })
     }
 

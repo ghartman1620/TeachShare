@@ -343,15 +343,24 @@ class PostViewSet(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
+        print("PostViewSet: get_queryset")
+        
         user_editing = self.request.query_params.get('user_edit', None)
         if(user_editing != None):
             view_set = get_objects_for_user(self.request.user, 'view_post', Post)
 
             edit_set = get_objects_for_user(User.objects.get(pk=user_editing), 'change_post', Post)
 
-            self.queryset = view_set & edit_set
+            #view_set is currently commented out because there's no interface for sharing who can see a post
+            #and making it public/private. If we add this feature, uncomment & view_set to disable viewing
+            #of posts the user isn't allowed to access.
+
+            #also in the else block switch the lines
+
+            self.queryset = edit_set #& view_set
         else:
-            self.queryset = get_objects_for_user(self.request.user, 'view_post', Post)
+            self.queryset = Post.objects.all()
+            #self.queryset = get_objects_for_user(self.request.user, 'view_post', Post)
         return self.queryset
     
     def get_object(self):
@@ -363,6 +372,26 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return post
 
+    def create(self, request):
+        resp = super(PostViewSet, self).create(request)
+        print("Creating a post!")
+        from pprint import pprint
+        print("\n\n\n\n\n\n\n\n")
+        print("resp:")
+
+        pprint(vars(resp))
+        print("\n\n\n\n\n\n\n\n")
+        print("respdata:")
+        
+        pprint(vars(resp.data))
+        print("\n\n\n\n\n\n\n\n")
+        print("resp data serializer:")
+        
+        pprint(vars(resp.data.serializer))
+        print("suer post call returns pk" + str(resp.data.serializer._data['pk']))
+        assign_perm('change_post', request.user, Post.objects.get(pk=resp.data.serializer._data['pk']))
+        return resp
+    
 class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     queryset = Comment.objects.all()

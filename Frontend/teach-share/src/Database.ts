@@ -67,7 +67,6 @@ export default class Database {
         indexeddb.
     */
     public getPost(pk: number): Promise<Post>{
-        console.log("sending get request for id " + pk);
         return new Promise((resolve, reject) => {
             this.dbPromise.then((db) => {
                 db.transaction("posts")
@@ -75,13 +74,12 @@ export default class Database {
                 .then((post) => {
 
                     if (post === undefined) {
-                        console.log("post " + pk + " not found ind b");
                         reject();
                     } else {
                         const p: Post = Post.pkify(post);
                         resolve(p);
                     }
-                }).catch((err) => console.log(err));
+                }).catch((err) => console.error(err));
             });
         });
     }
@@ -123,8 +121,16 @@ export default class Database {
         });
     }
 }
+
+// clear all of the posts out of the database - for debugging purposes only! 
+// remove me in production or unnecessary performance loss will happen
+
 Database.getInstance().manifest().then((manifest) => {
     for (const idAndVersion of manifest) {
         Database.getInstance().deletePost(idAndVersion!.id);
     }
 });
+// I also put this here so it happens on page load. It's as good a place as any.
+// Again, for debugging purposes.
+
+window.localStorage.removeItem("inProgressPost");

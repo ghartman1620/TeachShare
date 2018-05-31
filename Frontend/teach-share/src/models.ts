@@ -228,16 +228,11 @@ export class Post extends Model {
      * @param save? optionally indicate to save in the db and subscribe over websocket to this post.
     */
     public static get(pk: number, save?: boolean): Promise<Post> {
-        console.log("getting a post: " + pk);
-        console.log("Saving that post? " + save);
         return new Promise((resolve, reject) => {
-            console.log("is in db?");
             this.db.getPost(pk).then(p => {
-                console.log("it is in db!");
                 p.pk = pk;
                 resolve(p);
             }).catch( () => {
-                console.log("it is not in db");
                 if (save) {
                     Post.db.addEmptyPost(pk);
                     Post.ws.sendWatch(pk);
@@ -253,7 +248,6 @@ export class Post extends Model {
     // creates a Post model from the websocket serialized form (see idify for details)
     public static pkify(obj: any): Post {
         if (obj !== undefined) {
-            console.log(obj);
             let p: any = {
                 user: new User(obj.user_id),
                 ...obj
@@ -326,14 +320,12 @@ export class Post extends Model {
             likes: 0,
             ...this as object,
         };
-        console.log(obj, this.user.pk);
         delete obj.concepts;
         delete obj.coreIdeas;
         delete obj.pk;
         delete obj.user;
         delete obj.original_user;
         delete obj.comments;
-        console.log(obj);
         return obj;
     }
 

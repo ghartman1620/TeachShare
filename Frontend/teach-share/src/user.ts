@@ -47,13 +47,10 @@ export default class User {
         this.token = token || Cookie.get("token");
         this.expires = expires || new Date(Cookie.get("expires"));
         this.saveDataInCookie();
-
         if (refreshToken) {
             window.localStorage.setItem("refreshToken", refreshToken);
             window.localStorage.setItem("username", this.username);
         }
-        console.log("ASSIGNING API AUTHORIZATION DEFAULTS TO Bearer " + this.token);
-        Object.assign(api.defaults, {headers: {authorization: "Bearer " + this.token}});
     }
     public saveDataInCookie(): void {
         Cookie.set("token", this.token);

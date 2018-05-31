@@ -93,9 +93,6 @@ export const mutations = {
     },
     // Mutations for the currently edited post data:  and postElements
     ADD_ELEMENT: (state: PostState, element: any) => {
-        console.log(state);
-        console.log(element);
-        console.log(state.doneMutations);
         state.doneMutations.push({
             mutation: "UNDO_ADD_ELEMENT",
             arg: state.post!.elements.length
@@ -155,7 +152,6 @@ export const mutations = {
 
 export const actions = {
     beginPost: (context: PostContext, p: BeginPostArg) => {
-        console.log("Begin Post vuex --> ", p);
 
         // state mutation?
         context.state.post = undefined;
@@ -190,7 +186,6 @@ export const actions = {
             const response = await saveDraft(context).catch((err) =>
                 console.error(err)
             );
-            console.log(response);
             // context.dispatch("saveDraft").then(res => console.error(res));
         }
     },
@@ -211,13 +206,12 @@ export const actions = {
     addElement: (context: PostContext, element: any) => {
         mutAddElement(context, element);
         mutClearRedo(context);
-        saveDraft(context).then((res) => console.error(res));
+        saveDraft(context);
     },
     // Actions are only allowed to have one argument so iAndJ is
     // a list with index 0 as the first index to be swapped
     // and index 1 the second
     swapElements: (context: PostContext, iAndJ: number[]) => {
-        console.log("swapElements");
         context.commit("SWAP_ELEMENTS", iAndJ);
         context.commit("CLEAR_REDO");
         context.dispatch("saveDraft").then(res => console.error(res));
@@ -253,7 +247,6 @@ export const actions = {
         });
         /*
         return new Promise((resolve, reject) => {
-            console.log(postObj);
             api
                 .post("posts/", postObj)
                 .then(response => resolve(response))
@@ -318,8 +311,6 @@ export const getters = {
         return undefined;
     },
     getCurrentPost: (state: PostState) => {
-        console.log("hello, i'm getting current post. that current post is:");
-        console.log(state.post);
         return state.post;
     },
     getCurrentPostId: (state, getters) => {

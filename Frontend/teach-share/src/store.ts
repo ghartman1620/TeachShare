@@ -101,33 +101,27 @@ import {getMap, mutCreate, mutUpdate} from "./store_modules/PostService";
  * a store dependency we'd have a circular dependency and would cause all sorts of errors.
 */
 WebSocket.getInstance().addMessageListener( (msg) => {
-    console.log("Got a message!: " + msg.data.toString());
     const val = JSON.parse(msg.data);
-    console.log("Value is: ");
-    console.log(val);
-    console.log(val.payload);
+
 
     const db: Database = Database.getInstance();
     const keys = Object.keys(val);
-    if ("payload" in keys && "version" in keys) {
+    if (val.versions && val.payload) {
         for (let i = 0; i < val.payload.length; i++) {
             const post = val.payload[i].Post;
             const version = val.versions[i];
-            console.log("Store listener pkifying a post");
-
-            console.log("+++++++++++++++++", post.Post);
-            console.log("VERSION: ", version);
-            const pkifiedPost: Post = Post.pkify(post.Post);
+            const pkifiedPost: Post = Post.pkify(post);
             // check if the post we got from the WS is saved in the DB.
 
-            console.log("ATTEMPTING TO GET: ", pkifiedPost.pk as number);
             db.getPost(pkifiedPost.pk as number).then((dbCurrentPost) => {
-                console.log("GOT INSIDE GETPOST");
                 // If it is, we should save the post we got - because it's a post we've decided in the past to cache
                 db.putPost(pkifiedPost, version);
             }).catch((err) => {
-                console.log("There was a tremendous error -->", err);
-            }); // If not, DON'T save it, because we're not saving every single post that arrives.
+                // this catch block is expected, don't need to console.error - getPost errors
+                // when the post is not found in db
+                // it will happen on any post message not subscribed to
+                // just do nothing
+            });
 
             // for all posts - db saved and otherwise, send it over to the store to get rendered by components.
             if (typeof pkifiedPost.pk !== "undefined" && getMap(store).has(pkifiedPost.pk!.toString())) {

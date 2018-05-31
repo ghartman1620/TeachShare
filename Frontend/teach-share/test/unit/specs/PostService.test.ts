@@ -33,13 +33,11 @@ describe("[POST] CREATE should create a post", () => {
 
         // sanity check
         expect(s).to.not.equal(undefined);
-        console.log("[POST]: ", s);
         for (let i = 0; i < 100; i++) {
             const newPost = new Post(i);
             CREATE(s, newPost);
         }
         const posts = s.posts as ModelMap<Post>;
-        console.log("[POST]: ", posts);
         expect(posts.length).to.equal(100);
     });
 });

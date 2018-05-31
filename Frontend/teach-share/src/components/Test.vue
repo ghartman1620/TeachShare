@@ -26,7 +26,6 @@ export default {
     }),
     methods: {
         loadPost(){
-            console.log("beginning fetch");
             fetch("http://localhost:8000/api/posts/1/")
             .then(resp => resp.json())
             .then(resp => this.message = resp)
@@ -45,7 +44,6 @@ export default {
             this.$store.dispatch("fetchAllPosts");
         },
         getPostsByMyUser(){
-            console.log(this.userid);
             this.$store.dispatch("fetchFilteredPosts", this.userid);
         },
         getCommentsForPost(){

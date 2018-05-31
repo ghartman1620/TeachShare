@@ -11,7 +11,6 @@ var renderfu = function (colname, entry) {
 };
 
 var handleRow = function (event, entry) {
-    console.log("CLICK ROW: " + JSON.stringify(entry));
 };
 
 export default Vue.component("vue-bootstrap-table", { components: {

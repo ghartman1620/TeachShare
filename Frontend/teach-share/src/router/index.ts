@@ -177,16 +177,15 @@ export function asLoggedIn(promise: AxiosPromise<any>): Promise<any> {
 }
 
 function verifyAndRefreshLogin(): Promise<any> {
-    console.log("I'm verifying and refreshing login!");
-    if (store.getters.isLoggedIn){
-        return new Promise((resolve) => {resolve(true);});
-    } else if (Cookie.get("token") != null){
+    if (store.getters.isLoggedIn) {
+        return new Promise((resolve) => {resolve(true); });
+    } else if (Cookie.get("token") != null) {
         const u: User = new User();
         setUser(store, u);
         // store.dispatch("setUser", u);
+        Object.assign(api.defaults, {headers: {Authorization: "Bearer " + Cookie.get("token")}});
         return new Promise((resolve) => {resolve(true); });
     } else if (window.localStorage.getItem("refreshToken") !== null){
-
         return new Promise((resolve, reject) => {
             const body = {
                 grant_type: "refresh_token",
@@ -194,7 +193,6 @@ function verifyAndRefreshLogin(): Promise<any> {
                 username: window.localStorage.getItem("username")
             };
             const head = { headers: { "content-type": "application/json" } };
-            console.log("ASSIGNING API DEFAULTS TO EMPTY");
             Object.assign(api.defaults, {});
             api.post("get_token/", body, head).then((response: any) => {
 
@@ -208,14 +206,14 @@ function verifyAndRefreshLogin(): Promise<any> {
                     response.data.body.refresh_token);
                 setUser(store, user);
                 // store.dispatch("setUser", user);
+                Object.assign(api.defaults, {headers: {Authorization: "Bearer " + response.data.body.access_token}});
                 resolve(true);
 
-            }).catch(function(error: any) {
-                console.log(error);
+            }).catch((error: any) => {
                 resolve(false);
             });
         });
-    } else{
+    } else {
         return new Promise((resolve) => {resolve(false); });
     }
 }

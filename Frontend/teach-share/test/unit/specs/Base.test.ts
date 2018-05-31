@@ -23,14 +23,6 @@
 //     });
 //     it("should have the correct innerhtml", () => {
 //         const vm = CONSTRUCT(Base);
-//         console.log(vm.$el.children.length);
-//         // console.log(
-//         //     vm.$el.childNodes.forEach((val, ind, obj) => {
-//         //         console.log(ind, val);
-//         //     })
-//         // );
-//         console.log(vm.$el.children.item(0));
-//         console.log(vm.$el.children.item(1));
 //     });
 // });
 

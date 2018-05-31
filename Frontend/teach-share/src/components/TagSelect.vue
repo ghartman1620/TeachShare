@@ -101,21 +101,14 @@ export default class TagSelect extends Vue {
     loadStandardsHelp(){
         this.standardOptions = [];   
         var vm: TagSelect = this;
-        console.log("in loadstandards" + this.grade);
-        console.log(this.standardOptions);
         api.get(`/standards/?grade=${this.grade}&subject=${this.subject}`).then(function(response: any) {
-            console.log(response.data);
-            console.log(vm.standardOptions);
             for(var std of <any[]>response.data){
                 vm.standardOptions.push({
                     value: std.pk,
                     text: std.name + " (" + std.code +")",
                 })
             }
-            console.log(vm.standardOptions);
-            console.log(vm.grade);
         })
-        console.log(this.grade);
     }
     submitTagChanges(){
         this.$parent.$emit("submitTagChanges", this.grade, this.length, this.subject, this.contentType, this.standards,

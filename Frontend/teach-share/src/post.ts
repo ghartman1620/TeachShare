@@ -40,8 +40,7 @@ export class InProgressPost {
      * Otherwise, loads in data from the Post.
     */
     public constructor( userid: number, post?: Post) {
-        console.log("begin post ctor: ");
-        console.log(post);
+        
         if (post !== undefined) {
 
             this.elements = post.content ? post.content : [];
@@ -72,14 +71,15 @@ export class InProgressPost {
             if (!post.pk) {
                 console.error("InProgressPost error: constructor called with Post object with pk that does not exist");
             } else {
-                console.log("this.pk = post.pk", this.pk, post.pk);
                 this.pk = post.pk;
             }
-            console.log("returning from in progress post ctor: post is");
-            console.log(this);
-        } else {
-            console.log("ELSE BLOCK IN post.ts");
 
+        // I do believe this is currently never reached. Let's add a loud console error incase it is.
+        } else {
+            //this might happen if i change it to njust always make a new post when you refresh 
+            
+            console.error("Gabe was wrong!");
+            console.error("Else condition reached in InProgressPost ctor - it was created with an undefined post!");
             this.elements = [];
             this.title = "";
             this.tags = [];
@@ -106,7 +106,6 @@ export class InProgressPost {
                         // as wierd as that seems...
             }];
             this.original_user = undefined;
-            console.log(this);
         }
     }
 
@@ -115,7 +114,6 @@ export class InProgressPost {
     constructor(userid: number, postid: number);
     constructor(userid: number, postid?: number){
         if (typeof postid !== "undefined"){ //there's a postid and a user
-            console.log("WE'RE GETTING A PREVIOUSLY EDITED POST!");
             // we're going to get that post and populate our InProgressPost with it
             //@TODO: use the Post model and store.ts. At the time of writing store.ts is being worked on
             //and I don't want to use it as a dependency while its being changed.
@@ -141,7 +139,6 @@ export class InProgressPost {
             this.original_post = undefined;
             post.pk = postid;
             api.get("/posts/"+ postid).then(function(response){
-                console.log(response);
                 post.elements = response.data.content;
                 post.title = response.data.title;
                 post.draft = response.data.draft;
@@ -153,14 +150,11 @@ export class InProgressPost {
                 post.subject = response.data.subject;
                 post.standards = response.data.standards;
                 post.userPk = response.data.user;
-                console.log("subject: " + response.data.subject);
                 //response: #days hh:mm:ss
-                console.log(p.length);
                 post.length = parseInt(p.length.substring(p.length.length-2))/60
                             + parseInt(p.length.substring(p.length.length-5, p.length.length-3))
                             + Math.floor(parseInt(p.length.substring(p.length.length-8, p.length.length-6))*60)
 
-                console.log(post.length);
                 post.contentType = response.data.content_type;
                 post.coreIdeas = response.data.coreIdeas;
                 post.concepts = response.data.concepts;
@@ -170,10 +164,8 @@ export class InProgressPost {
                   
                 post.layout = response.data.layout;
             })
-            console.log("returning from post constructor");
         }
         else {//there's a user, lets make a new post
-            console.log("WE'RE MAKING A NEW POST!");
             this.elements = [];
             this.title = "";
             this.tags = [];
@@ -254,15 +246,7 @@ export class InProgressPost {
         Vue.set(this.elements, i, this.elements[j]);
         Vue.set(this.elements, j, tmp);
     }
-    public createNewDraft() {
-        const post: InProgressPost = this;
-        const obj = this.json();
-        api.post("posts/", obj).then((response) => {
-            post.pk = response.data.pk;
-            window.localStorage.setItem("inProgressPost", post.pk.toString());
-            post.status = PostStatus.Saved;
-        });
-    }
+
     public json(): any {
         return {
             user: this.userPk,
@@ -307,12 +291,9 @@ export class InProgressPost {
         return p;
     }
     public saveDraft(): void {
-        console.log("saving post...");
         const post: InProgressPost = this;
         this.status = PostStatus.Saving;
         /*api.put("posts/" + this.pk + "/", this.json()).then(function(response){
-            console.log("DRAFT SAVED!");
-            console.log(response);
             post.status = PostStatus.Saved;
         })*/
         Database.getInstance().putPost(this.toPost(), 1); // @TODO: is this right?

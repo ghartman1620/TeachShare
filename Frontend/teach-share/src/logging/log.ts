@@ -30,7 +30,6 @@ function logFull (level, depth, ...items) {
         var formatting = LevelEnum[level];
         var formattingStr;
         var line = ln(depth);
-        // console.log(line);
 
         if (level === undefined || formatting === undefined) {
             formattingStr = "";

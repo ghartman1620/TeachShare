@@ -71,7 +71,6 @@ export const actions = {
     },
     fetchPostSubscribe: async (ctx: PostContext, postID: string|number) => {
         try {
-            console.log("fetch post subscribing to post" + postID);
             if (typeof postID === "string") {
                 postID = parseInt(postID, 10);
             }
@@ -121,17 +120,13 @@ export const mutations = {
         }
     },
     CREATE: (ctx, data: Post) => {
-        console.log("doing mut create")
         
         const posts = ctx.posts as ModelMap<Post>;
-        console.log("before: posts.get(Number(data.pk)) = " + posts.get(Number(data.pk)));
-        console.log(data);
         if (typeof data.pk !== "undefined") {
             if (!ctx.posts.has(data.pk)) {
                 // @TODO: check if this actually works with vue reactivity.
                 // posts.set(String(data.pk), data);
                 Vue.set(ctx.posts.data, Number(data.pk), data);
-                console.log("after: posts.get(Number(data.pk)) = " + posts.get(Number(data.pk)));
             }
         }
     },

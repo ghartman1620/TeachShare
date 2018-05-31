@@ -30,7 +30,6 @@ const vueInstance = new Vue({
 // typescript 'require' workaround hack
 declare function require(name: string);
 
-// console.log("MUTATIONS: ", Object.keys(mutations));
 const { CREATE, UPDATE, CHANGE_LIMIT, DELETE, CLEAR } = mutations;
 
 function setup_state(): FileState {
@@ -69,7 +68,6 @@ describe("[FILES] CREATE should create a file", () => {
 
         // let f = state.files.next().value as GenericFile;
         // let f2 = state.files.next().value as GenericFile;
-        // console.log("FILE ITERATOR: ", f, f2);
         expect(files2.data).to.eql(out);
     });
     it("should create multiple duplicate-keyed entries", () => {
@@ -255,7 +253,6 @@ describe("[FILES] ACTIONS", () => {
         var files = [myFile];
         let store = vueInstance.$store;
         // upload(store, files).then(resp => {
-        //     // console.log("RESP: ", resp)
         //     expect(resp.finished).to.equal(true);
         // });
     });

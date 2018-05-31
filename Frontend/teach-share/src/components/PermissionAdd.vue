@@ -51,8 +51,6 @@ export default class PermissionAdd extends Vue {
            parseInt(this.userState.user.pk) !== this.postState.post.userPk && 
             this.userState.user.pk !== parseInt(this.postState.post.userPk)){
 
-            console.log(this.userState.user.pk);
-            console.log(this.postState.post.userPk);
             this.$notifyDanger("Only the owner of a post may change its permissions. If you want to invite a new collaborator, ask the owner of this post.");
             this.$router.push({name: "create"});
         }
@@ -61,7 +59,6 @@ export default class PermissionAdd extends Vue {
         })
     }
     public addUser() {
-        console.log("AH FUCK");
         
         
         var index: number = this.users.length;
@@ -91,8 +88,7 @@ export default class PermissionAdd extends Vue {
             this.users.splice(index,1);
 
         }).catch(err => {
-            console.log(err);
-            console.log(err.response);
+            console.error(err);
             this.$notifyDanger("An error occured removing user "  + this.users[index] + ": " + err.response.data.error);
         })
     }

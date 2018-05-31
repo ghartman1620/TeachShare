@@ -92,6 +92,10 @@ export default class WebSocket {
         const changed = p.toApiObject();
         // little hack to fix weird string id situation for user_id.
         (changed as any).user_id = parseInt((changed as any).user_id, 10);
+        console.log("Sending update!");
+        console.log(p);
+        console.log(changed);
+
         return this.send({
             message: MessageType.Update,
             post: changed
@@ -108,7 +112,6 @@ export default class WebSocket {
 
     }
     public sendGet(id: number): MessageStatus {
-        console.log("sending get for id " + id);
         return this.send({
             message: MessageType.Get,
             id,

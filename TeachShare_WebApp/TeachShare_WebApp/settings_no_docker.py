@@ -191,6 +191,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'TeachShare_WebApp.wsgi.application'
 
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'localhost:9200'
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases

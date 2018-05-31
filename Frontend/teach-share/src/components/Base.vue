@@ -57,7 +57,6 @@ export default class Base extends Vue {
 
     mounted() {
         /*let idbs = new IDBStore("default", 1);
-        // console.log("[IDBSTORE]: ", idbs);
 
         if (document.cookie !== "") {
             let uid = document.cookie.match(new RegExp("(?:pk=(?<pk>[^;]+))"));
@@ -77,8 +76,6 @@ export default class Base extends Vue {
         // const vm = new Constructor( { propsData: 
         //         {src: "http://localhost:8000/media/uploads/2018/03/15/2c3ef4c0-75e9-48ca-a00e-da83cb33de7b/wallhaven-616483.jpg"}
         //     }).$mount()
-        // console.log(vm);
-        // console.log("Height: ", vm.$el.children[0].height, "Width:", vm.$el.children[0].width);
         // this.waitDelay(0, vm);
 
         // you can do this (has worked on my many tests) or a generic timeout just to ensure the data is propogated.
@@ -88,7 +85,6 @@ export default class Base extends Vue {
         // any other method that doesn't require an arbitrary wait. Cause this current method actually 
         // could potentially not work.
         // window.addEventListener('load', () => {
-        //     console.log("Height: ", vm.$el.children["0"].naturalHeight, "Width:", vm.$el.children["0"].naturalWidth);
         // });
     }
 }

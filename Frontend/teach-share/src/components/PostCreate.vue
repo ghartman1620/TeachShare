@@ -5,7 +5,18 @@
 
         <div v-for="post in userPosts">
             <a href="#" v-on:click.stop="editPost(post)">
-                {{post.title}}
+                <span v-if="post.title != ''">
+                    {{post.title}}
+                </span>
+                <span v-else>
+                    Untitled Post
+                </span>
+                <span v-if="Number(post.user.pk) !== Number(getLoggedInUser.pk)">
+                    (Shared)
+                </span>
+                <span v-if="post.pk === inProgressPost.pk">
+                    (Open)
+                </span>
             </a>
         </div>
     </side-bar>
@@ -317,7 +328,6 @@ export default class PostCreate extends Vue {
     get userPosts(): Post[] {
         const store = this.$store;
         const userPosts = getPosts(this.$store).filter( (p) => {
-            console.log(p);
             // getLoggedInUser(store).pk seems to be a string at runtime.
             // It obviously ought to be a number, but somewhere
             // it gets assigned to a type-unsafe thing that winds up as a string.
@@ -347,7 +357,6 @@ export default class PostCreate extends Vue {
 
     get color() {
         if (getColor(this.$store) === null){
-            console.log("getColor undefined!!!");
             return "#96e6b3";
         }
         return getColor(this.$store);
@@ -359,7 +368,6 @@ export default class PostCreate extends Vue {
 
     public saveTagChanges(grade: number, length: number, subject: number, contentType: number, standards: number[],
             concepts, practices, coreIdeas, layout): void {
-        console.log(standards);
         if (this.inProgressPost !== undefined) {
             this.inProgressPost.setStandards(standards);
             this.inProgressPost.setGrade(grade);
@@ -484,14 +492,53 @@ export default class PostCreate extends Vue {
     public beginPost(userid: number, postid: number | undefined): void {
         let vm: PostCreate = this;
         if (postid !== undefined) {
+            // So the user fires up post create and wants some posts. We have a few cases.
+
+            // One: they've got no inProgressPost item. Most probably they've just logged in.
+
+            // In this case, currently (absolutely subject to change and i'll detail a better approach
+            // in just a moment) we'll kindly make them a post and then load that up into their db and 
+            // go ahead and subscribe to it. They'll get stuck on loading until the subscription is done
+            // and they get the get message from the websocket.
+
+
+            // Two: they do have an inProgressPost item. Awesome! Maybe they revisited the page (welcome back)
+            // or maybe they just clicked on another one of their posts to go edit it.
+
+
+            // In this case, we sort of expect that these fetch posts will hit their local cache (if not that's ok)
+            // But we'll begin post - either here or in the handler down in mounted() with the post with all
+            // the goodies they have saved in it from last time.
+
+
+            // (as far as a better approach to the first case goes - we shouldn't create a new post until they
+            // make some database-savable changes to their post. That way if they just hit reload repeatedly like
+            // i'm doing now to test things they won't make a bunch of new posts that are all empty.)
+            window.localStorage.setItem("inProgressPost", postid.toString());
             fetchPostSubscribe(this.$store, postid).then((p) => {
-                beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p});
-                vm.postStatus = vm.SAVED;
+                if(p.post) {
+                    beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p:p.post});
+                }
             });
         } else {
-            beginPost(this.$store, {
-                userid: userid as number,
-            });
+            //this is a little bit silly currently - use the api to create a post, then
+            // use websockets to subscribe to it. I know there's a create message in the works
+            // but last I heard of it was a brief slack consultation about the current
+            // db.rs being unable to create new posts. I know this works, so I'll use it for now.
+            // @TODO
+            api.post('/posts/', {
+                user: getLoggedInUser(vm.$store).pk,
+                content: [],
+                comments: [],
+
+            }).then((response) => {
+                window.localStorage.setItem("inProgressPost", response.data.pk.toString());
+                // We're not even going to bother dealing with the response from fetch post.
+                // It will always be undefined because this will never be a cache hit - it can't possibly be,
+                // seeing as we just right above made this post!
+                fetchPostSubscribe(vm.$store, response.data.pk);
+            })
+            
             // this.postStatus = vm.SAVED;
         }
     }
@@ -521,6 +568,7 @@ export default class PostCreate extends Vue {
             response = await asLoggedIn(api.get(`/posts/?user_edit=${this.getLoggedInUser.pk}&page=${nextPage.toString()}`));
 
             for (const post of response.data.results) {
+                
                 if (post.pk !== -1){
                     fetchPostSubscribe(this.$store, post.pk);
                 }
@@ -531,8 +579,6 @@ export default class PostCreate extends Vue {
     }
     created() {
         const inProgressPost: string | null = window.localStorage.getItem("inProgressPost");
-        console.log("IN-PROGRESS-POST -----> ", inProgressPost);
-        console.log("created.");
 
         // Get previous posts from the users
         this.getUserPosts();
@@ -546,7 +592,6 @@ export default class PostCreate extends Vue {
                 this.getLoggedInUser.pk as number,
                 undefined);
         } else {
-            console.log("else");
 
             this.beginPost(
                 this.getLoggedInUser.pk as number, parseInt(inProgressPost as string));
@@ -556,30 +601,24 @@ export default class PostCreate extends Vue {
         let vm: PostCreate = this;
 
         WebSocket.getInstance().addMessageListener((message) => {
-            console.log("Post create pkifying a post");
-            
             
             const val = JSON.parse(message.data);
-            console.log("RAW DATA: ");
-            console.log(val);
-            if (val.payload && val.payload.length > 0) {
-                console.log("WHY!?");
-                console.log("**********************", val.payload[0].Post);
-                let post = Post.pkify(val.payload[0].Post);
-                let inProgressPost = window.localStorage.getItem("inProgressPost");
-                
-                if (inProgressPost){
-                    if (post.pk === parseInt(inProgressPost as string, 10)) {
+            let iPP = window.localStorage.getItem("inProgressPost");
+            let inProgressPk: number = -1;
+            if (iPP) inProgressPk = parseInt(iPP as string);
+            if (val.payload && val.payload.length > 0 && inProgressPk != -1) {
+                for(let p of val.payload){
+                    let post = Post.pkify(p.Post);
+                    if (post.pk === inProgressPk) {
                         beginPost(store,{userid: userpk, p: post});
                         vm.postStatus = PostStatus.Saved;
                     }
-                } else {
-                    console.error("no inprogressPost localStorage item exists");
+                
                 }
+                
             }
             return undefined;
         });
-        console.log("end created");
     }
 
     mounted() {
