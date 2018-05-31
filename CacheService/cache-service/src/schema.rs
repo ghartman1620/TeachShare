@@ -116,6 +116,26 @@ table! {
 }
 
 table! {
+    guardian_groupobjectpermission (id) {
+        id -> Int4,
+        object_pk -> Varchar,
+        content_type_id -> Int4,
+        group_id -> Int4,
+        permission_id -> Int4,
+    }
+}
+
+table! {
+    guardian_userobjectpermission (id) {
+        id -> Int4,
+        object_pk -> Varchar,
+        content_type_id -> Int4,
+        permission_id -> Int4,
+        user_id -> Int4,
+    }
+}
+
+table! {
     oauth2_provider_accesstoken (id) {
         id -> Int8,
         token -> Varchar,
@@ -174,8 +194,8 @@ table! {
     posts_attachment (id) {
         id -> Int4,
         file -> Nullable<Varchar>,
-        post_id -> Nullable<Int4>,
         last_updated -> Timestamptz,
+        post_id -> Nullable<Int4>,
     }
 }
 
@@ -212,6 +232,26 @@ table! {
         color -> Varchar,
         layout -> Jsonb,
         original_user_id -> Nullable<Int4>,
+
+        // id -> Int4,
+        // practices -> Array<Int4>,
+        // crosscutting_concepts -> Array<Int4>,
+        // disciplinary_core_ideas -> Array<Int4>,
+        // color -> Varchar,
+        // layout -> Jsonb,
+        // title -> Varchar,
+        // content -> Jsonb,
+        // // updated -> Timestamptz,
+        // likes -> Int4,
+        // draft -> Bool,
+        // // timestamp -> Timestamptz,
+        // tags -> Jsonb,
+        // grade -> Int4,
+        // subject -> Int4,
+        // // length -> Interval,
+        // content_type -> Int4,
+        // original_user_id -> Nullable<Int4>,
+        // user_id -> Int4,
     }
 }
 
@@ -227,11 +267,11 @@ table! {
     posts_standard (id) {
         id -> Int4,
         name -> Varchar,
+        code -> Varchar,
         category -> Varchar,
         grade -> Int4,
         description -> Text,
         subject -> Int4,
-        code -> Varchar,
     }
 }
 
@@ -299,6 +339,12 @@ joinable!(auth_user_user_permissions -> auth_permission (permission_id));
 joinable!(auth_user_user_permissions -> auth_user (user_id));
 joinable!(django_admin_log -> auth_user (user_id));
 joinable!(django_admin_log -> django_content_type (content_type_id));
+joinable!(guardian_groupobjectpermission -> auth_group (group_id));
+joinable!(guardian_groupobjectpermission -> auth_permission (permission_id));
+joinable!(guardian_groupobjectpermission -> django_content_type (content_type_id));
+joinable!(guardian_userobjectpermission -> auth_permission (permission_id));
+joinable!(guardian_userobjectpermission -> auth_user (user_id));
+joinable!(guardian_userobjectpermission -> django_content_type (content_type_id));
 joinable!(oauth2_provider_accesstoken -> auth_user (user_id));
 joinable!(oauth2_provider_accesstoken -> oauth2_provider_application (application_id));
 joinable!(oauth2_provider_application -> auth_user (user_id));
@@ -310,7 +356,6 @@ joinable!(oauth2_provider_refreshtoken -> oauth2_provider_application (applicati
 joinable!(posts_attachment -> posts_post (post_id));
 joinable!(posts_comment -> auth_user (user_id));
 joinable!(posts_comment -> posts_post (post_id));
-joinable!(posts_post -> auth_user (user_id));
 joinable!(posts_post_standards -> posts_post (post_id));
 joinable!(posts_post_standards -> posts_standard (standard_id));
 joinable!(social_auth_usersocialauth -> auth_user (user_id));
@@ -329,6 +374,8 @@ allow_tables_to_appear_in_same_query!(
     django_content_type,
     django_migrations,
     django_session,
+    guardian_groupobjectpermission,
+    guardian_userobjectpermission,
     oauth2_provider_accesstoken,
     oauth2_provider_application,
     oauth2_provider_grant,

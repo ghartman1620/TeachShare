@@ -35,16 +35,15 @@ use cache::*;
 use db::save_posts;
 use models::*;
 
+use db::DB;
+use diesel::pg::PgConnection;
 use models::MessageType;
 use std::cell::RefCell;
+use std::collections::BTreeMap;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
-use std::collections::BTreeMap;
-use diesel::pg::PgConnection;
 use users::Oauth2ProviderAccesstoken;
-use db::DB;
-
 
 #[derive(Debug, Clone)]
 struct GrandSocketStation {
@@ -130,7 +129,7 @@ impl Handler for Connection {
         println!("HANDSHAKE: {:?}", hs);
         println!("HEADERS: {:?}", hs.request.headers());
         for (key, value) in hs.request.headers() {
-            println!("{:?}: {:?}", key, String::from_utf8(value.clone()) );
+            println!("{:?}: {:?}", key, String::from_utf8(value.clone()));
         }
         Ok(())
     }
@@ -169,7 +168,7 @@ impl Handler for Connection {
             CloseCode::Normal => {
                 println!("The client is done with the connection.");
                 self.remove_client();
-            },
+            }
             CloseCode::Away => {
                 println!("The client is leaving the site.");
                 self.remove_client();
@@ -189,38 +188,41 @@ impl Handler for Connection {
 
 impl Connection {
     fn remove_client(&mut self) {
-        println!("[GrandSocketStation] Removing 'self' from GrandSocketStation: {:?}", self.id);
+        println!(
+            "[GrandSocketStation] Removing 'self' from GrandSocketStation: {:?}",
+            self.id
+        );
         match &mut self.parent {
-            Some(val) => {
-                match val.try_borrow_mut() {
-                    Ok(ref mut parent) => {
-                        println!("[GrandSocketStation] [{:?}] Current Connections: {:?}", 
-                            parent.connections.len(),
-                            parent.connections,
-                        );
-                        let mut exiting_connection_id = 0;
-                        let old_connection_id = self.tx.connection_id();
-                        {
-                            exiting_connection_id = parent
-                                .connections
-                                .clone()
-                                .into_iter()
-                                .position(|x| x.tx.connection_id() == old_connection_id)
-                                .unwrap();
-                        }
-                        parent.connections.remove(exiting_connection_id);
-                        println!("[GrandSocketStation] [{:?}] Current Remaining Connections: {:?}", 
-                            parent.connections.len(), 
-                            parent.connections
-                        );
+            Some(val) => match val.try_borrow_mut() {
+                Ok(ref mut parent) => {
+                    println!(
+                        "[GrandSocketStation] [{:?}] Current Connections: {:?}",
+                        parent.connections.len(),
+                        parent.connections,
+                    );
+                    let mut exiting_connection_id = 0;
+                    let old_connection_id = self.tx.connection_id();
+                    {
+                        exiting_connection_id = parent
+                            .connections
+                            .clone()
+                            .into_iter()
+                            .position(|x| x.tx.connection_id() == old_connection_id)
+                            .unwrap();
                     }
-                    Err(e) => println!("[GrandSocketStation] Error: {:?}!", e),
+                    parent.connections.remove(exiting_connection_id);
+                    println!(
+                        "[GrandSocketStation] [{:?}] Current Remaining Connections: {:?}",
+                        parent.connections.len(),
+                        parent.connections
+                    );
                 }
-                
-            }
-            None => println!("[GrandSocketStation] None. Could not unwrap when attempting to access parent."),
+                Err(e) => println!("[GrandSocketStation] Error: {:?}!", e),
+            },
+            None => println!(
+                "[GrandSocketStation] None. Could not unwrap when attempting to access parent."
+            ),
         }
-        
     }
 
     fn serialize_and_send_posts(&self, data: &[Model], versions: &[u64]) -> Result<(), ws::Error> {

@@ -1,18 +1,20 @@
 use crossbeam_channel::Receiver;
-use diesel::insert_into;
-use diesel::pg::data_types::PgInterval;
-use diesel::pg::data_types::PgTimestamp;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use diesel::result;
-use diesel::result::Error;
-use diesel::update;
+use diesel::{result, update};
+use diesel::associations::{GroupedBy, BelongsTo, HasTable, Identifiable};
 use dotenv::dotenv;
 
 use models::Post;
-use schema::posts_post::dsl::*;
+use schema::posts_post;
+use schema::django_content_type;
+use schema::guardian_userobjectpermission;
+use models::User;
+
 use serde_json::value::Value;
 use std::env;
+use std::error::Error as StdError;
+use std::fmt;
 use std::rc::Rc;
 
 pub fn establish_connection() -> PgConnection {
@@ -38,6 +40,149 @@ impl DB {
     }
     pub fn get_mut(&mut self) -> Option<&mut PgConnection> {
         Rc::get_mut(&mut self._conn)
+    }
+}
+
+#[derive(Debug)]
+pub enum DBError {
+    IncorrectLogic,
+    MoreThanOne,
+    NotFound,
+    OtherDatabase,
+}
+
+impl fmt::Display for DBError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            DBError::NotFound => f.write_str("NotFound"),
+            DBError::MoreThanOne => f.write_str("MoreThanOne"),
+            DBError::IncorrectLogic => f.write_str("UnrelatedErr"),
+            DBError::OtherDatabase => f.write_str("OtherDieselErr"),
+        }
+    }
+}
+
+impl StdError for DBError {
+    fn description(&self) -> &str {
+        match *self {
+            DBError::NotFound => "Record not found",
+            DBError::MoreThanOne => "More than one entry was returned, when that should have not been possible.",
+            DBError::IncorrectLogic => "Something unrelated to the actual query went wrong. Denotes something that should not happen.",
+            DBError::OtherDatabase => "There was another diesel error."
+        }
+    }
+}
+
+impl From<diesel::result::Error> for DBError {
+    fn from(e: diesel::result::Error) -> Self {
+        match e {
+            diesel::result::Error::NotFound => DBError::NotFound,
+            _ => DBError::OtherDatabase,
+        }
+    }
+}
+
+#[derive(Identifiable, Queryable, Insertable, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+#[table_name = "django_content_type"]
+pub struct DjangContentType {
+    id: i32,
+    app_label: String, // make these str refs so that it's faster to write a query
+    model: String,     // as well as the fact that we won't use this struct for much
+} // but the id....
+
+/// ### DjangoContentType:
+/// used for mapping the content_type_id to the correct model (for auth-->permissions).
+///
+impl DjangContentType {
+    pub fn new() -> Self {
+        let result: DjangContentType = Default::default();
+        result
+    }
+    pub fn get_all(db: &DB) -> Result<Vec<DjangContentType>, DBError> {
+        use schema::django_content_type::dsl::{app_label, django_content_type, id, model};
+        let conn = db.get();
+        let content_types = django_content_type
+            .select((id, model, app_label))
+            .load(&*conn)?;
+        println!("Post content type: {:?}", content_types);
+        Ok(content_types)
+    }
+    pub fn get_dct_by_model<'a>(db: &DB, model_name: &'a str) -> Result<DjangContentType, DBError> {
+        use schema::django_content_type::dsl::{django_content_type, model};
+        let conn = db.get();
+        let content_type: Vec<DjangContentType> = django_content_type
+            .filter(model.eq(model_name.to_owned()))
+            .load::<DjangContentType>(&*conn)?;
+        if content_type.len() == 1 {
+            Ok(content_type[0].clone())
+        } else {
+            Err(DBError::MoreThanOne) // cause really, what's the difference!?
+        }
+    }
+}
+
+#[derive(Associations, Identifiable, Queryable, Insertable, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+#[belongs_to(Post, foreign_key = "object_pk")]
+#[belongs_to(DjangContentType, foreign_key="content_type_id")]
+#[table_name = "guardian_userobjectpermission"]
+pub struct UserObjectPermission {
+    pub id: i32,
+    pub object_pk: String,
+    pub content_type_id: i32,
+    pub user_id: i32,
+    pub permission_id: i32,
+}
+
+impl UserObjectPermission {
+    pub fn new() -> UserObjectPermission {
+        Default::default()
+    }
+
+    pub fn get_all(db: &DB) -> Result<Vec<UserObjectPermission>, DBError> {
+        use schema::guardian_userobjectpermission::dsl::guardian_userobjectpermission;
+
+        let session = db.get();
+        let response = guardian_userobjectpermission.load(&*session)?;
+        println!("UserObjectPermission => {:?}", response);
+        Ok(response)
+    }
+
+    fn get_by_id(obj_id: i32, content_type: i32, db: &DB) -> Result<UserObjectPermission, DBError> {
+        use schema::guardian_userobjectpermission::dsl::{
+            guardian_userobjectpermission, object_pk,
+            content_type_id
+        };
+
+        let id_str = obj_id.to_string();
+        let session = db.get();
+        let response = guardian_userobjectpermission
+            .filter(object_pk.eq(id_str))
+            .filter(content_type_id.eq(content_type))
+            .first(&*session)?;
+        println!("UserObjectPermission => {:?}", response);
+        Ok(response)
+    }
+}
+
+trait GetByID<T, U>
+where
+    U: Sized,
+{
+    fn get_by_id(&self, id: T, db: &DB) -> Result<Vec<U>, DBError>;
+}
+
+impl GetByID<i32, UserObjectPermission> for UserObjectPermission {
+    fn get_by_id(&self, obj_id: i32, db: &DB) -> Result<Vec<UserObjectPermission>, DBError> {
+        use schema::guardian_userobjectpermission::dsl::{
+            guardian_userobjectpermission, object_pk,
+        };
+
+        let session = db.get();
+        let response = guardian_userobjectpermission
+            .filter(object_pk.eq(obj_id.to_string()))
+            .load::<UserObjectPermission>(&*session)?;
+        println!("UserObjectPermission => {:?}", response);
+        Ok(response)
     }
 }
 
@@ -67,16 +212,23 @@ impl Post {
         }
     }
     pub fn get_all(ids: Vec<i32>, conn: &PgConnection) -> Result<Vec<Post>, result::Error> {
+        use schema::posts_post::dsl::*;
+
         return posts_post.filter(id.eq_any(ids)).load::<Post>(conn);
     }
 
     pub fn get(pk_id: i32, conn: &PgConnection) -> Result<Vec<Post>, result::Error> {
+        use schema::posts_post::dsl::*;
+
         return posts_post.filter(id.eq(pk_id)).load::<Post>(conn);
     }
 
     pub fn save(&self, conn: &PgConnection) -> Result<(), String> {
+        use schema::posts_post::dsl::*;
+
         let updated_row: Result<Post, result::Error> = update(posts_post.filter(id.eq(self.id)))
-            .set((title.eq(self.title.clone()),
+            .set((
+                title.eq(self.title.clone()),
                 content.eq(self.content.clone()),
                 likes.eq(self.likes),
                 tags.eq(self.tags.clone()),
@@ -84,13 +236,14 @@ impl Post {
                 draft.eq(self.draft),
                 content_type.eq(self.content_type),
                 grade.eq(self.grade),
-                subject.eq(self.subject), 
+                subject.eq(self.subject),
                 crosscutting_concepts.eq(self.crosscutting_concepts.clone()),
                 disciplinary_core_ideas.eq(self.disciplinary_core_ideas.clone()),
                 color.eq(self.color.clone()),
                 layout.eq(self.layout.clone()),
                 original_user_id.eq(self.original_user_id),
-                practices.eq(self.practices.clone())))
+                practices.eq(self.practices.clone()),
+            ))
             .get_result(conn);
 
         return if updated_row.is_err() {
@@ -104,7 +257,6 @@ impl Post {
             Ok(())
         };
     }
-
 }
 pub fn save_posts(rx: Receiver<Post>) {
     let db = DB::new();
@@ -132,12 +284,43 @@ pub fn save_posts(rx: Receiver<Post>) {
 mod tests {
     use crossbeam_channel::*;
     use db::*;
+    use models::*;
     use diesel::prelude::*;
     use diesel::result;
+    use schema::{posts_post, guardian_userobjectpermission};
 
     use std::sync::mpsc::channel;
     use std::thread;
     use std::time::SystemTime;
+
+    #[test]
+    fn test_django_content_type() {
+        let db = DB::new();
+        let test_q = DjangContentType::get_all(&db);
+        println!("TEST_Q -------> {:?}", test_q);
+
+        let test2 = DjangContentType::get_dct_by_model(&db, "post");
+        println!("DCT --------------------> {:?}", test2);
+    }
+
+    #[test]
+    fn test_guardian_userobjectpermission() {
+        let db = DB::new();
+        let test = UserObjectPermission::get_all(&db);
+        UserObjectPermission::get_by_id(1, 23, &db);
+        println!("UserObjectPermission: {:?}", test);
+    }
+
+    #[test]
+    fn test_association() {
+        let db = DB::new();
+        let session = db.get();
+        let post = Post::get(1, &session).unwrap();
+        let ct = DjangContentType::get_dct_by_model(&db, "post").unwrap();
+        let result: Result<UserObjectPermission, _> = UserObjectPermission::belonging_to(&ct).first(&*session);
+        println!("\n************************************\n{:?}\n", result);
+    }
+
     //pre: Post with pk -1 exists
     //tests that changing a post's title and calling its .save() method
     //has the change saved in the database to be yielded in future get()s

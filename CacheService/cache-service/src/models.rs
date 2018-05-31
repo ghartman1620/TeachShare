@@ -1,17 +1,11 @@
-
-use diesel::data_types::PgTimestamp;
-use diesel::Insertable;
-use schema::{oauth2_provider_accesstoken, posts_post};
-use serde_json::from_str;
+use diesel::{Insertable, Queryable};
+use schema::posts_post;
 use serde_json::Value;
 use std::cmp::{Eq, PartialEq};
-use std::error;
-use std::fmt;
-use std::sync::Arc;
-use users::*;
-use std::collections::{HashSet, HashMap};
-use std::hash::{Hasher, Hash};
+use std::collections::HashSet;
+use std::hash::{Hash, Hasher};
 use std::ops::{Add, AddAssign};
+use std::sync::Arc;
 
 // * option 1
 #[derive(Debug, Serialize)]
@@ -45,7 +39,6 @@ pub enum Model {
     Comment(Comment),
 }
 
-
 // This is KEY field for HashMap entries that make it so that we can still refer
 // to an entry only by their id (pk), and have no collision with different types.
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
@@ -55,7 +48,6 @@ pub enum ID {
     Comment(i32),
 }
 
-
 // pub struct UserPermission {
 //     pub permission: Permission,
 //     pub user: User,
@@ -63,10 +55,8 @@ pub enum ID {
 
 type UserSet = HashSet<UserID>;
 
-
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct UserSetEntry(u64, Option<UserSet>);
-
 
 #[derive(Debug, Clone)]
 pub enum UserPermission {
@@ -79,22 +69,17 @@ pub enum UserPermission {
 impl PartialEq for UserPermission {
     fn eq(&self, other: &UserPermission) -> bool {
         match self {
-            UserPermission::ChangePost(_) => {
-                match other {
-                    UserPermission::ChangePost(_) => true,
-                    _ => false,
-                }
+            UserPermission::ChangePost(_) => match other {
+                UserPermission::ChangePost(_) => true,
+                _ => false,
             },
-            UserPermission::ViewPost(_) => {
-                match other {
-                    UserPermission::ViewPost(_) => true,
-                    _ => false,
-                }
+            UserPermission::ViewPost(_) => match other {
+                UserPermission::ViewPost(_) => true,
+                _ => false,
             },
 
             // TODO: add any more for any other permissions!
             _ => unimplemented!(),
-
         }
     }
 }
@@ -114,7 +99,7 @@ impl Add for UserPermission {
                         return UserPermission::ChangePost(inner_rhs);
                     }
                     UserPermission::ChangePost(union)
-                },
+                }
                 _ => panic!("Cannot add different variants of UserPermission!!"),
             },
             UserPermission::ViewPost(inner_lhs) => match other {
@@ -126,9 +111,9 @@ impl Add for UserPermission {
                         return UserPermission::ViewPost(inner_rhs);
                     }
                     UserPermission::ViewPost(union)
-                },
+                }
                 _ => panic!("Cannot add different variants of UserPermission!!"),
-            }
+            },
         }
     }
 }
@@ -138,7 +123,6 @@ impl AddAssign for UserPermission {
         *self = self.clone() + other;
     }
 }
-
 
 #[derive(Debug, Clone)]
 pub struct UserID {
@@ -154,10 +138,7 @@ impl UserID {
         }
     }
     pub fn create(id: i32, token: String) -> UserID {
-        UserID {
-            id,
-            token,
-        }
+        UserID { id, token }
     }
 }
 
@@ -179,36 +160,24 @@ impl UserPermission {
     pub fn insert(&mut self, u: UserID) -> bool {
         println!("Inserting User: {:?}", u);
         match self {
-            UserPermission::ViewPost(view_post) => {
-                view_post.insert(u)
-            },
-            UserPermission::ChangePost(change_post) => {
-                change_post.insert(u)
-            },
+            UserPermission::ViewPost(view_post) => view_post.insert(u),
+            UserPermission::ChangePost(change_post) => change_post.insert(u),
             _ => unimplemented!(),
         }
     }
 
     pub fn remove(&mut self, u: &UserID) -> bool {
         match self {
-            UserPermission::ViewPost(view_post) => {
-                view_post.remove(u)
-            },
-            UserPermission::ChangePost(change_post) => {
-                change_post.remove(u)
-            },
+            UserPermission::ViewPost(view_post) => view_post.remove(u),
+            UserPermission::ChangePost(change_post) => change_post.remove(u),
             _ => unimplemented!(),
         }
     }
 
     pub fn get_users(&self) -> HashSet<UserID> {
         match self {
-            UserPermission::ViewPost(view_post) => {
-                view_post.into_iter().cloned().collect()
-            },
-            UserPermission::ChangePost(change_post) => {
-                change_post.into_iter().cloned().collect()
-            },
+            UserPermission::ViewPost(view_post) => view_post.into_iter().cloned().collect(),
+            UserPermission::ChangePost(change_post) => change_post.into_iter().cloned().collect(),
             _ => unimplemented!(),
         }
     }
@@ -227,20 +196,20 @@ pub struct Resource {
     /// Version: the id of the most recent update to a post.
     pub version: u64,
 
-    /// ## Permission: 
-    ///  the permission information for this resource. 
+    /// ## Permission:
+    ///  the permission information for this resource.
     ///  Can be though of as a Set of Set's (cause it is) in that
     ///  the outer set contains an inner set that is an individual
     ///  permission type (with all the users that have that permission)
-    ///  inside of it. 
+    ///  inside of it.
     ///  ### Basic idea:  
     ///        Vec{ ViewPost{User1, User2, User3...}, ChangePost{User2,}, }
-    /// 
-    ///  ### Example: 
+    ///
+    ///  ### Example:
     ///     let resource = Resource::new();
-    ///     resource.permissions.insert(Permission::ViewPost(true), 
+    ///     resource.permissions.insert(Permission::ViewPost(true),
     ///                                 UserPermission::ViewPost());
-    /// 
+    ///
     pub permissions: Vec<UserPermission>,
 }
 
@@ -255,8 +224,8 @@ impl Resource {
     }
 
     /// add_permission: really just merges the permissions object passed in, into the actual values
-    pub fn add_permission(&mut self, permission: UserPermission) /* -> Option<Vec<bool>> */ {
-        
+    pub fn add_permission(&mut self, permission: UserPermission) /* -> Option<Vec<bool>> */
+    {
         println!("\n******************************************\n");
         println!("[PERM] Permissions before: {:?}", self.permissions);
 
@@ -265,15 +234,16 @@ impl Resource {
         //   - Borrowing
         //              .... and then use it to determine if a value existed,
         // then actually borrow the value in the loop -> pattern match --> union the sets
-        // and finally set it as that new unioned value. 
+        // and finally set it as that new unioned value.
         let temp = self.permissions.clone();
-        let existing_value = temp.iter().find(|user_permission| **user_permission == permission);
-        
+        let existing_value = temp.iter()
+            .find(|user_permission| **user_permission == permission);
+
         match existing_value {
             None => {
                 println!("[PERM] pushing permission: {:?}.", permission);
-                self.permissions.push(permission); 
-            },
+                self.permissions.push(permission);
+            }
             Some(_) => {
                 for perm in &mut self.permissions {
                     let perm_clone = permission.clone();
@@ -308,7 +278,7 @@ impl Resource {
                 return;
             }
         }
-        self.watchers.remove(index as usize); 
+        self.watchers.remove(index as usize);
     }
 
     // ? all_watchers: goal is to get a vector of copy'd user's
@@ -401,7 +371,10 @@ impl Msg {
     }
 }
 
-#[derive(Queryable, Debug, Serialize, Deserialize, Clone, Hash, Eq, PartialEq)]
+use schema::auth_user;
+
+#[derive(Associations, Identifiable, Queryable, Debug, Serialize, Deserialize, Clone, Hash, Eq, PartialEq)]
+#[table_name = "auth_user"]
 pub struct User {
     pub id: i32,
     password: String,
@@ -454,7 +427,8 @@ impl Comment {
     }
 }
 
-#[derive(Queryable, Insertable, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+#[derive(Associations, Identifiable, Queryable, Insertable, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+#[belongs_to(User)]
 #[table_name = "posts_post"]
 pub struct Post {
     pub id: i32,
@@ -487,8 +461,8 @@ mod tests {
     use std;
     use std::any::Any;
     use std::any::TypeId;
-    use std::collections::{HashMap, HashSet};
     use std::collections::hash_map::{DefaultHasher, RandomState};
+    use std::collections::{HashMap, HashSet};
     use std::hash::{BuildHasher, Hasher};
 
     pub fn typeid<T: Any>(_: &T) -> TypeId {
@@ -500,15 +474,23 @@ mod tests {
     pub struct TestHash {}
 
     impl Hasher for TestHash {
-        fn finish(&self) -> u64 {0}
+        fn finish(&self) -> u64 {
+            0
+        }
         fn write(&mut self, input: &[u8]) {}
     }
 
     impl BuildHasher for TestHasher {
         type Hasher = TestHash;
         fn build_hasher(&self) -> <Self as std::hash::BuildHasher>::Hasher {
-            TestHash{}
+            TestHash {}
         }
+    }
+
+    #[test]
+    fn test_posts_by_user() {
+        
+        // Post::belonging_to()
     }
 
     #[test]
@@ -526,10 +508,8 @@ mod tests {
         println!("WSMsgResponse: {:?}", b);
     }
 
-
     #[test]
     fn test_hashset_stuff() {
-        
         let mut hs: HashSet<User> = HashSet::new();
         hs.insert(User::new());
         println!("HashSet: {:?}", hs);
@@ -556,16 +536,20 @@ mod tests {
         resource.add_permission(perm4.clone());
 
         let mut perm_add = perm.clone() + perm2.clone();
-        println!("** perm add --> perm [{:?}] + perm2 [{:?}] = {:?}", perm, perm2, perm_add);
+        println!(
+            "** perm add --> perm [{:?}] + perm2 [{:?}] = {:?}",
+            perm, perm2, perm_add
+        );
 
         let user5 = UserID::create(10, "aso7asdjd56fifk30dfikasdf8^&)hsd".to_owned());
         let mut perm5 = UserPermission::ViewPost(HashSet::new());
         perm5.insert(user5);
 
         perm_add += perm5.clone();
-        println!("** perm add2 (+=) --> perm_add [{:?}] += perm5 [{:?}]", perm_add, perm5);
-
-
+        println!(
+            "** perm add2 (+=) --> perm_add [{:?}] += perm5 [{:?}]",
+            perm_add, perm5
+        );
 
         // let test = UserSetEntry(1, Some(hs));
 

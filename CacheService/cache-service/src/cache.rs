@@ -2,17 +2,15 @@ extern crate crossbeam_channel;
 use crossbeam_channel::{Receiver, Sender};
 use db::*;
 use diesel::pg::PgConnection;
-use diesel::result;
 use models::*;
 use std::cell::{BorrowMutError, RefCell};
-use std::collections::{HashMap, BTreeMap};
+use std::collections::{BTreeMap, HashMap};
 use std::hash::Hash;
 use std::ops::{Index, IndexMut};
 use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use users::Oauth2ProviderAccesstoken;
 
 const MAX_DB_SAVE_TIMEOUT: Duration = Duration::from_millis(200);
 
@@ -37,15 +35,24 @@ pub enum CacheError {
 #[derive(Debug)]
 pub struct HashMapCache<K: Eq + Hash, V> {
     _inner: HashMap<K, V>,
+    _permissions: BTreeMap<i32, UserObjectPermission>,
 }
 
 impl<K, V> HashMapCache<K, V>
 where
     K: Eq + Hash,
 {
-    pub fn new() -> HashMapCache<K, V> {
+    pub fn new(db: &DB) -> HashMapCache<K, V> {
+        let mut permissions: BTreeMap<i32, UserObjectPermission> = BTreeMap::new();
+        let db_perm = UserObjectPermission::get_all(db).unwrap();
+        for perm in &db_perm {
+            println!("Adding permission: {:?} to cache..", perm);
+            permissions.insert(perm.id, perm.clone());
+        }
+
         HashMapCache {
             _inner: HashMap::new(),
+            _permissions: permissions,
         }
     }
 }
@@ -81,7 +88,7 @@ impl Index<ID> for HashMapCache<ID, Resource> {
 
     fn index(&self, index: ID) -> &Resource {
         self._inner.index(&index)
-    }   
+    }
 }
 
 // not really commended either..
@@ -89,23 +96,26 @@ impl IndexMut<ID> for HashMapCache<ID, Resource> {
     fn index_mut(&mut self, index: ID) -> &mut Resource {
         if !self._inner.contains_key(&index) {
             // @TODO: spruce this up so that it covers all corner cases..
-            
+
             match index {
                 ID::Post(id) => {
-                    self._inner.insert(index.clone(), Resource::new(Model::Post(Post::new())));
-                },
+                    self._inner
+                        .insert(index.clone(), Resource::new(Model::Post(Post::new())));
+                }
                 ID::User(id) => {
-                    self._inner.insert(index.clone(), Resource::new(Model::User(User::new())));
-                },
+                    self._inner
+                        .insert(index.clone(), Resource::new(Model::User(User::new())));
+                }
                 ID::Comment(id) => {
-                    self._inner.insert(index.clone(), Resource::new(Model::Comment(Comment::new())));
-                },
+                    self._inner
+                        .insert(index.clone(), Resource::new(Model::Comment(Comment::new())));
+                }
             }
         }
         match self._inner.get_mut(&index) {
             Some(val) => val,
             None => panic!("Index did not exist!!"),
-        } 
+        }
     }
 }
 
@@ -120,8 +130,9 @@ pub fn cache_thread(
 ) {
     thread::spawn(move || {
         let db = DB::new();
-        
-        let mut cache = Rc::new(RefCell::new(HashMapCache::new())); //Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new()));
+
+        let mut cache = Rc::new(RefCell::new(HashMapCache::new(&db))); //Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new()));
+        println!("[CACHE] {:?}", cache);
         loop {
             let conn = db.get();
             select_loop! {
@@ -709,8 +720,8 @@ mod tests {
     fn test_hashmap_cache_index() {
         let db = DB::new();
         let conn = db.get();
-        let mut hmc = HashMapCache::new();
-        
+        let mut hmc = HashMapCache::new(&db);
+
         let mut p = Post::new();
         p.id = 1;
         hmc.put(ID::Post(1), Resource::new(Model::Post(p)));
