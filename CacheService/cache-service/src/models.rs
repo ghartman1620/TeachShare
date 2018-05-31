@@ -304,13 +304,6 @@ pub enum MessageType {
     Get,
 }
 
-#[derive(Debug, Clone)]
-pub enum ModelType {
-    Post = 0,
-    User,
-    Comment,
-}
-
 #[derive(Clone)]
 pub struct Msg {
     pub msg_type: MessageType,
@@ -373,7 +366,8 @@ impl Msg {
 
 use schema::auth_user;
 
-#[derive(Associations, Identifiable, Queryable, Debug, Serialize, Deserialize, Clone, Hash, Eq, PartialEq)]
+#[derive(Associations, Identifiable, Queryable, Debug, Serialize, Deserialize, Clone, Hash, Eq,
+         PartialEq)]
 #[table_name = "auth_user"]
 pub struct User {
     pub id: i32,
@@ -427,7 +421,8 @@ impl Comment {
     }
 }
 
-#[derive(Associations, Identifiable, Queryable, Insertable, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+#[derive(Associations, Identifiable, Queryable, Insertable, Serialize, Deserialize, Debug, Clone,
+         PartialEq, Default)]
 #[belongs_to(User)]
 #[table_name = "posts_post"]
 pub struct Post {
@@ -489,7 +484,7 @@ mod tests {
 
     #[test]
     fn test_posts_by_user() {
-        
+
         // Post::belonging_to()
     }
 

@@ -309,7 +309,9 @@ fn handle_get(
             };
 
             if result_data.is_none() {
-                // get it from the db...
+                // 1.) get it from the db...
+                // 2.) confirm permissions
+                // 3.) populate permissions - chunk get's
 
                 // grab the id from the message
                 let id = match &m.data {

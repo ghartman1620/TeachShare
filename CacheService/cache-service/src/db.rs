@@ -1,15 +1,15 @@
 use crossbeam_channel::Receiver;
+use diesel::associations::{BelongsTo, GroupedBy, HasTable, Identifiable};
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::{result, update};
-use diesel::associations::{GroupedBy, BelongsTo, HasTable, Identifiable};
 use dotenv::dotenv;
 
 use models::Post;
-use schema::posts_post;
+use models::User;
 use schema::django_content_type;
 use schema::guardian_userobjectpermission;
-use models::User;
+use schema::posts_post;
 
 use serde_json::value::Value;
 use std::env;
@@ -82,7 +82,8 @@ impl From<diesel::result::Error> for DBError {
     }
 }
 
-#[derive(Identifiable, Queryable, Insertable, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+#[derive(Identifiable, Queryable, Insertable, Serialize, Deserialize, Debug, Clone, PartialEq,
+         Default)]
 #[table_name = "django_content_type"]
 pub struct DjangContentType {
     id: i32,
@@ -121,9 +122,10 @@ impl DjangContentType {
     }
 }
 
-#[derive(Associations, Identifiable, Queryable, Insertable, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+#[derive(Associations, Identifiable, Queryable, Insertable, Serialize, Deserialize, Debug, Clone,
+         PartialEq, Default)]
 #[belongs_to(Post, foreign_key = "object_pk")]
-#[belongs_to(DjangContentType, foreign_key="content_type_id")]
+#[belongs_to(DjangContentType, foreign_key = "content_type_id")]
 #[table_name = "guardian_userobjectpermission"]
 pub struct UserObjectPermission {
     pub id: i32,
@@ -149,8 +151,7 @@ impl UserObjectPermission {
 
     fn get_by_id(obj_id: i32, content_type: i32, db: &DB) -> Result<UserObjectPermission, DBError> {
         use schema::guardian_userobjectpermission::dsl::{
-            guardian_userobjectpermission, object_pk,
-            content_type_id
+            content_type_id, guardian_userobjectpermission, object_pk,
         };
 
         let id_str = obj_id.to_string();
@@ -160,6 +161,25 @@ impl UserObjectPermission {
             .filter(content_type_id.eq(content_type))
             .first(&*session)?;
         println!("UserObjectPermission => {:?}", response);
+        Ok(response)
+    }
+
+    // Grabs permission entires for objects in each direction, effectively a 'cache-line'. Minimizes
+    // requests, by hopefully getting a number chunk_starting_atof the subsequent objects permissions..
+    fn get_cache_line_for(
+        obj_id: i32,
+        content_type: i32,
+        db: &DB,
+    ) -> Result<Vec<UserObjectPermission>, DBError> {
+        use schema::guardian_userobjectpermission::dsl::{
+            content_type_id, guardian_userobjectpermission, object_pk,
+        };
+        let session = db.get();
+        let objects = vec![obj_id - 1, obj_id, obj_id + 1];
+        let query_ids: Vec<String> = objects.into_iter().map(|x| x.to_string()).collect();
+        let response: Vec<UserObjectPermission> = guardian_userobjectpermission
+            .filter(object_pk.eq_any(query_ids))
+            .load(&*session)?;
         Ok(response)
     }
 }
@@ -284,10 +304,10 @@ pub fn save_posts(rx: Receiver<Post>) {
 mod tests {
     use crossbeam_channel::*;
     use db::*;
-    use models::*;
     use diesel::prelude::*;
     use diesel::result;
-    use schema::{posts_post, guardian_userobjectpermission};
+    use models::*;
+    use schema::{guardian_userobjectpermission, posts_post};
 
     use std::sync::mpsc::channel;
     use std::thread;
@@ -309,6 +329,9 @@ mod tests {
         let test = UserObjectPermission::get_all(&db);
         UserObjectPermission::get_by_id(1, 23, &db);
         println!("UserObjectPermission: {:?}", test);
+
+        let test2 = UserObjectPermission::get_cache_line_for(1, 23, &db);
+        println!("$$$ TEST2 $$$  ----------> {:?}", test2);
     }
 
     #[test]
@@ -317,7 +340,8 @@ mod tests {
         let session = db.get();
         let post = Post::get(1, &session).unwrap();
         let ct = DjangContentType::get_dct_by_model(&db, "post").unwrap();
-        let result: Result<UserObjectPermission, _> = UserObjectPermission::belonging_to(&ct).first(&*session);
+        let result: Result<UserObjectPermission, _> =
+            UserObjectPermission::belonging_to(&ct).first(&*session);
         println!("\n************************************\n{:?}\n", result);
     }
 
