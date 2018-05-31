@@ -153,7 +153,7 @@
                         <br>
                         <br>
                         <br>
-                        <drag-and-drop v-if="currentPost.elements.length > 0" :key=nextStateId>
+                        <drag-and-drop v-if="currentPost.elements.length > 0" :key="[nextStateId, currentPost.layout]">
                         </drag-and-drop>
                         <br>
                         <br>
@@ -313,6 +313,7 @@ export default class PostCreate extends Vue {
     SAVED = PostStatus.Saved;
 
     public postStatus: PostStatus = this.LOADING;
+    public thisUserPosts: number[] = [];
 
     public title: string = ""; // @TODO: make changes to title a store mutation that is saved and can be undone/redone
     public inProgressTag: string = "";
@@ -327,11 +328,12 @@ export default class PostCreate extends Vue {
 
     get userPosts(): Post[] {
         const store = this.$store;
+        
         const userPosts = getPosts(this.$store).filter( (p) => {
             // getLoggedInUser(store).pk seems to be a string at runtime.
             // It obviously ought to be a number, but somewhere
             // it gets assigned to a type-unsafe thing that winds up as a string.
-            return p.user.pk === parseInt(getLoggedInUser(store).pk as any);
+            return this.thisUserPosts.includes(p.pk);
         });
         return userPosts;
     }
@@ -572,7 +574,7 @@ export default class PostCreate extends Vue {
                 if (post.pk !== -1){
                     fetchPostSubscribe(this.$store, post.pk);
                 }
-                // this.userPosts.push(post);
+                this.thisUserPosts.push(post.pk);
             }
             nextPage++;
         } while (response.data.next !== null);
@@ -604,6 +606,8 @@ export default class PostCreate extends Vue {
             
             const val = JSON.parse(message.data);
             let iPP = window.localStorage.getItem("inProgressPost");
+            console.log("Got a message! it looks like this");
+            console.log(val);
             let inProgressPk: number = -1;
             if (iPP) inProgressPk = parseInt(iPP as string);
             if (val.payload && val.payload.length > 0 && inProgressPk != -1) {

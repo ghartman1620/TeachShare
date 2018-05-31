@@ -285,6 +285,8 @@ export class InProgressPost {
         p.concepts = this.concepts;
         p.coreIdeas = this.coreIdeas;
         p.comments = this.comments;
+        p.color = this.color;
+        p.layout = this.layout;
         p.practices = this.practices;
         p.pk = this.pk;
         p.original_post = this.original_post;
@@ -296,6 +298,8 @@ export class InProgressPost {
         /*api.put("posts/" + this.pk + "/", this.json()).then(function(response){
             post.status = PostStatus.Saved;
         })*/
+        console.log("saving draft!");
+        console.log(this);
         Database.getInstance().putPost(this.toPost(), 1); // @TODO: is this right?
         WebSocket.getInstance().sendUpdate(this.toPost());
         // in the future - potentially some kind of ack message sent back to indicate to user post was saved?

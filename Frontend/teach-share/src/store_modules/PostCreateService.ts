@@ -44,6 +44,7 @@ export const mutations = {
         state.post!.setTags(tags);
     },
     SET_LAYOUT: (state: PostState, layout: ILayout[]) => {
+        console.log("set layout");
         state.post!.setLayout(layout);
     },
     SET_COLOR: (state: PostState, color: string) => {
@@ -164,6 +165,8 @@ export const actions = {
         // context.commit("SET_TAGS", tags);
     },
     setLayout: (context: PostContext, layout: ILayout[]) => {
+        console.log("set layoutaction");
+        console.log(layout);
         mutSetLayout(context, layout);
     },
     setColor: (context: PostContext, color: string) => {

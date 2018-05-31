@@ -130,7 +130,7 @@ export default class DragAndDrop extends Vue {
 
     mounted() { //this is pretty messy, it will be refactored soon. For now though, even like this, it works. :) -JL
 
-        var lowestItem : object = this.layout[0];
+        var lowestItem: ILayout = this.layout[0];
 
         // var lowestPosition : number = 0;
         // var lowestIndex : string = "0";
@@ -141,20 +141,26 @@ export default class DragAndDrop extends Vue {
 
         let storeLayout = getLayout(this.$store);
         if (storeLayout !== undefined) {
+            //debugger;
+            
             if (this.storeElements.length > 1) {
                 this.layout = storeLayout;
             }
 
             if (this.storeElements.length === storeLayout.length + 1) { //element added!
+                
                 var newItem = this.storeElements[this.storeElements.length - 1];
-                var bottomY : number = 0;
+                var bottomY: number = 0;
                 for (var i = 0; i < this.layout.length; i++) { //find the actual lowest thing to put our new item below.
                     if (this.layout[i]["y"] > lowestItem["y"]) {
                         lowestItem = this.layout[i];
                     }
                 }
-
-                var newPosition = bottomY + newItem["h"];
+                if(lowestItem.y === undefined || lowestItem.h === undefined){
+                    console.error("a layout item doesn't have y or h: it is");
+                    console.error(lowestItem);    
+                }
+                var newPosition = lowestItem.y + lowestItem.h;
                 var newIndex : string = storeLayout.length.toString();
                 this.layout.push({"x":0, "y":newPosition, "w":2, "h":this.defaultHeight, "i":newIndex});
                 setLayout(this.$store, this.layout);

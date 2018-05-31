@@ -122,7 +122,7 @@ export default class Database {
     }
 }
 
-// clear all of the posts out of the database - for debugging purposes only! 
+// clear all of the posts out of the database - for debugging purposes only!
 // remove me in production or unnecessary performance loss will happen
 
 Database.getInstance().manifest().then((manifest) => {
