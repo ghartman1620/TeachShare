@@ -7,9 +7,10 @@ use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use std::collections::{BTreeMap, BTreeSet};
 use time::Duration;
-use schema::{auth_user, oauth2_provider_accesstoken};
+use schema::{auth_user, auth_permission, django_content_type, oauth2_provider_accesstoken};
 
-use db::{DB, DBError};
+use db::{DB, DBError, DjangContentType};
+use diesel::dsl::Select;
 
 // user access tokens cache:
 // need: user_id, token, expires?
@@ -58,20 +59,20 @@ impl Oauth2ProviderAccesstoken {
         match all {
             Ok(auth_users) => {
                 for a in &auth_users {
-                    println!("AUTH_USER: {:?}", a);
+                    debug!("Auth-User: {:?}", a);
                     match a.user_id {
                         Some(userid) => match user_table.insert(userid, a.clone()) {
                             Some(previous) => {
-                                println!("Replaced: {:?} in user auth table.", previous)
+                                debug!("Replaced: {:?} in user auth table.", previous)
                             }
-                            None => println!(
+                            None => debug!(
                                 "Inserted Successfully!, EXPIRES: {:?}, NOW: {:?}",
                                 a.expires,
                                 Utc::now()
                             ),
                         },
                         None => {
-                            println!("There was no user id!");
+                            error!("There was no user id!");
                         }
                     }
                 }
@@ -81,6 +82,49 @@ impl Oauth2ProviderAccesstoken {
         }
     }
 }
+
+#[derive(Associations, Identifiable, Queryable, Debug, Serialize, Deserialize, Clone, Hash, Eq,
+         PartialEq, Default)]
+#[belongs_to(DjangContentType, foreign_key = "content_type_id")]
+#[table_name = "auth_permission"]
+
+pub struct AuthPermission {
+    pub id: i32,
+    pub name: String,  // formatted, capitalized name for this permission
+    pub content_type_id: i32, // linked to post model
+    pub codename: String,  // name of the permission @INFO: This won't change
+}
+
+impl AuthPermission {
+
+    pub fn new() -> AuthPermission {
+        Default::default()
+    }
+
+    pub fn get_by_codename(perm_name: String, db: &DB) -> Result<AuthPermission, DBError> {
+        use schema::auth_permission::dsl::{auth_permission, codename};
+        let conn = db.get();
+
+        let permission: AuthPermission = auth_permission.filter(codename.eq(perm_name)).first::<AuthPermission>(&*conn)?;
+        debug!("Permission Entry: {:?}", permission);
+        Ok(permission)
+    }
+
+    
+
+    pub fn get_with_content_type(db: &DB) {
+        use schema::auth_permission::dsl::*;
+        use schema::django_content_type::dsl::*;
+
+        let session = db.get();
+        let data: Vec<(i32, String, String, String)> = auth_permission.
+                        inner_join(django_content_type).select((content_type_id, codename, app_label, model)).load(&*session).unwrap();
+        for (i, d) in data.iter().enumerate() {
+            println!("{}.) {:?}", i+1, d);
+        }
+    }
+}
+
 
 #[derive(Associations, Identifiable, Queryable, Debug, Serialize, Deserialize, Clone, Hash, Eq,
          PartialEq)]
@@ -133,6 +177,7 @@ mod tests {
     use models::*;
     use std::collections::HashMap;
     use users::*;
+    use db::*;
 
     #[test]
     fn test_user_access_token_db() {
@@ -176,5 +221,23 @@ mod tests {
         let user = User::get_by_id(3, &db).unwrap();
         let posts: Vec<Post> = Post::belonging_to(&user).load(&*conn).unwrap();
         println!("POSTS [{:?}] ------------------> {:?}", posts.len(), posts);
+    }
+
+    #[test]
+    fn test_auth_permission_etc() {
+        let db = DB::new();
+        let conn = db.get();
+
+        let result = AuthPermission::get_by_codename("view_post".to_owned(), &db);
+        println!("AUTH-PERMISSION => {:?}", result);
+
+        let test2 = DjangContentType::get_dct_by_model(&db, "post");
+        println!("DCT --------------------> {:?}", test2);
+        
+        // let dct = test2.unwrap();
+        // let auth_perm = AuthPermission::belongs_to(&dct);
+
+        let say_what = AuthPermission::get_with_content_type(&db);
+        println!("\n*************************************\n{:?}\n", say_what);
     }
 }

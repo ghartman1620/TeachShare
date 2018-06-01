@@ -145,7 +145,7 @@ impl UserObjectPermission {
 
         let session = db.get();
         let response = guardian_userobjectpermission.load(&*session)?;
-        println!("UserObjectPermission => {:?}", response);
+        debug!("UserObjectPermission => {:?}", response);
         Ok(response)
     }
 
@@ -160,7 +160,7 @@ impl UserObjectPermission {
             .filter(object_pk.eq(id_str))
             .filter(content_type_id.eq(content_type))
             .first(&*session)?;
-        println!("UserObjectPermission => {:?}", response);
+        debug!("UserObjectPermission => {:?}", response);
         Ok(response)
     }
 
@@ -307,11 +307,13 @@ mod tests {
     use diesel::prelude::*;
     use diesel::result;
     use models::*;
-    use schema::{guardian_userobjectpermission, posts_post};
+    use schema::{guardian_userobjectpermission, posts_post, auth_permission};
 
     use std::sync::mpsc::channel;
     use std::thread;
     use std::time::SystemTime;
+
+    use users::{AuthPermission, Oauth2ProviderAccesstoken, User};
 
     #[test]
     fn test_django_content_type() {
@@ -321,6 +323,13 @@ mod tests {
 
         let test2 = DjangContentType::get_dct_by_model(&db, "post");
         println!("DCT --------------------> {:?}", test2);
+
+        // let dct = test2.unwrap();
+        // let auth_perm = AuthPermission::belongs_to(&dct);
+
+        // // let auth_p = AuthPermission::get_by_codename("view_post".to_owned(), &db).unwrap();
+        // // let test3 = DjangContentType::belongs_to(&auth_p);
+        // println!("DCT for AUTHP -----> {:?}", auth_perm);
     }
 
     #[test]

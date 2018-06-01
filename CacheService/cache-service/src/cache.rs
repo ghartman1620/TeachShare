@@ -47,7 +47,7 @@ where
         let mut permissions: BTreeMap<i32, UserObjectPermission> = BTreeMap::new();
         let db_perm = UserObjectPermission::get_all(db).unwrap();
         for perm in &db_perm {
-            println!("Adding permission: {:?} to cache..", perm);
+            debug!("Adding permission: {:?} to cache.", perm);
             permissions.insert(perm.id, perm.clone());
         }
 

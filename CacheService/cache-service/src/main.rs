@@ -5,22 +5,16 @@
 #![warn(clippy)]
 #![feature(extern_prelude)]
 
+extern crate pretty_env_logger;
+#[macro_use] extern crate log;
 extern crate chrono;
-
 extern crate time;
-
 extern crate ws;
-#[macro_use]
-extern crate serde_derive;
+#[macro_use] extern crate serde_derive;
 extern crate dotenv;
 extern crate serde_json;
-
-#[macro_use]
-extern crate crossbeam_channel;
-
-#[macro_use]
-extern crate diesel;
-
+#[macro_use] extern crate crossbeam_channel;
+#[macro_use] extern crate diesel;
 use std::fmt;
 use ws::{listen, CloseCode, Error, Handler, Handshake, Message, Sender};
 
@@ -44,6 +38,7 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
 use users::{Oauth2ProviderAccesstoken, User};
+use log::Level;
 
 
 #[derive(Debug, Clone)]
@@ -59,9 +54,12 @@ impl GrandSocketStation {
             Some(val) => val,
             None => BTreeMap::new(),
         };
-        println!("\n*********************************************");
-        println!("User Table: {:?}", auth);
-        println!("*********************************************");
+        if log_enabled!(Level::Info) {
+            info!("User Table:");
+            for (i, (pk, a)) in auth.iter().enumerate() {
+                info!("{:?}.) [id: {:?} -> token: {:?}, expires: {:?}]", i+1, pk, a.token, a.expires);
+            }
+        }
         GrandSocketStation {
             connections: vec![],
             auth_table: BTreeMap::new(),
@@ -126,20 +124,17 @@ struct WSMessage {
 
 impl Handler for Connection {
     fn on_open(&mut self, hs: Handshake) -> ws::Result<()> {
-        println!("client connected");
-        println!("HANDSHAKE: {:?}", hs);
-        println!("HEADERS: {:?}", hs.request.headers());
+        info!("client connected.");
         for (key, value) in hs.request.headers() {
-            println!("{:?}: {:?}", key, String::from_utf8(value.clone()));
+            info!("{:?}: {:?}", key, String::from_utf8(value.clone()));
         }
         Ok(())
     }
 
     fn on_message(&mut self, msg: Message) -> ws::Result<()> {
         match msg {
-            Message::Binary(bin) => {
-                println!("{:?}", bin);
-                panic!("Received binary message");
+            Message::Binary(_) => {
+                warn!("Received binary message. Doing nothing with it.");
             } // ..
             Message::Text(text) => {
                 let json: Result<WSMessage, serde_json::Error> = serde_json::from_str(&text);
@@ -157,7 +152,7 @@ impl Handler for Connection {
                     )),
                 };
                 if let Some(error_msg) = response {
-                    println!("Final error: {:?}", error_msg);
+                    error!("There was an error: {:?}", error_msg);
                 }
             }
         };
@@ -167,36 +162,36 @@ impl Handler for Connection {
     fn on_close(&mut self, code: CloseCode, reason: &str) {
         match code {
             CloseCode::Normal => {
-                println!("The client is done with the connection.");
+                info!("The client is done with the connection.");
                 self.remove_client();
             }
             CloseCode::Away => {
-                println!("The client is leaving the site.");
+                info!("The client is leaving the site.");
                 self.remove_client();
             }
             CloseCode::Abnormal => {
-                println!("Closing handshake failed! Unable to obtain closing status from client.");
+                info!("Closing handshake failed! Unable to obtain closing status from client.");
                 self.remove_client();
             }
-            _ => println!("The client encountered an error: {}", reason),
+            _ => warn!("The client encountered an unknown error: {}", reason),
         }
     }
 
     fn on_error(&mut self, err: Error) {
-        println!("The server encountered an error: {:?}", err);
+        error!("The server encountered an error: {:?}", err);
     }
 }
 
 impl Connection {
     fn remove_client(&mut self) {
-        println!(
+        debug!(
             "[GrandSocketStation] Removing 'self' from GrandSocketStation: {:?}",
             self.id
         );
         match &mut self.parent {
             Some(val) => match val.try_borrow_mut() {
                 Ok(ref mut parent) => {
-                    println!(
+                    debug!(
                         "[GrandSocketStation] [{:?}] Current Connections: {:?}",
                         parent.connections.len(),
                         parent.connections,
@@ -212,15 +207,15 @@ impl Connection {
                             .unwrap();
                     }
                     parent.connections.remove(exiting_connection_id);
-                    println!(
+                    debug!(
                         "[GrandSocketStation] [{:?}] Current Remaining Connections: {:?}",
                         parent.connections.len(),
                         parent.connections
                     );
                 }
-                Err(e) => println!("[GrandSocketStation] Error: {:?}!", e),
+                Err(e) => error!("[GrandSocketStation] Error: {:?}!", e),
             },
-            None => println!(
+            None => error!(
                 "[GrandSocketStation] None. Could not unwrap when attempting to access parent."
             ),
         }
@@ -228,16 +223,16 @@ impl Connection {
 
     fn serialize_and_send_posts(&self, data: &[Model], versions: &[u64]) -> Result<(), ws::Error> {
         let output = WSMessageResponse::new(data, versions);
-        println!("Sending: {:?}", output);
+        debug!("Sending: {:?}", output);
 
         let serialized =
             serde_json::to_string(&output).expect("Uh-oh... JSON serialization error!~");
-        println!("Serialized content: {}", serialized);
+        debug!("Serialized content: {}", serialized);
         self.tx.send(serialized)
     }
 
     fn handle_get_msg(&self, msg: WSMessage) -> Option<String> {
-        println!("[MAIN] received: {:?}", msg.message);
+        debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Get);
         let mut return_message = Msg::new().set_msg_type(MessageType::Get).build();
 
@@ -254,14 +249,14 @@ impl Connection {
         match self.to_cache.send(Arc::new(return_message)) {
             Ok(_) => {}
             Err(e) => {
-                println!("[Error] ---> {:?}", e);
+                error!("[Error] ---> {:?}", e);
             }
         };
 
         let resp = match self.from_cache.recv() {
             Ok(val) => val,
             Err(e) => {
-                println!("[Error] ---> {:?}", e);
+                error!("[Error] ---> {:?}", e);
                 let ret: String = format!("Error receiving from channel (from cache).");
                 return Some(ret);
             }
@@ -276,7 +271,7 @@ impl Connection {
         }
     }
     fn handle_create_msg(&self, msg: WSMessage) -> Option<String> {
-        println!("[MAIN] received: {:?}", msg.message);
+        debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Create);
         let mut wrap = Msg::new().set_msg_type(MessageType::Create).build();
 
@@ -291,10 +286,10 @@ impl Connection {
         wrap.items.push(Arc::new(Resource::new(Model::Post(p))));
         match self.to_cache.send(Arc::new(wrap)) {
             Ok(val) => {
-                println!("Sucessfully sent and got in return: {:?}", val);
+                debug!("Sucessfully sent and got in return: {:?}", val);
             }
             Err(e) => {
-                println!(
+                error!(
                     "There was an error communicating with the cache! Err: {:?}",
                     e
                 );
@@ -321,7 +316,7 @@ impl Connection {
     }
 
     fn handle_manifest_msg(&self, msg: WSMessage) -> Option<String> {
-        println!("[MAIN] received: {:?}", msg.message);
+        debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Manifest);
 
         let post_versions = match msg.manifest {
@@ -333,14 +328,14 @@ impl Connection {
             let versions = vec![];
             match self.serialize_and_send_posts(&posts, &versions) {
                 Ok(_) => {}
-                Err(e) => println!("Websocket Error: {:?}", e),
+                Err(e) => error!("Websocket Error: {:?}", e),
             }
             None
         } else {
-            println!("manifest: {:?}", post_versions);
+            debug!("manifest: {:?}", post_versions);
             let mut wrap = Msg::new().set_msg_type(MessageType::Manifest).build();
             for post_version in post_versions {
-                println!(
+                debug!(
                     "[MAIN] manifest handler: adding post id {} version {} to cache list",
                     post_version.id, post_version.version
                 );
@@ -350,13 +345,12 @@ impl Connection {
                 resource.version = post_version.version;
                 wrap.items.push(Arc::new(resource));
             }
-            println!("{:?}", wrap.items);
             match self.to_cache.send(Arc::new(wrap)) {
                 Ok(val) => {
-                    println!("Sucessfully sent and got in return: {:?}", val);
+                    debug!("Sucessfully sent and got in return: {:?}", val);
                 }
                 Err(e) => {
-                    println!(
+                    error!(
                         "There was an error communicating with the cache! Err: {:?}",
                         e
                     );
@@ -390,7 +384,7 @@ impl Connection {
         }
     }
     fn handle_update_msg(&mut self, msg: WSMessage) -> Option<String> {
-        println!("[MAIN] received: {:?}", msg.message);
+        debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Update);
         let mut wrap = Msg::new().set_msg_type(MessageType::Update).build();
 
@@ -405,14 +399,13 @@ impl Connection {
         {
             wrap.items.push(Arc::new(Resource::new(Model::Post(post))));
         }
-        println!("WRAP: {:?}", wrap.items);
 
         match self.to_cache.send(Arc::new(wrap)) {
             Ok(val) => {
-                println!("Sucessfully sent and got in return: {:?}", val);
+                debug!("Sucessfully sent and got in return: {:?}", val);
             }
             Err(e) => {
-                println!(
+                error!(
                     "There was an error communicating with the cache! Err: {:?}",
                     e
                 );
@@ -425,7 +418,7 @@ impl Connection {
 
         // @TODO: This is the actual update sending code. Could be optimized greatly.
         if let Ok(updated_data) = changes {
-            println!("Updated_data ---------------> {:?}", updated_data.items);
+            debug!("Updated_data ---------------> {:?}", updated_data.items);
             let mut watchers: Vec<Vec<i32>> = vec![];
             let (posts, versions): (Vec<Model>, Vec<u64>) = updated_data
                 .items
@@ -440,45 +433,39 @@ impl Connection {
             match &mut self.parent {
                 Some(val) => match val.try_borrow_mut() {
                     Ok(parent) => {
-                        println!("TOTAL CONNECTIONS: {:?}", &parent.connections);
+                        info!("TOTAL CONNECTIONS: {:?}", &parent.connections);
                         for c in &parent.connections {
                             // @TODO: Simplify/abstract this section into separate function(s)
-                            println!("Connection --> {:?}", c);
+                            debug!("Connection --> {:?}", c);
                             let id = c.tx.connection_id();
                             let all_watchers =
                                 watchers.iter().flat_map(|y| y).find(|x| **x == id as i32);
 
-                            println!("WATCHES ---> {:?}, LOOKING FOR ----> {:?}, MATCHED_WATCHES ---> {:?}", watchers, id, all_watchers);
+                            debug!("WATCHES ---> {:?}, LOOKING FOR ----> {:?}, MATCHED_WATCHES ---> {:?}", watchers, id, all_watchers);
                             if let Some(matched_connection) =
                                 watchers.iter().flat_map(|y| y).find(|x| **x == id as i32)
                             {
                                 let ws_response = WSMessageResponse::new(&posts, &versions);
-                                println!(
-                                    "******************** SENDING TO: {:?} ***************",
-                                    matched_connection
-                                );
                                 let serialized = serde_json::to_string(&ws_response)
                                     .expect("Uh-oh... JSON serialization error!~");
-
-                                println!("Serialized content (Update): {}", serialized);
                                 let send_result = c.tx.send(serialized);
                                 if send_result.is_err() {
                                     return Some(format!("Error: {:?}", send_result.unwrap_err()));
                                 }
                             } else {
-                                println!("There was no matched connection for: {}. It does not need to be updated.", id);
+                                debug!("There was no matched connection for: {}. It does not need to be updated.", id);
                             }
                         }
                     }
-                    Err(e) => println!("Error: {:?}!", e),
+                    Err(e) => error!("Error: {:?}!", e),
                 },
-                None => println!("None. Did not unwrap."),
+                None => warn!("None. Did not unwrap."),
             }
         }
         None
     }
     fn handle_watch_msg(&self, msg: WSMessage) -> Option<String> {
-        println!("[MAIN] received: {:?}", msg.message);
+        debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Watch);
         let mut wrap = Msg::new().set_msg_type(MessageType::Watch).build();
 
@@ -505,10 +492,10 @@ impl Connection {
         wrap.items.push(Arc::new(resource));
         match self.to_cache.send(Arc::new(wrap)) {
             Ok(val) => {
-                println!("Sucessfully sent and got in return: {:?}", val);
+                debug!("Sucessfully sent and got in return: {:?}", val);
             }
             Err(e) => {
-                println!(
+                error!(
                     "There was an error communicating with the cache! Err: {:?}",
                     e
                 );
@@ -535,6 +522,9 @@ impl Connection {
 }
 
 fn main() {
+    pretty_env_logger::init();
+    info!("starting cache service...");
+
     let db = DB::new();
     let session = db.get();
 
@@ -578,7 +568,7 @@ fn main() {
     // await db thread to end...
     match db_handle.join() {
         Ok(_) => {}
-        Err(e) => println!("Error in db_handle.join() --> {:?}", e),
+        Err(e) => error!("Error in db_handle.join() --> {:?}", e),
     }
 }
 
