@@ -6,6 +6,9 @@ use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, AddAssign};
 use std::sync::Arc;
+use db::{DB, DBError};
+use diesel::prelude::*;
+use users::{User};
 
 // * option 1
 #[derive(Debug, Serialize)]
@@ -182,6 +185,7 @@ impl UserPermission {
         }
     }
 }
+
 
 #[derive(Debug, Clone)]
 pub struct Resource {
@@ -361,43 +365,6 @@ impl Msg {
     /// built up wrapper.
     pub fn build(&mut self) -> Msg {
         self.clone()
-    }
-}
-
-use schema::auth_user;
-
-#[derive(Associations, Identifiable, Queryable, Debug, Serialize, Deserialize, Clone, Hash, Eq,
-         PartialEq)]
-#[table_name = "auth_user"]
-pub struct User {
-    pub id: i32,
-    password: String,
-    // last_login: Option<PgTimestamp>,
-    pub is_superuser: bool,
-    pub username: String,
-    pub first_name: String,
-    pub last_name: String,
-    pub email: String,
-    pub is_staff: bool,
-    pub is_active: bool,
-    // date_joined: PgTimestamp,
-}
-
-impl User {
-    pub fn new() -> User {
-        User {
-            id: 0,
-            password: String::from(""),
-            // last_login: Option::from(PgTimestamp(0)),
-            is_superuser: false,
-            username: String::from(""),
-            first_name: String::from(""),
-            last_name: String::from(""),
-            email: String::from(""),
-            is_staff: false,
-            is_active: false,
-            // date_joined: PgTimestamp(0),
-        }
     }
 }
 

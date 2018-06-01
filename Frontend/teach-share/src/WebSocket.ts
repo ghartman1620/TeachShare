@@ -74,7 +74,9 @@ export default class WebSocket {
     private static instance: WebSocket;
     private rws: ReconnectingWebSocket;
     private constructor() {
+        // this.rws = new ReconnectingWebSocket("ws://169.233.195.236:3012");
         this.rws = new ReconnectingWebSocket("ws://127.0.0.1:3012");
+        
 
     }
 

@@ -11,6 +11,7 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
+use users::{User};
 
 const MAX_DB_SAVE_TIMEOUT: Duration = Duration::from_millis(200);
 

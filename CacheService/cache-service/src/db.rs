@@ -6,7 +6,7 @@ use diesel::{result, update};
 use dotenv::dotenv;
 
 use models::Post;
-use models::User;
+use users::{User};
 use schema::django_content_type;
 use schema::guardian_userobjectpermission;
 use schema::posts_post;
