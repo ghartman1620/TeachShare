@@ -52,16 +52,16 @@ impl Oauth2ProviderAccesstoken {
     }
     pub fn build_user_table_cached(
         conn: &PgConnection,
-    ) -> Option<BTreeMap<i32, Oauth2ProviderAccesstoken>> {
+    ) -> Option<BTreeMap<String, Oauth2ProviderAccesstoken>> {
         let all = Oauth2ProviderAccesstoken::get_all(conn);
-        let mut user_table: BTreeMap<i32, Oauth2ProviderAccesstoken> = BTreeMap::new();
+        let mut user_table: BTreeMap<String, Oauth2ProviderAccesstoken> = BTreeMap::new();
 
         match all {
             Ok(auth_users) => {
                 for a in &auth_users {
                     debug!("Auth-User: {:?}", a);
                     match a.user_id {
-                        Some(userid) => match user_table.insert(userid, a.clone()) {
+                        Some(userid) => match user_table.insert(a.token.clone(), a.clone()) {
                             Some(previous) => {
                                 debug!("Replaced: {:?} in user auth table.", previous)
                             }

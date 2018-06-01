@@ -83,6 +83,8 @@ impl Cache for HashMapCache<ID, Resource> {
     }
 }
 
+
+
 // not really recommended..
 impl Index<ID> for HashMapCache<ID, Resource> {
     type Output = Resource;

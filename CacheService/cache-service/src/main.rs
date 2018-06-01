@@ -39,13 +39,14 @@ use std::sync::Arc;
 use std::thread;
 use users::{Oauth2ProviderAccesstoken, User};
 use log::Level;
+use chrono::{DateTime, Local, Utc, NaiveTime, Duration};
 
 
 #[derive(Debug, Clone)]
 struct GrandSocketStation {
     // represents the list of connections
     connections: Vec<Rc<Connection>>,
-    auth_table: BTreeMap<i32, Oauth2ProviderAccesstoken>,
+    auth_table: BTreeMap<String, Oauth2ProviderAccesstoken>,
 }
 
 impl GrandSocketStation {
@@ -56,8 +57,15 @@ impl GrandSocketStation {
         };
         if log_enabled!(Level::Info) {
             info!("User Table:");
-            for (i, (pk, a)) in auth.iter().enumerate() {
-                info!("{:?}.) [id: {:?} -> token: {:?}, expires: {:?}]", i+1, pk, a.token, a.expires);
+            for (i, (token, a)) in auth.iter().enumerate() {
+                let difference = (a.expires - Utc::now());
+                let hours = difference.num_hours();
+                let difference = difference - Duration::hours(hours);
+                let min = difference.num_minutes();
+                info!(
+                    "{:?}.) [token: {:?} -> user: {:?}, expires in {} hours and {} minutes]", 
+                    i+1, token, a.user_id, hours, min
+                );
             }
         }
         GrandSocketStation {
@@ -74,6 +82,12 @@ impl GrandSocketStation {
     pub fn push_connection(&mut self, conn: Connection) {
         self.connections.push(Rc::new(conn))
     }
+
+    pub fn check_token(&self, token: String) {
+        self.auth_table.get(&token);
+    }
+
+
 }
 
 impl std::cmp::PartialEq for Connection {
