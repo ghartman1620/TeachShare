@@ -39,6 +39,7 @@ use std::sync::Arc;
 use std::thread;
 use users::{Oauth2ProviderAccesstoken, User};
 use log::Level;
+use std::error::Error as StdError;
 use chrono::{DateTime, Local, Utc, NaiveTime, Duration};
 
 
@@ -55,10 +56,10 @@ impl GrandSocketStation {
             Some(val) => val,
             None => BTreeMap::new(),
         };
-        if log_enabled!(Level::Info) {
+        if log_enabled!(Level::Info) && !auth.is_empty() {
             info!("User Table:");
             for (i, (token, a)) in auth.iter().enumerate() {
-                let difference = (a.expires - Utc::now());
+                let difference = a.expires - Utc::now();
                 let hours = difference.num_hours();
                 let difference = difference - Duration::hours(hours);
                 let min = difference.num_minutes();
@@ -67,10 +68,12 @@ impl GrandSocketStation {
                     i+1, token, a.user_id, hours, min
                 );
             }
+        } else {
+            warn!("No users have a valid token. (Nobody is logged in)");
         }
         GrandSocketStation {
             connections: vec![],
-            auth_table: BTreeMap::new(),
+            auth_table: auth,
         }
     }
     pub fn get_connections(&self) -> &Vec<Rc<Connection>> {
@@ -86,7 +89,6 @@ impl GrandSocketStation {
     pub fn check_token(&self, token: String) {
         self.auth_table.get(&token);
     }
-
 
 }
 
@@ -142,6 +144,51 @@ impl Handler for Connection {
         for (key, value) in hs.request.headers() {
             info!("{:?}: {:?}", key, String::from_utf8(value.clone()));
         }
+
+        // find the user...
+        let token = hs.request.header("Cookie");
+        token.and_then(|tok| {
+            let cookie_str = String::from_utf8(tok.clone()).unwrap();
+            let cookie_entries: Vec<&str> = cookie_str.split(";").collect();
+            let token_entry: Vec<&str> = cookie_entries[6].split("=").collect();
+            let token: String = token_entry[1].to_owned();
+            debug!("Cookie entries: {:?}", cookie_entries);
+            debug!("Token: {:?}", token);
+            let u = User::new();
+            let out = match &self.parent {
+                Some(val) => match val.try_borrow_mut() {
+                    Ok(parent) => {
+                        debug!("Parent --> {:?}", parent);
+                        Ok(parent)
+                    },
+                    Err(e) => {
+                        error!("There was an error! {}", e); 
+                        Err(GSSError::from(e))
+                    },
+                },
+                None => {
+                    error!("Could not borrow parent as a mutable reference!"); 
+                    Err(GSSError::GetParent)
+                }
+            };
+            println!("test test test");
+            info!("got parent! {:?}", out);
+            let p = out.unwrap();
+            let table: &BTreeMap<String, Oauth2ProviderAccesstoken> = &p.auth_table;
+            debug!("Table: {:?}", table);
+
+            if table.contains_key(&token) {
+                let test = &p.auth_table[&token];
+                info!("FOUND USER OAUTH2 ENTRY: {:?}", test);
+            } else {
+                warn!("Oath2 Entry does not exist for token. Could be expired.");
+            }
+            // Oauth2ProviderAccesstoken::get_by_token(tok, )
+            // self.set_user(u);
+            Some(u)
+        });
+        
+
         Ok(())
     }
 
@@ -196,7 +243,62 @@ impl Handler for Connection {
     }
 }
 
+#[derive(Debug)]
+pub enum GSSError {
+    GetParent,
+    Unknown,
+}
+
+impl fmt::Display for GSSError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            GSSError::GetParent => f.write_str("Get parent error."),
+            GSSError::Unknown => f.write_str("Unknown GSS error.")
+        }
+    }
+}
+
+impl StdError for GSSError {
+    fn description(&self) -> &str {
+        match *self {
+            GSSError::GetParent => "Could not mutably borrow parent.",
+            GSSError::Unknown => "Unknown error handling GrandSocketStation instance.",
+        }
+    }
+}
+
+impl From<std::cell::BorrowMutError> for GSSError {
+    fn from(e: std::cell::BorrowMutError) -> Self {
+        GSSError::GetParent
+    }
+}
+
 impl Connection {
+
+    fn set_user(&mut self, u: User) {
+        self.user = Some(u);
+    }
+
+    // @FIXME: Fix this (may not be plausible to have a borrowed value returned...)
+    // fn get_parent(&self) -> Result<&GrandSocketStation, GSSError> {
+    //     match &conn.parent {
+    //         Some(val) => match val.try_borrow_mut() {
+    //             Ok(parent) => {
+    //                 debug!("Parent --> {:?}", parent);
+    //                 Ok(&parent)
+    //             },
+    //             Err(e) => {
+    //                 error!("There was an error! {}", e); 
+    //                 Err(GSSError::from(e))
+    //             },
+    //         },
+    //         None => {
+    //             error!("Could not borrow parent as a mutable reference!"); 
+    //             Err(GSSError::GetParent)
+    //         },
+    //     }
+    // }
+
     fn remove_client(&mut self) {
         debug!(
             "[GrandSocketStation] Removing 'self' from GrandSocketStation: {:?}",
@@ -571,7 +673,8 @@ fn main() {
                 kill_cache: c.clone(),
             });
         }
-        let conn = value.unwrap();
+        let conn: Connection = value.unwrap();
+
         let h = &mut hub.borrow_mut();
         h.push_connection(conn.clone());
         let value: Option<Connection> = Some(conn.clone());
@@ -589,6 +692,24 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use models::*;
+    use super::*;
+
+    #[test]
+    fn test_connection_add_user() {
+        // Builder::new().with_settings(Settings::default()).build();
+        // let (send_db, recv_db) = crossbeam_channel::unbounded();
+        // let (a, b, c) = wire_up(send_db);
+        // let c = Connection {
+        //         id: 1,
+        //         tx: Sender::new(Token::new(), SyncSender::<Command>::new(), 1),
+        //         user: None,
+        //         parent: Some(hub.clone()),
+        //         to_cache: a.clone(),
+        //         from_cache: b.clone(),
+        //         kill_cache: c.clone(),
+        // };
+
+    }
 
     // #[test]
     // fn test_raises_no_id_provided() {
