@@ -342,6 +342,7 @@ joinable!(django_admin_log -> django_content_type (content_type_id));
 joinable!(guardian_groupobjectpermission -> auth_group (group_id));
 joinable!(guardian_groupobjectpermission -> auth_permission (permission_id));
 joinable!(guardian_groupobjectpermission -> django_content_type (content_type_id));
+// joinable!(guardian_userobjectpermission -> posts_post(object_pk));
 joinable!(guardian_userobjectpermission -> auth_permission (permission_id));
 joinable!(guardian_userobjectpermission -> auth_user (user_id));
 joinable!(guardian_userobjectpermission -> django_content_type (content_type_id));

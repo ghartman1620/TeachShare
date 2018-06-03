@@ -11,7 +11,7 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use users::{User};
+use users::User;
 
 const MAX_DB_SAVE_TIMEOUT: Duration = Duration::from_millis(200);
 
@@ -82,8 +82,6 @@ impl Cache for HashMapCache<ID, Resource> {
         self._inner.insert(key, value)
     }
 }
-
-
 
 // not really recommended..
 impl Index<ID> for HashMapCache<ID, Resource> {

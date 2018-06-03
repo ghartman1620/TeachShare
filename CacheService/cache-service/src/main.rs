@@ -6,15 +6,19 @@
 #![feature(extern_prelude)]
 
 extern crate pretty_env_logger;
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 extern crate chrono;
 extern crate time;
 extern crate ws;
-#[macro_use] extern crate serde_derive;
+#[macro_use]
+extern crate serde_derive;
 extern crate dotenv;
 extern crate serde_json;
-#[macro_use] extern crate crossbeam_channel;
-#[macro_use] extern crate diesel;
+#[macro_use]
+extern crate crossbeam_channel;
+#[macro_use]
+extern crate diesel;
 use std::fmt;
 use ws::{listen, CloseCode, Error, Handler, Handshake, Message, Sender};
 
@@ -29,19 +33,18 @@ use cache::*;
 use db::save_posts;
 use models::*;
 
+use chrono::{DateTime, Duration, Local, NaiveTime, Utc};
 use db::DB;
 use diesel::pg::PgConnection;
+use log::Level;
 use models::MessageType;
 use std::cell::RefCell;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
 use users::{Oauth2ProviderAccesstoken, User};
-use log::Level;
-use std::error::Error as StdError;
-use chrono::{DateTime, Local, Utc, NaiveTime, Duration};
-
 
 #[derive(Debug, Clone)]
 struct GrandSocketStation {
@@ -64,8 +67,12 @@ impl GrandSocketStation {
                 let difference = difference - Duration::hours(hours);
                 let min = difference.num_minutes();
                 info!(
-                    "{:?}.) [token: {:?} -> user: {:?}, expires in {} hours and {} minutes]", 
-                    i+1, token, a.user_id, hours, min
+                    "{:?}.) [token: {:?} -> user: {:?}, expires in {} hours and {} minutes]",
+                    i + 1,
+                    token,
+                    a.user_id,
+                    hours,
+                    min
                 );
             }
         } else {
@@ -89,7 +96,6 @@ impl GrandSocketStation {
     pub fn check_token(&self, token: String) {
         self.auth_table.get(&token);
     }
-
 }
 
 impl std::cmp::PartialEq for Connection {
@@ -160,14 +166,14 @@ impl Handler for Connection {
                     Ok(parent) => {
                         debug!("Parent --> {:?}", parent);
                         Ok(parent)
-                    },
+                    }
                     Err(e) => {
-                        error!("There was an error! {}", e); 
+                        error!("There was an error! {}", e);
                         Err(GSSError::from(e))
-                    },
+                    }
                 },
                 None => {
-                    error!("Could not borrow parent as a mutable reference!"); 
+                    error!("Could not borrow parent as a mutable reference!");
                     Err(GSSError::GetParent)
                 }
             };
@@ -187,7 +193,6 @@ impl Handler for Connection {
             // self.set_user(u);
             Some(u)
         });
-        
 
         Ok(())
     }
@@ -253,7 +258,7 @@ impl fmt::Display for GSSError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             GSSError::GetParent => f.write_str("Get parent error."),
-            GSSError::Unknown => f.write_str("Unknown GSS error.")
+            GSSError::Unknown => f.write_str("Unknown GSS error."),
         }
     }
 }
@@ -274,7 +279,6 @@ impl From<std::cell::BorrowMutError> for GSSError {
 }
 
 impl Connection {
-
     fn set_user(&mut self, u: User) {
         self.user = Some(u);
     }
@@ -288,12 +292,12 @@ impl Connection {
     //                 Ok(&parent)
     //             },
     //             Err(e) => {
-    //                 error!("There was an error! {}", e); 
+    //                 error!("There was an error! {}", e);
     //                 Err(GSSError::from(e))
     //             },
     //         },
     //         None => {
-    //             error!("Could not borrow parent as a mutable reference!"); 
+    //             error!("Could not borrow parent as a mutable reference!");
     //             Err(GSSError::GetParent)
     //         },
     //     }
@@ -691,8 +695,8 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use models::*;
     use super::*;
+    use models::*;
 
     #[test]
     fn test_connection_add_user() {

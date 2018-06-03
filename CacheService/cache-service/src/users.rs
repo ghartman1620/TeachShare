@@ -5,11 +5,11 @@ use diesel::Queryable;
 use chrono::{DateTime, Local, Utc};
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
+use schema::{auth_permission, auth_user, django_content_type, oauth2_provider_accesstoken};
 use std::collections::{BTreeMap, BTreeSet};
 use time::Duration;
-use schema::{auth_user, auth_permission, django_content_type, oauth2_provider_accesstoken};
 
-use db::{DB, DBError, DjangContentType};
+use db::{DBError, DjangContentType, UserObjectPermission, DB};
 use diesel::dsl::Select;
 
 // user access tokens cache:
@@ -44,7 +44,7 @@ impl Oauth2ProviderAccesstoken {
     pub fn get_all(
         conn: &PgConnection,
     ) -> Result<Vec<Oauth2ProviderAccesstoken>, diesel::result::Error> {
-        use schema::oauth2_provider_accesstoken::dsl::{oauth2_provider_accesstoken, expires};
+        use schema::oauth2_provider_accesstoken::dsl::{expires, oauth2_provider_accesstoken};
 
         oauth2_provider_accesstoken
             .filter(expires.gt(Utc::now()))
@@ -90,13 +90,12 @@ impl Oauth2ProviderAccesstoken {
 
 pub struct AuthPermission {
     pub id: i32,
-    pub name: String,  // formatted, capitalized name for this permission
+    pub name: String,         // formatted, capitalized name for this permission
     pub content_type_id: i32, // linked to post model
-    pub codename: String,  // name of the permission @INFO: This won't change
+    pub codename: String,     // name of the permission @INFO: This won't change
 }
 
 impl AuthPermission {
-
     pub fn new() -> AuthPermission {
         Default::default()
     }
@@ -105,26 +104,77 @@ impl AuthPermission {
         use schema::auth_permission::dsl::{auth_permission, codename};
         let conn = db.get();
 
-        let permission: AuthPermission = auth_permission.filter(codename.eq(perm_name)).first::<AuthPermission>(&*conn)?;
+        let permission: AuthPermission = auth_permission
+            .filter(codename.eq(perm_name))
+            .first::<AuthPermission>(&*conn)?;
         debug!("Permission Entry: {:?}", permission);
         Ok(permission)
     }
 
-    
-
     pub fn get_with_content_type(db: &DB) {
-        use schema::auth_permission::dsl::*;
-        use schema::django_content_type::dsl::*;
+        use schema::auth_permission::dsl::{auth_permission, codename, content_type_id};
+        use schema::auth_user::dsl::{auth_user, email, id, username};
+        use schema::django_content_type::dsl::{app_label, django_content_type, model};
+        use schema::guardian_userobjectpermission::dsl::{
+            guardian_userobjectpermission, object_pk, permission_id,
+        };
+        use schema::oauth2_provider_accesstoken::dsl::{
+            expires, oauth2_provider_accesstoken, token,
+        };
 
         let session = db.get();
-        let data: Vec<(i32, String, String, String)> = auth_permission.
-                        inner_join(django_content_type).select((content_type_id, codename, app_label, model)).load(&*session).unwrap();
-        for (i, d) in data.iter().enumerate() {
-            println!("{}.) {:?}", i+1, d);
-        }
+        let user_and_perm: Vec<(
+            String,
+            Option<String>,
+            Option<String>,
+            Option<i32>,
+            Option<String>,
+            Option<String>,
+        )> = guardian_userobjectpermission
+            .left_join(auth_user)
+            .left_join(auth_permission)
+            .left_outer_join(django_content_type)
+            .select((
+                object_pk,
+                codename.nullable(),
+                model.nullable(),
+                id.nullable(),
+                username.nullable(),
+                email.nullable(),
+            ))
+            .load(&*session)
+            .unwrap();
+
+        println!("USER_AND_AUTH: {:?}", user_and_perm);
+
+        // let data: Vec<(String, String, String, i32, i32, User)> = auth_permission
+        //                 .left_join(django_content_type)
+        //                 .inner_join(guardian_userobjectpermission
+        //                     .left_join(auth_user)
+        //                 )
+        //                 .select((codename, model, object_pk, permission_id, (auth_user)))
+        //                 .load(&*session)
+        //                 .unwrap();
+
+        // for (i, d) in data.iter().enumerate() {
+        //     println!("{}.) {:?}", i+1, d);
+        // }
     }
 }
 
+pub fn duration_valid(t: chrono::DateTime<Utc>) -> Option<Duration> {
+    let difference = t - Utc::now();
+    println!("The difference is: {:?}", difference);
+    let hours = difference.num_hours();
+    let difference = difference - Duration::hours(hours);
+    let min = difference.num_minutes();
+    println!("Hours: {:?}, Difference: {:?}, Minutes: {:?}", hours, difference, min);
+
+    if difference < Duration::hours(0) {
+        return None;
+    }
+    Some(difference)
+}
 
 #[derive(Associations, Identifiable, Queryable, Debug, Serialize, Deserialize, Clone, Hash, Eq,
          PartialEq)]
@@ -167,17 +217,57 @@ impl User {
         let user = auth_user.filter(id.eq(user_id)).first(&*session)?;
         Ok(user)
     }
+
+    pub fn get_associated(user_id: i32, db: &DB) -> Result<User, DBError> {
+        use schema::auth_user::dsl::{auth_user, id};
+        use schema::oauth2_provider_accesstoken::dsl::{
+            expires, oauth2_provider_accesstoken, token,
+        };
+
+        let session = db.get();
+        let user: (i32, Option<String>, Option<chrono::DateTime<Utc>>) = auth_user
+            .left_join(oauth2_provider_accesstoken)
+            .filter(id.eq(user_id))
+            .select((id, token.nullable(), expires.nullable()))
+            .first(&*session)?;
+        let just_user: User = auth_user.filter(id.eq(user_id)).first(&*session)?;
+
+        let dt =  duration_valid(user.2.unwrap());
+        println!("DURATION_VALID: {:?}", dt);
+
+        let ae = AuthEntry {
+            user: just_user.clone(),
+            token: user.1,
+            expires: user.2,
+            valid_for: dt,
+        };
+        println!("USER + MORE = {:?}", ae);
+        let oauth2_data: Vec<Oauth2ProviderAccesstoken> =
+            Oauth2ProviderAccesstoken::belonging_to(&just_user).load(&*session)?;
+        println!("USER + OAUTH2 = {:?}", oauth2_data);
+
+        let u = User::new();
+        Ok(u)
+    }
+}
+
+#[derive(Debug)]
+pub struct AuthEntry {
+    user: User,
+    token: Option<String>,
+    expires: Option<chrono::DateTime<Utc>>,
+    valid_for: Option<Duration>,
 }
 
 #[cfg(test)]
 
 mod tests {
     use db::DB;
+    use db::*;
     use models;
     use models::*;
     use std::collections::HashMap;
     use users::*;
-    use db::*;
 
     #[test]
     fn test_user_access_token_db() {
@@ -206,7 +296,8 @@ mod tests {
         let conn = db.get();
         // let auth = Oauth2ProviderAccesstoken::get_all(&*conn).unwrap();
         let user = User::get_by_id(3, &db).unwrap();
-        let result: Result<Oauth2ProviderAccesstoken, _> = Oauth2ProviderAccesstoken::belonging_to(&user).first(&*conn);
+        let result: Result<Oauth2ProviderAccesstoken, _> =
+            Oauth2ProviderAccesstoken::belonging_to(&user).first(&*conn);
         // let result: Result<User, _> =
         //     User::belonging_to(&auth).first(&*conn);
         // println!("\n************************************\n{:?}\n", auth);
@@ -233,11 +324,13 @@ mod tests {
 
         let test2 = DjangContentType::get_dct_by_model(&db, "post");
         println!("DCT --------------------> {:?}", test2);
-        
+
         // let dct = test2.unwrap();
         // let auth_perm = AuthPermission::belongs_to(&dct);
 
         let say_what = AuthPermission::get_with_content_type(&db);
         println!("\n*************************************\n{:?}\n", say_what);
+
+        let user_assoc = User::get_associated(3, &db);
     }
 }

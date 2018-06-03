@@ -1,3 +1,5 @@
+use db::{DBError, DB};
+use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use schema::posts_post;
 use serde_json::Value;
@@ -6,9 +8,7 @@ use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, AddAssign};
 use std::sync::Arc;
-use db::{DB, DBError};
-use diesel::prelude::*;
-use users::{User};
+use users::User;
 
 // * option 1
 #[derive(Debug, Serialize)]
@@ -185,7 +185,6 @@ impl UserPermission {
         }
     }
 }
-
 
 #[derive(Debug, Clone)]
 pub struct Resource {

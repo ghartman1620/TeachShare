@@ -6,10 +6,10 @@ use diesel::{result, update};
 use dotenv::dotenv;
 
 use models::Post;
-use users::{User};
 use schema::django_content_type;
 use schema::guardian_userobjectpermission;
 use schema::posts_post;
+use users::User;
 
 use serde_json::value::Value;
 use std::env;
@@ -307,7 +307,7 @@ mod tests {
     use diesel::prelude::*;
     use diesel::result;
     use models::*;
-    use schema::{guardian_userobjectpermission, posts_post, auth_permission};
+    use schema::{auth_permission, guardian_userobjectpermission, posts_post};
 
     use std::sync::mpsc::channel;
     use std::thread;
