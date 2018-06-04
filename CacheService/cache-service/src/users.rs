@@ -11,6 +11,7 @@ use time::Duration;
 
 use db::{DBError, DjangContentType, UserObjectPermission, DB};
 use diesel::dsl::Select;
+use GrandSocketStation;
 
 // user access tokens cache:
 // need: user_id, token, expires?
@@ -162,20 +163,6 @@ impl AuthPermission {
     }
 }
 
-pub fn duration_valid(t: chrono::DateTime<Utc>) -> Option<Duration> {
-    let difference = t - Utc::now();
-    println!("The difference is: {:?}", difference);
-    let hours = difference.num_hours();
-    let difference = difference - Duration::hours(hours);
-    let min = difference.num_minutes();
-    println!("Hours: {:?}, Difference: {:?}, Minutes: {:?}", hours, difference, min);
-
-    if difference < Duration::hours(0) {
-        return None;
-    }
-    Some(difference)
-}
-
 #[derive(Associations, Identifiable, Queryable, Debug, Serialize, Deserialize, Clone, Hash, Eq,
          PartialEq)]
 #[table_name = "auth_user"]
@@ -238,7 +225,7 @@ impl User {
             .first(&*session)?;
         let just_user: User = auth_user.filter(id.eq(user_id)).first(&*session)?;
 
-        let dt =  duration_valid(user.2.unwrap());
+        let dt =  GrandSocketStation::duration_valid(user.2.unwrap());
         println!("DURATION_VALID: {:?}", dt);
 
         let ae = AuthEntry {

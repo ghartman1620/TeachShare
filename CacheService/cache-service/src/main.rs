@@ -83,6 +83,20 @@ impl GrandSocketStation {
             auth_table: auth,
         }
     }
+    pub fn duration_valid(t: chrono::DateTime<Utc>) -> Option<Duration> {
+        let difference = t - Utc::now();
+        println!("The difference is: {:?}", difference);
+        let hours = difference.num_hours();
+        let difference = difference - Duration::hours(hours);
+        let min = difference.num_minutes();
+        println!("Hours: {:?}, Difference: {:?}, Minutes: {:?}", hours, difference, min);
+
+        if difference < Duration::hours(0) {
+            return None;
+        }
+        Some(difference)
+    }
+
     pub fn get_connections(&self) -> &Vec<Rc<Connection>> {
         &self.connections
     }
