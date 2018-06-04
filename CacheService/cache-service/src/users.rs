@@ -193,6 +193,12 @@ pub struct User {
     pub date_joined: chrono::DateTime<chrono::Utc>,
 }
 
+impl Default for User {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl User {
     pub fn new() -> User {
         User {
