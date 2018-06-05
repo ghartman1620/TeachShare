@@ -131,9 +131,8 @@ pub fn cache_thread(
 ) {
     thread::spawn(move || {
         let db = DB::new();
-
         let mut cache = Rc::new(RefCell::new(HashMapCache::new(&db))); //Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new()));
-        println!("[CACHE] {:?}", cache);
+        
         loop {
             let conn = db.get();
             select_loop! {
@@ -141,7 +140,7 @@ pub fn cache_thread(
                     let m = msg.clone();
                     match msg.msg_type {
                         MessageType::Get => {
-                            println!("[CACHE] RECEIVED => {:?}", msg.msg_type);
+                            debug!("[CACHE] RECEIVED => {:?}", msg.msg_type);
                             assert_eq!(msg.msg_type, MessageType::Get);
                             {
                                 let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
@@ -149,7 +148,7 @@ pub fn cache_thread(
                             }
                         },
                         MessageType::Create => {
-                            println!("[CACHE] RECEIVED => {:?}", msg.msg_type);
+                            debug!("[CACHE] RECEIVED => {:?}", msg.msg_type);
                             assert_eq!(msg.msg_type, MessageType::Create);
                             {
                                 let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
@@ -157,7 +156,7 @@ pub fn cache_thread(
                             }
                         },
                         MessageType::Watch => {
-                            println!("[CACHE] RECEIVED => {:?}", msg.msg_type);
+                            debug!("[CACHE] RECEIVED => {:?}", msg.msg_type);
                             assert_eq!(msg.msg_type, MessageType::Watch);
                             {
                                 let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
@@ -165,16 +164,16 @@ pub fn cache_thread(
                             }
                         },
                         MessageType::Update => {
-                            println!("[CACHE] RECEIVED => {:?}", msg.msg_type);
+                            debug!("[CACHE] RECEIVED => {:?}", msg.msg_type);
                             assert_eq!(msg.msg_type, MessageType::Update);
                             {
                                 let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
                                 handle_update(&msg, c, &ret_pipe, &db_send);
                             }
                         },
-                        //  _ => println!("CATCH ALL"),
+                        //  _ => debug!("CATCH ALL"),
                         MessageType::Manifest => {
-                            println!("[CACHE] RECEIVED => {:?}", msg.msg_type);
+                            debug!("[CACHE] RECEIVED => {:?}", msg.msg_type);
                             assert_eq!(msg.msg_type, MessageType::Manifest);
                             {
                                 let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
@@ -183,10 +182,10 @@ pub fn cache_thread(
                         },
                     };
 
-                println!("[CACHE] (current) -> {:?}", cache);
+                debug!("[CACHE] (current) -> {:?}", cache);
                 },
                 recv(cancel, s) => {
-                    println!("[CACHE] Exiting.... Cancel Message: {:?}", s);
+                    debug!("[CACHE] Exiting.... Cancel Message: {:?}", s);
                     return;
                 }
             }
@@ -206,13 +205,13 @@ pub fn wire_up(db_send: Sender<Post>) -> (Sender<Arc<Msg>>, Receiver<Arc<Msg>>, 
 
     cache_thread(recv_pipe, send_ret_pipe, recv_cancel, db_send);
 
-    println!("Server started..");
+    info!("Cache server started...");
     (send_pipe, recv_ret_pipe, send_cancel)
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Cancel {
-    msg: String,
+    pub msg: String,
 }
 
 fn handle_manifest(
@@ -225,7 +224,7 @@ fn handle_manifest(
     let mut wrap = Msg::new().set_msg_type(MessageType::Manifest).build();
 
     let mut db_posts: Vec<i32> = Vec::new();
-    println!("[CACHE] Manifest: begin");
+    debug!("[CACHE] Manifest: begin");
 
     for m in &msg.items {
         let id = match &m.data {
@@ -238,11 +237,11 @@ fn handle_manifest(
         match borrowed_val.get(ID::Post(id)) {
             //1. if cache has this post id:
             Some(val) => {
-                println!("[CACHE] Manifest: For key: {:?} ----> {:?}", id, val);
+                debug!("[CACHE] Manifest: For key: {:?} ----> {:?}", id, val);
                 //2. If the version provided does not match the version in the cache
                 if val.version != m.version {
                     //3. Add the entire post's content to the return wrapper's items
-                    // println!(
+                    // debug!(
                     //     "[CACHE] manifest: adding post {} to return list",
                     //     val.get_data().id
                     // );
@@ -253,18 +252,18 @@ fn handle_manifest(
             }
             //4. If cache does not have this post id:
             None => {
-                println!("[CACHE] Manifest Key ({:?}) did not exist.", id);
+                debug!("[CACHE] Manifest Key ({:?}) did not exist.", id);
                 //5. Add it to the list of the db post gets we'll need to make
                 db_posts.push(id);
             }
         }
     }
-    println!("[CACHE] Manifest: making db hits for posts {:?}", db_posts);
+    debug!("[CACHE] Manifest: making db hits for posts {:?}", db_posts);
     //6. Get all the posts in the manifest list that weren't in the cache
 
     let mut posts: Vec<Post> = Post::get_all(db_posts, db).expect("Getting from database failed");
 
-    println!("[CACHE] Manifest: got posts from db: {:?}", posts);
+    debug!("[CACHE] Manifest: got posts from db: {:?}", posts);
 
     let mut mutable_cache = cash.borrow_mut();
     // For each post returned by db
@@ -278,12 +277,13 @@ fn handle_manifest(
         mutable_cache.put(ID::Post(id), resource.clone());
 
         //8. Add them all to the return list.
-        println!("[CACHE] manifest: adding post {} to return list", id);
+        debug!("[CACHE] manifest: adding post {} to return list", id);
         wrap.items.push(Arc::new(resource));
     }
     //9. Send back the return list.
-    ret_pipe.send(Arc::new(wrap));
-    println!("[CACHE] Manifest: end");
+    if let Err(e) = ret_pipe.send(Arc::new(wrap)) {
+        error!("There was an error sending response. Err: {:?}", e);
+    }
 }
 
 #[allow(dead_code)]
@@ -292,7 +292,7 @@ fn handle_get(
     cash: &mut RefCellCache,
     ret_pipe: &Sender<Arc<Msg>>,
     db: &PgConnection,
-) -> Result<Resource, CacheError> {
+) {
     let mut wrap = Msg::new().set_msg_type(MessageType::Get).build();
 
     for m in &msg.items {
@@ -326,10 +326,10 @@ fn handle_get(
                     Ok(posts) => {
                         dne_flag = true;
                         db_posts.extend(posts);
-                        println!("POSTS: {:?}", db_posts);
+                        debug!("POSTS: {:?}", db_posts);
                     }
                     Err(err) => {
-                        println!("[DB]<ERROR> {:?}", err);
+                        error!("[DB]<ERROR> {:?}", err);
                     }
                 }
             } else {
@@ -346,13 +346,13 @@ fn handle_get(
                 let inserted = cache.put(ID::Post(first.id), resource_new.clone());
                 match inserted {
                     Some(val) => {
-                        println!(
+                        debug!(
                             "[CACHE] ******* Key already existed. Previous --> {:?}",
                             val
                         );
                     }
                     None => {
-                        println!("[CACHE] Key did not currently exist.");
+                        warn!("[CACHE] Key did not currently exist.");
                     }
                 }
                 wrap.items.push(Arc::new(resource_new));
@@ -360,10 +360,9 @@ fn handle_get(
         }
     }
     match ret_pipe.send(Arc::new(wrap)) {
-        Ok(val) => println!("[CACHE] Successfully sent return value: {:?}", val),
-        Err(e) => println!("[CACHE] Error: {:?}", e),
+        Ok(val) => debug!("[CACHE] Successfully sent return value: {:?}", val),
+        Err(e) => error!("[CACHE] Error: {:?}", e),
     };
-    Err(CacheError::Get("meh, something went wrong."))
 }
 
 #[allow(dead_code)]
@@ -379,18 +378,17 @@ fn handle_create(
         match m.data {
             Model::Post(ref post) => {
                 let (resource, need_db) = create_post_cache(&post, &cash);
-                println!("[CREATE] Resource: {:?}", resource);
+                debug!("[CREATE] Resource: {:?}", resource);
                 match resource {
                     Ok(val) => match val {
-                        Some(old) => println!("Replaced value {:?}", old),
-                        None => println!("Did not previously exist."),
+                        Some(old) => debug!("Replaced value {:?}", old),
+                        None => debug!("Did not previously exist."),
                     },
                     // This would be a huge problem, and a systemic failure
-                    Err(e) => println!("There was an error borrowing the cache. {:?}", e),
+                    Err(e) => error!("There was an error borrowing the cache. {:?}", e),
                 }
                 if need_db {
                     let errors = create_post_db(&post, db, true);
-                    println!("[CREATE] <Errors> --> {:?}", errors);
                 }
             }
             _ => unimplemented!(),
@@ -402,8 +400,8 @@ fn handle_create(
 #[allow(dead_code)]
 fn send_back(return_pipe: &Sender<Arc<Msg>>, msg: Msg) {
     match return_pipe.send(Arc::new(msg)) {
-        Ok(val) => println!("[CACHE] Successfully sent return value: {:?}", val),
-        Err(e) => println!("[CACHE] Error sending on return pipe: {:?}", e),
+        Ok(val) => debug!("[CACHE] Successfully sent return value: {:?}", val),
+        Err(e) => error!("[CACHE] Error sending on return pipe: {:?}", e),
     };
 }
 
@@ -419,8 +417,6 @@ fn handle_watch(
     let wrap = Msg::new().set_msg_type(MessageType::Create).build();
 
     for m in &msg.items {
-        println!("MSG ---------------> {:?}", m);
-
         let mut exists_cache = Option::default();
         let mut exists = false;
 
@@ -449,16 +445,12 @@ fn handle_watch(
 
                 match &m.data {
                     Model::Post(post) => {
-                        println!("POST ID# ----> {}", post.id);
                         let post_result = Post::get(post.id, db_read);
-                        println!("RAW RESULT: {:?}", post_result);
                         let posts: Option<Vec<Post>> = match post_result {
                             Ok(val) => Some(val),
                             Err(e) => None,
                         };
-                        println!("RAW POSTS =====>>>> {:?}", posts);
                         if posts.is_some() {
-                            println!("POSTS =====>>>> {:?}", posts);
                             let cleaned_posts_response: Vec<Resource> = posts
                                 .unwrap()
                                 .into_iter()
@@ -468,7 +460,7 @@ fn handle_watch(
                                 .filter(|resource| resource.is_some())
                                 .map(|resource| resource.unwrap())
                                 .collect();
-                            println!("cleaned_posts_response: {:?}", cleaned_posts_response);
+                            debug!("cleaned_posts_response: {:?}", cleaned_posts_response);
                         }
                     }
                     Model::User(user) => unimplemented!(),
@@ -485,13 +477,13 @@ fn handle_watch(
                     match response {
                         Some(val) => {
                             val.add_watch(msg.connection_id);
-                            println!(
+                            debug!(
                                 "[CACHE] Current watchers -----------------> {:?}",
                                 val.watchers
                             );
                         }
                         None => {
-                            println!("ERROR: There was no valid entry for that Post ID.");
+                            error!("ERROR: There was no valid entry for that Post ID.");
                         }
                     }
                 }
@@ -531,15 +523,12 @@ fn create_posts(
                 // ret
             })
             .collect();
-        println!("RESULT SET: {:?}", rs);
         let errors_inner: Vec<String> = create_posts_db(rs.as_slice(), db_write, true)
             .into_iter()
             .map(|val| val.unwrap_err())
             .collect();
-        println!("ERRORS_INNER: {:?}", errors_inner);
         errors.extend(errors_inner);
     }
-    println!("ALL_ERRORS: {:?}", errors);
     errors
 }
 
@@ -559,7 +548,7 @@ fn create_posts_db(
 
 #[allow(dead_code)]
 fn create_post_db(post: &Post, db_write: &Sender<Post>, async: bool) -> Result<(), String> {
-    println!("[CACHE] Sending Post ID# {} to be written to DB.", post.id);
+    info!("[CACHE] Sending Post ID# {} to be written to DB.", post.id);
 
     if !async {
         db_write
@@ -586,7 +575,6 @@ fn create_posts_cache(output: &mut Vec<Post>, cache: RefCellCache) -> Option<Vec
         .map(|(a, _)| a)
         .collect();
 
-    println!("{:?}", mapped);
     Some(mapped)
 }
 
@@ -607,7 +595,7 @@ fn create_post_cache(
             }
         }
         Err(e) => {
-            println!("There was an error borrowing the cache.");
+            error!("There was an error borrowing the cache.");
             (Err(e), true) // @TODO: pull from db just in case?
         }
     }
@@ -625,14 +613,13 @@ fn handle_update(
 
     for m in &msg.items {
         {
-            println!("M ---------------------> {:?}", *m);
             match &m.data {
                 Model::Post(post) => {
                     let resource = cache_mut.get(ID::Post(post.id));
                     if resource.is_some() {
                         // current watchers from Cache
                         let w = resource.unwrap().watchers.to_vec();
-                        println!("Watchers --> {:?}", w);
+                        debug!("Watchers --> {:?}", w);
                         all_watchers.push(w);
                     }
                 }
@@ -649,19 +636,19 @@ fn handle_update(
                     entry.watchers.clear();
                     entry.watchers.extend(old_watchers);
 
-                    println!("\n************************************************************");
-                    println!("Entry of ID:{}, has a version --> {}", post.id, old_version);
+                    debug!("\n************************************************************");
+                    debug!("Entry of ID:{}, has a version --> {}", post.id, old_version);
                     entry.version = old_version + 1;
                     // entry.increment();
-                    println!("New Version: {}", entry.version);
-                    println!("************************************************************\n");
+                    debug!("New Version: {}", entry.version);
+                    debug!("************************************************************\n");
                 }
             }
             _ => unimplemented!(),
         }
     }
 
-    println!("ALL WATCHERS ------------------> {:?}", all_watchers);
+    info!("ALL WATCHERS ------------------> {:?}", all_watchers);
 
     let mut just_resources: Vec<Resource> = vec![];
     for item in &msg.items {
@@ -689,7 +676,7 @@ fn handle_update(
     // return the watchers ID's, on success writeback to DB..?
     match ret_pipe.send(Arc::new(wrap)) {
         Ok(val) => {
-            println!("[CACHE] Result: {:?}", val);
+            debug!("[CACHE] Result: {:?}", val);
             let posts: Vec<Post> = msg.items
                 .iter()
                 .map(|item| match item.data {
@@ -699,7 +686,7 @@ fn handle_update(
                 .collect();
             create_posts_db(posts.as_slice(), db_write, true);
         }
-        Err(e) => println!("[CACHE] Error: {:?}", e),
+        Err(e) => error!("[CACHE] Error: {:?}", e),
     };
 }
 

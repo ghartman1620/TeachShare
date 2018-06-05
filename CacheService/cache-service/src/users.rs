@@ -96,6 +96,15 @@ pub struct AuthPermission {
     pub codename: String,     // name of the permission @INFO: This won't change
 }
 
+type UserAndPermission = (
+    String,
+    Option<String>,
+    Option<String>,
+    Option<i32>,
+    Option<String>,
+    Option<String>,
+);
+
 impl AuthPermission {
     pub fn new() -> AuthPermission {
         Default::default()
@@ -124,14 +133,7 @@ impl AuthPermission {
         };
 
         let session = db.get();
-        let user_and_perm: Vec<(
-            String,
-            Option<String>,
-            Option<String>,
-            Option<i32>,
-            Option<String>,
-            Option<String>,
-        )> = guardian_userobjectpermission
+        let user_and_perm: Vec<UserAndPermission> = guardian_userobjectpermission
             .left_join(auth_user)
             .left_join(auth_permission)
             .left_outer_join(django_content_type)
@@ -146,7 +148,7 @@ impl AuthPermission {
             .load(&*session)
             .unwrap();
 
-        println!("USER_AND_AUTH: {:?}", user_and_perm);
+        info!("USER_AND_AUTH: {:?}", user_and_perm);
 
         // let data: Vec<(String, String, String, i32, i32, User)> = auth_permission
         //                 .left_join(django_content_type)
@@ -158,7 +160,7 @@ impl AuthPermission {
         //                 .unwrap();
 
         // for (i, d) in data.iter().enumerate() {
-        //     println!("{}.) {:?}", i+1, d);
+        //     info!("{}.) {:?}", i+1, d);
         // }
     }
 }
@@ -225,8 +227,8 @@ impl User {
             .first(&*session)?;
         let just_user: User = auth_user.filter(id.eq(user_id)).first(&*session)?;
 
-        let dt =  GrandSocketStation::duration_valid(user.2.unwrap());
-        println!("DURATION_VALID: {:?}", dt);
+        let dt = GrandSocketStation::duration_valid(user.2.unwrap());
+        info!("DURATION_VALID: {:?}", dt);
 
         let ae = AuthEntry {
             user: just_user.clone(),
@@ -234,10 +236,10 @@ impl User {
             expires: user.2,
             valid_for: dt,
         };
-        println!("USER + MORE = {:?}", ae);
+        info!("USER + MORE = {:?}", ae);
         let oauth2_data: Vec<Oauth2ProviderAccesstoken> =
             Oauth2ProviderAccesstoken::belonging_to(&just_user).load(&*session)?;
-        println!("USER + OAUTH2 = {:?}", oauth2_data);
+        info!("USER + OAUTH2 = {:?}", oauth2_data);
 
         let u = User::new();
         Ok(u)
@@ -324,6 +326,8 @@ mod tests {
         let say_what = AuthPermission::get_with_content_type(&db);
         println!("\n*************************************\n{:?}\n", say_what);
 
-        let user_assoc = User::get_associated(3, &db);
+        println!("---------------------------------------------");
+        let user_assoc = User::get_associated(4, &db);
+        println!("USER_ASSOC: {:?}", user_assoc);
     }
 }

@@ -30,21 +30,25 @@ mod schema;
 mod users;
 
 use cache::*;
-use db::save_posts;
 use models::*;
 
 use chrono::{DateTime, Duration, Local, NaiveTime, Utc};
+use crossbeam_channel::{Receiver, Sender as CrossBSender};
 use db::DB;
 use diesel::pg::PgConnection;
 use log::Level;
 use models::MessageType;
+use pool::ThreadPool;
 use std::cell::RefCell;
 use std::collections::BTreeMap;
 use std::error::Error as StdError;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
+use std::time::SystemTime;
 use users::{Oauth2ProviderAccesstoken, User};
+
+const DB_POOL_SIZE: usize = 4;
 
 #[derive(Debug, Clone)]
 struct GrandSocketStation {
@@ -89,7 +93,10 @@ impl GrandSocketStation {
         let hours = difference.num_hours();
         let difference = difference - Duration::hours(hours);
         let min = difference.num_minutes();
-        println!("Hours: {:?}, Difference: {:?}, Minutes: {:?}", hours, difference, min);
+        println!(
+            "Hours: {:?}, Difference: {:?}, Minutes: {:?}",
+            hours, difference, min
+        );
 
         if difference < Duration::hours(0) {
             return None;
@@ -220,7 +227,7 @@ impl Handler for Connection {
                 let json: Result<WSMessage, serde_json::Error> = serde_json::from_str(&text);
                 let response: Option<String> = match json {
                     Ok(msg) => match msg.message {
-                        MessageType::Get => self.handle_get_msg(msg),
+                        MessageType::Get => self.handle_get_msg(&msg),
                         MessageType::Create => self.handle_create_msg(msg),
                         MessageType::Watch => self.handle_watch_msg(msg),
                         MessageType::Update => self.handle_update_msg(msg),
@@ -297,26 +304,6 @@ impl Connection {
         self.user = Some(u);
     }
 
-    // @FIXME: Fix this (may not be plausible to have a borrowed value returned...)
-    // fn get_parent(&self) -> Result<&GrandSocketStation, GSSError> {
-    //     match &conn.parent {
-    //         Some(val) => match val.try_borrow_mut() {
-    //             Ok(parent) => {
-    //                 debug!("Parent --> {:?}", parent);
-    //                 Ok(&parent)
-    //             },
-    //             Err(e) => {
-    //                 error!("There was an error! {}", e);
-    //                 Err(GSSError::from(e))
-    //             },
-    //         },
-    //         None => {
-    //             error!("Could not borrow parent as a mutable reference!");
-    //             Err(GSSError::GetParent)
-    //         },
-    //     }
-    // }
-
     fn remove_client(&mut self) {
         debug!(
             "[GrandSocketStation] Removing 'self' from GrandSocketStation: {:?}",
@@ -365,7 +352,7 @@ impl Connection {
         self.tx.send(serialized)
     }
 
-    fn handle_get_msg(&self, msg: WSMessage) -> Option<String> {
+    fn handle_get_msg(&self, msg: &WSMessage) -> Option<String> {
         debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Get);
         let mut return_message = Msg::new().set_msg_type(MessageType::Get).build();
@@ -391,7 +378,7 @@ impl Connection {
             Ok(val) => val,
             Err(e) => {
                 error!("[Error] ---> {:?}", e);
-                let ret: String = format!("Error receiving from channel (from cache).");
+                let ret: String = "Error receiving from channel (from cache).".to_string();
                 return Some(ret);
             }
         };
@@ -576,8 +563,7 @@ impl Connection {
                                 watchers.iter().flat_map(|y| y).find(|x| **x == id as i32);
 
                             debug!("WATCHES ---> {:?}, LOOKING FOR ----> {:?}, MATCHED_WATCHES ---> {:?}", watchers, id, all_watchers);
-                            if let Some(matched_connection) =
-                                watchers.iter().flat_map(|y| y).find(|x| **x == id as i32)
+                            if watchers.iter().flat_map(|y| y).any(|x| *x == id as i32)
                             {
                                 let ws_response = WSMessageResponse::new(&posts, &versions);
                                 let serialized = serde_json::to_string(&ws_response)
@@ -639,7 +625,7 @@ impl Connection {
             }
         };
 
-        let resp = match self.from_cache.recv() {
+        match self.from_cache.recv() {
             Ok(val) => val,
             Err(_) => {
                 return Some(String::from("Error receiving from channel (from cache)."));
@@ -649,10 +635,57 @@ impl Connection {
         let output = vec![];
         let versions = vec![];
         match self.serialize_and_send_posts(&output, &versions) {
-            Ok(o) => None,
+            Ok(_) => None,
             Err(e) => Some(format!("Err: {:?}", e)),
         }
     }
+}
+
+fn start_db_pool() -> (crossbeam_channel::Sender<models::Post>, crossbeam_channel::Sender<cache::Cancel>) {
+
+    let (kill_db_send, kill_db_recv): (CrossBSender<Cancel>, Receiver<Cancel>) =
+        crossbeam_channel::unbounded();
+    let (send_db, recv_db): (CrossBSender<Post>, Receiver<Post>) = crossbeam_channel::unbounded();
+
+    match ThreadPool::new(DB_POOL_SIZE) {
+        Ok(pool) => {
+            info!("starting a pool of threads for teh DB saves...");
+            
+            thread::spawn(move || {
+                for i in 0..DB_POOL_SIZE {
+                    info!("Starting thread: {}.", i);
+                    let closure_owned_recv = recv_db.clone();
+                    let closure_owned_cancel = kill_db_recv.clone(); 
+                        
+                    pool.execute(move || {
+                        let db = DB::new(); // only make a DB once
+                        let conn = db.get(); // grab reference
+                        loop {
+                            select_loop! {
+                                recv(closure_owned_recv, p) => {
+                                    let res = p.save(&*conn);
+                                    debug!("attempting to save post... {:?}", res);
+                                    match res {
+                                        Ok(_) => info!("Saving post in DB response was successful!"),
+                                        Err(e) => error!("[DB]<ERROR> Saving post error. '{:?}'", e),
+                                    }
+                                },
+                                recv(closure_owned_cancel, cancel) => {
+                                    warn!("Closing one of the DB threads...");
+                                    return;
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        Err(e) => error!(
+            "There was an error creating the Database Threadpool. {:?}",
+            e
+        ),
+    }
+    (send_db, kill_db_send)
 }
 
 fn main() {
@@ -665,11 +698,8 @@ fn main() {
     let hub = Rc::new(RefCell::new(GrandSocketStation::new(&session)));
     let i = &mut 0;
 
-    // start db (SAVE only) thread
-    let (send_db, recv_db) = crossbeam_channel::unbounded();
-    let db_handle = thread::spawn(move || {
-        save_posts(recv_db);
-    });
+    // setup database send threadpool. Should allow for pretty high load if necessary...
+    let (send_db, kill_db_send) = start_db_pool();    
 
     // start cache + return necessary comm. channels
     let (a, b, c): (
@@ -700,10 +730,9 @@ fn main() {
         value.unwrap()
     }).unwrap();
 
-    // await db thread to end...
-    match db_handle.join() {
-        Ok(_) => {}
-        Err(e) => error!("Error in db_handle.join() --> {:?}", e),
+    match kill_db_send.send(Cancel{ msg: "Closing...".to_owned() }) {
+        Ok(_) => {},
+        Err(err) => error!("There was an error closing the db threadpool. {:?}", err),
     }
 }
 

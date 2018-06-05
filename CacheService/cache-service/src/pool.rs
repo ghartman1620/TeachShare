@@ -22,21 +22,23 @@ pub struct Worker {
 impl Worker {
     fn new(id: usize, receiver: Arc<Mutex<crossbeam_channel::Receiver<Message>>>) -> Worker {
         let thread = thread::spawn(move || loop {
+            
             let msg = receiver
                 .lock()
                 .expect("Could not acquire lock.")
                 .recv()
                 .expect("Failed to recieve message.");
 
-            println!("Worker {} got a job; executing.", id);
+            // info!("Worker {} got a job; executing.", id);
+            
 
             match msg {
                 Message::NewJob(job) => {
-                    println!("Worker {} got a job; executing.", id);
+                    info!("Worker {} got a job; executing", id);
                     job.call_box();
                 }
                 Message::Terminate => {
-                    println!("Worker {} was told to terminate,", id);
+                    info!("Worker {} was told to terminate,", id);
                     break;
                 }
             }
@@ -73,7 +75,6 @@ impl ThreadPool {
 
         let mut workers = Vec::with_capacity(size);
         for i in 0..size {
-            println!("{}", i);
             workers.push(Worker::new(i, Arc::clone(&receiver)));
         }
         Ok(ThreadPool { workers, sender })
@@ -84,7 +85,7 @@ impl ThreadPool {
         F: FnOnce() + Send + 'static,
     {
         let job = Box::new(f);
-
+        debug!("Starting to execute task...");
         self.sender
             .send(Message::NewJob(job))
             .expect("Failed to send new job.");
@@ -99,7 +100,7 @@ impl Drop for ThreadPool {
                 .expect("Failed to send termination message.");
         }
         for worker in &mut self.workers {
-            println!("Shutting down worker {}", worker.id);
+            info!("Shutting down worker {}", worker.id);
             if let Some(thread) = worker.thread.take() {
                 match thread.join() {
                     Ok(joined) => joined,

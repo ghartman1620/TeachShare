@@ -105,7 +105,7 @@ impl DjangContentType {
         let content_types = django_content_type
             .select((id, model, app_label))
             .load(&*conn)?;
-        println!("Post content type: {:?}", content_types);
+        info!("Post content type: {:?}", content_types);
         Ok(content_types)
     }
     pub fn get_dct_by_model<'a>(db: &DB, model_name: &'a str) -> Result<DjangContentType, DBError> {
@@ -201,7 +201,7 @@ impl GetByID<i32, UserObjectPermission> for UserObjectPermission {
         let response = guardian_userobjectpermission
             .filter(object_pk.eq(obj_id.to_string()))
             .load::<UserObjectPermission>(&*session)?;
-        println!("UserObjectPermission => {:?}", response);
+        info!("UserObjectPermission => {:?}", response);
         Ok(response)
     }
 }
@@ -233,14 +233,12 @@ impl Post {
     }
     pub fn get_all(ids: Vec<i32>, conn: &PgConnection) -> Result<Vec<Post>, result::Error> {
         use schema::posts_post::dsl::*;
-
-        return posts_post.filter(id.eq_any(ids)).load::<Post>(conn);
+        posts_post.filter(id.eq_any(ids)).load::<Post>(conn)
     }
 
     pub fn get(pk_id: i32, conn: &PgConnection) -> Result<Vec<Post>, result::Error> {
         use schema::posts_post::dsl::*;
-
-        return posts_post.filter(id.eq(pk_id)).load::<Post>(conn);
+        posts_post.filter(id.eq(pk_id)).load::<Post>(conn)
     }
 
     pub fn save(&self, conn: &PgConnection) -> Result<(), String> {
@@ -266,39 +264,39 @@ impl Post {
             ))
             .get_result(conn);
 
-        return if updated_row.is_err() {
+        if updated_row.is_err() {
             let actual_error = updated_row.unwrap_err();
-            println!("[DB]<ERROR> {:?}", actual_error);
+            error!("[DB]<ERROR> {:?}", actual_error);
             Err(String::from(
                 "There was an issue with the supplied database connection.",
             ))
         } else {
-            println!("[DB] ** Saved post successfully! **");
+            info!("[DB] ** Saved post successfully! **");
             Ok(())
-        };
-    }
-}
-pub fn save_posts(rx: Receiver<Post>) {
-    let db = DB::new();
-
-    loop {
-        use std::time::SystemTime;
-        let res = rx.recv();
-        if res.is_err() {
-            println!("Sender hung up, exiting");
-            break;
-        } else {
-            let p: Post = res.unwrap();
-            // let res = db.insert_post(p);
-            let res = p.save(&*db.get());
-            // res.expect("error saving post");
-            match res {
-                Ok(_) => println!("Saving post in DB response was successful!"),
-                Err(e) => println!("[DB]<ERROR> Saving post error. '{:?}'", e),
-            }
         }
     }
 }
+// pub fn save_posts(rx: Receiver<Post>) {
+//     let db = DB::new();
+
+//     loop {
+//         use std::time::SystemTime;
+//         let res = rx.recv();
+//         if res.is_err() {
+//             println!("Sender hung up, exiting");
+//             break;
+//         } else {
+//             let p: Post = res.unwrap();
+//             // let res = db.insert_post(p);
+//             let res = p.save(&*db.get());
+//             // res.expect("error saving post");
+//             match res {
+//                 Ok(_) => println!("Saving post in DB response was successful!"),
+//                 Err(e) => println!("[DB]<ERROR> Saving post error. '{:?}'", e),
+//             }
+//         }
+//     }
+// }
 
 #[cfg(test)]
 mod tests {
@@ -392,38 +390,38 @@ mod tests {
         assert!(res.is_err());
     }
 
-    #[test]
-    fn test_save_posts_thread() {
-        let connection = establish_connection();
+    // #[test]
+    // fn test_save_posts_thread() {
+    //     let connection = establish_connection();
 
-        let (tx, rx) = unbounded();
-        let begin = SystemTime::now();
+    //     let (tx, rx) = unbounded();
+    //     let begin = SystemTime::now();
 
-        let t = thread::spawn(move || {
-            save_posts(rx);
-        });
-        let mut posts = Post::get(1, &connection).expect("no post 1");
-        //we'll set p's title back to whatever it was once we're done
+    //     let t = thread::spawn(move || {
+    //         save_posts(rx);
+    //     });
+    //     let mut posts = Post::get(1, &connection).expect("no post 1");
+    //     //we'll set p's title back to whatever it was once we're done
 
-        let p = &mut posts[0];
-        let s = p.title.clone();
-        let _ = tx.send(p.clone());
-        for x in 0..2 {
-            p.title = format!("change{}", x);
-            tx.send(p.clone()).expect("Error sending post");
-        }
-        println!("i can continue doing useful work while posts are being saved!");
-        p.title = s;
-        tx.send(p.clone()).expect("Error sending post");
-        drop(tx);
-        let delta = SystemTime::now()
-            .duration_since(begin)
-            .expect("time went backwards");
-        println!("Finished sending posts in time of {:?}", delta);
-        let _ = t.join();
-        let delta = SystemTime::now()
-            .duration_since(begin)
-            .expect("time went backwards");
-        println!("Finished saving posts in time of {:?}", delta);
-    }
+    //     let p = &mut posts[0];
+    //     let s = p.title.clone();
+    //     let _ = tx.send(p.clone());
+    //     for x in 0..2 {
+    //         p.title = format!("change{}", x);
+    //         tx.send(p.clone()).expect("Error sending post");
+    //     }
+    //     println!("i can continue doing useful work while posts are being saved!");
+    //     p.title = s;
+    //     tx.send(p.clone()).expect("Error sending post");
+    //     drop(tx);
+    //     let delta = SystemTime::now()
+    //         .duration_since(begin)
+    //         .expect("time went backwards");
+    //     println!("Finished sending posts in time of {:?}", delta);
+    //     let _ = t.join();
+    //     let delta = SystemTime::now()
+    //         .duration_since(begin)
+    //         .expect("time went backwards");
+    //     println!("Finished saving posts in time of {:?}", delta);
+    // }
 }
