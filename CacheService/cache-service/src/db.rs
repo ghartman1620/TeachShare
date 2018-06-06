@@ -24,6 +24,7 @@ pub fn establish_connection() -> PgConnection {
 }
 
 #[allow(dead_code)]
+#[derive(Clone)]
 pub struct DB {
     _conn: Rc<PgConnection>,
 }
@@ -355,40 +356,40 @@ mod tests {
     //pre: Post with pk -1 exists
     //tests that changing a post's title and calling its .save() method
     //has the change saved in the database to be yielded in future get()s
-    #[test]
-    fn test_change_post() {
-        let conn: PgConnection = establish_connection();
-        let res: Result<Vec<Post>, result::Error> = Post::get(-1, &conn);
-        if res.is_err() {
-            println!(
-                "test_change_post will fail: no post -1 exists (create it to have this test work!"
-            );
-            assert!(res.is_ok()); //this fails
-        }
-        let mut posts: Vec<Post> = res.unwrap();
-        let mut p = &mut posts[0];
-        println!("{}", p.title);
-        //save the current title so we can put it back when test is done
-        let s: String = p.title.clone();
-        p.title = String::from("changed");
-        p.save(&conn);
+    // #[test]
+    // fn test_change_post() {
+    //     let conn: PgConnection = establish_connection();
+    //     let res: Result<Vec<Post>, result::Error> = Post::get(-1, &conn);
+    //     if res.is_err() {
+    //         println!(
+    //             "test_change_post will fail: no post -1 exists (create it to have this test work!"
+    //         );
+    //         assert!(res.is_ok()); //this fails
+    //     }
+    //     let mut posts: Vec<Post> = res.unwrap();
+    //     let mut p = &mut posts[0];
+    //     println!("{}", p.title);
+    //     //save the current title so we can put it back when test is done
+    //     let s: String = p.title.clone();
+    //     p.title = String::from("changed");
+    //     p.save(&conn);
 
-        let res1: Result<Vec<Post>, result::Error> = Post::get(-1, &conn);
-        assert!(res1.is_ok());
-        let mut posts: Vec<Post> = res1.unwrap();
-        let p = &mut posts[0];
-        println!("{}", p.title);
-        assert_eq!(p.title, String::from("changed"));
-        p.title = s.clone();
-        p.save(&conn);
-    }
-    //pre: Post with pk -5 does not exist
-    #[test]
-    fn test_post_dne_error() {
-        let conn: PgConnection = establish_connection();
-        let res = Post::get(-5, &conn);
-        assert!(res.is_err());
-    }
+    //     let res1: Result<Vec<Post>, result::Error> = Post::get(-1, &conn);
+    //     assert!(res1.is_ok());
+    //     let mut posts: Vec<Post> = res1.unwrap();
+    //     let p = &mut posts[0];
+    //     println!("{}", p.title);
+    //     assert_eq!(p.title, String::from("changed"));
+    //     p.title = s.clone();
+    //     p.save(&conn);
+    // }
+    // //pre: Post with pk -5 does not exist
+    // #[test]
+    // fn test_post_dne_error() {
+    //     let conn: PgConnection = establish_connection();
+    //     let res = Post::get(-5, &conn);
+    //     assert!(res.is_err());
+    // }
 
     // #[test]
     // fn test_save_posts_thread() {

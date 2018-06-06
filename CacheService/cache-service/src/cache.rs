@@ -636,10 +636,9 @@ fn handle_update(
                     entry.watchers.clear();
                     entry.watchers.extend(old_watchers);
 
-                    debug!("\n************************************************************");
+                    debug!("************************************************************");
                     debug!("Entry of ID:{}, has a version --> {}", post.id, old_version);
                     entry.version = old_version + 1;
-                    // entry.increment();
                     debug!("New Version: {}", entry.version);
                     debug!("************************************************************\n");
                 }

@@ -127,6 +127,7 @@ impl std::cmp::PartialEq for Connection {
 
 #[derive(Clone)]
 struct Connection {
+    db: DB,
     parent: Option<Rc<RefCell<GrandSocketStation>>>,
     user: Option<User>,
     id: i32,
@@ -140,9 +141,10 @@ impl fmt::Debug for Connection {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "Connection ID: {}, sender: {}",
+            "ConnectionID: {}, sender: {} -> User: {:?}",
             self.id,
-            self.tx.connection_id()
+            self.tx.connection_id(),
+            self.user
         )
     }
 }
@@ -170,34 +172,35 @@ trait CookieExtractor {
     fn get_key(&self, key: &str) -> Option<Self::ResultType>;
 }
 
-struct CookieStr(Vec<u8>);
+struct CookieStr<'a>(&'a Vec<u8>);
 
-impl CookieExtractor for CookieStr {
+impl<'a> CookieExtractor for CookieStr<'a> {
     type ResultType = String;
     fn get_key(&self, key: &str) -> Option<Self::ResultType> {
         let cookie_str: Result<Vec<Vec<String>>, _> = String::from_utf8(self.0.as_slice().to_vec())
             .map(|x| {
-                let temp: Vec<Vec<String>> = x.split(";")
+                x.split(";")
                     .map(|y| {
                         y.trim()
                             .to_owned()
                             .split("=")
                             .map(|a| a.to_owned())
                             .collect::<Vec<String>>()
-                            
                     })
                     .filter(|c| &*c[0] == key)
-                    .collect();
-                println!("testing... {:?}", temp);
-                temp
-                // temp.map(|y: Vec<&str>| y[6].split("=").collect())[0]
+                    .collect()
             });
-        // let cookie_entries: Vec<&str> = cookie_str.split(";").collect();
-        // let token_entry: Vec<&str> = cookie_entries[6].split("=").collect();
-        // let token: String = token_entry[1].to_owned();
-        // debug!("Cookie entries: {:?}", cookie_entries);
-        // debug!("Token: {:?}", token);
-        Some(String::from(""))
+
+        if cookie_str.is_ok() {
+            let res = cookie_str.unwrap();
+            if res.len() > 0 {
+                Some(res[0][1].clone())
+            } else {
+                None
+            }
+        } else {
+            None
+        }
     }
 }
 
@@ -209,52 +212,83 @@ impl Handler for Connection {
         }
 
         // find the user...
-        let token = hs.request.header("Cookie");
-        token.and_then(|tok| {
-            let cookie_str = String::from_utf8(tok.clone()).unwrap();
-            let cookie_entries: Vec<&str> = cookie_str.split(";").collect();
-            let token_entry: Vec<&str> = cookie_entries[6].split("=").collect();
-            let token: String = token_entry[1].to_owned();
-            debug!("Cookie entries: {:?}", cookie_entries);
-            debug!("Token: {:?}", token);
-            let u = User::new();
-            let out = match &self.parent {
-                Some(val) => match val.try_borrow_mut() {
-                    Ok(parent) => {
-                        debug!("Parent --> {:?}", parent);
-                        Ok(parent)
-                    }
-                    Err(e) => {
-                        error!("There was an error! {}", e);
-                        Err(GSSError::from(e))
-                    }
-                },
-                None => {
-                    error!("Could not borrow parent as a mutable reference!");
-                    Err(GSSError::GetParent)
+        let mut user_id = -1;
+        {
+            // funky scope is due to the need for a mutable and immutable borrow on 'self'
+            // which requires one of the borrows to return the value before the next can continue..
+            let token = hs.request.header("Cookie");
+            let oauth_id = token.and_then(|tok| {
+                let cookies = CookieStr(tok);
+                let mut token = String::new();
+                if let Some(token_str) = cookies.get_key("token") {
+                    token = token_str;
                 }
-            };
-            info!("got parent! {:?}", out);
-            match out {
-                Ok(p) => {
-                    let table: &BTreeMap<String, Oauth2ProviderAccesstoken> = &p.auth_table;
-                    debug!("Table: {:?}", table);
-                    if table.contains_key(&token) {
-                        let oauth2 = &p.auth_table[&token];
-                        info!("Found User OAUTH2 entry: {:?}", oauth2);
-                    } else {
-                        warn!("Oath2 Entry does not exist for token. Could be expired.");
+                debug!("Token: {:?}", token);
+                let u = User::new();
+                let out = match &self.parent {
+                    Some(val) => match val.try_borrow_mut() {
+                        Ok(parent) => {
+                            debug!("Parent --> {:?}", parent);
+                            Ok(parent)
+                        }
+                        Err(e) => {
+                            error!("There was an error! {}", e);
+                            Err(GSSError::from(e))
+                        }
+                    },
+                    None => {
+                        error!("Could not borrow parent as a mutable reference!");
+                        Err(GSSError::GetParent)
                     }
+                };
+                info!("got parent! {:?}", out);
+                match out {
+                    Ok(p) => {
+                        let table: &BTreeMap<
+                            String,
+                            Oauth2ProviderAccesstoken,
+                        > = &p.auth_table;
+                        debug!("Table: {:?}", table);
+                        if table.contains_key(&token) {
+                            let oauth2 = p.auth_table[&token].clone();
+                            info!("Found User OAUTH2 entry: {:?}", oauth2);
+                            return Some(oauth2);
+                        } else {
+                            warn!("Oath2 Entry does not exist for token. Could be expired.");
+                            return None;
+                        }
+                    }
+                    Err(e) => warn!("Could not unwrap Parent (GrandSocketStation"),
                 }
-                Err(e) => warn!("Could not unwrap Parent (GrandSocketStation"),
+
+                // Oauth2ProviderAccesstoken::get_by_token(tok, )
+                // self.set_user(u);
+                None
+            });
+            user_id = oauth_id.and_then(|v| v.user_id).unwrap();
+        }
+
+        // let db = self.db.get();
+        if user_id != -1 {
+            let u = User::get_by_id(user_id, &self.db);
+            if u.is_ok() {
+                let user = u.unwrap();
+                info!("Got user: {:?}", user);
+                self.set_user(user);
+                info!("CONNECTION: {:?}", self);
+                Ok(())
+            } else {
+                Err(ws::Error::new(
+                    ws::ErrorKind::Internal,
+                    "Could not find/authenticate user...",
+                ))
             }
-
-            // Oauth2ProviderAccesstoken::get_by_token(tok, )
-            // self.set_user(u);
-            Some(u)
-        });
-
-        Ok(())
+        } else {
+            Err(ws::Error::new(
+                ws::ErrorKind::Internal,
+                "Could not find/authenticate user...",
+            ))
+        }
     }
 
     fn on_message(&mut self, msg: Message) -> ws::Result<()> {
@@ -752,6 +786,7 @@ fn main() {
         let mut value = None;
         {
             value = Some(Connection {
+                db: DB::new(),
                 id: *i,
                 tx: out.clone(),
                 user: None,
@@ -801,11 +836,13 @@ mod tests {
     }
 
     #[test]
-    fn test_CookieStr() {
-        let test = CookieStr(" test=Teststring;  a=v; ".to_owned().as_bytes().to_vec());
-        test.get_key("test");
-        test.get_key("a");
-        test.get_key("b");
+    fn test_cookie_str() {
+        let st = " test=Teststring;  a=v; ".to_owned().as_bytes().to_vec();
+        let test = CookieStr(&st);
+        let a = test.get_key("test");
+        let b = test.get_key("a");
+        let c = test.get_key("b");
+        println!("a={:?}, b={:?}, c={:?}", a, b, c);
     }
 
     // #[test]
