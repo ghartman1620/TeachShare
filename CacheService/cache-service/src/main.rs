@@ -165,6 +165,42 @@ struct WSMessage {
     version: Option<u64>,
 }
 
+trait CookieExtractor {
+    type ResultType;
+    fn get_key(&self, key: &str) -> Option<Self::ResultType>;
+}
+
+struct CookieStr(Vec<u8>);
+
+impl CookieExtractor for CookieStr {
+    type ResultType = String;
+    fn get_key(&self, key: &str) -> Option<Self::ResultType> {
+        let cookie_str: Result<Vec<Vec<String>>, _> = String::from_utf8(self.0.as_slice().to_vec())
+            .map(|x| {
+                let temp: Vec<Vec<String>> = x.split(";")
+                    .map(|y| {
+                        y.trim()
+                            .to_owned()
+                            .split("=")
+                            .map(|a| a.to_owned())
+                            .collect::<Vec<String>>()
+                            
+                    })
+                    .filter(|c| &*c[0] == key)
+                    .collect();
+                println!("testing... {:?}", temp);
+                temp
+                // temp.map(|y: Vec<&str>| y[6].split("=").collect())[0]
+            });
+        // let cookie_entries: Vec<&str> = cookie_str.split(";").collect();
+        // let token_entry: Vec<&str> = cookie_entries[6].split("=").collect();
+        // let token: String = token_entry[1].to_owned();
+        // debug!("Cookie entries: {:?}", cookie_entries);
+        // debug!("Token: {:?}", token);
+        Some(String::from(""))
+    }
+}
+
 impl Handler for Connection {
     fn on_open(&mut self, hs: Handshake) -> ws::Result<()> {
         info!("client connected.");
@@ -198,18 +234,21 @@ impl Handler for Connection {
                     Err(GSSError::GetParent)
                 }
             };
-            println!("test test test");
             info!("got parent! {:?}", out);
-            let p = out.unwrap();
-            let table: &BTreeMap<String, Oauth2ProviderAccesstoken> = &p.auth_table;
-            debug!("Table: {:?}", table);
-
-            if table.contains_key(&token) {
-                let test = &p.auth_table[&token];
-                info!("FOUND USER OAUTH2 ENTRY: {:?}", test);
-            } else {
-                warn!("Oath2 Entry does not exist for token. Could be expired.");
+            match out {
+                Ok(p) => {
+                    let table: &BTreeMap<String, Oauth2ProviderAccesstoken> = &p.auth_table;
+                    debug!("Table: {:?}", table);
+                    if table.contains_key(&token) {
+                        let oauth2 = &p.auth_table[&token];
+                        info!("Found User OAUTH2 entry: {:?}", oauth2);
+                    } else {
+                        warn!("Oath2 Entry does not exist for token. Could be expired.");
+                    }
+                }
+                Err(e) => warn!("Could not unwrap Parent (GrandSocketStation"),
             }
+
             // Oauth2ProviderAccesstoken::get_by_token(tok, )
             // self.set_user(u);
             Some(u)
@@ -563,8 +602,7 @@ impl Connection {
                                 watchers.iter().flat_map(|y| y).find(|x| **x == id as i32);
 
                             debug!("WATCHES ---> {:?}, LOOKING FOR ----> {:?}, MATCHED_WATCHES ---> {:?}", watchers, id, all_watchers);
-                            if watchers.iter().flat_map(|y| y).any(|x| *x == id as i32)
-                            {
+                            if watchers.iter().flat_map(|y| y).any(|x| *x == id as i32) {
                                 let ws_response = WSMessageResponse::new(&posts, &versions);
                                 let serialized = serde_json::to_string(&ws_response)
                                     .expect("Uh-oh... JSON serialization error!~");
@@ -641,8 +679,10 @@ impl Connection {
     }
 }
 
-fn start_db_pool() -> (crossbeam_channel::Sender<models::Post>, crossbeam_channel::Sender<cache::Cancel>) {
-
+fn start_db_pool() -> (
+    crossbeam_channel::Sender<models::Post>,
+    crossbeam_channel::Sender<cache::Cancel>,
+) {
     let (kill_db_send, kill_db_recv): (CrossBSender<Cancel>, Receiver<Cancel>) =
         crossbeam_channel::unbounded();
     let (send_db, recv_db): (CrossBSender<Post>, Receiver<Post>) = crossbeam_channel::unbounded();
@@ -650,13 +690,13 @@ fn start_db_pool() -> (crossbeam_channel::Sender<models::Post>, crossbeam_channe
     match ThreadPool::new(DB_POOL_SIZE) {
         Ok(pool) => {
             info!("starting a pool of threads for teh DB saves...");
-            
+
             thread::spawn(move || {
                 for i in 0..DB_POOL_SIZE {
                     info!("Starting thread: {}.", i);
                     let closure_owned_recv = recv_db.clone();
-                    let closure_owned_cancel = kill_db_recv.clone(); 
-                        
+                    let closure_owned_cancel = kill_db_recv.clone();
+
                     pool.execute(move || {
                         let db = DB::new(); // only make a DB once
                         let conn = db.get(); // grab reference
@@ -699,7 +739,7 @@ fn main() {
     let i = &mut 0;
 
     // setup database send threadpool. Should allow for pretty high load if necessary...
-    let (send_db, kill_db_send) = start_db_pool();    
+    let (send_db, kill_db_send) = start_db_pool();
 
     // start cache + return necessary comm. channels
     let (a, b, c): (
@@ -730,8 +770,10 @@ fn main() {
         value.unwrap()
     }).unwrap();
 
-    match kill_db_send.send(Cancel{ msg: "Closing...".to_owned() }) {
-        Ok(_) => {},
+    match kill_db_send.send(Cancel {
+        msg: "Closing...".to_owned(),
+    }) {
+        Ok(_) => {}
         Err(err) => error!("There was an error closing the db threadpool. {:?}", err),
     }
 }
@@ -756,6 +798,14 @@ mod tests {
         //         kill_cache: c.clone(),
         // };
 
+    }
+
+    #[test]
+    fn test_CookieStr() {
+        let test = CookieStr(" test=Teststring;  a=v; ".to_owned().as_bytes().to_vec());
+        test.get_key("test");
+        test.get_key("a");
+        test.get_key("b");
     }
 
     // #[test]

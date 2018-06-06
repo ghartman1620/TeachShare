@@ -22,7 +22,6 @@ pub struct Worker {
 impl Worker {
     fn new(id: usize, receiver: Arc<Mutex<crossbeam_channel::Receiver<Message>>>) -> Worker {
         let thread = thread::spawn(move || loop {
-            
             let msg = receiver
                 .lock()
                 .expect("Could not acquire lock.")
@@ -30,7 +29,6 @@ impl Worker {
                 .expect("Failed to recieve message.");
 
             // info!("Worker {} got a job; executing.", id);
-            
 
             match msg {
                 Message::NewJob(job) => {

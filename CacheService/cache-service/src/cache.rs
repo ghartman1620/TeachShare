@@ -132,7 +132,7 @@ pub fn cache_thread(
     thread::spawn(move || {
         let db = DB::new();
         let mut cache = Rc::new(RefCell::new(HashMapCache::new(&db))); //Rc::new(RefCell::new(HashMap::<i32, Resource<Post>>::new()));
-        
+
         loop {
             let conn = db.get();
             select_loop! {
