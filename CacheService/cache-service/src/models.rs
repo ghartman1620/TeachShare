@@ -457,24 +457,18 @@ mod tests {
     #[test]
     fn test_response_msg() {
         let p: Post = Default::default();
-
         let payload = vec![Model::Post(p)];
         let versions = vec![1];
         let a = WSMessageResponse::new(&payload, &versions);
-        println!("WSMessageResponse --> {:?}", a);
-
         let new_post: Post = Default::default();
         let t = &Model::Post(new_post);
         let b = WSMsgResponse(1, t);
-        println!("WSMsgResponse: {:?}", b);
     }
 
     #[test]
     fn test_hashset_stuff() {
         let mut hs: HashSet<User> = HashSet::new();
         hs.insert(User::new());
-        println!("HashSet: {:?}", hs);
-
         let mut resource = Resource::new(Model::Post(Post::new()));
         let user = UserID::new();
         let mut perm = UserPermission::ViewPost(HashSet::new());
@@ -497,32 +491,11 @@ mod tests {
         resource.add_permission(perm4.clone());
 
         let mut perm_add = perm.clone() + perm2.clone();
-        println!(
-            "** perm add --> perm [{:?}] + perm2 [{:?}] = {:?}",
-            perm, perm2, perm_add
-        );
-
         let user5 = UserID::create(10, "aso7asdjd56fifk30dfikasdf8^&)hsd".to_owned());
         let mut perm5 = UserPermission::ViewPost(HashSet::new());
         perm5.insert(user5);
 
         perm_add += perm5.clone();
-        println!(
-            "** perm add2 (+=) --> perm_add [{:?}] += perm5 [{:?}]",
-            perm_add, perm5
-        );
-
-        // let test = UserSetEntry(1, Some(hs));
-
-        // let a = UserPermission::ChangePost()
-        // resource.permissions.insert(Permission::ViewPost, UserPermission::ViewPost(hs.clone()));
-        // println!("RESOURCE ----------> {:?}", resource);
-
-        // let result = resource.add_permission(Permission::ViewPost, UserPermission::ViewPost(hs.clone()));
-        // let result = resource.add_permission(Permission::ViewPost, UserPermission::ViewPost(hs.clone()));
-        // let result = resource.add_permission(Permission::ChangePost, UserPermission::ChangePost(hs.clone()));
-        // let result = resource.add_permission(Permission::ChangePost, UserPermission::ChangePost(hs.clone()));
-        // println!("RESULT: {:?}", resource.permissions);
     }
 
     // #[test]

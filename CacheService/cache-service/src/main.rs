@@ -819,41 +819,11 @@ mod tests {
     use models::*;
 
     #[test]
-    fn test_connection_add_user() {
-        // Builder::new().with_settings(Settings::default()).build();
-        // let (send_db, recv_db) = crossbeam_channel::unbounded();
-        // let (a, b, c) = wire_up(send_db);
-        // let c = Connection {
-        //         id: 1,
-        //         tx: Sender::new(Token::new(), SyncSender::<Command>::new(), 1),
-        //         user: None,
-        //         parent: Some(hub.clone()),
-        //         to_cache: a.clone(),
-        //         from_cache: b.clone(),
-        //         kill_cache: c.clone(),
-        // };
-
-    }
-
-    #[test]
     fn test_cookie_str() {
         let st = " test=Teststring;  a=v; ".to_owned().as_bytes().to_vec();
         let test = CookieStr(&st);
         let a = test.get_key("test");
         let b = test.get_key("a");
         let c = test.get_key("b");
-        println!("a={:?}, b={:?}, c={:?}", a, b, c);
     }
-
-    // #[test]
-    // fn test_raises_no_id_provided() {
-    //     fn inner(yes: bool) -> Result<(), NoIDProvided> {
-    //         if yes {
-    //             Err(NoIDProvided::new("this is the error msg."))
-    //         } else {
-    //             Ok(())
-    //         }
-    //     }
-    // }
-
 }

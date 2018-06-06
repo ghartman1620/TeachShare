@@ -45,10 +45,17 @@ where
 {
     pub fn new(db: &DB) -> HashMapCache<K, V> {
         let mut permissions: BTreeMap<i32, UserObjectPermission> = BTreeMap::new();
-        let db_perm = UserObjectPermission::get_all(db).unwrap();
-        for perm in &db_perm {
-            debug!("Adding permission: {:?} to cache.", perm);
-            permissions.insert(perm.id, perm.clone());
+        match UserObjectPermission::get_all(db) {
+            Ok(db_perm) => {
+                for perm in &db_perm {
+                    debug!("Adding permission: {:?} to cache.", perm);
+                    permissions.insert(perm.id, perm.clone());
+                }
+            }
+            Err(db_err) => warn!(
+                "There was an error getting all UserObjectPermission objects. {:?}",
+                db_err
+            ),
         }
 
         HashMapCache {
@@ -718,7 +725,7 @@ mod tests {
         // check it!
         {
             let result = &hmc[ID::Post(1)];
-            println!("HMC [Post(1)] -> {:?}", result);
+            // println!("HMC [Post(1)] -> {:?}", result);
         }
         {
             let id = 2;
@@ -738,9 +745,6 @@ mod tests {
             c.id = id;
             hmc[ID::Comment(4)] = Resource::new(Model::Comment(c));
         }
-        println!("Post(2): {:?}", hmc[ID::Post(2)]);
-        println!("User(3): {:?}", hmc[ID::User(3)]);
-        println!("Comment(4): {:?}", hmc[ID::Comment(4)]);
     }
 
     // #[test]

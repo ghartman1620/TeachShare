@@ -272,32 +272,22 @@ mod tests {
             String::from("wiAGgM3GQoAgMnqydoatfSITZElgzI"),
             &session,
         );
-        println!("RESULT: {:?}", results);
-
         let table_cache = Oauth2ProviderAccesstoken::build_user_table_cached(&session);
-        println!("OAuth User Table: {:?}", table_cache);
     }
 
     #[test]
     fn test_get_user_db() {
         let db = DB::new();
         let user = User::get_by_id(1, &db);
-        println!("USER => {:?}", user);
     }
 
     #[test]
     fn test_user_auth_association() {
         let db = DB::new();
         let conn = db.get();
-        // let auth = Oauth2ProviderAccesstoken::get_all(&*conn).unwrap();
         let user = User::get_by_id(3, &db).unwrap();
         let result: Result<Oauth2ProviderAccesstoken, _> =
             Oauth2ProviderAccesstoken::belonging_to(&user).first(&*conn);
-        // let result: Result<User, _> =
-        //     User::belonging_to(&auth).first(&*conn);
-        // println!("\n************************************\n{:?}\n", auth);
-        println!("\n************************************\n{:?}\n", user);
-        println!("\n************************************\n{:?}\n", result);
     }
 
     #[test]
@@ -306,7 +296,6 @@ mod tests {
         let conn = db.get();
         let user = User::get_by_id(3, &db).unwrap();
         let posts: Vec<Post> = Post::belonging_to(&user).load(&*conn).unwrap();
-        println!("POSTS [{:?}] ------------------> {:?}", posts.len(), posts);
     }
 
     #[test]
@@ -315,19 +304,8 @@ mod tests {
         let conn = db.get();
 
         let result = AuthPermission::get_by_codename("view_post".to_owned(), &db);
-        println!("AUTH-PERMISSION => {:?}", result);
-
         let test2 = DjangContentType::get_dct_by_model(&db, "post");
-        println!("DCT --------------------> {:?}", test2);
-
-        // let dct = test2.unwrap();
-        // let auth_perm = AuthPermission::belongs_to(&dct);
-
         let say_what = AuthPermission::get_with_content_type(&db);
-        println!("\n*************************************\n{:?}\n", say_what);
-
-        println!("---------------------------------------------");
         let user_assoc = User::get_associated(4, &db);
-        println!("USER_ASSOC: {:?}", user_assoc);
     }
 }

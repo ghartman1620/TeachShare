@@ -123,6 +123,22 @@ impl DjangContentType {
     }
 }
 
+impl Refresh for UserObjectPermission {
+    type Model = UserObjectPermission;
+    fn refresh(&mut self) -> Option<&Self::Model> {
+        let db = DB::new();
+        match UserObjectPermission::get_by_id(self.id, self.content_type_id, &db) {
+            Ok(val) => {
+                *self = val;
+            },
+            Err(db_err) => {
+                error!("Error: {:?}", db_err);
+            },
+        }
+        Some(self)
+    }
+}
+
 #[derive(Associations, Identifiable, Queryable, Insertable, Serialize, Deserialize, Debug, Clone,
          PartialEq, Default)]
 #[belongs_to(Post, foreign_key = "object_pk")]
@@ -207,6 +223,29 @@ impl GetByID<i32, UserObjectPermission> for UserObjectPermission {
     }
 }
 
+trait Refresh {
+    type Model;
+    fn refresh(&mut self) -> Option<&Self::Model>;
+}
+
+impl Refresh for Post {
+    type Model = Post;
+
+    fn refresh(&mut self) -> Option<&Self::Model> {
+        let db = DB::new();
+        let session = db.get();
+        match Post::get(self.id, &*session) {
+            Ok(val) => {
+                *self = val[0].clone();
+            },
+            Err(db_err) => {
+                error!("Error: {:?}", db_err);
+            },
+        }
+        Some(self)
+    }
+}
+
 impl Post {
     pub fn new() -> Post {
         Post {
@@ -277,58 +316,37 @@ impl Post {
         }
     }
 }
-// pub fn save_posts(rx: Receiver<Post>) {
-//     let db = DB::new();
-
-//     loop {
-//         use std::time::SystemTime;
-//         let res = rx.recv();
-//         if res.is_err() {
-//             println!("Sender hung up, exiting");
-//             break;
-//         } else {
-//             let p: Post = res.unwrap();
-//             // let res = db.insert_post(p);
-//             let res = p.save(&*db.get());
-//             // res.expect("error saving post");
-//             match res {
-//                 Ok(_) => println!("Saving post in DB response was successful!"),
-//                 Err(e) => println!("[DB]<ERROR> Saving post error. '{:?}'", e),
-//             }
-//         }
-//     }
-// }
 
 #[cfg(test)]
 mod tests {
-    use crossbeam_channel::*;
     use db::*;
-    use diesel::prelude::*;
-    use diesel::result;
     use models::*;
-    use schema::{auth_permission, guardian_userobjectpermission, posts_post};
 
-    use std::sync::mpsc::channel;
-    use std::thread;
-    use std::time::SystemTime;
+    #[test]
+    fn test_refresh_userobjectperm() {
+        let db = DB::new();
+        let mut uop: UserObjectPermission = UserObjectPermission::get_all(&db).unwrap()[0].clone();
+        let temp1 = uop.clone();
+        uop.object_pk = String::from("uhoh");
+        uop.refresh();
+        assert_eq!(temp1, uop); // that it's refreshing to the db version
+    }
 
-    use users::{AuthPermission, Oauth2ProviderAccesstoken, User};
+    #[test]
+    fn test_post_refresh_trait() {
+        let db = DB::new();
+        let session = db.get();
+        let p = Post::get(5, &*session);
+        let mut p1 = p.unwrap()[0].clone();
+        p1.title = String::from("this is a different title now!");
+        p1.refresh();
+    }
 
     #[test]
     fn test_django_content_type() {
         let db = DB::new();
         let test_q = DjangContentType::get_all(&db);
-        println!("TEST_Q -------> {:?}", test_q);
-
         let test2 = DjangContentType::get_dct_by_model(&db, "post");
-        println!("DCT --------------------> {:?}", test2);
-
-        // let dct = test2.unwrap();
-        // let auth_perm = AuthPermission::belongs_to(&dct);
-
-        // // let auth_p = AuthPermission::get_by_codename("view_post".to_owned(), &db).unwrap();
-        // // let test3 = DjangContentType::belongs_to(&auth_p);
-        // println!("DCT for AUTHP -----> {:?}", auth_perm);
     }
 
     #[test]
@@ -336,10 +354,7 @@ mod tests {
         let db = DB::new();
         let test = UserObjectPermission::get_all(&db);
         UserObjectPermission::get_by_id(1, 23, &db);
-        println!("UserObjectPermission: {:?}", test);
-
         let test2 = UserObjectPermission::get_cache_line_for(1, 23, &db);
-        println!("$$$ TEST2 $$$  ----------> {:?}", test2);
     }
 
     #[test]
@@ -350,79 +365,5 @@ mod tests {
         let ct = DjangContentType::get_dct_by_model(&db, "post").unwrap();
         let result: Result<UserObjectPermission, _> =
             UserObjectPermission::belonging_to(&ct).first(&*session);
-        println!("\n************************************\n{:?}\n", result);
     }
-
-    //pre: Post with pk -1 exists
-    //tests that changing a post's title and calling its .save() method
-    //has the change saved in the database to be yielded in future get()s
-    // #[test]
-    // fn test_change_post() {
-    //     let conn: PgConnection = establish_connection();
-    //     let res: Result<Vec<Post>, result::Error> = Post::get(-1, &conn);
-    //     if res.is_err() {
-    //         println!(
-    //             "test_change_post will fail: no post -1 exists (create it to have this test work!"
-    //         );
-    //         assert!(res.is_ok()); //this fails
-    //     }
-    //     let mut posts: Vec<Post> = res.unwrap();
-    //     let mut p = &mut posts[0];
-    //     println!("{}", p.title);
-    //     //save the current title so we can put it back when test is done
-    //     let s: String = p.title.clone();
-    //     p.title = String::from("changed");
-    //     p.save(&conn);
-
-    //     let res1: Result<Vec<Post>, result::Error> = Post::get(-1, &conn);
-    //     assert!(res1.is_ok());
-    //     let mut posts: Vec<Post> = res1.unwrap();
-    //     let p = &mut posts[0];
-    //     println!("{}", p.title);
-    //     assert_eq!(p.title, String::from("changed"));
-    //     p.title = s.clone();
-    //     p.save(&conn);
-    // }
-    // //pre: Post with pk -5 does not exist
-    // #[test]
-    // fn test_post_dne_error() {
-    //     let conn: PgConnection = establish_connection();
-    //     let res = Post::get(-5, &conn);
-    //     assert!(res.is_err());
-    // }
-
-    // #[test]
-    // fn test_save_posts_thread() {
-    //     let connection = establish_connection();
-
-    //     let (tx, rx) = unbounded();
-    //     let begin = SystemTime::now();
-
-    //     let t = thread::spawn(move || {
-    //         save_posts(rx);
-    //     });
-    //     let mut posts = Post::get(1, &connection).expect("no post 1");
-    //     //we'll set p's title back to whatever it was once we're done
-
-    //     let p = &mut posts[0];
-    //     let s = p.title.clone();
-    //     let _ = tx.send(p.clone());
-    //     for x in 0..2 {
-    //         p.title = format!("change{}", x);
-    //         tx.send(p.clone()).expect("Error sending post");
-    //     }
-    //     println!("i can continue doing useful work while posts are being saved!");
-    //     p.title = s;
-    //     tx.send(p.clone()).expect("Error sending post");
-    //     drop(tx);
-    //     let delta = SystemTime::now()
-    //         .duration_since(begin)
-    //         .expect("time went backwards");
-    //     println!("Finished sending posts in time of {:?}", delta);
-    //     let _ = t.join();
-    //     let delta = SystemTime::now()
-    //         .duration_since(begin)
-    //         .expect("time went backwards");
-    //     println!("Finished saving posts in time of {:?}", delta);
-    // }
 }
