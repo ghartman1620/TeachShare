@@ -115,7 +115,6 @@ impl GrandSocketStation {
     pub fn push_connection(&mut self, conn: Connection) {
         self.connections.push(Rc::new(conn))
     }
-
     pub fn check_token(&self, token: String) {
         self.auth_table.get(&token);
     }
