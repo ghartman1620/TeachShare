@@ -1,5 +1,8 @@
 *.py[cod]
 env/
+TeachShare_WebApp/env
+
+TeachShare_WebApp/env3
 __pycache__/
 .idea/
 .vscode/

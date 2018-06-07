@@ -229,10 +229,14 @@ export class Post extends Model {
     */
     public static get(pk: number, save?: boolean): Promise<Post> {
         return new Promise((resolve, reject) => {
+            console.log("getting post " +  pk);
             this.db.getPost(pk).then(p => {
                 p.pk = pk;
+                console.log("got post from db!");
+                console.log(p);
                 resolve(p);
             }).catch( () => {
+                console.log("didn't get post from db");
                 if (save) {
                     Post.db.addEmptyPost(pk);
                     Post.ws.sendWatch(pk);

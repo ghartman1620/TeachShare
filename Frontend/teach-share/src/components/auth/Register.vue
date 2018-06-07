@@ -53,6 +53,7 @@ import {
   Mutation,
   namespace
 } from "vuex-class";
+import {createUser} from "../../store_modules/UserService";
 
 import forEach from "lodash/forEach";
 import AuthPage from "./AuthPage";
@@ -109,7 +110,7 @@ export default class Register extends Vue{
 
         if(this.emailValid && this.usernameValid && this.passwordValid){
             var vm = this;
-            this.createUser("createUser", {
+            createUser(this.$store, {
                 username: this.username,
                 password: this.pw1,
                 email: this.email,

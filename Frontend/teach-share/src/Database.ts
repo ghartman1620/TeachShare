@@ -76,7 +76,9 @@ export default class Database {
                     if (post === undefined) {
                         reject();
                     } else {
-                        const p: Post = Post.pkify(post);
+                        console.log(post);
+                        const p: Post = Post.pkify(post.post);
+                        console.log(p);
                         resolve(p);
                     }
                 }).catch((err) => console.error(err));
@@ -133,4 +135,4 @@ Database.getInstance().manifest().then((manifest) => {
 // I also put this here so it happens on page load. It's as good a place as any.
 // Again, for debugging purposes.
 
-window.localStorage.removeItem("inProgressPost");
+//window.localStorage.removeItem("inProgressPost");
