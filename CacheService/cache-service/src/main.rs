@@ -1,9 +1,8 @@
 /*!
  The websocket cache service is used for realtime communication between connected users.
 */
-#![feature(vec_remove_item)]
+#![feature(vec_remove_item, slice_patterns, extern_prelude)]
 #![warn(clippy)]
-#![feature(extern_prelude)]
 
 extern crate pretty_env_logger;
 #[macro_use]
@@ -20,7 +19,10 @@ extern crate crossbeam_channel;
 #[macro_use]
 extern crate diesel;
 use std::fmt;
-use ws::{listen, CloseCode, Error, Handler, Handshake, Message, Sender};
+use ws::{
+    listen, CloseCode, Error, Handler, Handshake, Message, Request, Response, Result as WSResult,
+    Sender,
+};
 
 mod cache;
 mod db;
@@ -179,22 +181,32 @@ impl<'a> CookieExtractor for CookieStr<'a> {
     fn get_key(&self, key: &str) -> Option<Self::ResultType> {
         let cookie_str: Result<Vec<Vec<String>>, _> = String::from_utf8(self.0.as_slice().to_vec())
             .map(|x| {
-                x.split(";")
+                x.split(';')
                     .map(|y| {
                         y.trim()
                             .to_owned()
-                            .split("=")
+                            .split('=')
                             .map(|a| a.to_owned())
                             .collect::<Vec<String>>()
                     })
-                    .filter(|c| &*c[0] == key)
+                    .filter(|c| match c.as_slice() {
+                        [k, _, _..] if key == &**k => true,
+                        _ => false,
+                    })
                     .collect()
             });
 
         if cookie_str.is_ok() {
             let res = cookie_str.unwrap();
-            if res.len() > 0 {
-                Some(res[0][1].clone())
+
+            // The silly-ness below is actually just very careful bounds checking. Better
+            // safe than 'IndexOutOfBounds'..
+            if !res.is_empty() {
+                if res[0].len() > 1 {
+                    Some(res[0][1].clone())
+                } else {
+                    None
+                }
             } else {
                 None
             }
@@ -204,7 +216,50 @@ impl<'a> CookieExtractor for CookieStr<'a> {
     }
 }
 
+pub enum WSAuthError {
+    BadToken,
+}
+
 impl Handler for Connection {
+    fn on_request(&mut self, req: &Request) -> WSResult<Response> {
+        info!(
+            "Websocket request recieved for [resource]: {:?} from [addr]: {:?} --> [origin]: {:?}",
+            req.resource(),
+            req.client_addr(),
+            req.origin()
+        );
+        let cookie = req.header("Cookie");
+        if cookie.is_some() {
+            let empty = "".to_owned().into_bytes();
+            let cookie_str = CookieStr(cookie.unwrap_or(&empty));
+            match cookie_str.get_key("token") {
+                Some(token) => {
+                    debug!("Token: {:?}", token);
+                    // check token
+
+                    let res = Response::from_request(req)?;
+                    Ok(res)
+                }
+                None => {
+                    error!("No token found, revoke access!");
+                    Err(ws::Error::new(
+                        ws::ErrorKind::Custom(Box::new(GSSError::BadToken("Testing string..."))),
+                        "The client could not be authenticated properly..",
+                    ))
+                }
+            }
+        } else {
+            Err(ws::Error::new(
+                ws::ErrorKind::Custom(Box::new(GSSError::BadToken("Testing string #2..."))),
+                "The client could not be authenticated properly..",
+            ))
+        }
+        //
+    }
+
+    // @TODO: @FIXME: This needs to probably go in the 'on_request' method, where we deny them
+    // BEFORE connection, as apose to this, where it is already technically too late. I need to
+    // deny the connection earlier. The logic will be roughly the same though, 1-1.
     fn on_open(&mut self, hs: Handshake) -> ws::Result<()> {
         info!("client connected.");
         for (key, value) in hs.request.headers() {
@@ -265,7 +320,7 @@ impl Handler for Connection {
                 // self.set_user(u);
                 None
             });
-            user_id = oauth_id.and_then(|v| v.user_id).unwrap();
+            user_id = oauth_id.and_then(|v| v.user_id).unwrap_or(-1);
         }
 
         // let db = self.db.get();
@@ -343,30 +398,38 @@ impl Handler for Connection {
 }
 
 #[derive(Debug)]
-pub enum GSSError {
+pub enum GSSError<'tokstr> {
     GetParent,
     Unknown,
+    BadToken(&'tokstr str),
 }
 
-impl fmt::Display for GSSError {
+impl<'tokstr> fmt::Display for GSSError<'tokstr> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             GSSError::GetParent => f.write_str("Get parent error."),
             GSSError::Unknown => f.write_str("Unknown GSS error."),
+            GSSError::BadToken(msg) => {
+                let temp = format!("Bad token. Msg: [{}]", msg);
+                f.write_str(&*temp)
+            }
         }
     }
 }
 
-impl StdError for GSSError {
+impl<'tokstr> StdError for GSSError<'tokstr> {
     fn description(&self) -> &str {
         match *self {
             GSSError::GetParent => "Could not mutably borrow parent.",
             GSSError::Unknown => "Unknown error handling GrandSocketStation instance.",
+            GSSError::BadToken(msg) => {
+                msg
+            }
         }
     }
 }
 
-impl From<std::cell::BorrowMutError> for GSSError {
+impl<'tokstr> From<std::cell::BorrowMutError> for GSSError<'tokstr> {
     fn from(e: std::cell::BorrowMutError) -> Self {
         GSSError::GetParent
     }

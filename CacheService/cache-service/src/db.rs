@@ -112,11 +112,13 @@ impl DjangContentType {
     pub fn get_dct_by_model<'a>(db: &DB, model_name: &'a str) -> Result<DjangContentType, DBError> {
         use schema::django_content_type::dsl::{django_content_type, model};
         let conn = db.get();
-        let content_type: Vec<DjangContentType> = django_content_type
+        let mut content_type: Vec<DjangContentType> = django_content_type
             .filter(model.eq(model_name.to_owned()))
             .load::<DjangContentType>(&*conn)?;
         if content_type.len() == 1 {
-            Ok(content_type[0].clone())
+            Ok(content_type
+                .pop()
+                .expect("Unwrap pop'd value. Shouldn't be possible to fail!"))
         } else {
             Err(DBError::MoreThanOne) // cause really, what's the difference!?
         }
@@ -130,10 +132,10 @@ impl Refresh for UserObjectPermission {
         match UserObjectPermission::get_by_id(self.id, self.content_type_id, &db) {
             Ok(val) => {
                 *self = val;
-            },
+            }
             Err(db_err) => {
                 error!("Error: {:?}", db_err);
-            },
+            }
         }
         Some(self)
     }
@@ -235,12 +237,14 @@ impl Refresh for Post {
         let db = DB::new();
         let session = db.get();
         match Post::get(self.id, &*session) {
-            Ok(val) => {
-                *self = val[0].clone();
-            },
+            Ok(ref mut val) => {
+                if let Some(s) = val.pop() {
+                    *self = s;
+                }
+            }
             Err(db_err) => {
                 error!("Error: {:?}", db_err);
-            },
+            }
         }
         Some(self)
     }
@@ -337,9 +341,12 @@ mod tests {
         let db = DB::new();
         let session = db.get();
         let p = Post::get(5, &*session);
-        let mut p1 = p.unwrap()[0].clone();
-        p1.title = String::from("this is a different title now!");
-        p1.refresh();
+        let temp_p = p.unwrap();
+        if temp_p.len() > 0 {
+            let mut p1 = temp_p[0].clone();
+            p1.title = String::from("this is a different title now!");
+            p1.refresh();
+        }
     }
 
     #[test]

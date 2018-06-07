@@ -348,7 +348,9 @@ fn handle_get(
         if dne_flag {
             let mut cache = cash.borrow_mut();
             if db_posts.len() == 1 {
-                let first = &db_posts[0];
+                let first = &db_posts
+                    .pop()
+                    .expect("There was an error unwrapping a pop'd item. This should not happen!");
                 let resource_new = Resource::new(Model::Post(first.clone()));
                 let inserted = cache.put(ID::Post(first.id), resource_new.clone());
                 match inserted {
