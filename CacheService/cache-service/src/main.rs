@@ -21,7 +21,7 @@ extern crate diesel;
 use std::fmt;
 use ws::{
     listen, CloseCode, Error, Handler, Handshake, Message, Request, Response, Result as WSResult,
-    Sender,
+    Sender, Factory,
 };
 
 mod cache;
@@ -333,14 +333,14 @@ impl Handler for Connection {
                 Ok(())
             } else {
                 Err(ws::Error::new(
-                    ws::ErrorKind::Internal,
-                    "Could not find/authenticate user...",
-                ))
+                        ws::ErrorKind::Custom(Box::new(GSSError::FailedUserAuth("No user was found for that id."))),
+                        "The client could not be authenticated properly..",
+                    ))
             }
         } else {
             Err(ws::Error::new(
-                ws::ErrorKind::Internal,
-                "Could not find/authenticate user...",
+                ws::ErrorKind::Custom(Box::new(GSSError::FailedUserAuth("Could not find Oauth2 reference in db for token."))),
+                "The client could not be authenticated properly..",
             ))
         }
     }
@@ -397,13 +397,14 @@ impl Handler for Connection {
 }
 
 #[derive(Debug)]
-pub enum GSSError<'tokstr> {
+pub enum GSSError<'tokstr, 'authstr> {
     GetParent,
     Unknown,
     BadToken(&'tokstr str),
+    FailedUserAuth(&'authstr str),
 }
 
-impl<'tokstr> fmt::Display for GSSError<'tokstr> {
+impl<'tokstr, 'authstr> fmt::Display for GSSError<'tokstr, 'authstr> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             GSSError::GetParent => f.write_str("Get parent error."),
@@ -411,24 +412,27 @@ impl<'tokstr> fmt::Display for GSSError<'tokstr> {
             GSSError::BadToken(msg) => {
                 let temp = format!("Bad token. Msg: [{}]", msg);
                 f.write_str(&*temp)
+            },
+            GSSError::FailedUserAuth(msg) => {
+                let temp = format!("Could not authenticate user. Msg: [{}]", msg);
+                f.write_str(&*temp)
             }
         }
     }
 }
 
-impl<'tokstr> StdError for GSSError<'tokstr> {
+impl<'tokstr, 'authstr> StdError for GSSError<'tokstr, 'authstr> {
     fn description(&self) -> &str {
         match *self {
             GSSError::GetParent => "Could not mutably borrow parent.",
             GSSError::Unknown => "Unknown error handling GrandSocketStation instance.",
-            GSSError::BadToken(msg) => {
-                msg
-            }
+            GSSError::BadToken(msg) => msg,
+            GSSError::FailedUserAuth(msg) => msg,
         }
     }
 }
 
-impl<'tokstr> From<std::cell::BorrowMutError> for GSSError<'tokstr> {
+impl<'tokstr, 'authstr> From<std::cell::BorrowMutError> for GSSError<'tokstr, 'authstr> {
     fn from(e: std::cell::BorrowMutError) -> Self {
         GSSError::GetParent
     }
@@ -438,7 +442,6 @@ impl Connection {
     fn set_user(&mut self, u: User) {
         self.user = Some(u);
     }
-
     fn remove_client(&mut self) {
         debug!(
             "[GrandSocketStation] Removing 'self' from GrandSocketStation: {:?}",
@@ -476,7 +479,6 @@ impl Connection {
             ),
         }
     }
-
     fn serialize_and_send_posts(&self, data: &[Model], versions: &[u64]) -> Result<(), ws::Error> {
         let output = WSMessageResponse::new(data, versions);
         debug!("Sending: {:?}", output);
@@ -486,7 +488,6 @@ impl Connection {
         debug!("Serialized content: {}", serialized);
         self.tx.send(serialized)
     }
-
     fn handle_get_msg(&self, msg: &WSMessage) -> Option<String> {
         debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Get);
@@ -570,7 +571,6 @@ impl Connection {
             Err(e) => Some(format!("Err: {:?}", e)),
         }
     }
-
     fn handle_manifest_msg(&self, msg: WSMessage) -> Option<String> {
         debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Manifest);
@@ -824,6 +824,29 @@ fn start_db_pool() -> (
     (send_db, kill_db_send)
 }
 
+// struct WServeFactory;
+
+// impl Factory for WServeFactory {
+//     type Handler = Connection;
+
+//     fn connection_made(&mut self, ws: Sender) -> Connection {
+//         Connection {
+//             ws: ws,
+
+//             is_client: true,
+//             db: DB::new(),
+//             id: *i,
+//             tx: out.clone(),
+//             user: None,
+//             parent: Some(hub.clone()),
+//             to_cache: a.clone(),
+//             from_cache: b.clone(),
+//             kill_cache: c.clone(),
+//         }
+//     }
+// }
+
+
 fn main() {
     pretty_env_logger::init();
     info!("starting cache service...");
@@ -843,6 +866,13 @@ fn main() {
         crossbeam_channel::Receiver<Arc<Msg>>,
         crossbeam_channel::Sender<Cancel>,
     ) = wire_up(send_db);
+
+    let mut settings = ws::Settings::default();
+    settings.panic_on_internal = false;
+
+    // let socket_serv = ws::Builder::new().with_settings(settings);
+    
+    // socket_serv.build(factory);
 
     listen("0.0.0.0:3012", move |out| {
         let mut value = None;
