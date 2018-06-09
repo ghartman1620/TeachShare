@@ -13,6 +13,18 @@ use db::{DBError, DjangContentType, UserObjectPermission, DB};
 use diesel::dsl::Select;
 use GrandSocketStation;
 
+
+// Wanted to create an event system, specifically to invalidate user's who's
+// token has expired..
+pub trait Event<T> {
+    type Item;
+
+    fn attach() {
+
+    }
+
+}
+
 // user access tokens cache:
 // need: user_id, token, expires?
 #[derive(Associations, Identifiable, Queryable, Debug, Serialize, Deserialize, Clone, Hash, Eq,
@@ -35,12 +47,12 @@ impl Oauth2ProviderAccesstoken {
     pub fn get_by_token(
         user_token: String,
         conn: &PgConnection,
-    ) -> Result<Vec<Oauth2ProviderAccesstoken>, diesel::result::Error> {
+    ) -> Result<Oauth2ProviderAccesstoken, diesel::result::Error> {
         use schema::oauth2_provider_accesstoken::dsl::{oauth2_provider_accesstoken, token};
 
         oauth2_provider_accesstoken
             .filter(token.eq(user_token))
-            .load::<Oauth2ProviderAccesstoken>(conn)
+            .first::<Oauth2ProviderAccesstoken>(conn)
     }
     pub fn get_all(
         conn: &PgConnection,
@@ -170,7 +182,7 @@ impl AuthPermission {
 #[table_name = "auth_user"]
 pub struct User {
     pub id: i32,
-    password: String,
+    // password: String,
     pub last_login: Option<chrono::DateTime<chrono::Utc>>,
     pub is_superuser: bool,
     pub username: String,
@@ -192,7 +204,7 @@ impl User {
     pub fn new() -> User {
         User {
             id: 0,
-            password: String::from(""),
+            // password: String::from(""),
             last_login: Some(chrono::Utc::now()),
             is_superuser: false,
             username: String::from(""),

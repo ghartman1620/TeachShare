@@ -48,7 +48,7 @@ table! {
 table! {
     auth_user (id) {
         id -> Int4,
-        password -> Varchar,
+        // password -> Varchar,
         last_login -> Nullable<Timestamptz>,
         is_superuser -> Bool,
         username -> Varchar,

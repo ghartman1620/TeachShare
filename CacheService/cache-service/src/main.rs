@@ -50,6 +50,8 @@ use std::thread;
 use std::time::SystemTime;
 use users::{Oauth2ProviderAccesstoken, User};
 
+use std::sync::atomic::{AtomicPtr, Ordering};
+
 const DB_POOL_SIZE: usize = 4;
 
 #[derive(Debug, Clone)]
@@ -238,11 +240,59 @@ impl Handler for Connection {
             match cookie_str.get_key("token") {
                 Some(token) => {
                     debug!("Token: {:?}", token);
+
                     // check token
+                    match &self.parent {
+                        Some(val) => match val.try_borrow_mut() {
+                            Ok(parent) => {
+                                debug!("Parent --> {:?}", parent);
+
+                                /// # Check local cache
+                                /// 
+                                let cached_auth = parent.auth_table.get(&token);
+
+                                
+                                /// # Check Database
+                                /// 
+                                match cached_auth {
+                                    Some(cached) => {
+                                        let auth_db = Oauth2ProviderAccesstoken::get_by_token(token, &*self.db.get());
+                                        match auth_db {
+                                            Ok(db) => {
+                                                info!("Recieved auth data for token: {:?} from cache.", db.token);
+                                                if let Some(user_id) = db.user_id {
+                                                    let associated_user = User::get_associated(user_id as i32, &self.db);
+                                                    debug!("Associated value: {:?}", associated_user);
+                                                    if let Ok(user) = associated_user {
+                                                        self.user = Some(user);
+                                                    }
+                                                    
+                                                } 
+                                            },
+                                            Err(db_err) => { 
+                                                warn!("Could not find entry in Cache or DB! Err: {:?}", db_err);
+                                                // !Warning! DENY ACCESS HERE
+                                            },
+                                        }
+                                        
+                                    },
+                                    None => warn!("Token did not exist in cached auth data."),
+                                }
+                            },
+                            Err(e) => {
+                                error!("There was an error! {}", e);
+                                // return Err(GSSError::from(e));
+                            }
+                        },
+                        None => {
+                            error!("Could not borrow parent as a mutable reference!");
+                            // return Err(GSSError::GetParent);
+                        }
+                    };
 
                     let res = Response::from_request(req)?;
                     Ok(res)
-                }
+                },
                 None => {
                     error!("No token found, revoke access!");
                     Err(ws::Error::new(
