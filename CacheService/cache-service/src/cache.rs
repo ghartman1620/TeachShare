@@ -178,7 +178,7 @@ pub fn cache_thread(
                         },
                     };
 
-                debug!("[CACHE] (current) -> {:?}", cache);
+                trace!("[CACHE] (current) -> {:?}", cache);
                 },
                 recv(cancel, s) => {
                     debug!("[CACHE] Exiting.... Cancel Message: {:?}", s);
@@ -259,7 +259,7 @@ fn handle_manifest(
 
     let mut posts: Vec<Post> = Post::get_all(db_posts, db).expect("Getting from database failed");
 
-    debug!("[CACHE] Manifest: got posts from db: {:?}", posts);
+    trace!("[CACHE] Manifest: got posts from db: {:?}", posts);
 
     let mut mutable_cache = cash.borrow_mut();
     // For each post returned by db

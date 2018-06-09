@@ -121,8 +121,8 @@ impl GrandSocketStation {
     pub fn push_connection(&mut self, conn: Connection) {
         self.connections.push(Rc::new(conn))
     }
-    pub fn check_token(&self, token: String) {
-        self.auth_table.get(&token);
+    pub fn check_token(&self, token: &String) -> Option<&Oauth2ProviderAccesstoken> {
+        self.auth_table.get(token)
     }
 }
 
@@ -249,22 +249,33 @@ impl Handler for Connection {
 
                                 /// # Check local cache
                                 /// 
-                                let cached_auth = parent.auth_table.get(&token);
-
+                                // let cached_auth = parent.auth_table.get(&token);
+                                let cached_auth = (*parent).check_token(&token);
                                 
                                 /// # Check Database
                                 /// 
                                 match cached_auth {
                                     Some(cached) => {
-                                        let auth_db = Oauth2ProviderAccesstoken::get_by_token(token, &*self.db.get());
+                                        let auth_db: Result<Oauth2ProviderAccesstoken, _>;
+                                        {
+                                            auth_db = Oauth2ProviderAccesstoken::get_by_token(token, &*self.db.get());
+                                        }
                                         match auth_db {
                                             Ok(db) => {
                                                 info!("Recieved auth data for token: {:?} from cache.", db.token);
                                                 if let Some(user_id) = db.user_id {
-                                                    let associated_user = User::get_associated(user_id as i32, &self.db);
+                                                    let associated_user = User::get_associated_user(user_id as i32, &self.db);
                                                     debug!("Associated value: {:?}", associated_user);
                                                     if let Ok(user) = associated_user {
+
+                                                        // @TODO: fix this first!!
                                                         self.user = Some(user);
+                                                        // self.set_user(user);
+                                                        debug!("User {:?} set for connection {}", self.user, self.id);
+                                                        debug!("Connection: {:?}", self);
+                                                    } else {
+                                                        let errs = associated_user.unwrap_err();
+                                                        debug!("Errors: {:?}", errs);
                                                     }
                                                     
                                                 } 
@@ -315,92 +326,93 @@ impl Handler for Connection {
     // deny the connection earlier. The logic will be roughly the same though, 1-1.
     fn on_open(&mut self, hs: Handshake) -> ws::Result<()> {
         info!("client connected.");
-        for (key, value) in hs.request.headers() {
-            info!("{:?}: {:?}", key, String::from_utf8(value.clone()));
-        }
+        // for (key, value) in hs.request.headers() {
+        //     info!("{:?}: {:?}", key, String::from_utf8(value.clone()));
+        // }
 
-        // find the user...
-        let mut user_id = -1;
-        {
-            // funky scope is due to the need for a mutable and immutable borrow on 'self'
-            // which requires one of the borrows to return the value before the next can continue..
-            let token = hs.request.header("Cookie");
-            let oauth_id = token.and_then(|tok| {
-                let cookies = CookieStr(tok);
-                let mut token = String::new();
-                if let Some(token_str) = cookies.get_key("token") {
-                    token = token_str;
-                }
-                debug!("Token: {:?}", token);
-                let u = User::new();
-                let out = match &self.parent {
-                    Some(val) => match val.try_borrow_mut() {
-                        Ok(parent) => {
-                            debug!("Parent --> {:?}", parent);
-                            Ok(parent)
-                        }
-                        Err(e) => {
-                            error!("There was an error! {}", e);
-                            Err(GSSError::from(e))
-                        }
-                    },
-                    None => {
-                        error!("Could not borrow parent as a mutable reference!");
-                        Err(GSSError::GetParent)
-                    }
-                };
-                info!("got parent! {:?}", out);
-                match out {
-                    Ok(p) => {
-                        let table: &BTreeMap<
-                            String,
-                            Oauth2ProviderAccesstoken,
-                        > = &p.auth_table;
-                        debug!("Table: {:?}", table);
-                        if table.contains_key(&token) {
-                            let oauth2 = p.auth_table[&token].clone();
-                            info!("Found User OAUTH2 entry: {:?}", oauth2);
-                            return Some(oauth2);
-                        } else {
-                            warn!("Oath2 Entry does not exist for token. Could be expired.");
-                            return None;
-                        }
-                    }
-                    Err(e) => warn!("Could not unwrap Parent (GrandSocketStation"),
-                }
+        // // find the user...
+        // let mut user_id = -1;
+        // {
+        //     // funky scope is due to the need for a mutable and immutable borrow on 'self'
+        //     // which requires one of the borrows to return the value before the next can continue..
+        //     let token = hs.request.header("Cookie");
+        //     let oauth_id = token.and_then(|tok| {
+        //         let cookies = CookieStr(tok);
+        //         let mut token = String::new();
+        //         if let Some(token_str) = cookies.get_key("token") {
+        //             token = token_str;
+        //         }
+        //         debug!("Token: {:?}", token);
+        //         let u = User::new();
+        //         let out = match &self.parent {
+        //             Some(val) => match val.try_borrow_mut() {
+        //                 Ok(parent) => {
+        //                     debug!("Parent --> {:?}", parent);
+        //                     Ok(parent)
+        //                 }
+        //                 Err(e) => {
+        //                     error!("There was an error! {}", e);
+        //                     Err(GSSError::from(e))
+        //                 }
+        //             },
+        //             None => {
+        //                 error!("Could not borrow parent as a mutable reference!");
+        //                 Err(GSSError::GetParent)
+        //             }
+        //         };
+        //         info!("got parent! {:?}", out);
+        //         match out {
+        //             Ok(p) => {
+        //                 let table: &BTreeMap<
+        //                     String,
+        //                     Oauth2ProviderAccesstoken,
+        //                 > = &p.auth_table;
+        //                 debug!("Table: {:?}", table);
+        //                 if table.contains_key(&token) {
+        //                     let oauth2 = p.auth_table[&token].clone();
+        //                     info!("Found User OAUTH2 entry: {:?}", oauth2);
+        //                     return Some(oauth2);
+        //                 } else {
+        //                     warn!("Oath2 Entry does not exist for token. Could be expired.");
+        //                     return None;
+        //                 }
+        //             }
+        //             Err(e) => warn!("Could not unwrap Parent (GrandSocketStation"),
+        //         }
 
-                // Oauth2ProviderAccesstoken::get_by_token(tok, )
-                // self.set_user(u);
-                None
-            });
-            user_id = oauth_id.and_then(|v| v.user_id).unwrap_or(-1);
-        }
+        //         // Oauth2ProviderAccesstoken::get_by_token(tok, )
+        //         // self.set_user(u);
+        //         None
+        //     });
+        //     user_id = oauth_id.and_then(|v| v.user_id).unwrap_or(-1);
+        // }
 
-        // let db = self.db.get();
-        if user_id != -1 {
-            let u = User::get_by_id(user_id, &self.db);
-            if u.is_ok() {
-                let user = u.unwrap();
-                info!("Got user: {:?}", user);
-                self.set_user(user);
-                info!("CONNECTION: {:?}", self);
-                Ok(())
-            } else {
-                Err(ws::Error::new(
-                    ws::ErrorKind::Custom(Box::new(GSSError::FailedUserAuth(
-                        "No user was found for that id.",
-                    ))),
-                    "The client could not be authenticated properly..",
-                ))
-            }
-        } else {
-            Err(ws::Error::new(
-                ws::ErrorKind::Custom(Box::new(GSSError::FailedUserAuth(
-                    "Could not find Oauth2 reference in db for token.",
-                ))),
-                "The client could not be authenticated properly..",
-            ))
-        }
+        // // let db = self.db.get();
+        // if user_id != -1 {
+        //     let u = User::get_by_id(user_id, &self.db);
+        //     if u.is_ok() {
+        //         let user = u.unwrap();
+        //         info!("Got user: {:?}", user);
+        //         self.set_user(user);
+        //         info!("CONNECTION: {:?}", self);
+        //         Ok(())
+        //     } else {
+        //         Err(ws::Error::new(
+        //             ws::ErrorKind::Custom(Box::new(GSSError::FailedUserAuth(
+        //                 "No user was found for that id.",
+        //             ))),
+        //             "The client could not be authenticated properly..",
+        //         ))
+        //     }
+        // } else {
+        //     Err(ws::Error::new(
+        //         ws::ErrorKind::Custom(Box::new(GSSError::FailedUserAuth(
+        //             "Could not find Oauth2 reference in db for token.",
+        //         ))),
+        //         "The client could not be authenticated properly..",
+        //     ))
+        // }
+        Ok(())
     }
 
     fn on_message(&mut self, msg: Message) -> ws::Result<()> {
@@ -539,15 +551,15 @@ impl Connection {
     }
     fn serialize_and_send_posts(&self, data: &[Model], versions: &[u64]) -> Result<(), ws::Error> {
         let output = WSMessageResponse::new(data, versions);
-        debug!("Sending: {:?}", output);
+        trace!("Sending: {:?}", output);
 
         let serialized =
             serde_json::to_string(&output).expect("Uh-oh... JSON serialization error!~");
-        debug!("Serialized content: {}", serialized);
+        trace!("Serialized content: {}", serialized);
         self.tx.send(serialized)
     }
     fn handle_get_msg(&self, msg: &WSMessage) -> Option<String> {
-        debug!("[MAIN] received: {:?}", msg.message);
+        trace!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Get);
         let mut return_message = Msg::new().set_msg_type(MessageType::Get).build();
 

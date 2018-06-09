@@ -225,36 +225,34 @@ impl User {
         Ok(user)
     }
 
-    pub fn get_associated(user_id: i32, db: &DB) -> Result<User, DBError> {
+    pub fn get_associated_user(user_id: i32, db: &DB) -> Result<User, DBError> {
         use schema::auth_user::dsl::{auth_user, id};
         use schema::oauth2_provider_accesstoken::dsl::{
             expires, oauth2_provider_accesstoken, token,
         };
 
         let session = db.get();
-        let user: (i32, Option<String>, Option<chrono::DateTime<Utc>>) = auth_user
-            .left_join(oauth2_provider_accesstoken)
-            .filter(id.eq(user_id))
-            .select((id, token.nullable(), expires.nullable()))
-            .first(&*session)?;
-        let just_user: User = auth_user.filter(id.eq(user_id)).first(&*session)?;
+        // let user: (i32, Option<String>, Option<chrono::DateTime<Utc>>) = auth_user
+        //     .left_join(oauth2_provider_accesstoken)
+        //     .filter(id.eq(user_id))
+        //     .select((id, token.nullable(), expires.nullable()))
+        //     .first(&*session)?;
+        let user: User = auth_user.filter(id.eq(user_id)).first(&*session)?;
 
-        let dt = GrandSocketStation::duration_valid(user.2.unwrap());
-        info!("DURATION_VALID: {:?}", dt);
+        // let dt = GrandSocketStation::duration_valid(user.2.unwrap());
+        // info!("DURATION_VALID: {:?}", dt);
 
-        let ae = AuthEntry {
-            user: just_user.clone(),
-            token: user.1,
-            expires: user.2,
-            valid_for: dt,
-        };
-        info!("USER + MORE = {:?}", ae);
-        let oauth2_data: Vec<Oauth2ProviderAccesstoken> =
-            Oauth2ProviderAccesstoken::belonging_to(&just_user).load(&*session)?;
-        info!("USER + OAUTH2 = {:?}", oauth2_data);
+        // let ae = AuthEntry {
+        //     user: just_user.clone(),
+        //     token: user.1,
+        //     expires: user.2,
+        //     valid_for: dt,
+        // };
+        // let oauth2_data: Vec<Oauth2ProviderAccesstoken> =
+        //     Oauth2ProviderAccesstoken::belonging_to(&just_user).load(&*session)?;
 
-        let u = User::new();
-        Ok(u)
+        // let u = User::new();
+        Ok(user)
     }
 }
 
@@ -318,6 +316,6 @@ mod tests {
         let result = AuthPermission::get_by_codename("view_post".to_owned(), &db);
         let test2 = DjangContentType::get_dct_by_model(&db, "post");
         let say_what = AuthPermission::get_with_content_type(&db);
-        let user_assoc = User::get_associated(4, &db);
+        let user_assoc = User::get_associated_user(4, &db);
     }
 }
