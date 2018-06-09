@@ -83,6 +83,22 @@ impl From<diesel::result::Error> for DBError {
     }
 }
 
+impl Refresh for DjangContentType {
+    type Model = DjangContentType;
+    fn refresh(&mut self) -> Option<&Self::Model> {
+        let db = DB::new();
+        match DjangContentType::get_by_id(self.id, &db) {
+            Ok(val) => {
+                *self = val;
+            }
+            Err(db_err) => {
+                error!("Error: {:?}", db_err);
+            }
+        }
+        Some(self)
+    }
+}
+
 #[derive(Identifiable, Queryable, Insertable, Serialize, Deserialize, Debug, Clone, PartialEq,
          Default)]
 #[table_name = "django_content_type"]
@@ -100,13 +116,25 @@ impl DjangContentType {
         let result: DjangContentType = Default::default();
         result
     }
+    pub fn get_by_id(key: i32, db: &DB) -> Result<DjangContentType, DBError> {
+        use schema::django_content_type::dsl::{django_content_type};
+        let conn = db.get();
+        let content_type: DjangContentType = django_content_type.find(key).first(&*conn)?;
+        debug!("Content type: {:?}", content_type);
+        Ok(content_type)
+        // match content_type {
+        //     Ok(ct) => Ok(ct),
+        //     Err(err) => Err(DBError::NotFound),
+        // }
+    }
+
     pub fn get_all(db: &DB) -> Result<Vec<DjangContentType>, DBError> {
         use schema::django_content_type::dsl::{app_label, django_content_type, id, model};
         let conn = db.get();
         let content_types = django_content_type
             .select((id, model, app_label))
             .load(&*conn)?;
-        info!("Post content type: {:?}", content_types);
+        debug!("Post content type: {:?}", content_types);
         Ok(content_types)
     }
     pub fn get_dct_by_model<'a>(db: &DB, model_name: &'a str) -> Result<DjangContentType, DBError> {
@@ -325,6 +353,31 @@ impl Post {
 mod tests {
     use db::*;
     use models::*;
+
+    #[test]
+    fn test_django_ctt_refresh() {
+        let db = DB::new();
+        let mut example: DjangContentType = DjangContentType::get_by_id(1, &db).unwrap();
+        let DjangContentType{id, app_label, model} = example.clone();
+        println!("original: {:?}", example);
+        example.model = "this isn't a model name but OK!".to_owned();
+        println!("changed: {:?}", example);
+        example.refresh();
+        println!("after refresh: {:?}", example);
+        assert_eq!(id, example.id);
+        assert_eq!(app_label, example.app_label);
+        assert_eq!(model, example.model);
+    }
+
+    #[test]
+    fn test_django_ctt_get_by_id() {
+        let db = DB::new();
+        let example = DjangContentType::get_by_id(1, &db);
+        println!("EXAMPLE: {:?}", example);
+        assert!(example.is_ok());
+        let extracted = example.unwrap(); // don't care if we panic on test...
+        assert_eq!(1, extracted.id);
+    }
 
     #[test]
     fn test_refresh_userobjectperm() {

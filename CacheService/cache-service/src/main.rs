@@ -20,8 +20,8 @@ extern crate crossbeam_channel;
 extern crate diesel;
 use std::fmt;
 use ws::{
-    listen, CloseCode, Error, Handler, Handshake, Message, Request, Response, Result as WSResult,
-    Sender, Factory,
+    listen, CloseCode, Error, Factory, Handler, Handshake, Message, Request, Response,
+    Result as WSResult, Sender,
 };
 
 mod cache;
@@ -68,18 +68,22 @@ impl GrandSocketStation {
         if log_enabled!(Level::Info) && !auth.is_empty() {
             info!("User Table:");
             for (i, (token, a)) in auth.iter().enumerate() {
-                let difference = a.expires - Utc::now();
-                let hours = difference.num_hours();
-                let difference = difference - Duration::hours(hours);
-                let min = difference.num_minutes();
-                info!(
-                    "{:?}.) [token: {:?} -> user: {:?}, expires in {} hours and {} minutes]",
-                    i + 1,
-                    token,
-                    a.user_id,
-                    hours,
-                    min
-                );
+
+                if let Some(difference) = GrandSocketStation::duration_valid(a.expires) {
+                    let hours = difference.num_hours();
+                    let difference = difference - Duration::hours(hours);
+                    let min = difference.num_minutes();
+                    info!(
+                        "{:?}.) [token: {:?} -> user: {:?}, expires in {} hours and {} minutes]",
+                        i + 1,
+                        token,
+                        a.user_id,
+                        hours,
+                        min
+                    );
+                }
+                // let difference = a.expires - Utc::now();
+                
             }
         } else {
             warn!("No users have a valid token. (Nobody is logged in)");
@@ -333,13 +337,17 @@ impl Handler for Connection {
                 Ok(())
             } else {
                 Err(ws::Error::new(
-                        ws::ErrorKind::Custom(Box::new(GSSError::FailedUserAuth("No user was found for that id."))),
-                        "The client could not be authenticated properly..",
-                    ))
+                    ws::ErrorKind::Custom(Box::new(GSSError::FailedUserAuth(
+                        "No user was found for that id.",
+                    ))),
+                    "The client could not be authenticated properly..",
+                ))
             }
         } else {
             Err(ws::Error::new(
-                ws::ErrorKind::Custom(Box::new(GSSError::FailedUserAuth("Could not find Oauth2 reference in db for token."))),
+                ws::ErrorKind::Custom(Box::new(GSSError::FailedUserAuth(
+                    "Could not find Oauth2 reference in db for token.",
+                ))),
                 "The client could not be authenticated properly..",
             ))
         }
@@ -412,7 +420,7 @@ impl<'tokstr, 'authstr> fmt::Display for GSSError<'tokstr, 'authstr> {
             GSSError::BadToken(msg) => {
                 let temp = format!("Bad token. Msg: [{}]", msg);
                 f.write_str(&*temp)
-            },
+            }
             GSSError::FailedUserAuth(msg) => {
                 let temp = format!("Could not authenticate user. Msg: [{}]", msg);
                 f.write_str(&*temp)
@@ -846,7 +854,6 @@ fn start_db_pool() -> (
 //     }
 // }
 
-
 fn main() {
     pretty_env_logger::init();
     info!("starting cache service...");
@@ -871,7 +878,7 @@ fn main() {
     settings.panic_on_internal = false;
 
     // let socket_serv = ws::Builder::new().with_settings(settings);
-    
+
     // socket_serv.build(factory);
 
     listen("0.0.0.0:3012", move |out| {

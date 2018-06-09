@@ -102,27 +102,16 @@ impl Index<ID> for HashMapCache<ID, Resource> {
 // not really commended either..
 impl IndexMut<ID> for HashMapCache<ID, Resource> {
     fn index_mut(&mut self, index: ID) -> &mut Resource {
-        if !self._inner.contains_key(&index) {
-            // @TODO: spruce this up so that it covers all corner cases..
-
-            match index {
-                ID::Post(id) => {
-                    self._inner
-                        .insert(index.clone(), Resource::new(Model::Post(Post::new())));
-                }
-                ID::User(id) => {
-                    self._inner
-                        .insert(index.clone(), Resource::new(Model::User(User::new())));
-                }
-                ID::Comment(id) => {
-                    self._inner
-                        .insert(index.clone(), Resource::new(Model::Comment(Comment::new())));
-                }
-            }
-        }
-        match self._inner.get_mut(&index) {
-            Some(val) => val,
-            None => panic!("Index did not exist!!"),
+        match index {
+            ID::Post(id) => self._inner
+                .entry(index)
+                .or_insert_with(|| Resource::new(Model::Post(Post::new()))),
+            ID::User(id) => self._inner
+                .entry(index)
+                .or_insert_with(|| Resource::new(Model::User(User::new()))),
+            ID::Comment(id) => self._inner
+                .entry(index)
+                .or_insert_with(|| Resource::new(Model::Comment(Comment::new()))),
         }
     }
 }
