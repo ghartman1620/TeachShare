@@ -23,6 +23,7 @@ import {
     Card,
     Carousel,
     Collapse,
+    Dropdown,
     Form,
 
     FormCheckbox,
@@ -78,6 +79,8 @@ Vue.use(Jumbotron);
 Vue.use(Alert);
 Vue.use(Collapse);
 Vue.use(Card);
+Vue.use(Dropdown);
+
 Vue.use(Navbar);
 
 Vue.use(Button);

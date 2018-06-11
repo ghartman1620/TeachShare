@@ -148,7 +148,6 @@ export default class DragAndDrop extends Vue {
     }
 
     mounted() { //this is pretty messy, it will be refactored soon. For now though, even like this, it works. :) -JL
-        console.log("drag and drop mounted.");
 
         var lowestItem: ILayout = this.layout[0];
 

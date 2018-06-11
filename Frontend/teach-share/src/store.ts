@@ -103,7 +103,8 @@ import {getMap, mutCreate, mutUpdate} from "./store_modules/PostService";
 WebSocket.getInstance().addMessageListener( (msg) => {
     const val = JSON.parse(msg.data);
 
-
+    console.log("STORE: got message");
+    console.log(val);
     const db: Database = Database.getInstance();
     const keys = Object.keys(val);
     if (val.versions && val.payload) {
