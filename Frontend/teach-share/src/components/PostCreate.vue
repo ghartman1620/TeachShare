@@ -105,12 +105,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card background">
-                        <div class="row">
-                            <div class="col-2">
-                                <label for="tagTextbox"><h4><strong>Post Color: </strong></h4></label>
-                            </div>
-                            <div class="col-10">
+                    <div style="width: 100px;">
+                        <b-dropdown id="ddown-buttons" text="Post Color" class="m2">
+                            <b-row style="width: 700px">
+                                <b-col cols="10">
                                 <span class="dot" style="background-color: #ffafc5;" @click= "changeColor('#ffafc5', $event)"></span>
                                 <span class="dot" style="background-color: #ee6055;" @click= "changeColor('#ee6055', $event)"></span>
                                 <span class="dot" style="background-color: #ffae03;" @click= "changeColor('#ffae03', $event)"></span>
@@ -120,9 +118,10 @@
                                 <span class="dot" style="background-color: #dbcdc6;" @click= "changeColor('#dbcdc6', $event)"></span>
                                 <span class="dot" style="background-color: #0e3b43;" @click= "changeColor('#0e3b43', $event)"></span>
                                 <span class="dot" style="background-color: #775253;" @click= "changeColor('#775253', $event)"></span>
-                                <span class="dot" style="background-color: #596f62;" @click= "changeColor('#596f62', $event)"></span> 
-                            </div>
-                        </div>
+                                <span class="dot" style="background-color: #596f62;" @click= "changeColor('#596f62', $event)"></span>
+                                </b-col>
+                            </b-row>
+                        </b-dropdown>
                     </div>
                 </div>
             </div>
