@@ -51,8 +51,6 @@ use std::time::SystemTime;
 use users::{Oauth2ProviderAccesstoken, User};
 use db::DBError;
 
-use std::sync::atomic::{AtomicPtr, Ordering};
-
 const DB_POOL_SIZE: usize = 4;
 
 impl fmt::Debug for GrandSocketStation {
@@ -92,8 +90,6 @@ impl GrandSocketStation {
                         min
                     );
                 }
-                // let difference = a.expires - Utc::now();
-                
             }
         } else {
             warn!("No users have a valid token. (Nobody is logged in)");
@@ -138,16 +134,16 @@ impl GrandSocketStation {
         let auth = Oauth2ProviderAccesstoken::get_by_token(token, &*conn)?;
         Ok(auth)
     }
-    pub fn check_token(&self, token: &String) -> Option<Oauth2ProviderAccesstoken> {
+    pub fn check_token(&self, token: &String) -> Result<Option<Oauth2ProviderAccesstoken>, DBError> {
         let cache_token = self.check_token_cache(token);
         if let Some(cached_auth) = cache_token {
-            return Some(cached_auth);
+            return Ok(Some(cached_auth));
         } else {
             match self.check_token_db(token) {
                 Ok(db_token) => {
-                    return Some(db_token);
+                    return Ok(Some(db_token));
                 },
-                Err(db_err) => None,
+                Err(db_err) => Err(db_err),
             }
         }
     }
@@ -282,7 +278,7 @@ impl Handler for Connection {
                         if borrowed_parent.is_ok() {
                             let parent = borrowed_parent.unwrap();
                             let cached_auth = (*parent).check_token(&token);
-                            if let Some(auth) = cached_auth {
+                            if let Ok(Some(auth)) = cached_auth {
                                 match auth.user_id {
                                     Some(user_id) => {
                                         let associated_user = User::get_associated_user(user_id as i32, &self.db);
@@ -315,14 +311,24 @@ impl Handler for Connection {
                     // future reference..
                     info!("Found user: {:?}", user);
                     match user {
-                        Some(u) => self.set_user(u),
+                        Some(u) => self.set_user(u), // FIXME: for some reason this doesn't work
+                                                     // which really is an issue with self not actually
+                                                     // being connected to the GrandSocketStation connections
+                                                     // vector.
                         None => warn!("Could not find a user associated with auth entry"),
                     }
 
                     debug!("CONNECTION refcount: {:?}", self);
                     match &self.parent {
                         Some(parent) => {
-                            info!("PARENT: {:?}", (*parent.borrow()).connections);
+                            info!("PARENT: {:?}", (*parent.borrow()).get_connections());
+                            for con in parent.borrow_mut().get_connections_mut() {
+                                debug!("Connection: {:?}", con);
+                                if con.id == self.id {
+                                    *con = Rc::new(self.clone());
+                                }
+                            }
+                            info!("PARENT: {:?}", (*parent.borrow()).get_connections());
                         },
                         None => {},
                     }
@@ -706,6 +712,7 @@ impl Connection {
                 resource.version = post_version.version;
                 wrap.items.push(Arc::new(resource));
             }
+            // self.to_cache.
             match self.to_cache.send(Arc::new(wrap)) {
                 Ok(val) => {
                     debug!("Sucessfully sent and got in return: {:?}", val);
@@ -795,24 +802,22 @@ impl Connection {
             match &mut self.parent {
                 Some(val) => match val.try_borrow_mut() {
                     Ok(parent) => {
-                        info!("TOTAL CONNECTIONS: {:?}", parent.connections);
-                        for c in &parent.connections {
+                        info!("TOTAL CONNECTIONS: {:?}", parent.get_connections());
+                        for c in parent.get_connections() {
                             // @TODO: Simplify/abstract this section into separate function(s)
                             debug!("Connection --> {:?}", c);
-                            debug!("User --> {:?}", c.user);
-                            debug!("User[self] --> {:?}", self.user);
                             let id = c.tx.connection_id();
-                            let all_watchers =
-                                watchers.iter().flat_map(|y| y).find(|x| **x == id as i32);
 
-                            debug!("WATCHES ---> {:?}, LOOKING FOR ----> {:?}, MATCHED_WATCHES ---> {:?}", watchers, id, all_watchers);
                             if watchers.iter().flat_map(|y| y).any(|x| *x == id as i32) {
                                 let ws_response = WSMessageResponse::new(&posts, &versions);
-                                let serialized = serde_json::to_string(&ws_response)
-                                    .expect("Uh-oh... JSON serialization error!~");
-                                let send_result = c.tx.send(serialized);
-                                if send_result.is_err() {
-                                    return Some(format!("Error: {:?}", send_result.unwrap_err()));
+                                match serde_json::to_string(&ws_response) {
+                                    Ok(serialized) => {
+                                        let send_result = c.tx.send(serialized);
+                                        if send_result.is_err() {
+                                            return Some(format!("Error: {:?}", send_result.unwrap_err()));
+                                        }
+                                    },
+                                    Err(err) => error!("Failed to serialize response!!!"),
                                 }
                             } else {
                                 debug!("There was no matched connection for: {}. It does not need to be updated.", id);
