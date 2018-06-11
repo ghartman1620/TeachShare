@@ -45,7 +45,7 @@ pub struct Oauth2ProviderAccesstoken {
 /// Oauth2ProviderAccessToken is used to match users --> tokens --> users, you get it.
 impl Oauth2ProviderAccesstoken {
     pub fn get_by_token(
-        user_token: String,
+        user_token: &String,
         conn: &PgConnection,
     ) -> Result<Oauth2ProviderAccesstoken, diesel::result::Error> {
         use schema::oauth2_provider_accesstoken::dsl::{oauth2_provider_accesstoken, token};
@@ -279,7 +279,7 @@ mod tests {
         let db = DB::new();
         let session = db.get();
         let results = Oauth2ProviderAccesstoken::get_by_token(
-            String::from("wiAGgM3GQoAgMnqydoatfSITZElgzI"),
+            &String::from("wiAGgM3GQoAgMnqydoatfSITZElgzI"),
             &session,
         );
         let table_cache = Oauth2ProviderAccesstoken::build_user_table_cached(&session);

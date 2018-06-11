@@ -220,7 +220,7 @@ fn handle_manifest(
     let mut wrap = Msg::new().set_msg_type(MessageType::Manifest).build();
 
     let mut db_posts: Vec<i32> = Vec::new();
-    debug!("[CACHE] Manifest: begin");
+    trace!("[CACHE] Manifest: begin");
 
     for m in &msg.items {
         let id = match &m.data {
@@ -233,7 +233,7 @@ fn handle_manifest(
         match borrowed_val.get(ID::Post(id)) {
             //1. if cache has this post id:
             Some(val) => {
-                debug!("[CACHE] Manifest: For key: {:?} ----> {:?}", id, val);
+                trace!("[CACHE] Manifest: For key: {:?} ----> {:?}", id, val);
                 //2. If the version provided does not match the version in the cache
                 if val.version != m.version {
                     //3. Add the entire post's content to the return wrapper's items
@@ -248,7 +248,7 @@ fn handle_manifest(
             }
             //4. If cache does not have this post id:
             None => {
-                debug!("[CACHE] Manifest Key ({:?}) did not exist.", id);
+                warn!("[CACHE] Manifest Key ({:?}) did not exist.", id);
                 //5. Add it to the list of the db post gets we'll need to make
                 db_posts.push(id);
             }
@@ -273,7 +273,7 @@ fn handle_manifest(
         mutable_cache.put(ID::Post(id), resource.clone());
 
         //8. Add them all to the return list.
-        debug!("[CACHE] manifest: adding post {} to return list", id);
+        trace!("[CACHE] manifest: adding post {} to return list", id);
         wrap.items.push(Arc::new(resource));
     }
     //9. Send back the return list.

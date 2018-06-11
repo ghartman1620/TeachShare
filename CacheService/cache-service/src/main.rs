@@ -49,14 +49,22 @@ use std::sync::Arc;
 use std::thread;
 use std::time::SystemTime;
 use users::{Oauth2ProviderAccesstoken, User};
+use db::DBError;
 
 use std::sync::atomic::{AtomicPtr, Ordering};
 
 const DB_POOL_SIZE: usize = 4;
 
-#[derive(Debug, Clone)]
+impl fmt::Debug for GrandSocketStation {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "GrandSocketStation: {{ db, connections: [ {:?} ], auth_table: {{ {:?} }} }}", self.connections, self.auth_table)
+    }
+}
+
+#[derive(Clone)]
 struct GrandSocketStation {
     // represents the list of connections
+    db: DB,
     connections: Vec<Rc<Connection>>,
     auth_table: BTreeMap<String, Oauth2ProviderAccesstoken>,
 }
@@ -91,6 +99,7 @@ impl GrandSocketStation {
             warn!("No users have a valid token. (Nobody is logged in)");
         }
         GrandSocketStation {
+            db: DB::new(),
             connections: vec![],
             auth_table: auth,
         }
@@ -121,9 +130,28 @@ impl GrandSocketStation {
     pub fn push_connection(&mut self, conn: Connection) {
         self.connections.push(Rc::new(conn))
     }
-    pub fn check_token(&self, token: &String) -> Option<&Oauth2ProviderAccesstoken> {
-        self.auth_table.get(token)
+    pub fn check_token_cache(&self, token: &String) -> Option<Oauth2ProviderAccesstoken> {
+        self.auth_table.get(token).cloned()
     }
+    pub fn check_token_db(&self, token: &String) -> Result<Oauth2ProviderAccesstoken, DBError> {
+        let conn = self.db.get();
+        let auth = Oauth2ProviderAccesstoken::get_by_token(token, &*conn)?;
+        Ok(auth)
+    }
+    pub fn check_token(&self, token: &String) -> Option<Oauth2ProviderAccesstoken> {
+        let cache_token = self.check_token_cache(token);
+        if let Some(cached_auth) = cache_token {
+            return Some(cached_auth);
+        } else {
+            match self.check_token_db(token) {
+                Ok(db_token) => {
+                    return Some(db_token);
+                },
+                Err(db_err) => None,
+            }
+        }
+    }
+
 }
 
 impl std::cmp::PartialEq for Connection {
@@ -146,17 +174,23 @@ struct Connection {
 
 impl fmt::Debug for Connection {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "ConnectionID: {}, sender: {} -> User: {:?}",
-            self.id,
-            self.tx.connection_id(),
-            self.user
-        )
+        if self.user.is_some() {
+            let u = &self.clone().user.unwrap(); // clone will act as a snapshot of the state
+            write!(
+                f,
+                "{{ ConnectionID: {} -> User: {{ id: {}, username: {} }} }}",
+                self.id,
+                u.id,
+                u.username
+            )
+        } else {
+            write!(f, "{{ ConnectionID: {} -> User: {:?} }}", self.id, self.user)
+        }
+
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)] 
 enum IdOrPost {
     Id(i32),
     Post(models::Post),
@@ -242,64 +276,56 @@ impl Handler for Connection {
                     debug!("Token: {:?}", token);
 
                     // check token
-                    match &self.parent {
-                        Some(val) => match val.try_borrow_mut() {
-                            Ok(parent) => {
-                                debug!("Parent --> {:?}", parent);
-
-                                /// # Check local cache
-                                /// 
-                                // let cached_auth = parent.auth_table.get(&token);
-                                let cached_auth = (*parent).check_token(&token);
-                                
-                                /// # Check Database
-                                /// 
-                                match cached_auth {
-                                    Some(cached) => {
-                                        let auth_db: Result<Oauth2ProviderAccesstoken, _>;
-                                        {
-                                            auth_db = Oauth2ProviderAccesstoken::get_by_token(token, &*self.db.get());
+                    // @TODO: Fix this section... its messy.
+                    let user = if let Some(ref parent_cell) = self.parent {
+                        let borrowed_parent = parent_cell.try_borrow_mut();
+                        if borrowed_parent.is_ok() {
+                            let parent = borrowed_parent.unwrap();
+                            let cached_auth = (*parent).check_token(&token);
+                            if let Some(auth) = cached_auth {
+                                match auth.user_id {
+                                    Some(user_id) => {
+                                        let associated_user = User::get_associated_user(user_id as i32, &self.db);
+                                        debug!("Associated user: {:?}", associated_user);
+                                        if associated_user.is_ok() {
+                                            let u = associated_user.unwrap();
+                                            Some(u)
+                                            // self.set_user(u);
+                                        } else {
+                                            None
                                         }
-                                        match auth_db {
-                                            Ok(db) => {
-                                                info!("Recieved auth data for token: {:?} from cache.", db.token);
-                                                if let Some(user_id) = db.user_id {
-                                                    let associated_user = User::get_associated_user(user_id as i32, &self.db);
-                                                    debug!("Associated value: {:?}", associated_user);
-                                                    if let Ok(user) = associated_user {
-
-                                                        // @TODO: fix this first!!
-                                                        self.user = Some(user);
-                                                        // self.set_user(user);
-                                                        debug!("User {:?} set for connection {}", self.user, self.id);
-                                                        debug!("Connection: {:?}", self);
-                                                    } else {
-                                                        let errs = associated_user.unwrap_err();
-                                                        debug!("Errors: {:?}", errs);
-                                                    }
-                                                    
-                                                } 
-                                            },
-                                            Err(db_err) => { 
-                                                warn!("Could not find entry in Cache or DB! Err: {:?}", db_err);
-                                                // !Warning! DENY ACCESS HERE
-                                            },
-                                        }
-                                        
                                     },
-                                    None => warn!("Token did not exist in cached auth data."),
+                                    None => {
+                                        warn!("No user associated with auth entry!!");
+                                        None
+                                    }, // this shouldn't be possible, should it?
                                 }
-                            },
-                            Err(e) => {
-                                error!("There was an error! {}", e);
-                                // return Err(GSSError::from(e));
+                            } else {
+                                None
                             }
-                        },
-                        None => {
-                            error!("Could not borrow parent as a mutable reference!");
-                            // return Err(GSSError::GetParent);
+                        } else {
+                            None
                         }
-                    };
+                            
+                    } else {
+                        None
+                    }; 
+
+                    // Was there a user? set the user on the connection we are in, for
+                    // future reference..
+                    info!("Found user: {:?}", user);
+                    match user {
+                        Some(u) => self.set_user(u),
+                        None => warn!("Could not find a user associated with auth entry"),
+                    }
+
+                    debug!("CONNECTION refcount: {:?}", self);
+                    match &self.parent {
+                        Some(parent) => {
+                            info!("PARENT: {:?}", (*parent.borrow()).connections);
+                        },
+                        None => {},
+                    }
 
                     let res = Response::from_request(req)?;
                     Ok(res)
@@ -326,6 +352,7 @@ impl Handler for Connection {
     // deny the connection earlier. The logic will be roughly the same though, 1-1.
     fn on_open(&mut self, hs: Handshake) -> ws::Result<()> {
         info!("client connected.");
+        debug!("ON_OPEN connection SELF: {:?}", self);
         // for (key, value) in hs.request.headers() {
         //     info!("{:?}: {:?}", key, String::from_utf8(value.clone()));
         // }
@@ -416,6 +443,7 @@ impl Handler for Connection {
     }
 
     fn on_message(&mut self, msg: Message) -> ws::Result<()> {
+        debug!("ON_MESSAGE SELF: {:?}", self);
         match msg {
             Message::Binary(_) => {
                 warn!("Received binary message. Doing nothing with it.");
@@ -444,6 +472,7 @@ impl Handler for Connection {
     }
 
     fn on_close(&mut self, code: CloseCode, reason: &str) {
+        debug!("ON_CLOSE SELF: {:?}", self);
         match code {
             CloseCode::Normal => {
                 info!("The client is done with the connection.");
@@ -462,6 +491,7 @@ impl Handler for Connection {
     }
 
     fn on_error(&mut self, err: Error) {
+        debug!("ON_ERROR SELF: {:?}", self);
         error!("The server encountered an error: {:?}", err);
     }
 }
@@ -510,7 +540,9 @@ impl<'tokstr, 'authstr> From<std::cell::BorrowMutError> for GSSError<'tokstr, 'a
 
 impl Connection {
     fn set_user(&mut self, u: User) {
+        debug!("Before setting user: {:?}", self);
         self.user = Some(u);
+        debug!("After setting user: {:?}", self);
     }
     fn remove_client(&mut self) {
         debug!(
@@ -559,6 +591,7 @@ impl Connection {
         self.tx.send(serialized)
     }
     fn handle_get_msg(&self, msg: &WSMessage) -> Option<String> {
+        debug!("HANDLE_GET SELF: {:?}", self);
         trace!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Get);
         let mut return_message = Msg::new().set_msg_type(MessageType::Get).build();
@@ -598,6 +631,7 @@ impl Connection {
         }
     }
     fn handle_create_msg(&self, msg: WSMessage) -> Option<String> {
+        debug!("HANDLE_CREATE SELF: {:?}", self);
         debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Create);
         let mut wrap = Msg::new().set_msg_type(MessageType::Create).build();
@@ -642,6 +676,7 @@ impl Connection {
         }
     }
     fn handle_manifest_msg(&self, msg: WSMessage) -> Option<String> {
+        debug!("HANDLE_MANIFEST SELF: {:?}", self);
         debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Manifest);
 
@@ -710,6 +745,7 @@ impl Connection {
         }
     }
     fn handle_update_msg(&mut self, msg: WSMessage) -> Option<String> {
+        debug!("HANDLE_UPDATE SELF: {:?}", self);
         debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Update);
         let mut wrap = Msg::new().set_msg_type(MessageType::Update).build();
@@ -744,7 +780,7 @@ impl Connection {
 
         // @TODO: This is the actual update sending code. Could be optimized greatly.
         if let Ok(updated_data) = changes {
-            debug!("Updated_data ---------------> {:?}", updated_data.items);
+            trace!("Updated_data ---------------> {:?}", updated_data.items);
             let mut watchers: Vec<Vec<i32>> = vec![];
             let (posts, versions): (Vec<Model>, Vec<u64>) = updated_data
                 .items
@@ -759,10 +795,12 @@ impl Connection {
             match &mut self.parent {
                 Some(val) => match val.try_borrow_mut() {
                     Ok(parent) => {
-                        info!("TOTAL CONNECTIONS: {:?}", &parent.connections);
+                        info!("TOTAL CONNECTIONS: {:?}", parent.connections);
                         for c in &parent.connections {
                             // @TODO: Simplify/abstract this section into separate function(s)
                             debug!("Connection --> {:?}", c);
+                            debug!("User --> {:?}", c.user);
+                            debug!("User[self] --> {:?}", self.user);
                             let id = c.tx.connection_id();
                             let all_watchers =
                                 watchers.iter().flat_map(|y| y).find(|x| **x == id as i32);
@@ -789,6 +827,7 @@ impl Connection {
         None
     }
     fn handle_watch_msg(&self, msg: WSMessage) -> Option<String> {
+        debug!("HANDLE_WATCH SELF: {:?}", self);
         debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Watch);
         let mut wrap = Msg::new().set_msg_type(MessageType::Watch).build();
@@ -961,9 +1000,10 @@ fn main() {
 
         let h = &mut hub.borrow_mut();
         h.push_connection(conn.clone());
-        let value: Option<Connection> = Some(conn.clone());
+        value = Some(conn.clone());
         *i += 1;
-        value.unwrap()
+        // value.unwrap()
+        conn
     }).unwrap();
 
     match kill_db_send.send(Cancel {
