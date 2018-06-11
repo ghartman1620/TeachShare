@@ -46,7 +46,7 @@
             },
             rowHeight: {
                 type: Number,
-                default: 150
+                default: 1
             },
             maxRows: {
                 type: Number,
@@ -55,7 +55,7 @@
             margin: {
                 type: Array,
                 default: function () {
-                    return [10, 10];
+                    return [0,0];
                 }
             },
             isDraggable: {

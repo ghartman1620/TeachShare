@@ -124,7 +124,8 @@
             submit: function(event) {
                 this.filterNumericValues();
                 this.chooseGraphs();
-                this.$parent.$emit("submitElement", { type: 'table', values: this.values}, this.$route.query.index);
+                this.$parent.$emit("submitElement", { type: 'table', content: this.values}, this.$route.query.index);
+                console.log("Submitting table from edit table to table. ", this.values);
                 // if (
                 //     this.$route.query.index ==
                 //     this.$store.state.create.postElements.length

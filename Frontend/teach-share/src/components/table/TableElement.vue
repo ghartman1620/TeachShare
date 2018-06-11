@@ -26,5 +26,8 @@ export default Vue.component("table-element", {
         ChartData,
         BootstrapVue
     },
+    mounted () {
+        console.log("this.element in Table Element: ", this.element);
+    }
 })
 </script>

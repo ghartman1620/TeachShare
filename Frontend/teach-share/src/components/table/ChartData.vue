@@ -16,7 +16,8 @@
                     <PieChart userLabel=userLabel v-bind:userData=userData></PieChart>
                 </div>
             </div> -->
-            <b-table striped hover :fields="displayData" :items="this.displayData"> </b-table>
+            <!-- <b-table striped hover :fields="displayData" :items="this.displayData"> </b-table> -->
+            <a>table to come here here!</a>
             <b-tabs>
                 <b-tab v-if="this.graphOptions.bar === true" title="Bar Graph" @click="setActiveTab('bar')" active>
                     <br>
@@ -72,7 +73,8 @@
                 this.activeTab = graph;
             },
             processData: function () {
-                this.displayData = JSON.parse(JSON.stringify(this.userData)); //save original form of data for displaying in table
+                this.displayData = JSON.parse(JSON.stringify(this.userData.values)); //save original form of data for displaying in table
+                console.log("User data in ChartData.vue:", this.userData);
                 this.graphOptions = this.userData.pop();
                 var rowLabel = this.graphOptions.rowLabel;                      //row label to hopefully distinguish multiple datasets
                 if (rowLabel !== false) {
@@ -91,6 +93,7 @@
             BootstrapVue
         },
         created () {
+            console.log("This.", this);
             this.processData();
         }
     });

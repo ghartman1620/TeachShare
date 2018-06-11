@@ -199,6 +199,7 @@
             };
         },
         mounted: function () {
+        console.log("Trying to mount table, with this info: columns, values: ", columns, valeus);
           this.$nextTick(function () {
               this.loading= true;
             //   this.setSortOrders();

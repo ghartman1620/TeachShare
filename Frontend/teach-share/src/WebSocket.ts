@@ -94,7 +94,7 @@ export default class WebSocket {
         (changed as any).user_id = parseInt((changed as any).user_id, 10);
         console.log("sending a message! it has post");
         console.log(changed);
-        console.trace();
+        // console.trace();
         return this.send({
             message: MessageType.Update,
             post: changed

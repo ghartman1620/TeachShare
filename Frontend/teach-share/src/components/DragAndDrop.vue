@@ -4,14 +4,13 @@
 <template>
     <grid-layout @layout-updated="saveLayout" v-if="storeElements.length > 0"
             :layout="layout"
-            :col-num="2"
+            :col-num="1"
             :row-height="rowHeight"
             :is-draggable="true"
             :is-resizable="false"
             :is-mirrored="false"
             :vertical-compact="true"
-            :margin="[0,0]"
-            :use-css-transforms="true"
+            :use-css-transforms="false"
             
     >
                 <grid-item @update-layout="updateLayout" :key="index" v-for="(element,index) in layout"
@@ -78,15 +77,26 @@ import { addElement,
 export default class DragAndDrop extends Vue {
     allElementsUpdated : Boolean = false;
     childEventsReceived : number = 0;
-    rowHeight : number = 5;
-    defaultHeight : number = 30;
+    rowHeight : number = 1;
+    defaultHeight : number = 100;
+    marginHeight : number = 20;
     newHeight : number = 0;
     storeElements: Object[] = getCurrentPost(this.$store)!.elements;
     layout : ILayout[] = [{"x":0, "y":0, "w":2, "h":this.defaultHeight, "i":"0"}];
 
+    get dbLayout(): ILayout[] {
+        var dbLayout = this.layout;
+        console.log("This layout moved in dragandropv.vue: ", dbLayout[0]["moved"]);
+        for (var x = 0; x < dbLayout.length; x++) {
+            if (dbLayout[x.toString()]["moved"] !== undefined) { console.log("deleting moved field."); delete dbLayout[x.toString()]["moved"] };
+        }
+        return dbLayout;
+    }
+
     removeElement(index: number, element: Object) {
         removeElement(this.$store, index);
     }
+
 
     updateDimensions ()
     {
@@ -110,13 +120,21 @@ export default class DragAndDrop extends Vue {
         else {
             let height : number = elementDim.height;
             for(var x = 0; x < this.layout.length; x++) {
+                console.log("Object value: ", (this.layout[x]));
                 let item : string = this.layout[x]["i"];
                 if (item === index) {
                     this.childEventsReceived = this.childEventsReceived + 1;
                     if (height > this.layout[x]["h"]*this.rowHeight) {
                         this.newHeight = (height/this.rowHeight);
                         this.layout[x]["h"] = this.newHeight;
-                        setLayout(this.$store,this.layout);
+                        console.log("New layout in draganddrop.vue: ", this.layout);
+                        var dbLayout : any = this.layout;
+                        for (var i = 0; i < dbLayout.length; i++)
+                        {
+                            var layout = dbLayout[i];
+                            console.log("layout index here: ", dbLayout[i].i);
+                        }
+                        setLayout(this.$store,dbLayout);
                     }
                 }
             }
@@ -125,6 +143,7 @@ export default class DragAndDrop extends Vue {
     }
 
     saveLayout(newLayout) {
+        console.log("Save layout in drag and drop: ", newLayout);
         setLayout(this.$store, newLayout);
     }
 
@@ -161,10 +180,10 @@ export default class DragAndDrop extends Vue {
                     console.error("a layout item doesn't have y or h: it is");
                     console.error(lowestItem);    
                 }
-                var newPosition = lowestItem.y + lowestItem.h;
+                var newPosition = lowestItem.y + lowestItem.h + this.marginHeight;
                 var newIndex : string = storeLayout.length.toString();
                 this.layout.push({"x":0, "y":newPosition, "w":2, "h":this.defaultHeight, "i":newIndex});
-                console.log("layout in draganddrop mounted is");
+                console.log("layout in draganddrop mounted hook: ");
                 console.log(getCurrentPost(this.$store)!.layout);
                 console.log(this.layout);
                 setLayout(this.$store, this.layout);

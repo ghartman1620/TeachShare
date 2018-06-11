@@ -19,7 +19,9 @@
                         </div>
                         <div class="col-11 container">
                             <div class="post-element card">
+                                <!-- <post-element v-if="this.element.values.size < 1" :element="this.element" :index="this.index"> -->
                                 <post-element :element="this.element" :index="this.index"></post-element>
+                                <!-- <div v-else> Undefined or empty element! </div> -->
                             </div>
                         </div>
 
@@ -33,10 +35,6 @@
                             </div>
                         </div>
                     </div>
-                            <slot></slot>
-                <span v-if="resizable" ref="handle" :class="resizableHandleClass">
-                </span>
-
             </div>
 
 
@@ -337,8 +335,8 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
                 elementDimensions: {},
                 cols: 1,
                 containerWidth: 100,
-                rowHeight: 30,
-                margin: [10, 10],
+                rowHeight: 1,
+                margin: [0,0],
                 maxRows: Infinity,
                 draggable: null,
                 resizable: null,
@@ -438,7 +436,7 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
             this.rowHeight = this.$parent.rowHeight;
             this.containerWidth = this.$parent.width !== null ? this.$parent.width : 100;
             // this.margin = this.$parent.margin !== undefined ? this.$parent.margin : [10, 10];
-            this.margin = [1,1];
+            this.margin = [0,0];
             this.maxRows = this.$parent.maxRows;
             if (this.isDraggable === null) {
                 this.draggable = this.$parent.isDraggable;
@@ -454,6 +452,7 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
             this.createStyle();
         },
         updated: function () {
+            // console.log("GridItem.vue updated!");
             //This is to check that we only emit the rendered height once upon update,
             if (this.dimensionsEmitted === false) { //not over hundreds of updates to the grid
                     this.$nextTick(function () { this.emitDimensions(); })
@@ -590,10 +589,11 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
             },
 
             emitDimensions: function(){
-                var cardHeight = document.getElementById('element-'+this.i).offsetHeight;
+                var cardHeight = document.getElementById('element-'+this.i).clientHeight;
                 this.elementDimensions["index"] = this.i;
                 this.elementDimensions["height"] = cardHeight;
                 this.dimensionsEmitted = true;
+                console.log("New dimensions emitted from GridItem: ", this.elementDimensions);
                 this.$emit('update-layout', this.elementDimensions, false);
             },
             removeElement: function (index) {

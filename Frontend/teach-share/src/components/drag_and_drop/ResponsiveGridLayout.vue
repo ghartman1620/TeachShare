@@ -33,7 +33,7 @@
             },
             rowHeight: {
                 type: Number,
-                default: 150
+                default: 1
             },
             maxRows: {
                 type: Number,

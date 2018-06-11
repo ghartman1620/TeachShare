@@ -196,7 +196,7 @@ export class InProgressPost {
     setLayout(layout: ILayout[]): void {
         this.layout = layout;
         console.log("setting layotu!");
-        console.trace();
+        // console.trace();
         this.saveDraft();
     }
     setColor(color: string): void {

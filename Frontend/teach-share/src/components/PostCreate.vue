@@ -191,7 +191,7 @@
         <div v-else-if="postStatus === SAVED">
             Saved!
         </div>
-        <b-pagination size="md" :per-page="10" v-model="currentPage">
+        <b-pagination class="pull-left" size="md" :per-page="10" v-model="currentPage">
 
         </b-pagination>
         <button type="button" class="undo-button align-right btn btn-sm btn-outline-danger btn-primary-spacing" @click="undo">
@@ -200,7 +200,7 @@
         <button type="button" class="redo-button align-right btn btn-sm btn-outline-success btn-primary-spacing" @click="redo">
             <font-awesome-icon icon="redo" fixed-width></font-awesome-icon> redo 
         </button>
-        <button type="button" class="submit-button btn btn-primary" v-on:click="submitPost">
+        <button type="button" class="btn-sm submit-button btn btn-primary" v-on:click="submitPost">
             <font-awesome-icon icon="check" fixed-width></font-awesome-icon> Publish post
         </button>
     </nav>
@@ -338,6 +338,7 @@ export default class PostCreate extends Vue {
             // it gets assigned to a type-unsafe thing that winds up as a string.
             return this.thisUserPosts.includes(p.pk);
         });
+        // console.log("user posts in post create: ", userPosts)
         return userPosts;
     }
     get currentPost(): InProgressPost | undefined {
@@ -495,6 +496,7 @@ export default class PostCreate extends Vue {
         this.beginPost(user.pk as number, post.pk as number);
     }
     public beginPost(userid: number, postid: number | undefined): void {
+        console.log("Beginning the post again");
         let vm: PostCreate = this;
         if (postid !== undefined) {
             // So the user fires up post create and wants some posts. We have a few cases.
@@ -506,10 +508,8 @@ export default class PostCreate extends Vue {
             // go ahead and subscribe to it. They'll get stuck on loading until the subscription is done
             // and they get the get message from the websocket.
 
-
             // Two: they do have an inProgressPost item. Awesome! Maybe they revisited the page (welcome back)
             // or maybe they just clicked on another one of their posts to go edit it.
-
 
             // In this case, we sort of expect that these fetch posts will hit their local cache (if not that's ok)
             // But we'll begin post - either here or in the handler down in mounted() with the post with all
@@ -539,6 +539,7 @@ export default class PostCreate extends Vue {
             }).then((response) => {
                 this.thisUserPosts.push(response.data.pk);
                 window.localStorage.setItem("inProgressPost", response.data.pk.toString());
+                console.log
                 // We're not even going to bother dealing with the response from fetch post.
                 // It will always be undefined because this will never be a cache hit - it can't possibly be,
                 // seeing as we just right above made this post!
@@ -550,6 +551,24 @@ export default class PostCreate extends Vue {
     }
     saveLayout() {
         setLayout(this.$store, this.layout);
+    }
+    //manual check if the pertinent parts of a layout are the same
+    sameLayout(layout1 : Object[], layout2: Object[]) : boolean {
+        var same : boolean = false;
+        if (layout1.length === layout2.length) { //auto-fail.
+            same = true;
+            for (var x = 0; x < layout1.length; x++) {
+                if (layout1["h"] !== layout2["h"] ||
+                    layout1["i"] !== layout2["i"] ||
+                    layout1["w"] !== layout2["w"] ||
+                    layout1["x"] !== layout2["x"] ||
+                    layout1["y"] !== layout2["y"] ) 
+                {
+                    same = false;
+                }
+            }
+        }
+        return same;
     }
     public removeElement(index: number) {
         removeElement(this.$store, index);
@@ -618,24 +637,17 @@ export default class PostCreate extends Vue {
                 for(let p of val.payload){
                     let post = Post.pkify(p.Post);
                     if (post.pk === inProgressPk) {
-                        //console.log("considering whether or not to remount drag and drop");
-                        //console.log(this.inProgressPost === undefined);
-                        if(this.inProgressPost !== undefined){
-                            //console.log(post.layout !== this.inProgressPost!.layout);
-                        }
-                        else{
-                            //console.log("in progress post is undefined");
-                        }
-                        if(this.inProgressPost === undefined || post.layout !== this.inProgressPost!.layout){
+                        // console.log("considering whether or not to remount drag and drop");
+                        // console.log(this.inProgressPost === undefined);
+                        //added sameLayout() function to manually test similarity of layouts. Plain JS operators are too unreliable,
+                        //plus the moved field pops up in the layout when updated directly from the GridLayout component.
+                        if(this.inProgressPost === undefined || !this.sameLayout(this.inProgressPost!.layout, post.layout)){
                             this.changeDragAndDrop++;
-                            //console.log("Changing drag and drop!");
+                            // console.log("Changing drag and drop!");
                         }
                         else{
-                            //console.log("not changing drag and drop");
-                        }
-                            
-                    
-                        
+                            console.log("not changing drag and drop");
+                        }                        
                         beginPost(store,{userid: userpk, p: post});
                         vm.postStatus = PostStatus.Saved;
                     }
@@ -870,7 +882,7 @@ card-row {
 }
 
 .bottom-navbar {
-    height: 50px;
+    height: 70px;
     background-color: lighten(
         rgba($title-tag-card-background, 0.9),
         15%
