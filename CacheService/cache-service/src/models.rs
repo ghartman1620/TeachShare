@@ -8,6 +8,7 @@ use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, AddAssign};
 use std::sync::Arc;
+use std::rc::Rc;
 use users::User;
 
 // * option 1
@@ -311,9 +312,9 @@ pub enum MessageType {
 pub struct Msg {
     pub msg_type: MessageType,
     pub timestamp: i32,
-    pub items: Vec<Arc<Resource>>,
-    pub errors: Vec<String>,
+    pub items: Vec<Resource>,
     pub connection_id: i32,
+    pub user: Option<User>,
 }
 
 /// Msg uses the common standard library/crate pattern for building objects called
@@ -324,8 +325,8 @@ impl Msg {
             msg_type: MessageType::Get,
             timestamp: 0,
             items: vec![],
-            errors: vec![],
             connection_id: 0,
+            user: None,
         }
     }
     pub fn set_msg_type(&mut self, msg_type: MessageType) -> &mut Self {
@@ -341,18 +342,16 @@ impl Msg {
             .iter()
             .zip(watchers.iter())
             .map(|(post, watchers)| {
-                let temp = &mut Arc::new(post.clone()); // @Clone
-                let resource = Arc::get_mut(temp).expect("Could not borrow mutably.");
-
+                let mut resource = post.clone();
                 watchers.iter().for_each(|watch| {
                     resource.add_watch(watch.clone());
                 });
-                Arc::new(resource.clone())
+                resource
             })
             .collect::<Vec<_>>();
 
         // @TODO: avoid this extra loop if possible.
-        let mut actual: Vec<Arc<Resource>> = vec![];
+        let mut actual: Vec<Resource> = vec![];
         for a in temp {
             actual.push(a.clone());
         }

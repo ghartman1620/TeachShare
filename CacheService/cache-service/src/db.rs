@@ -265,10 +265,8 @@ impl Refresh for Post {
         let db = DB::new();
         let session = db.get();
         match Post::get(self.id, &*session) {
-            Ok(ref mut val) => {
-                if let Some(s) = val.pop() {
-                    *self = s;
-                }
+            Ok(val) => {
+                *self = val;
             }
             Err(db_err) => {
                 error!("Error: {:?}", db_err);
@@ -308,9 +306,23 @@ impl Post {
         posts_post.filter(id.eq_any(ids)).load::<Post>(conn)
     }
 
-    pub fn get(pk_id: i32, conn: &PgConnection) -> Result<Vec<Post>, result::Error> {
-        use schema::posts_post::dsl::*;
-        posts_post.filter(id.eq(pk_id)).load::<Post>(conn)
+    pub fn get(pk_id: i32, conn: &PgConnection) -> Result<Post, result::Error> {
+        use schema::posts_post::dsl::{posts_post};
+        posts_post.find(pk_id).first::<Post>(conn)
+    }
+
+    pub fn get_and_perm(pk_id: i32, db: &DB) -> Result<(Post, UserObjectPermission), DBError> {
+        let conn = db.get();
+        let post = Post::get(pk_id, &*conn)?;
+        debug!("{:#?}", post);
+        
+        let ct = DjangContentType::get_dct_by_model(db, "post")?;
+        debug!("{:#?}", ct);
+        
+        let perm = UserObjectPermission::get_by_id(pk_id, ct.id, db)?;
+        debug!("{:#?}", perm);
+        
+        Ok((post, perm))
     }
 
     pub fn save(&self, conn: &PgConnection) -> Result<(), String> {

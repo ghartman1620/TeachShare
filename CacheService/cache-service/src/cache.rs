@@ -4,13 +4,14 @@ use db::*;
 use diesel::pg::PgConnection;
 use models::*;
 use std::cell::{BorrowMutError, RefCell};
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::hash::Hash;
 use std::ops::{Index, IndexMut};
 use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
+// use std::collections::HashSet;
 use users::User;
 
 const MAX_DB_SAVE_TIMEOUT: Duration = Duration::from_millis(200);
@@ -18,11 +19,12 @@ const MAX_DB_SAVE_TIMEOUT: Duration = Duration::from_millis(200);
 pub trait Cache {
     type Key;
     type Entry;
-    type Err;
+    type Err;  // currently not used
 
     fn get(&self, key: Self::Key) -> Option<&Self::Entry>;
     fn get_mut(&mut self, key: Self::Key) -> Option<&mut Self::Entry>;
     fn put(&mut self, key: Self::Key, value: Self::Entry) -> Option<Self::Entry>;
+    // fn has_permission(&self, user: &User, object: ObjID) -> bool;
 }
 
 /// Unused (substantially) currently but may soon
@@ -37,6 +39,12 @@ pub enum CacheError {
 pub struct HashMapCache<K: Eq + Hash, V> {
     _inner: HashMap<K, V>,
     _permissions: BTreeMap<i32, UserObjectPermission>,
+}
+
+pub enum ObjID<'id> {
+    Post(&'id str),
+    User(&'id str),
+    Comment(&'id str),
 }
 
 impl<K, V> HashMapCache<K, V>
@@ -88,6 +96,10 @@ impl Cache for HashMapCache<ID, Resource> {
     fn put(&mut self, key: ID, value: Resource) -> Option<Resource> {
         self._inner.insert(key, value)
     }
+
+    // fn has_permission(&self, user: &User, object: ObjID) -> bool {
+        
+    // }
 }
 
 // not really recommended..
@@ -136,11 +148,11 @@ pub fn cache_thread(
                     let m = msg.clone();
                     match msg.msg_type {
                         MessageType::Get => {
-                            debug!("[CACHE] RECEIVED => {:?}", msg.msg_type);
+                            debug!("[CACHE] RECEIVED => {:?}: ID: {:?}", msg.msg_type, msg.items[0].data);
                             assert_eq!(msg.msg_type, MessageType::Get);
                             {
                                 let c: &mut RefCell<HashMapCache<ID, Resource>> = Rc::get_mut(&mut cache).unwrap();
-                                handle_get(&msg, c, &ret_pipe, &conn);
+                                handle_get(&msg, c, &ret_pipe, &db);
                             }
                         },
                         MessageType::Create => {
@@ -241,8 +253,8 @@ fn handle_manifest(
                     //     "[CACHE] manifest: adding post {} to return list",
                     //     val.get_data().id
                     // );
-                    let resource = Arc::new(val.clone());
-                    wrap.items.push(resource);
+                    // let resource = Arc::new(val.clone());
+                    wrap.items.push(val.clone());
                 }
                 //otherwise, the sender has the correct post and doesn't need it updated
             }
@@ -274,7 +286,7 @@ fn handle_manifest(
 
         //8. Add them all to the return list.
         trace!("[CACHE] manifest: adding post {} to return list", id);
-        wrap.items.push(Arc::new(resource));
+        wrap.items.push(resource);
     }
     //9. Send back the return list.
     if let Err(e) = ret_pipe.send(Arc::new(wrap)) {
@@ -287,13 +299,13 @@ fn handle_get(
     msg: &Arc<Msg>,
     cash: &mut RefCellCache,
     ret_pipe: &Sender<Arc<Msg>>,
-    db: &PgConnection,
+    db: &DB,
 ) {
     let mut wrap = Msg::new().set_msg_type(MessageType::Get).build();
 
     for m in &msg.items {
         let mut dne_flag = false;
-        let mut db_posts: Vec<Post> = vec![];
+        let mut db_posts: Vec<(Post, UserObjectPermission)> = vec![];
         {
             // immutably borrow cache
             let mut cache = cash.borrow();
@@ -317,11 +329,11 @@ fn handle_get(
                 };
 
                 // get post from the database
-                let post_result = Post::get(id, db);
+                let post_result = Post::get_and_perm(id, db);
                 match post_result {
-                    Ok(posts) => {
+                    Ok((posts, perm)) => {
                         dne_flag = true;
-                        db_posts.extend(posts);
+                        db_posts.push((posts, perm));
                         debug!("POSTS: {:?}", db_posts);
                     }
                     Err(err) => {
@@ -331,7 +343,7 @@ fn handle_get(
             } else {
                 // model_data is the data from the cache
                 let model_data = result_data.unwrap();
-                wrap.items.push(Arc::new(model_data.clone()));
+                wrap.items.push(model_data.clone());
             }
         }
         if dne_flag {
@@ -340,8 +352,18 @@ fn handle_get(
                 let first = &db_posts
                     .pop()
                     .expect("There was an error unwrapping a pop'd item. This should not happen!");
-                let resource_new = Resource::new(Model::Post(first.clone()));
-                let inserted = cache.put(ID::Post(first.id), resource_new.clone());
+
+                info!("Post: #{}, Permission: {:?}", first.0.id, first.1);
+                let mut resource_new = Resource::new(Model::Post(first.0.clone()));
+                
+                // generate permission object
+                let mut permission = UserPermission::ViewPost(HashSet::new());
+                permission.insert(UserID::new());
+                
+                // insert permission into resource
+                resource_new.add_permission(permission);
+
+                let inserted = cache.put(ID::Post(first.0.id), resource_new.clone());
                 match inserted {
                     Some(val) => {
                         debug!(
@@ -353,7 +375,7 @@ fn handle_get(
                         warn!("[CACHE] Key did not currently exist.");
                     }
                 }
-                wrap.items.push(Arc::new(resource_new));
+                wrap.items.push(resource_new);
             }
         }
     }
@@ -444,20 +466,14 @@ fn handle_watch(
                 match &m.data {
                     Model::Post(post) => {
                         let post_result = Post::get(post.id, db_read);
-                        let posts: Option<Vec<Post>> = match post_result {
+                        let posts: Option<Post> = match post_result {
                             Ok(val) => Some(val),
                             Err(e) => None,
                         };
                         if posts.is_some() {
-                            let cleaned_posts_response: Vec<Resource> = posts
-                                .unwrap()
-                                .into_iter()
-                                .map(|post| create_post_cache(&post, &cash))
-                                .filter(|(resource, need_db)| *need_db && resource.is_ok())
-                                .map(|(resource, _)| resource.unwrap())
-                                .filter(|resource| resource.is_some())
-                                .map(|resource| resource.unwrap())
-                                .collect();
+                            let cleaned_posts_response = posts.unwrap();
+                            create_post_cache(&post, &cash);
+
                             debug!("cleaned_posts_response: {:?}", cleaned_posts_response);
                         }
                     }
@@ -501,27 +517,25 @@ fn create_posts(
     db_write: &Sender<Post>,
 ) -> Vec<String> {
     let need_db = create_posts_cache(output, cache);
+    let mut posts = vec![];
     let mut errors = vec![];
     if need_db.is_some() {
         // actually create them
         let ids = need_db.unwrap();
-        let rs: Vec<Post> = ids.into_iter()
-            .flat_map(|x| {
+        
+        ids.into_iter()
+            .for_each(|x| {
                 let ret = Post::get(x, db_read);
 
-                // @FIX: This throws away legitimate errors potentially
-                // also will treat duplicate PK values as legitimate by
-                // flattening the results. This could cause undefined behavior.
                 if ret.is_ok() {
-                    ret.unwrap()
+                    posts.push(ret.unwrap());
                 } else {
-                    errors.push(ret.map_err(|e| format!("{:?}", e)).unwrap_err());
-                    return vec![]; // empty
+                    let err = format!("{:?}", ret.unwrap_err());
+                    error!("Error: {:?}", err);
+                    errors.push(err);
                 }
-                // ret
-            })
-            .collect();
-        let errors_inner: Vec<String> = create_posts_db(rs.as_slice(), db_write, true)
+            });
+        let errors_inner: Vec<String> = create_posts_db(posts.as_slice(), db_write, true)
             .into_iter()
             .map(|val| val.unwrap_err())
             .collect();
@@ -608,6 +622,7 @@ fn handle_update(
 ) {
     let mut cache_mut = cash.borrow_mut();
     let all_watchers = &mut vec![];
+    let all_versions = &mut vec![];
 
     for m in &msg.items {
         {
@@ -615,9 +630,10 @@ fn handle_update(
                 Model::Post(post) => {
                     let resource = cache_mut.get(ID::Post(post.id));
                     if resource.is_some() {
+                        let from_cache = resource.unwrap();
+
                         // current watchers from Cache
-                        let w = resource.unwrap().watchers.to_vec();
-                        debug!("Watchers --> {:?}", w);
+                        let w = from_cache.watchers.to_vec();
                         all_watchers.push(w);
                     }
                 }
@@ -636,26 +652,31 @@ fn handle_update(
 
                     debug!("************************************************************");
                     debug!("Entry of ID:{}, has a version --> {}", post.id, old_version);
-                    entry.version = old_version + 1;
+                    (*entry).version = old_version + 1;
+                    // m.version = old_version + 1;
                     debug!("New Version: {}", entry.version);
                     debug!("************************************************************\n");
+                    trace!("whole cache entry: {:?}", entry);
+
+                    // get version from cache here too!
+                    all_versions.push(entry.version);
                 }
             }
             _ => unimplemented!(),
         }
     }
 
-    info!("ALL WATCHERS ------------------> {:?}", all_watchers);
+    info!("Versions: {:?}", all_versions);
+    info!("Watchers: {:?}", all_watchers);
 
     let mut just_resources: Vec<Resource> = vec![];
-    for item in &msg.items {
+    for (i, item) in msg.items.iter().enumerate() {
         match item.data {
             Model::Post(ref post) => {
                 let watchers = item.watchers.clone();
-                let version = item.version;
                 let mut resource = Resource::new(Model::Post(post.clone()));
+                resource.version = all_versions[i];
                 watchers.iter().for_each(|watch| resource.add_watch(*watch));
-                // resource.add_watch()
                 just_resources.push(resource);
             }
             _ => unimplemented!(),

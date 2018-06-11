@@ -44,7 +44,7 @@ p.title = "This is a post title";
 // p.updated = new Date();
 
 // storeSocket.sendCreate(p);
-// storeSocket.sendGet(2);
+storeSocket.sendGet(1);
 // storeSocket.sendWatch(1);
 // storeSocket.sendWatch(2);
 // storeSocket.sendUpdate(p);

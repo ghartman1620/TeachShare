@@ -353,103 +353,8 @@ impl Handler for Connection {
         //
     }
 
-    // @TODO: @FIXME: This needs to probably go in the 'on_request' method, where we deny them
-    // BEFORE connection, as apose to this, where it is already technically too late. I need to
-    // deny the connection earlier. The logic will be roughly the same though, 1-1.
-    fn on_open(&mut self, hs: Handshake) -> ws::Result<()> {
-        info!("client connected.");
-        debug!("ON_OPEN connection SELF: {:?}", self);
-        // for (key, value) in hs.request.headers() {
-        //     info!("{:?}: {:?}", key, String::from_utf8(value.clone()));
-        // }
-
-        // // find the user...
-        // let mut user_id = -1;
-        // {
-        //     // funky scope is due to the need for a mutable and immutable borrow on 'self'
-        //     // which requires one of the borrows to return the value before the next can continue..
-        //     let token = hs.request.header("Cookie");
-        //     let oauth_id = token.and_then(|tok| {
-        //         let cookies = CookieStr(tok);
-        //         let mut token = String::new();
-        //         if let Some(token_str) = cookies.get_key("token") {
-        //             token = token_str;
-        //         }
-        //         debug!("Token: {:?}", token);
-        //         let u = User::new();
-        //         let out = match &self.parent {
-        //             Some(val) => match val.try_borrow_mut() {
-        //                 Ok(parent) => {
-        //                     debug!("Parent --> {:?}", parent);
-        //                     Ok(parent)
-        //                 }
-        //                 Err(e) => {
-        //                     error!("There was an error! {}", e);
-        //                     Err(GSSError::from(e))
-        //                 }
-        //             },
-        //             None => {
-        //                 error!("Could not borrow parent as a mutable reference!");
-        //                 Err(GSSError::GetParent)
-        //             }
-        //         };
-        //         info!("got parent! {:?}", out);
-        //         match out {
-        //             Ok(p) => {
-        //                 let table: &BTreeMap<
-        //                     String,
-        //                     Oauth2ProviderAccesstoken,
-        //                 > = &p.auth_table;
-        //                 debug!("Table: {:?}", table);
-        //                 if table.contains_key(&token) {
-        //                     let oauth2 = p.auth_table[&token].clone();
-        //                     info!("Found User OAUTH2 entry: {:?}", oauth2);
-        //                     return Some(oauth2);
-        //                 } else {
-        //                     warn!("Oath2 Entry does not exist for token. Could be expired.");
-        //                     return None;
-        //                 }
-        //             }
-        //             Err(e) => warn!("Could not unwrap Parent (GrandSocketStation"),
-        //         }
-
-        //         // Oauth2ProviderAccesstoken::get_by_token(tok, )
-        //         // self.set_user(u);
-        //         None
-        //     });
-        //     user_id = oauth_id.and_then(|v| v.user_id).unwrap_or(-1);
-        // }
-
-        // // let db = self.db.get();
-        // if user_id != -1 {
-        //     let u = User::get_by_id(user_id, &self.db);
-        //     if u.is_ok() {
-        //         let user = u.unwrap();
-        //         info!("Got user: {:?}", user);
-        //         self.set_user(user);
-        //         info!("CONNECTION: {:?}", self);
-        //         Ok(())
-        //     } else {
-        //         Err(ws::Error::new(
-        //             ws::ErrorKind::Custom(Box::new(GSSError::FailedUserAuth(
-        //                 "No user was found for that id.",
-        //             ))),
-        //             "The client could not be authenticated properly..",
-        //         ))
-        //     }
-        // } else {
-        //     Err(ws::Error::new(
-        //         ws::ErrorKind::Custom(Box::new(GSSError::FailedUserAuth(
-        //             "Could not find Oauth2 reference in db for token.",
-        //         ))),
-        //         "The client could not be authenticated properly..",
-        //     ))
-        // }
-        Ok(())
-    }
-
     fn on_message(&mut self, msg: Message) -> ws::Result<()> {
-        debug!("ON_MESSAGE SELF: {:?}", self);
+        info!("on_message: {:?}", self);
         match msg {
             Message::Binary(_) => {
                 warn!("Received binary message. Doing nothing with it.");
@@ -478,7 +383,7 @@ impl Handler for Connection {
     }
 
     fn on_close(&mut self, code: CloseCode, reason: &str) {
-        debug!("ON_CLOSE SELF: {:?}", self);
+        info!("on_close: {:?}", self);
         match code {
             CloseCode::Normal => {
                 info!("The client is done with the connection.");
@@ -497,7 +402,7 @@ impl Handler for Connection {
     }
 
     fn on_error(&mut self, err: Error) {
-        debug!("ON_ERROR SELF: {:?}", self);
+        debug!("on_error: {:?}", self);
         error!("The server encountered an error: {:?}", err);
     }
 }
@@ -597,7 +502,7 @@ impl Connection {
         self.tx.send(serialized)
     }
     fn handle_get_msg(&self, msg: &WSMessage) -> Option<String> {
-        debug!("HANDLE_GET SELF: {:?}", self);
+        info!("handle_get: {:?}", self);
         trace!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Get);
         let mut return_message = Msg::new().set_msg_type(MessageType::Get).build();
@@ -610,7 +515,7 @@ impl Connection {
 
         return_message
             .items
-            .push(Arc::new(Resource::new(Model::Post(p))));
+            .push(Resource::new(Model::Post(p)));
 
         match self.to_cache.send(Arc::new(return_message)) {
             Ok(_) => {}
@@ -637,7 +542,7 @@ impl Connection {
         }
     }
     fn handle_create_msg(&self, msg: WSMessage) -> Option<String> {
-        debug!("HANDLE_CREATE SELF: {:?}", self);
+        info!("handle_create: {:?}", self);
         debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Create);
         let mut wrap = Msg::new().set_msg_type(MessageType::Create).build();
@@ -650,7 +555,7 @@ impl Connection {
             }
         };
 
-        wrap.items.push(Arc::new(Resource::new(Model::Post(p))));
+        wrap.items.push(Resource::new(Model::Post(p)));
         match self.to_cache.send(Arc::new(wrap)) {
             Ok(val) => {
                 debug!("Sucessfully sent and got in return: {:?}", val);
@@ -682,7 +587,7 @@ impl Connection {
         }
     }
     fn handle_manifest_msg(&self, msg: WSMessage) -> Option<String> {
-        debug!("HANDLE_MANIFEST SELF: {:?}", self);
+        info!("handle_manifest: {:?}", self);
         debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Manifest);
 
@@ -710,7 +615,7 @@ impl Connection {
                 p.id = post_version.id;
                 let mut resource = Resource::new(Model::Post(p));
                 resource.version = post_version.version;
-                wrap.items.push(Arc::new(resource));
+                wrap.items.push(resource);
             }
             // self.to_cache.
             match self.to_cache.send(Arc::new(wrap)) {
@@ -752,7 +657,7 @@ impl Connection {
         }
     }
     fn handle_update_msg(&mut self, msg: WSMessage) -> Option<String> {
-        debug!("HANDLE_UPDATE SELF: {:?}", self);
+        info!("handle_update: {:?}", self);
         debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Update);
         let mut wrap = Msg::new().set_msg_type(MessageType::Update).build();
@@ -766,7 +671,7 @@ impl Connection {
             }
         };
         {
-            wrap.items.push(Arc::new(Resource::new(Model::Post(post))));
+            wrap.items.push(Resource::new(Model::Post(post)));
         }
 
         match self.to_cache.send(Arc::new(wrap)) {
@@ -787,6 +692,8 @@ impl Connection {
 
         // @TODO: This is the actual update sending code. Could be optimized greatly.
         if let Ok(updated_data) = changes {
+            let versions: Vec<u64> = updated_data.items.iter().map(|x| (*x).version).collect();
+            debug!("Version: {:?}", versions);
             trace!("Updated_data ---------------> {:?}", updated_data.items);
             let mut watchers: Vec<Vec<i32>> = vec![];
             let (posts, versions): (Vec<Model>, Vec<u64>) = updated_data
@@ -802,7 +709,7 @@ impl Connection {
             match &mut self.parent {
                 Some(val) => match val.try_borrow_mut() {
                     Ok(parent) => {
-                        info!("TOTAL CONNECTIONS: {:?}", parent.get_connections());
+                        info!("TOTAL CONNECTIONS: {:#?}", parent.get_connections());
                         for c in parent.get_connections() {
                             // @TODO: Simplify/abstract this section into separate function(s)
                             debug!("Connection --> {:?}", c);
@@ -832,7 +739,7 @@ impl Connection {
         None
     }
     fn handle_watch_msg(&self, msg: WSMessage) -> Option<String> {
-        debug!("HANDLE_WATCH SELF: {:?}", self);
+        info!("handle_watch: {:?}", self);
         debug!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Watch);
         let mut wrap = Msg::new().set_msg_type(MessageType::Watch).build();
@@ -857,7 +764,7 @@ impl Connection {
         wrap.connection_id = conn_id as i32;
 
         // wrap it up and send
-        wrap.items.push(Arc::new(resource));
+        wrap.items.push(resource);
         match self.to_cache.send(Arc::new(wrap)) {
             Ok(val) => {
                 debug!("Sucessfully sent and got in return: {:?}", val);
