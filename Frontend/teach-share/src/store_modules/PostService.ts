@@ -76,8 +76,6 @@ export const actions = {
             }
             const p: Post = await Post.get(postID as number, true);
             // const resp: AxiosResponse<Post> = await api.get(`posts/${postID}/`);
-            console.log("from fetch post sub - got post!");
-            console.log(p);
             mutCreate(ctx, p);
             return p;
         } catch (err) {

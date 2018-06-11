@@ -1,7 +1,6 @@
 
 import api from "./api";
 
-
 import Database from "./Database";
 import WebSocket from "./WebSocket";
 
@@ -229,14 +228,10 @@ export class Post extends Model {
     */
     public static get(pk: number, save?: boolean): Promise<Post> {
         return new Promise((resolve, reject) => {
-            console.log("getting post " +  pk);
             this.db.getPost(pk).then(p => {
                 p.pk = pk;
-                console.log("got post from db!");
-                console.log(p);
                 resolve(p);
             }).catch( () => {
-                console.log("didn't get post from db");
                 if (save) {
                     Post.db.addEmptyPost(pk);
                     Post.ws.sendWatch(pk);
@@ -266,6 +261,21 @@ export class Post extends Model {
             return new Post();
         }
     }
+    private static compareObj(obj1: any, obj2: any): boolean{
+        console.log(obj1);
+        console.log(obj2);
+        let keys1 = Object.keys(obj1);
+        let keys2 = Object.keys(obj2);
+        for (let key of keys1) {
+            if(!keys2.includes(key as string)) return false;
+            if(obj1[key as string] != obj2[key as string]) return false;
+        }
+        for (let key of keys2) {
+            if(!keys1.includes(key as string)) return false;
+        }
+        return true;
+    }
+    
     private static db: Database = Database.getInstance();
     private static ws: WebSocket = WebSocket.getInstance();
 
@@ -310,6 +320,56 @@ export class Post extends Model {
         }];
     }
 
+    
+
+    public equals(other: Post): boolean{
+        console.log(this);
+        console.log(other);
+        //debugger;
+        // check layout
+        if (this.layout.length !== other.layout.length) {
+            return false;
+        }
+        for (let i: number = 0; i < this.layout.length; i++) {
+            const lay1 = this.layout[i];
+            const lay2 = other.layout[i];
+            if (lay1.h !== lay2.h || lay1.i !== lay2.i || lay1.w !== lay2.w || lay1.x !== lay2.x || lay1.y !== lay2.y) {
+                return false;
+            }
+        }
+        // check content
+        if (this.content.length !== other.content.length) {
+            return false;
+        }
+        for (let i: number = 0; i < this.content.length; i++){
+            const ele1 = this.content[i];
+            const ele2 = other.content[i];
+            console.log(ele1);
+            console.log(ele2);
+            if (!Post.compareObj(ele1, ele2)) {
+                return false;
+            }
+        }
+        const checkPlainArray = (arr1, arr2) => {
+            if (arr1.length !== arr2.length) {
+                return false;
+            }
+            for (let i: number = 0; i < arr1.length; i++){
+                const thing1 = arr1[i];
+                const thing2 = arr2[i];
+                if (thing1 !== thing2) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        //debugger;
+        if (!checkPlainArray(this.tags, other.tags)) {
+            return false;
+        }
+        //debugger;
+        return this.title === other.title && this.color === other.color;
+    }
     // Creates an object of the form the websocket requires for deserialization:
     // pk is known as id
     // user isn't an object, it's just a "user_id" with the pk/id of the user

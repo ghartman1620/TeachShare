@@ -129,7 +129,6 @@ export default class DragAndDrop extends Vue {
     }
 
     mounted() { //this is pretty messy, it will be refactored soon. For now though, even like this, it works. :) -JL
-        console.log("drag and drop mounted.");
 
         var lowestItem: ILayout = this.layout[0];
 
@@ -164,9 +163,6 @@ export default class DragAndDrop extends Vue {
                 var newPosition = lowestItem.y + lowestItem.h;
                 var newIndex : string = storeLayout.length.toString();
                 this.layout.push({"x":0, "y":newPosition, "w":2, "h":this.defaultHeight, "i":newIndex});
-                console.log("layout in draganddrop mounted is");
-                console.log(getCurrentPost(this.$store)!.layout);
-                console.log(this.layout);
                 setLayout(this.$store, this.layout);
                 // for (var prev_index = 0; prev_index < this.storeElements.length - 1; prev_index++) {
                 //     let index = prev_index + 1; //index of the element layout item we're pushing.

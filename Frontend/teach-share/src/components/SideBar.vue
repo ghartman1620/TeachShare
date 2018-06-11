@@ -48,25 +48,23 @@ export default class SideBar extends Vue {
 
 <style lang="scss" scoped>
 .sidebar {
-    background-color:  #f1f1f1; //this is some random offwhite color that i picked
-    // border: 3px solid black; //this is awful lets not use it to indicate end of sidebar 
-    opacity: .9; //this is also an option
-    overflow: scroll;
+    background-color:  #f1f1f1; 
+    opacity: .9; 
     position: fixed;
-    height: auto; //enable me for having the white background conform to the height of the contents of the sidebar
-    top: 60px; /* height of top navbar */
+    height: auto; 
+    top: 60px;
     left: 0;
     width: 410px;
     -webkit-transition: all 0.1s ease-in-out;
     -moz-transition: all 0.1s ease-in-out;
     transition: all 0.1s ease-in-out;
-    overflow-y: scroll;
+    overflow: auto;
     z-index: 3;
 }
 .sidebar.collapsed {
     width: auto;
     background-color: transparent;
-    overflow: hidden;
+
 }
 .sidebar-btn {
     width: 100%;

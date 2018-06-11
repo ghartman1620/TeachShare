@@ -4,7 +4,6 @@
     <side-bar collapsedString="Your posts">
 
         <div v-for="post in userPosts">
-            {{post}}
             <a href="#" v-on:click.stop="editPost(post)">
                 <span :key="post.title" v-if="post.title != ''">
                     {{post.title}}
@@ -94,7 +93,7 @@
 
                                     <div class="col-10">
                                     
-                                        <input class="form-control" type="text" v-model="inProgressPost.title"
+                                        <input class="form-control" type="text" @change="changeTitle" v-model="inProgressPost.title"
                                             placeholder="Title required" id="titleTextbox">
                                     </div>
                                 </div>
@@ -233,6 +232,8 @@ import {
   namespace
 } from "vuex-class";
 import { mapState } from "vuex";
+import isEqual from "lodash/isEqual";
+
 import forEach from "lodash/forEach";
 import PostElement from "./PostElement.vue";
 import {PostStatus, InProgressPost} from "../post";
@@ -336,11 +337,7 @@ export default class PostCreate extends Vue {
 
     get userPosts(): Post[] {
         const store = this.$store;
-        
         const userPosts = getPosts(this.$store).filter( (p) => {
-            // getLoggedInUser(store).pk seems to be a string at runtime.
-            // It obviously ought to be a number, but somewhere
-            // it gets assigned to a type-unsafe thing that winds up as a string.
             return this.thisUserPosts.includes(p.pk);
         });
         return userPosts;
@@ -437,6 +434,10 @@ export default class PostCreate extends Vue {
             this.createTag();
         }
     }
+    public changeTitle() {
+        console.log("change title called!");
+        this.inProgressPost!.saveDraft();
+    }
     public createTag() {
         this.tags.push(this.inProgressTag);
         this.inProgressTag = "";
@@ -497,6 +498,8 @@ export default class PostCreate extends Vue {
 
         window.localStorage.setItem("inProgressPost", post.pk);
         const user: User = this.getLoggedInUser as  User;
+        console.log("beginning post with post ");
+        console.log(post.pk);
         this.beginPost(user.pk as number, post.pk as number);
     }
     public beginPost(userid: number, postid: number | undefined): void {
@@ -525,9 +528,13 @@ export default class PostCreate extends Vue {
             // make some database-savable changes to their post. That way if they just hit reload repeatedly like
             // i'm doing now to test things they won't make a bunch of new posts that are all empty.)
             window.localStorage.setItem("inProgressPost", postid.toString());
+            console.log("fetching post " + postid);
             fetchPostSubscribe(this.$store, postid).then((p) => {
-                if(p.post) {
-                    beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p:p.post});
+                if(p) {
+                    console.log("begin post")
+                    console.log(p);
+                    beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p:p});
+                    this.postStatus = this.SAVED;
                 }
             });
         } else {
@@ -603,7 +610,6 @@ export default class PostCreate extends Vue {
                 this.getLoggedInUser.pk as number,
                 undefined);
         } else {
-
             this.beginPost(
                 this.getLoggedInUser.pk as number, parseInt(inProgressPost as string));
         }
@@ -614,35 +620,35 @@ export default class PostCreate extends Vue {
         WebSocket.getInstance().addMessageListener((message) => {
             //debugger;
             const val = JSON.parse(message.data);
+            console.log("POST CREATE; got message");
+            console.log(val);
             let iPP = window.localStorage.getItem("inProgressPost");
-            //console.log("Got a message! it looks like this");
-            //console.log(val);
             let inProgressPk: number = -1;
             if (iPP) inProgressPk = parseInt(iPP as string);
+            console.log(inProgressPk);
             if (val.payload && val.payload.length > 0 && inProgressPk != -1) {
                 for(let p of val.payload){
                     let post = Post.pkify(p.Post);
                     if (post.pk === inProgressPk) {
-                        //console.log("considering whether or not to remount drag and drop");
-                        //console.log(this.inProgressPost === undefined);
-                        if(this.inProgressPost !== undefined){
-                            //console.log(post.layout !== this.inProgressPost!.layout);
-                        }
-                        else{
-                            //console.log("in progress post is undefined");
-                        }
-                        if(this.inProgressPost === undefined || post.layout !== this.inProgressPost!.layout){
-                            this.changeDragAndDrop++;
-                            //console.log("Changing drag and drop!");
-                        }
-                        else{
-                            //console.log("not changing drag and drop");
-                        }
-                            
+                        console.log("trying to update the post we see here.")
+                        console.log(post);
+                        //console.log(this.inProgressPost!.toPost());
+                        
+                        let changed: boolean = this.inProgressPost === undefined || !this.inProgressPost!.toPost().equals(post);
+                        console.log(changed);
+                        if(changed){
+                            if(this.inProgressPost === undefined || post.layout !== this.inProgressPost!.layout){
+                                console.log("changing drag + drop");
+                                this.changeDragAndDrop++;
+                            }
+                            else{
+                                console.log("not changing drag + drop");
+                            }
                     
                         
-                        beginPost(store,{userid: userpk, p: post});
-                        vm.postStatus = PostStatus.Saved;
+                            beginPost(store,{userid: userpk, p: post});
+                            vm.postStatus = PostStatus.Saved;
+                        }
                     }
                 
                 }
