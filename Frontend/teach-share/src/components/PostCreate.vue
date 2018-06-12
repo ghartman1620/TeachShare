@@ -130,29 +130,26 @@
                                     Share
                                 </router-link>
                             </div>
-                            <div class="card background">
-                            <div class="row">
-                            <div class="col-2">
-                                <label for="tagTextbox"><h4><strong>Post Color: </strong></h4></label>
-                            </div>
-                            <!-- <b-dropdown class="m-md-2">
-                                <b-dropdown-item>-->
-                                    <div class="col-10"> 
-                                        <span class="dot" style="background-color: #ffafc5;" @click= "changeColor('#ffafc5')"></span>
-                                        <span class="dot" style="background-color: #ee6055;" @click= "changeColor('#ee6055')"></span>
-                                        <span class="dot" style="background-color: #f2c078;" @click= "changeColor('#f2c078')"></span>
-                                        <span class="dot" style="background-color: #96e6b3;" @click= "changeColor('#96e6b3')"></span>
-                                        <span class="dot" style="background-color: #7797ff;" @click= "changeColor('#7797ff')"></span>
-                                        <span class="dot" style="background-color: #7b4b94;" @click= "changeColor('#7b4b94')"></span>
-                                        <span class="dot" style="background-color: #d2ab99;" @click= "changeColor('#d2ab99')"></span>
-                                        <span class="dot" style="background-color: #0e3b43;" @click= "changeColor('#0e3b43')"></span>
-                                        <span class="dot" style="background-color: #775253;" @click= "changeColor('#775253')"></span>
-                                        <span class="dot" style="background-color: #c9cebd;" @click= "changeColor('#c9cebd')"></span> 
-                                    </div>
-                                <!-- </b-dropdown-item>
-                            </b-dropdown> -->
-                        </div>
-                    </div>
+                            <b-dropdown id="ddown-buttons" text="Post Color" class="m2">
+                            <b-container>
+                            <b-row style="width: 700px">
+                                <b-col cols="12">
+                                <span class="dot" style="background-color: #ffafc5;" @click= "changeColor('#ffafc5', $event)"></span>
+                                <span class="dot" style="background-color: #ee6055;" @click= "changeColor('#ee6055', $event)"></span>
+                                <span class="dot" style="background-color: #ffae03;" @click= "changeColor('#ffae03', $event)"></span>
+                                <span class="dot" style="background-color: #f4d06f;" @click= "changeColor('#f4d06f', $event)"></span>
+                                <span class="dot" style="background-color: #96e6b3;" @click= "changeColor('#96e6b3', $event)"></span>
+                                <span class="dot" style="background-color: #7797ff;" @click= "changeColor('#7797ff', $event)"></span>
+                                <span class="dot" style="background-color: #306bac;" @click= "changeColor('#306bac', $event)"></span>
+                                <span class="dot" style="background-color: #7b4b94;" @click= "changeColor('#7b4b94', $event)"></span>
+                                <span class="dot" style="background-color: #dbcdc6;" @click= "changeColor('#dbcdc6', $event)"></span>
+                                <span class="dot" style="background-color: #775253;" @click= "changeColor('#775253', $event)"></span>
+                                <span class="dot" style="background-color: #596f62;" @click= "changeColor('#596f62', $event)"></span>
+                                <span class="dot" style="background-color: #0e3b43;" @click= "changeColor('#0e3b43', $event)"></span>
+                                </b-col>
+                            </b-row>
+                            </b-container>
+                        </b-dropdown>
 
                         </div>
                         <br>
