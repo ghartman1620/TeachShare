@@ -218,7 +218,8 @@ function verifyAndRefreshLogin(): Promise<any> {
     }
 }
 
-const loginProtectedRoutes = ["create", "posts"];
+const loginProtectedRoutes = ["create", "posts",
+"edit-file", "edit-text", "edit-table", "edit-video", "edit-audio", "edit-image", "permission-add"];
 const loggedOutRoutes = ["login", "register"];
 router.beforeEach((to, from, next) => {
     if (loggedOutRoutes.some(val => val === to.name)) {

@@ -19,6 +19,7 @@
                 </span>
             </a>
         </div>
+        <a href="#" v-on:click.stop="createNewPost()">Create new Post!</a>
     </side-bar>
     <div v-if="currentPage===1">
        
@@ -195,9 +196,9 @@
         <div v-else-if="postStatus === SAVED">
             Saved!
         </div>
-        <b-pagination class="pull-left" size="md" :per-page="10" v-model="currentPage">
-
-        </b-pagination>
+        <b-button variant="primary" @click="currentPage = 1;">Edit post</b-button>
+        <b-button variant="primary" @click="currentPage = 2;">Edit post tags</b-button>
+        
         <button type="button" class="undo-button align-right btn btn-sm btn-outline-danger btn-primary-spacing" @click="undo">
             <font-awesome-icon icon="undo" fixed-width></font-awesome-icon> undo 
         </button>
@@ -330,7 +331,7 @@ export default class PostCreate extends Vue {
     public changeDragAndDrop: number = 0;
     // userPosts: any[] = [];
 
-    public currentPage: number = 0;
+    public currentPage: number = 1;
 
     // these aren't ever saved into InProgressPost, they're here for the purpose
     // of loading in a post's current info when you load up a post.
@@ -436,7 +437,6 @@ export default class PostCreate extends Vue {
         }
     }
     public changeTitle() {
-        console.log("change title called!");
         this.inProgressPost!.saveDraft();
     }
     public createTag() {
@@ -499,8 +499,6 @@ export default class PostCreate extends Vue {
 
         window.localStorage.setItem("inProgressPost", post.pk);
         const user: User = this.getLoggedInUser as  User;
-        console.log("beginning post with post ");
-        console.log(post.pk);
         this.beginPost(user.pk as number, post.pk as number);
     }
     public beginPost(userid: number, postid: number | undefined): void {
@@ -510,6 +508,10 @@ export default class PostCreate extends Vue {
             // So the user fires up post create and wants some posts. We have a few cases.
 
             // One: they've got no inProgressPost item. Most probably they've just logged in.
+            // Or, alternately, this will always happen because taht idiot Gabe procrastinated and 
+            // decided to use the "make a new post every time ytoure at create" workaround
+            // instead of actually adding the fucking new post button he promised like 5 weeks ago.
+            // Thanks Gabe.
 
             // In this case, currently (absolutely subject to change and i'll detail a better approach
             // in just a moment) we'll kindly make them a post and then load that up into their db and 
@@ -527,12 +529,10 @@ export default class PostCreate extends Vue {
             // (as far as a better approach to the first case goes - we shouldn't create a new post until they
             // make some database-savable changes to their post. That way if they just hit reload repeatedly like
             // i'm doing now to test things they won't make a bunch of new posts that are all empty.)
+            console.log("beginniing post from existing post");
             window.localStorage.setItem("inProgressPost", postid.toString());
-            console.log("fetching post " + postid);
             fetchPostSubscribe(this.$store, postid).then((p) => {
                 if(p) {
-                    console.log("begin post")
-                    console.log(p);
                     beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p:p});
                     this.postStatus = this.SAVED;
                 }
@@ -544,6 +544,7 @@ export default class PostCreate extends Vue {
             // but last I heard of it was a brief slack consultation about the current
             // db.rs being unable to create new posts. I know this works, so I'll use it for now.
             // @TODO
+            console.log("begining post from new post");
             api.post('/posts/', {
                 user: getLoggedInUser(vm.$store).pk,
                 content: [],
@@ -562,6 +563,9 @@ export default class PostCreate extends Vue {
             
             // this.postStatus = vm.SAVED;
         }
+    }
+    public createNewPost() {
+        this.beginPost(this.getLoggedInUser.pk, undefined);
     }
     saveLayout() {
         setLayout(this.$store, this.layout);
@@ -619,6 +623,7 @@ export default class PostCreate extends Vue {
         } while (response.data.next !== null);
     }
     created() {
+        console.log("created post reate");
         const inProgressPost: string | null = window.localStorage.getItem("inProgressPost");
 
         // Get previous posts from the users
@@ -627,6 +632,7 @@ export default class PostCreate extends Vue {
         // Were we working on something? Begin post with either that post, or
         // the userid of ourselves to start a completely new one.
         if (inProgressPost === null) {
+            console.log("begin post");
             this.beginPost(
                 // ???? how on earth is this type string | undefined
                 // It's definitely just a number. Look at user.ts.
@@ -643,29 +649,19 @@ export default class PostCreate extends Vue {
         WebSocket.getInstance().addMessageListener((message) => {
             //debugger;
             const val = JSON.parse(message.data);
-            console.log("POST CREATE; got message");
-            console.log(val);
             let iPP = window.localStorage.getItem("inProgressPost");
             let inProgressPk: number = -1;
             if (iPP) inProgressPk = parseInt(iPP as string);
-            console.log(inProgressPk);
             if (val.payload && val.payload.length > 0 && inProgressPk != -1) {
                 for(let p of val.payload){
                     let post = Post.pkify(p.Post);
                     if (post.pk === inProgressPk) {
-                        console.log("trying to update the post we see here.")
-                        console.log(post);
                         //console.log(this.inProgressPost!.toPost());
                         
-                        // let changed: boolean = this.inProgressPost === undefined || !this.inProgressPost!.toPost().equals(post);
-                        // console.log(changed);
-                        //if(changed){
-                            if(this.inProgressPost === undefined || !this.sameLayout(post.layout, this.inProgressPost!.layout)){
-                                console.log("changing drag + drop");
+                        let changed: boolean = this.inProgressPost === undefined || !this.inProgressPost!.toPost().equals(post);
+                        if(changed){
+                            if(this.inProgressPost === undefined || post.layout !== this.inProgressPost!.layout){
                                 this.changeDragAndDrop++;
-                            }
-                            else{
-                                console.log("not changing drag + drop");
                             }
                     
                         
@@ -677,9 +673,10 @@ export default class PostCreate extends Vue {
                 }
                 
             }
-            return undefined;
-        });
-    }
+                return undefined;
+            }});
+        }
+    
 
     mounted() {
         var vm: PostCreate = this;

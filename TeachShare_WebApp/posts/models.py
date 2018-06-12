@@ -99,8 +99,7 @@ SCIENCE_CROSSCUTTING_CONCEPTS = (
     (6, 'Stability and Change'),
     (7, 'Interdependence of Science, Engineering, and Technology'),
     (8, 'Influence of Engineering, Technology, \
-    and Science on Society and the Natural World'),
-    
+    and Science on Society and the Natural World'),    
 )
 
 SUBJECTS = (
@@ -116,20 +115,59 @@ SUBJECTS = (
 #some python shell code I ran to load in all the standards from Math.json.
 #Saved here for posterity incase we need to repeat the process at some point
 #Perhaps for ELA standards?
-'''
-In [27]: for std in obj:
-    ...:     Standard.objects.create(
-    ...:         name=std['title'],
-    ...:         code=std['standard_codes'][0] if len(std['standard_codes']) > 0 else 'N/A',
-    ...:         category=std['subject_domains'][0] if len(std['subject_domains']) > 0 else 'N/A',
-    ...:         grade=(1 if std['grades'][0]=='K' else
-    ...:             (0 if std['grades'][0]=='Pre-K' else int(std['grades'][0])+1)),
-    ...:         description=std['goal_text'],
-    ...:         subject=0,
-    ...:     )
-    ...:
-    ...:
-'''
+def load_standards():
+    import json
+    f = open("scraping/Math.json")
+    content = f.read()
+    obj = json.loads(content)
+    for std in obj:
+        Standard.objects.create(
+            name=std['title'],
+            code=std['standard_codes'][0] if len(std['standard_codes']) > 0 else 'N/A',
+            category=std['subject_domains'][0] if len(std['subject_domains']) > 0 else 'N/A',
+            grade=(1 if std['grades'][0]=='K' else
+                (0 if std['grades'][0]=='Pre-K' else int(std['grades'][0])+1)),
+            description=std['goal_text'],
+            subject=0,
+        )
+
+    f1 = open("scraping/Reading.json")
+    for std in json.loads(f1.read()):
+        Standard.objects.create(
+            name=std['title'],
+            code=std['standard_codes'][0] if len(std['standard_codes']) > 0 else 'N/A',
+            category=std['subject_domains'][0] if len(std['subject_domains']) > 0 else 'N/A',
+            grade=(1 if std['grades'][0]=='K' else
+                (0 if std['grades'][0]=='Pre-K' else int(std['grades'][0])+1)),
+            description=std['goal_text'],
+            subject=1,
+        )
+
+    for std in json.loads(open("scraping/English+Learners.json").read()):
+        Standard.objects.create(
+            name=std['title'],
+            code=std['standard_codes'][0] if len(std['standard_codes']) > 0 else 'N/A',
+            category=std['subject_domains'][0] if len(std['subject_domains']) > 0 else 'N/A',
+            grade=(1 if std['grades'][0]=='K' else
+                (0 if std['grades'][0]=='Pre-K' else int(std['grades'][0])+1)),
+            description=std['goal_text'],
+            subject=1,
+        )
+
+    for std in json.loads(open("scraping/Speech+%26+Language.json").read()):
+        Standard.objects.create(
+            name=std['title'],
+            code=std['standard_codes'][0] if len(std['standard_codes']) > 0 else 'N/A',
+            category=std['subject_domains'][0] if len(std['subject_domains']) > 0 else 'N/A',
+            grade=(1 if std['grades'][0]=='K' else
+                (0 if std['grades'][0]=='Pre-K' else int(std['grades'][0])+1)),
+            description=std['goal_text'],
+            subject=1,
+        )
+
+
+
+
 
 class Standard(models.Model):
     

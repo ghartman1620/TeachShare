@@ -21,48 +21,52 @@
                              authored by {{getOriginalUser().username}}
                     </div>
                     <hr>
-                    <div>
-                        <div :key="element.pk" v-for="element in post.content">
-                            <post-element :element="element"  :index="index"/>
-                        </div>
+                    <span v-if="post.grade !== undefined">
+                        {{getGrade(post.grade)}} </span>
+                    <span v-if="post.subject !== undefined">
+                        {{getSubject(post.subject)}}
+                    </span>
+                    <hr>
+                    <div :key="element.pk" v-for="element in post.content">
+                        <post-element :element="element"  :index="index"/>
                     </div>
-                </div> <!-- div class="col-12" -->
-            </div> <!-- div class="row" -->
-            <hr>
-            <h3>Comments: </h3>
-            <br>
-            <b-row>
-                <b-col cols="12">
-                    <comments
-                        :post="post">
-                    </comments>
-                </b-col>
-            </b-row>
-            <b-row>
-                <b-col cols="12">
-                    <b-container>
-                        <b-form-textarea
-                            :rows="4"
-                            v-model="newCommentText">
-                        </b-form-textarea>
-                        <b-row>
-                            <b-col offset="3" cols="6" offset-md="4" md="5" offset-lg="4" lg="4">
-                                <br>
-                                <b-btn
-                                    @click="submitComment"
-                                    block
-                                    :disabled="!textLength"
-                                    variant="primary">
-                                    <font-awesome-icon icon="check" fixed-width></font-awesome-icon>
-                                    Submit
-                                </b-btn>
-                            </b-col>
-                        </b-row>
-                        <br><br>
-                    </b-container>
-                </b-col>
-            </b-row>
-        </div> <!-- div :id="index"... -->
+                </div>
+            </div> <!-- div class="col-12" -->
+        </div> <!-- div class="row" -->
+        <hr>
+        <h3>Comments: </h3>
+        <br>
+        <b-row>
+            <b-col cols="12">
+                <comments
+                    :post="post">
+                </comments>
+            </b-col>
+        </b-row>
+        <b-row>
+            <b-col cols="12">
+                <b-container>
+                    <b-form-textarea
+                        :rows="4"
+                        v-model="newCommentText">
+                    </b-form-textarea>
+                    <b-row>
+                        <b-col offset="3" cols="6" offset-md="4" md="5" offset-lg="4" lg="4">
+                            <br>
+                            <b-btn
+                                @click="submitComment"
+                                block
+                                :disabled="!textLength"
+                                variant="primary">
+                                <font-awesome-icon icon="check" fixed-width></font-awesome-icon>
+                                Submit
+                            </b-btn>
+                        </b-col>
+                    </b-row>
+                    <br><br>
+                </b-container>
+            </b-col>
+        </b-row>
     </see-more>
 </template>
 
@@ -79,7 +83,7 @@ import Logger from "../logging/logger";
 import {Comment, Post, User} from "../models";
 import { createUpdateComment, getByPost, getCommentsForPost } from "../store_modules/CommentService";
 import { fetchUser, getUserByID, getLoggedInUser } from "../store_modules/UserService";
-
+import { gradeOptions, subjectOptions} from "../superTagOptions";
 @Component({
     components: {
         SeeMore,
@@ -131,6 +135,13 @@ export default class PostComp extends Vue {
     }
     constructor() {
         super();
+    }
+
+    getGrade() {
+        return gradeOptions.find(d => this.post.grade === d.value).text;
+    }
+    getSubject() {
+        return subjectOptions.find(d => this.post.subject === d.value).text;
     }
 
     getOriginalUser(){
@@ -227,6 +238,8 @@ export default class PostComp extends Vue {
         if(this.post.original_user){
             fetchUser(this.$store, this.post.original_user);
         }
+        console.log(this.getGrade());
+        console.log(this.getSubject());
     }
 
 };

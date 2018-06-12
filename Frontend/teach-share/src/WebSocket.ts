@@ -143,8 +143,6 @@ export default class WebSocket {
     }
     private send(val): MessageStatus {
         const msg = JSON.stringify(val);
-        console.log("WEBSOCKET: sendimg essage");
-        console.log(val);
         if (this.rws.readyState ===  ReadyState.Connecting) {
             this.addOpenListener((event) => {
                 this.rws.send(msg);
