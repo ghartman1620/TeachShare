@@ -122,6 +122,14 @@ impl AuthPermission {
         Default::default()
     }
 
+    pub fn get_by_id(auth_pk: i32, db: &DB) -> Result<AuthPermission, DBError> {
+        use schema::auth_permission::dsl::{auth_permission, id};
+        let conn = db.get();
+
+        let auth_p: AuthPermission = auth_permission.filter(id.eq(auth_pk)).first(&*conn)?;
+        Ok(auth_p)
+    }
+
     pub fn get_by_codename(perm_name: String, db: &DB) -> Result<AuthPermission, DBError> {
         use schema::auth_permission::dsl::{auth_permission, codename};
         let conn = db.get();

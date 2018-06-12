@@ -302,10 +302,17 @@ fn handle_get(
     db: &DB,
 ) {
     let mut wrap = Msg::new().set_msg_type(MessageType::Get).build();
+    let mut user: &User = &User::new();
+
+    if let Some(msg_user) = &msg.user {
+        debug!("User making request: {:#?}", msg_user);
+        user = &msg_user;
+    }
 
     for m in &msg.items {
+
         let mut dne_flag = false;
-        let mut db_posts: Vec<(Post, UserObjectPermission)> = vec![];
+        let mut db_posts: Vec<(Post, Vec<UserPermission>)> = vec![];
         {
             // immutably borrow cache
             let mut cache = cash.borrow();
@@ -317,6 +324,23 @@ fn handle_get(
                 Model::Comment(c) => cache.get(ID::Comment(c.id)),
             };
 
+            result_data.clone().map(|resource| {
+                // technically, we only need the variant to check the permission. 
+                let mut perm = UserPermission::ViewPost(HashSet::new());
+
+                // to add a permission, or related functionality. This won't HURT
+                // the call to has_permission, but it isn't required, and won't be used
+                // in any way.
+                perm.insert(UserID::create(user.id));
+                
+                // actually check the permission in the resource
+                let has_perm = resource.has_permission(&user, &perm);
+                debug!("The permission check returns: {}.", has_perm);
+                if !has_perm {
+                    return;
+                }
+            });
+
             if result_data.is_none() {
                 // 1.) get it from the db...
                 // 2.) confirm permissions
@@ -327,6 +351,9 @@ fn handle_get(
                     Model::Post(p) => p.id,
                     _ => unimplemented!(),
                 };
+
+                let just_post = Post::get_and_perm(id, db);
+                info!("JUST_POST: {:#?}", just_post);
 
                 // get post from the database
                 let post_result = Post::get_and_perm(id, db);
@@ -357,13 +384,20 @@ fn handle_get(
                 let mut resource_new = Resource::new(Model::Post(first.0.clone()));
                 
                 // generate permission object
-                let mut permission = UserPermission::ViewPost(HashSet::new());
-                permission.insert(UserID::new());
+                // @FIXME: this is just for testing!!
+                let mut permission = &first.1;
+                
+                // UserPermission::ViewPost(HashSet::new());
+                // per/mission.insert(UserID::create(first.1.user_id));
                 
                 // insert permission into resource
-                resource_new.add_permission(permission);
-
+                for p in permission.iter() {
+                    resource_new.add_permission(p);
+                }
+                
                 let inserted = cache.put(ID::Post(first.0.id), resource_new.clone());
+                debug!("Cache-Snapshot: {:#?}", cache);
+
                 match inserted {
                     Some(val) => {
                         debug!(

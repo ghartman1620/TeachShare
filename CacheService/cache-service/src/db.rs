@@ -4,12 +4,13 @@ use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::{result, update};
 use dotenv::dotenv;
+use std::collections::HashSet;
 
-use models::Post;
+use models::{Post, UserPermission, UserID};
 use schema::django_content_type;
 use schema::guardian_userobjectpermission;
 use schema::posts_post;
-use users::User;
+use users::{User, AuthPermission, AuthEntry};
 
 use serde_json::value::Value;
 use std::env;
@@ -153,21 +154,23 @@ impl DjangContentType {
     }
 }
 
-impl Refresh for UserObjectPermission {
-    type Model = UserObjectPermission;
-    fn refresh(&mut self) -> Option<&Self::Model> {
-        let db = DB::new();
-        match UserObjectPermission::get_by_id(self.id, self.content_type_id, &db) {
-            Ok(val) => {
-                *self = val;
-            }
-            Err(db_err) => {
-                error!("Error: {:?}", db_err);
-            }
-        }
-        Some(self)
-    }
-}
+// impl Refresh for UserObjectPermission {
+//     type Model = UserObjectPermission;
+//     fn refresh(&mut self) -> Option<&Self::Model> {
+//         let db = DB::new();
+//         for uop in &UserObjectPermission::get_by_id(self.id, self.content_type_id, &db) {
+//             match uop {
+//                 Ok(val) => {
+//                     *self = val;
+//                 }
+//                 Err(db_err) => {
+//                     error!("Error: {:?}", db_err);
+//                 }
+//             }
+//         }
+//         Some(self)
+//     }
+// }
 
 #[derive(Associations, Identifiable, Queryable, Insertable, Serialize, Deserialize, Debug, Clone,
          PartialEq, Default)]
@@ -196,7 +199,7 @@ impl UserObjectPermission {
         Ok(response)
     }
 
-    fn get_by_id(obj_id: i32, content_type: i32, db: &DB) -> Result<UserObjectPermission, DBError> {
+    fn get_by_id(obj_id: i32, content_type: i32, db: &DB) -> Result<Vec<UserObjectPermission>, DBError> {
         use schema::guardian_userobjectpermission::dsl::{
             content_type_id, guardian_userobjectpermission, object_pk,
         };
@@ -206,7 +209,7 @@ impl UserObjectPermission {
         let response = guardian_userobjectpermission
             .filter(object_pk.eq(id_str))
             .filter(content_type_id.eq(content_type))
-            .first(&*session)?;
+            .load(&*session)?;
         debug!("UserObjectPermission => {:?}", response);
         Ok(response)
     }
@@ -307,22 +310,49 @@ impl Post {
     }
 
     pub fn get(pk_id: i32, conn: &PgConnection) -> Result<Post, result::Error> {
-        use schema::posts_post::dsl::{posts_post};
-        posts_post.find(pk_id).first::<Post>(conn)
+        use schema::posts_post::dsl::{posts_post, id};
+        posts_post.filter(id.eq(pk_id)).first::<Post>(conn)
     }
 
-    pub fn get_and_perm(pk_id: i32, db: &DB) -> Result<(Post, UserObjectPermission), DBError> {
+    pub fn get_and_perm(pk_id: i32, db: &DB) -> Result<(Post, Vec<UserPermission>), DBError> {
+        warn!("starting get_and_perm..");        
         let conn = db.get();
         let post = Post::get(pk_id, &*conn)?;
         debug!("{:#?}", post);
+        warn!("after post in get_and_perm.."); 
         
         let ct = DjangContentType::get_dct_by_model(db, "post")?;
         debug!("{:#?}", ct);
+        warn!("after content_type in get_and_perm..");    
         
         let perm = UserObjectPermission::get_by_id(pk_id, ct.id, db)?;
         debug!("{:#?}", perm);
+        warn!("after user_object_permission in get_and_perm..");    
+        let mut types = vec![];
         
-        Ok((post, perm))
+        for p in &perm {
+            if let Ok(perm_type) = AuthPermission::get_by_id(p.permission_id, db) {
+                types.push((p, perm_type));
+            }
+        }
+        debug!("{:#?}", types);
+        warn!("after AuthPermission in get_and_perm..");
+        let permissions: Vec<_> = types.iter().map(|(p, p_t)| {
+            let mut hs = HashSet::new();
+            hs.insert(UserID::create(p.user_id));
+            match &p_t.codename[..] {
+                "change_post" => {
+                    UserPermission::ChangePost(hs)
+                },
+                "view_post" => {
+                    UserPermission::ViewPost(hs)
+                },
+                _ => unimplemented!(),
+            }
+        }).collect();
+        debug!("permissions -------> {:#?}", permissions);
+        
+        Ok((post, permissions))
     }
 
     pub fn save(&self, conn: &PgConnection) -> Result<(), String> {

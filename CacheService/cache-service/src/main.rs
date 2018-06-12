@@ -101,20 +101,19 @@ impl GrandSocketStation {
         }
     }
     pub fn duration_valid(t: chrono::DateTime<Utc>) -> Option<Duration> {
-        let difference = t - Utc::now();
-        println!("The difference is: {:?}", difference);
-        let hours = difference.num_hours();
-        let difference = difference - Duration::hours(hours);
+        let original = t - Utc::now();
+        let hours = original.num_hours();
+        let difference = original - Duration::hours(hours);
         let min = difference.num_minutes();
-        println!(
+        trace!(
             "Hours: {:?}, Difference: {:?}, Minutes: {:?}",
             hours, difference, min
         );
 
-        if difference < Duration::hours(0) {
+        if original < Duration::hours(0) {
             return None;
         }
-        Some(difference)
+        Some(original)
     }
 
     pub fn get_connections(&self) -> &Vec<Rc<Connection>> {
@@ -402,6 +401,7 @@ impl Handler for Connection {
     }
 
     fn on_error(&mut self, err: Error) {
+        self.remove_client();
         debug!("on_error: {:?}", self);
         error!("The server encountered an error: {:?}", err);
     }
@@ -505,7 +505,7 @@ impl Connection {
         info!("handle_get: {:?}", self);
         trace!("[MAIN] received: {:?}", msg.message);
         assert_eq!(msg.message, MessageType::Get);
-        let mut return_message = Msg::new().set_msg_type(MessageType::Get).build();
+        let mut cache_msg = Msg::new().set_msg_type(MessageType::Get).build();
 
         let mut p = Post::new();
         p.id = match msg.id {
@@ -513,11 +513,14 @@ impl Connection {
             None => return Some(String::from("No Post ID provided.")),
         };
 
-        return_message
+        cache_msg
             .items
             .push(Resource::new(Model::Post(p)));
 
-        match self.to_cache.send(Arc::new(return_message)) {
+        cache_msg.user = self.user.clone(); // could still be none, of course
+        debug!("Message to cache: {:#?}", cache_msg);
+
+        match self.to_cache.send(Arc::new(cache_msg)) {
             Ok(_) => {}
             Err(e) => {
                 error!("[Error] ---> {:?}", e);
@@ -912,7 +915,7 @@ fn main() {
 
         let h = &mut hub.borrow_mut();
         h.push_connection(conn.clone());
-        value = Some(conn.clone());
+        // value = Some(conn.clone());
         *i += 1;
         // value.unwrap()
         conn

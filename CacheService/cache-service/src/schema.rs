@@ -130,8 +130,8 @@ table! {
         id -> Int4,
         object_pk -> Varchar,
         content_type_id -> Int4,
-        permission_id -> Int4,
         user_id -> Int4,
+        permission_id -> Int4,
     }
 }
 
