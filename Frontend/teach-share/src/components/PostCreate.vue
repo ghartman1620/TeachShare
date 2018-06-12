@@ -435,7 +435,6 @@ export default class PostCreate extends Vue {
         }
     }
     public changeTitle() {
-        console.log("change title called!");
         this.inProgressPost!.saveDraft();
     }
     public createTag() {
@@ -498,8 +497,6 @@ export default class PostCreate extends Vue {
 
         window.localStorage.setItem("inProgressPost", post.pk);
         const user: User = this.getLoggedInUser as  User;
-        console.log("beginning post with post ");
-        console.log(post.pk);
         this.beginPost(user.pk as number, post.pk as number);
     }
     public beginPost(userid: number, postid: number | undefined): void {
@@ -528,11 +525,8 @@ export default class PostCreate extends Vue {
             // make some database-savable changes to their post. That way if they just hit reload repeatedly like
             // i'm doing now to test things they won't make a bunch of new posts that are all empty.)
             window.localStorage.setItem("inProgressPost", postid.toString());
-            console.log("fetching post " + postid);
             fetchPostSubscribe(this.$store, postid).then((p) => {
                 if(p) {
-                    console.log("begin post")
-                    console.log(p);
                     beginPost(vm.$store, {userid: getLoggedInUser(vm.$store).pk, p:p});
                     this.postStatus = this.SAVED;
                 }
@@ -620,29 +614,19 @@ export default class PostCreate extends Vue {
         WebSocket.getInstance().addMessageListener((message) => {
             //debugger;
             const val = JSON.parse(message.data);
-            console.log("POST CREATE; got message");
-            console.log(val);
             let iPP = window.localStorage.getItem("inProgressPost");
             let inProgressPk: number = -1;
             if (iPP) inProgressPk = parseInt(iPP as string);
-            console.log(inProgressPk);
             if (val.payload && val.payload.length > 0 && inProgressPk != -1) {
                 for(let p of val.payload){
                     let post = Post.pkify(p.Post);
                     if (post.pk === inProgressPk) {
-                        console.log("trying to update the post we see here.")
-                        console.log(post);
                         //console.log(this.inProgressPost!.toPost());
                         
                         let changed: boolean = this.inProgressPost === undefined || !this.inProgressPost!.toPost().equals(post);
-                        console.log(changed);
                         if(changed){
                             if(this.inProgressPost === undefined || post.layout !== this.inProgressPost!.layout){
-                                console.log("changing drag + drop");
                                 this.changeDragAndDrop++;
-                            }
-                            else{
-                                console.log("not changing drag + drop");
                             }
                     
                         

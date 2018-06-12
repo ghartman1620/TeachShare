@@ -262,8 +262,6 @@ export class Post extends Model {
         }
     }
     private static compareObj(obj1: any, obj2: any): boolean{
-        console.log(obj1);
-        console.log(obj2);
         let keys1 = Object.keys(obj1);
         let keys2 = Object.keys(obj2);
         for (let key of keys1) {
@@ -320,11 +318,7 @@ export class Post extends Model {
         }];
     }
 
-    
-
     public equals(other: Post): boolean{
-        console.log(this);
-        console.log(other);
         //debugger;
         // check layout
         if (this.layout.length !== other.layout.length) {
@@ -344,8 +338,6 @@ export class Post extends Model {
         for (let i: number = 0; i < this.content.length; i++){
             const ele1 = this.content[i];
             const ele2 = other.content[i];
-            console.log(ele1);
-            console.log(ele2);
             if (!Post.compareObj(ele1, ele2)) {
                 return false;
             }

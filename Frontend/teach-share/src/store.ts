@@ -102,9 +102,7 @@ import {getMap, mutCreate, mutUpdate} from "./store_modules/PostService";
 */
 WebSocket.getInstance().addMessageListener( (msg) => {
     const val = JSON.parse(msg.data);
-
-    console.log("STORE: got message");
-    console.log(val);
+    
     const db: Database = Database.getInstance();
     const keys = Object.keys(val);
     if (val.versions && val.payload) {
@@ -129,6 +127,8 @@ WebSocket.getInstance().addMessageListener( (msg) => {
                 // it already exists in the store
                 mutUpdate(store, pkifiedPost);
             } else {
+                console.log("saving post to store");
+                console.log(pkifiedPost);1
                 // it didn't already exist in the store - now it does!
                 mutCreate(store, pkifiedPost);
             }

@@ -16,6 +16,8 @@
                         </span>
                     </h4>
                     <hr>
+                    abc123
+                    {{post.original_post}}
                     <div v-if="post.original_post" style="text-align: center;">
                         This post was derived from a <router-link :to="{name: 'detail', params: {post_id: post.original_post}}">post</router-link>
                              authored by {{getOriginalUser().username}}

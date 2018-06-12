@@ -73,7 +73,6 @@ export class InProgressPost {
             } else {
                 this.pk = post.pk;
             }
-            console.log(this);
         // I do believe this is currently never reached. Let's add a loud console error incase it is.
         } else {
             //this might happen if i change it to njust always make a new post when you refresh 
@@ -192,7 +191,6 @@ export class InProgressPost {
         this.saveDraft();
     }
     public setLayout(layout: ILayout[]): void {
-        console.log("setting layout!");
         this.layout = layout;
         this.saveDraft();
     
@@ -202,11 +200,7 @@ export class InProgressPost {
         this.saveDraft();
     }
     public setTitle(title: string): void {
-        console.log("set title called");
         this.title = title;
-        console.log("set title!")
-        console.log(this.title)
-        console.log(title);
         this.saveDraft();
     }
     public setGrade(grade: number): void {
@@ -303,8 +297,6 @@ export class InProgressPost {
         /*api.put("posts/" + this.pk + "/", this.json()).then(function(response){
             post.status = PostStatus.Saved;
         })*/
-        console.log(this.toPost());
-        console.log(this.title);
         Database.getInstance().putPost(this.toPost(), 1); // @TODO: is this right?
         WebSocket.getInstance().sendUpdate(this.toPost());
         // in the future - potentially some kind of ack message sent back to indicate to user post was saved?
