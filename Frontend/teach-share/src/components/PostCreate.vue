@@ -538,6 +538,7 @@ export default class PostCreate extends Vue {
                 }
             });
         } else {
+            console.log("Before request");
             //this is a little bit silly currently - use the api to create a post, then
             // use websockets to subscribe to it. I know there's a create message in the works
             // but last I heard of it was a brief slack consultation about the current
@@ -551,11 +552,12 @@ export default class PostCreate extends Vue {
             }).then((response) => {
                 this.thisUserPosts.push(response.data.pk);
                 window.localStorage.setItem("inProgressPost", response.data.pk.toString());
-                console.log
                 // We're not even going to bother dealing with the response from fetch post.
                 // It will always be undefined because this will never be a cache hit - it can't possibly be,
                 // seeing as we just right above made this post!
                 fetchPostSubscribe(vm.$store, response.data.pk);
+                console.log("After request");
+
             })
             
             // this.postStatus = vm.SAVED;
@@ -564,7 +566,9 @@ export default class PostCreate extends Vue {
     saveLayout() {
         setLayout(this.$store, this.layout);
     }
-    //manual check if the pertinent parts of a layout are the same
+
+    //manually check if the pertinent parts of a layout are the same
+
     sameLayout(layout1 : Object[], layout2: Object[]) : boolean {
         var same : boolean = false;
         if (layout1.length === layout2.length) { //auto-fail.
@@ -653,10 +657,10 @@ export default class PostCreate extends Vue {
                         console.log(post);
                         //console.log(this.inProgressPost!.toPost());
                         
-                        let changed: boolean = this.inProgressPost === undefined || !this.inProgressPost!.toPost().equals(post);
-                        console.log(changed);
-                        if(changed){
-                            if(this.inProgressPost === undefined || post.layout !== this.inProgressPost!.layout){
+                        // let changed: boolean = this.inProgressPost === undefined || !this.inProgressPost!.toPost().equals(post);
+                        // console.log(changed);
+                        //if(changed){
+                            if(this.inProgressPost === undefined || !this.sameLayout(post.layout, this.inProgressPost!.layout)){
                                 console.log("changing drag + drop");
                                 this.changeDragAndDrop++;
                             }
@@ -667,7 +671,7 @@ export default class PostCreate extends Vue {
                         
                             beginPost(store,{userid: userpk, p: post});
                             vm.postStatus = PostStatus.Saved;
-                        }
+                        //}
                     }
                 
                 }

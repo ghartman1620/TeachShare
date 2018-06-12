@@ -97,6 +97,21 @@ export default class DragAndDrop extends Vue {
         removeElement(this.$store, index);
     }
 
+    sameLayout(layout1 : Object[], layout2 : Object[]) : boolean {
+        var same : boolean = false;
+        if (layout1.length === layout2.length) {
+            same = true;
+            for (var i = 0; i < layout1.length; i++ ) {
+                if (layout1[i]["i"] === layout2[i]["i"] ||
+                    layout1[i]["x"] === layout2[i]["x"] ||
+                    layout1[i]["y"] === layout2[i]["y"] ||
+                    layout1[i]["w"] === layout2[i]["w"] ||
+                    layout1[i]["h"] === layout2[i]["h"])
+                    same = false;
+            }
+        }
+        return same;
+    }
 
     updateDimensions ()
     {
@@ -179,7 +194,7 @@ export default class DragAndDrop extends Vue {
                     console.error("a layout item doesn't have y or h: it is");
                     console.error(lowestItem);    
                 }
-                var newPosition = lowestItem.y + lowestItem.h + this.marginHeight;
+                var newPosition = lowestItem.y + lowestItem.h;
                 var newIndex : string = storeLayout.length.toString();
                 this.layout.push({"x":0, "y":newPosition, "w":2, "h":this.defaultHeight, "i":newIndex});
                 console.log("layout in draganddrop mounted hook: ");

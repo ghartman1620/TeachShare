@@ -128,11 +128,11 @@ export default class Database {
 // clear all of the posts out of the database - for debugging purposes only!
 // remove me in production or unnecessary performance loss will happen
 
-/*Database.getInstance().manifest().then((manifest) => {
+Database.getInstance().manifest().then((manifest) => {
     for (const idAndVersion of manifest) {
         Database.getInstance().deletePost(idAndVersion!.id);
     }
-});*/
+});
 // I also put this here so it happens on page load. It's as good a place as any.
 // Again, for debugging purposes.
 

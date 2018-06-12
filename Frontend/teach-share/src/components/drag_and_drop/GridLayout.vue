@@ -191,6 +191,7 @@
             }
         },
         methods: {
+            
             deleteElement (index) {
             },
             layoutUpdate() {

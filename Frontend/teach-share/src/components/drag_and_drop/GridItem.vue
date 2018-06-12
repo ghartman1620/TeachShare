@@ -92,6 +92,7 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
         border-radius: 5px;
         box-shadow: $card-shadow;
         image-rendering: pixelated;
+        height: 310px;
         // margin: auto;
         // position: absolute;
         // top: 0;
@@ -102,7 +103,7 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
     }
 
     .post-element {
-        image-rendering: pixelated;
+        height: 220px;
     }
 
     .vue-draggable-handle {
@@ -331,6 +332,8 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
         inject: ["eventBus"],
         data: function () {
             return {
+                
+                update: 0,
                 dimensionsEmitted: false,
                 elementDimensions: {},
                 cols: 1,
@@ -361,6 +364,7 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
                 innerY: this.y,
                 innerW: this.w,
                 innerH: this.h
+
 
             }
         },
@@ -566,6 +570,10 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
                 } else {
                     return 'vue-resizable-handle';
                 }
+            },
+            getType() {
+                return getCurrentPost(this.$store).elements[index].type;
+                update++;
             }
         },
         methods: {
@@ -588,10 +596,11 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
                 this.$router.push(loc);
             },
 
-            emitDimensions: function(){
-                var cardHeight = document.getElementById('element-'+this.i).clientHeight;
+            emitDimensions: function() {
+                // var cardHeight = document.getElementById('element-'+this.i).offsetHeight;
+
                 this.elementDimensions["index"] = this.i;
-                this.elementDimensions["height"] = cardHeight;
+                this.elementDimensions["height"] = 330;
                 this.dimensionsEmitted = true;
                 console.log("New dimensions emitted from GridItem: ", this.elementDimensions);
                 this.$emit('update-layout', this.elementDimensions, false);
@@ -743,7 +752,6 @@ $card-shadow: 4px 8px 8px -1px rgba(0, 0, 0, 0.4);
                     case "dragstart":
                         this.previousX = this.innerX;
                         this.previousY = this.innerY;
-
                         var parentRect = event.target.offsetParent.getBoundingClientRect();
                         var clientRect = event.target.getBoundingClientRect();
                         if (this.renderRtl) {
