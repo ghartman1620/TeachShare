@@ -136,4 +136,4 @@ export default class Database {
 // I also put this here so it happens on page load. It's as good a place as any.
 // Again, for debugging purposes.
 
-window.localStorage.removeItem("inProgressPost");
+//window.localStorage.removeItem("inProgressPost");

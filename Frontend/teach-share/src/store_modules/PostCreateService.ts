@@ -183,9 +183,7 @@ export const actions = {
 
             context.commit(mut.mutation, mut.arg);
 
-            const response = await saveDraft(context).catch((err) =>
-                console.error(err)
-            );
+            saveDraft(context);
             // context.dispatch("saveDraft").then(res => console.error(res));
         }
     },
@@ -229,7 +227,7 @@ export const actions = {
     editElement: (context: PostContext, editedElement: EditedElement) => {
         context.commit("EDIT_ELEMENT", editedElement);
         context.commit("CLEAR_REDO");
-        context.dispatch("saveDraft").then((res) => console.error(res));
+        context.dispatch("saveDraft");
     },
     saveDraft: (ctx: PostContext) => {
         ctx.commit("SAVE_DRAFT");
