@@ -367,6 +367,7 @@ impl Handler for Connection {
                         MessageType::Watch => self.handle_watch_msg(msg),
                         MessageType::Update => self.handle_update_msg(msg),
                         MessageType::Manifest => self.handle_manifest_msg(msg),
+                        MessageType::Failed => self.handle_failure(msg),
                     },
                     Err(e) => Some(format!(
                         "There is a terrible error parsing {:?}: {:?}",
@@ -536,6 +537,16 @@ impl Connection {
             }
         };
 
+        debug!("msg_type: {:?}", resp.msg_type);
+        match resp.msg_type {
+            MessageType::Failed => {
+                let resp_err = "Invalid permissions to access requested object.".to_owned();
+                error!("{}", &resp_err[..]);
+                return Some(resp_err);
+            },
+            _ => {},
+        }
+
         let resp_data: Vec<Model> = resp.items.iter().map(|x| x.data.clone()).collect();
         let versions: Vec<u64> = resp.items.iter().map(|resource| resource.version).collect();
 
@@ -677,6 +688,8 @@ impl Connection {
             wrap.items.push(Resource::new(Model::Post(post)));
         }
 
+        wrap.user = self.user.clone();
+
         match self.to_cache.send(Arc::new(wrap)) {
             Ok(val) => {
                 debug!("Sucessfully sent and got in return: {:?}", val);
@@ -797,7 +810,9 @@ impl Connection {
             Err(e) => Some(format!("Err: {:?}", e)),
         }
     }
+    fn handle_failure(&self, msg: WSMessage) -> Option<String> { None }
 }
+
 
 fn start_db_pool() -> (
     crossbeam_channel::Sender<models::Post>,

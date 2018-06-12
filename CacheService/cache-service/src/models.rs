@@ -285,8 +285,6 @@ impl Resource {
                 } else { return false }
             },
         }
-        // }
-        false
     }
 
     pub fn add_watch(&mut self, id: i32) {
@@ -329,6 +327,7 @@ pub enum MessageType {
     Create,
     Update,
     Get,
+    Failed,
 }
 
 #[derive(Clone, Debug)]

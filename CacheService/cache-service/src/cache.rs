@@ -188,6 +188,9 @@ pub fn cache_thread(
                                 handle_manifest(msg, c, &ret_pipe, &conn);
                             }
                         },
+                        MessageType::Failed => {
+                            warn!("recieved a 'failed' msg type.")
+                        },
                     };
 
                 trace!("[CACHE] (current) -> {:?}", cache);
@@ -303,6 +306,7 @@ fn handle_get(
 ) {
     let mut wrap = Msg::new().set_msg_type(MessageType::Get).build();
     let mut user: &User = &User::new();
+    let mut add_permission = false;
 
     if let Some(msg_user) = &msg.user {
         debug!("User making request: {:#?}", msg_user);
@@ -318,28 +322,13 @@ fn handle_get(
             let mut cache = cash.borrow();
 
             // Get the inner cache data, if exists
-            let result_data: Option<&Resource> = match &m.data {
+            let mut result_data: Option<&Resource> = match &m.data {
                 Model::Post(p) => cache.get(ID::Post(p.id)),
                 Model::User(u) => cache.get(ID::User(u.id)),
                 Model::Comment(c) => cache.get(ID::Comment(c.id)),
             };
 
-            result_data.clone().map(|resource| {
-                // technically, we only need the variant to check the permission. 
-                let mut perm = UserPermission::ViewPost(HashSet::new());
-
-                // to add a permission, or related functionality. This won't HURT
-                // the call to has_permission, but it isn't required, and won't be used
-                // in any way.
-                perm.insert(UserID::create(user.id));
-                
-                // actually check the permission in the resource
-                let has_perm = resource.has_permission(&user, &perm);
-                debug!("The permission check returns: {}.", has_perm);
-                if !has_perm {
-                    return;
-                }
-            });
+            debug!("RESULT_DATA: {:#?}", result_data);
 
             if result_data.is_none() {
                 // 1.) get it from the db...
@@ -394,6 +383,7 @@ fn handle_get(
                 for p in permission.iter() {
                     resource_new.add_permission(p);
                 }
+                debug!("resource_new: {:?}", resource_new);
                 
                 let inserted = cache.put(ID::Post(first.0.id), resource_new.clone());
                 debug!("Cache-Snapshot: {:#?}", cache);
@@ -413,6 +403,27 @@ fn handle_get(
             }
         }
     }
+    for r in &wrap.items {
+        let mut perm = UserPermission::ViewPost(HashSet::new());
+        // to add a permission, or related functionality. This won't HURT
+        // the call to has_permission, but it isn't required, and won't be used
+        // in any way.
+        perm.insert(UserID::create(user.id));
+        
+        // actually check the permission in the resource
+        let has_perm = r.has_permission(&user, &perm);
+        debug!("The permission check returns: {}.", has_perm);
+        debug!("{:?}", r);
+        if !has_perm {
+            let failure_msg = Msg::new().set_msg_type(MessageType::Failed).build();
+            match ret_pipe.send(Arc::new(failure_msg)) {
+                Ok(val) => debug!("[CACHE] Successfully sent return value: {:?}", val),
+                Err(e) => error!("[CACHE] Error: {:?}", e),
+            };
+            return;
+        }
+    }
+    
     match ret_pipe.send(Arc::new(wrap)) {
         Ok(val) => debug!("[CACHE] Successfully sent return value: {:?}", val),
         Err(e) => error!("[CACHE] Error: {:?}", e),
@@ -657,6 +668,11 @@ fn handle_update(
     let mut cache_mut = cash.borrow_mut();
     let all_watchers = &mut vec![];
     let all_versions = &mut vec![];
+    let mut user: &User = &User::new();
+
+    if let Some(ref user_msg) = msg.user {
+        user = user_msg;
+    }
 
     for m in &msg.items {
         {
@@ -678,8 +694,14 @@ fn handle_update(
         match &m.data {
             Model::Post(post) => {
                 if let Some(entry) = cache_mut.get_mut(ID::Post(post.id)) {
+                    debug!("Entry --------------> {:?}", entry);
                     let old_watchers = entry.watchers.clone();
                     let old_version = entry.version;
+
+                    // this should maintain everything in the resource but the actual post data
+                    entry.data = Model::Post(post.clone());
+                    debug!("Entry --------------> {:?}", entry);
+
                     *entry = Resource::new(Model::Post(post.clone()));
                     entry.watchers.clear();
                     entry.watchers.extend(old_watchers);
@@ -698,6 +720,7 @@ fn handle_update(
             }
             _ => unimplemented!(),
         }
+        debug!("Entry --------------> {:?}", &m);
     }
 
     info!("Versions: {:?}", all_versions);
@@ -711,6 +734,7 @@ fn handle_update(
                 let mut resource = Resource::new(Model::Post(post.clone()));
                 resource.version = all_versions[i];
                 watchers.iter().for_each(|watch| resource.add_watch(*watch));
+                debug!("[update] {:?}", resource);
                 just_resources.push(resource);
             }
             _ => unimplemented!(),
