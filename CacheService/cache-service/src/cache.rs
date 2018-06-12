@@ -669,6 +669,7 @@ fn handle_update(
     let all_watchers = &mut vec![];
     let all_versions = &mut vec![];
     let mut user: &User = &User::new();
+    let mut resources_all = vec![];
 
     if let Some(ref user_msg) = msg.user {
         user = user_msg;
@@ -690,6 +691,8 @@ fn handle_update(
                 _ => unimplemented!(),
             }
         }
+        
+
         // insert updates
         match &m.data {
             Model::Post(post) => {
@@ -700,7 +703,9 @@ fn handle_update(
 
                     // this should maintain everything in the resource but the actual post data
                     entry.data = Model::Post(post.clone());
-                    debug!("Entry --------------> {:?}", entry);
+                    // debug!("Entry --------------> {:?}", entry);
+                    
+                    resources_all.push(entry.clone());
 
                     *entry = Resource::new(Model::Post(post.clone()));
                     entry.watchers.clear();
@@ -727,15 +732,16 @@ fn handle_update(
     info!("Watchers: {:?}", all_watchers);
 
     let mut just_resources: Vec<Resource> = vec![];
-    for (i, item) in msg.items.iter().enumerate() {
-        match item.data {
+    for (i, item) in resources_all.iter().enumerate() {
+        match item.data {    //    -  [2] watchers list to send updates to
+
             Model::Post(ref post) => {
                 let watchers = item.watchers.clone();
-                let mut resource = Resource::new(Model::Post(post.clone()));
-                resource.version = all_versions[i];
-                watchers.iter().for_each(|watch| resource.add_watch(*watch));
-                debug!("[update] {:?}", resource);
-                just_resources.push(resource);
+                let res = item.clone();
+                // resource.version = all_versions[i];
+                // watchers.iter().for_each(|watch| resource.add_watch(*watch));
+                debug!("[update] {:?}", res);
+                just_resources.push(res.clone());
             }
             _ => unimplemented!(),
         }
